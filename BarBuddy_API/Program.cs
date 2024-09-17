@@ -1,18 +1,21 @@
-using BarBuddy_API;
-using Infrastructure;
+using BarBuddy_API.DependencyInjection;
+using FarmerOnlineApi.Middleware;
+using Infrastructure.DependencyInjection;
+using Microsoft.OpenApi.Models;
+using Persistence.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//Config
-builder.Services.AddPackages();
-builder.Services.AddInfrastructure();
+// DI
+builder.Services.AddPresentation(builder.Configuration);
+
 
 var app = builder.Build();
 
@@ -22,10 +25,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseHttpsRedirection();
 app.UseCors("AllowReactBarBuddy");
+
+// Middleware configuration
+app.UseRouting();
 
 app.UseHttpsRedirection();
 
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();
