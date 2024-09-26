@@ -1,12 +1,7 @@
 ﻿using Application.Mappers;
-using Domain.Interfaces;
 using Domain.IRepository;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Persistence.Data;
-using Persistence.DependencyInjection;
 using Persistence.Repository;
 
 namespace Infrastructure.DependencyInjection
@@ -35,13 +30,6 @@ namespace Infrastructure.DependencyInjection
 
 
 
-        //public static void AddDatabase(this IServiceCollection services, IConfiguration configuration)
-        //{
-        //    services.AddDbContext<MyDbContext>(options =>
-        //        options.UseSqlServer(configuration.GetConnectionString("Default"),
-        //        b => b.MigrationsAssembly(typeof(DIPersistance).Assembly.FullName)),
-        //        ServiceLifetime.Scoped);
-        //}
 
         public static void AddServices(this IServiceCollection services)
         {

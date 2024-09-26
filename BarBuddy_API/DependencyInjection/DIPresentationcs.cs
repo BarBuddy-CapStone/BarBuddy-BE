@@ -1,5 +1,6 @@
 ﻿using Infrastructure.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Persistence.DependencyInjection;
 
 namespace BarBuddy_API.DependencyInjection
 {
@@ -7,11 +8,15 @@ namespace BarBuddy_API.DependencyInjection
     {
         public static IServiceCollection AddPresentation(this IServiceCollection services, IConfiguration configuration)
         {
-            // Swagger lock
+
+            //Swagger
             services.AddSwagger();
 
-            // Lien ket Infrastructure
+            //DI Infrastructure
             services.AddInfrastructure(configuration);
+
+            //DI Persistence
+            services.AddPersistence(configuration);
             return services;
         }
 
@@ -32,23 +37,24 @@ namespace BarBuddy_API.DependencyInjection
                 });
 
                 option.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
                 {
+                    Reference = new OpenApiReference
                     {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            },
-                            Scheme = "oauth2",
-                            Name = "Bearer",
-                            In = ParameterLocation.Header
-                        },
-                        new List<string>()
-                    }
-                });
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    },
+                    Scheme = "oauth2",
+                    Name = "Bearer",
+                    In = ParameterLocation.Header
+                },
+                new List<string>()
+            }
+        });
             });
         }
+
     }
 }

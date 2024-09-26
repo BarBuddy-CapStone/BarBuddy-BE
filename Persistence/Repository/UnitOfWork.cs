@@ -1,4 +1,4 @@
-﻿using Domain.Interfaces;
+﻿using Domain.IRepository;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Data;
 using System;

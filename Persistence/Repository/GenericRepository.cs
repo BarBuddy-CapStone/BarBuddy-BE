@@ -1,4 +1,4 @@
-﻿using Domain.Interfaces;
+﻿using Domain.IRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Persistence.Data;
@@ -113,48 +113,48 @@ namespace Persistence.Repository
             return await dbSet.FindAsync(id);
         }
 
-        public async Task<IPaginatedList<TEntity>> GetPagging(IQueryable<TEntity> query, int? pageIndex, int? pageSize)
-        {
-            // Kiểm tra xem query có hỗ trợ IAsyncQueryProvider hay không
-            if (query.Provider is IAsyncQueryProvider)
-            {
-                // Đảm bảo rằng truy vấn đang được thực hiện trên cơ sở dữ liệu với Entity Framework
-                query = query.AsNoTracking();
+        //public async Task<IPaginatedList<TEntity>> GetPagging(IQueryable<TEntity> query, int? pageIndex, int? pageSize)
+        //{
+        //    // Kiểm tra xem query có hỗ trợ IAsyncQueryProvider hay không
+        //    if (query.Provider is IAsyncQueryProvider)
+        //    {
+        //        // Đảm bảo rằng truy vấn đang được thực hiện trên cơ sở dữ liệu với Entity Framework
+        //        query = query.AsNoTracking();
 
-                // Nếu pageIndex hoặc pageSize không được truyền, trả về tất cả các bản ghi
-                if (!pageIndex.HasValue || !pageSize.HasValue)
-                {
-                    var allItems = await query.ToListAsync();  // Đổi tên items thành allItems để tránh trùng lặp
-                    return new PaginatedList<TEntity>(allItems, allItems.Count, 1, allItems.Count); // Trả về toàn bộ dữ liệu
-                }
+        //        // Nếu pageIndex hoặc pageSize không được truyền, trả về tất cả các bản ghi
+        //        if (!pageIndex.HasValue || !pageSize.HasValue)
+        //        {
+        //            var allItems = await query.ToListAsync();  // Đổi tên items thành allItems để tránh trùng lặp
+        //            return new PaginatedList<TEntity>(allItems, allItems.Count, 1, allItems.Count); // Trả về toàn bộ dữ liệu
+        //        }
 
-                // Nếu có truyền pageIndex và pageSize, thực hiện phân trang
-                int count = await query.CountAsync();  // Đếm tổng số bản ghi
-                var paginatedItems = await query  // Đổi tên items thành paginatedItems
-                    .Skip((pageIndex.Value - 1) * pageSize.Value)
-                    .Take(pageSize.Value)
-                    .ToListAsync();
+        //        // Nếu có truyền pageIndex và pageSize, thực hiện phân trang
+        //        int count = await query.CountAsync();  // Đếm tổng số bản ghi
+        //        var paginatedItems = await query  // Đổi tên items thành paginatedItems
+        //            .Skip((pageIndex.Value - 1) * pageSize.Value)
+        //            .Take(pageSize.Value)
+        //            .ToListAsync();
 
-                return new PaginatedList<TEntity>(paginatedItems, count, pageIndex.Value, pageSize.Value);
-            }
-            else
-            {
-                // Nếu không hỗ trợ IAsyncQueryProvider, thực hiện truy vấn đồng bộ
-                if (!pageIndex.HasValue || !pageSize.HasValue)
-                {
-                    var allItems = query.ToList();  // Đổi tên items thành allItems
-                    return new PaginatedList<TEntity>(allItems, allItems.Count, 1, allItems.Count); // Trả về toàn bộ dữ liệu
-                }
+        //        return new PaginatedList<TEntity>(paginatedItems, count, pageIndex.Value, pageSize.Value);
+        //    }
+        //    else
+        //    {
+        //        // Nếu không hỗ trợ IAsyncQueryProvider, thực hiện truy vấn đồng bộ
+        //        if (!pageIndex.HasValue || !pageSize.HasValue)
+        //        {
+        //            var allItems = query.ToList();  // Đổi tên items thành allItems
+        //            return new PaginatedList<TEntity>(allItems, allItems.Count, 1, allItems.Count); // Trả về toàn bộ dữ liệu
+        //        }
 
-                int count = query.Count();
-                var paginatedItems = query  // Đổi tên items thành paginatedItems
-                    .Skip((pageIndex.Value - 1) * pageSize.Value)
-                    .Take(pageSize.Value)
-                    .ToList();
+        //        int count = query.Count();
+        //        var paginatedItems = query  // Đổi tên items thành paginatedItems
+        //            .Skip((pageIndex.Value - 1) * pageSize.Value)
+        //            .Take(pageSize.Value)
+        //            .ToList();
 
-                return new PaginatedList<TEntity>(paginatedItems, count, pageIndex.Value, pageSize.Value);
-            }
-        }
+        //        return new PaginatedList<TEntity>(paginatedItems, count, pageIndex.Value, pageSize.Value);
+        //    }
+        //}
 
 
         public async Task InsertAsync(TEntity obj)
