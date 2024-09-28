@@ -1,3 +1,5 @@
+using Application.IService;
+using Application.Service;
 using BarBuddy_API.DependencyInjection;
 using FarmerOnlineApi.Middleware;
 using Infrastructure.DependencyInjection;
@@ -7,6 +9,7 @@ using Persistence.DependencyInjection;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddScoped<ITableTypeService, TableTypeService>();
 
 builder.Services.AddControllers();
 
