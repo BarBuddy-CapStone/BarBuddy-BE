@@ -1,11 +1,6 @@
-﻿using Domain.IRepository;
-using Microsoft.EntityFrameworkCore;
+﻿using Domain.Entities;
+using Domain.IRepository;
 using Persistence.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Persistence.Repository
 {
@@ -13,24 +8,207 @@ namespace Persistence.Repository
     {
         private MyDbContext _context = new MyDbContext();
 
-        //private IGenericRepository<Animal> _animalRepository;
+        private IGenericRepository<Account> _accountRepository;
+        private IGenericRepository<Bar> _barRepository;
+        private IGenericRepository<Booking> _bookingRepository;
+        private IGenericRepository<BookingDrink> _bookingDrinkRepository;
+        private IGenericRepository<BookingTable> _bookingTableRepository;
+        private IGenericRepository<Drink> _drinkRepository;
+        private IGenericRepository<DrinkCategory> _drinkCategoryRepository;
+        private IGenericRepository<DrinkEmotionalCategory> _drinkEmotionalCategoryRepository;
+        private IGenericRepository<EmotionalDrinkCategory> _emotionalDrinkCategoryRepository;
+        private IGenericRepository<Feedback> _feedbackRepository;
+        private IGenericRepository<PaymentHistory> _paymentHistoryRepository;
+        private IGenericRepository<Role> _roleRepository;
+        private IGenericRepository<Table> _tableRepository;
+        private IGenericRepository<TableType> _tableTypeRepository;
 
 
         public UnitOfWork()
         {
         }
-        //public IGenericRepository<Animal> AnimalRepository
-        //{
-        //    get
-        //    {
 
-        //        if (_animalRepository == null)
-        //        {
-        //            _animalRepository = new GenericRepository<Animal>(_context);
-        //        }
-        //        return _animalRepository;
-        //    }
-        //}
+        public IGenericRepository<Account> AccountRepository
+        {
+            get
+            {
+
+                if (_accountRepository == null)
+                {
+                    _accountRepository = new GenericRepository<Account>(_context);
+                }
+                return _accountRepository;
+            }
+        }
+
+        public IGenericRepository<Bar> BarRepository
+        {
+            get
+            {
+
+                if (_barRepository == null)
+                {
+                    _barRepository = new GenericRepository<Bar>(_context);
+                }
+                return _barRepository;
+            }
+        }
+
+        public IGenericRepository<Booking> BookingRepository
+        {
+            get
+            {
+
+                if (_bookingRepository == null)
+                {
+                    _bookingRepository = new GenericRepository<Booking>(_context);
+                }
+                return _bookingRepository;
+            }
+        }
+
+        public IGenericRepository<BookingDrink> BookingDrinkRepository
+        {
+            get
+            {
+
+                if (_bookingDrinkRepository == null)
+                {
+                    _bookingDrinkRepository = new GenericRepository<BookingDrink>(_context);
+                }
+                return _bookingDrinkRepository;
+            }
+        }
+
+        public IGenericRepository<BookingTable> BookingTableRepository
+        {
+            get
+            {
+
+                if (_bookingTableRepository == null)
+                {
+                    _bookingTableRepository = new GenericRepository<BookingTable>(_context);
+                }
+                return _bookingTableRepository;
+            }
+        }
+
+        public IGenericRepository<Drink> DrinkRepository
+        {
+            get
+            {
+
+                if (_drinkRepository == null)
+                {
+                    _drinkRepository = new GenericRepository<Drink>(_context);
+                }
+                return _drinkRepository;
+            }
+        }
+
+        public IGenericRepository<DrinkCategory> DrinkCategoryRepository
+        {
+            get
+            {
+
+                if (_drinkCategoryRepository == null)
+                {
+                    _drinkCategoryRepository = new GenericRepository<DrinkCategory>(_context);
+                }
+                return _drinkCategoryRepository;
+            }
+        }
+
+        public IGenericRepository<DrinkEmotionalCategory> DrinkEmotionalCategoryRepository
+        {
+            get
+            {
+
+                if (_drinkEmotionalCategoryRepository == null)
+                {
+                    _drinkEmotionalCategoryRepository = new GenericRepository<DrinkEmotionalCategory>(_context);
+                }
+                return _drinkEmotionalCategoryRepository;
+            }
+        }
+
+        public IGenericRepository<EmotionalDrinkCategory> EmotionalDrinkCategoryRepository
+        {
+            get
+            {
+
+                if (_emotionalDrinkCategoryRepository == null)
+                {
+                    _emotionalDrinkCategoryRepository = new GenericRepository<EmotionalDrinkCategory>(_context);
+                }
+                return _emotionalDrinkCategoryRepository;
+            }
+        }
+
+        public IGenericRepository<Feedback> FeedbackRepository
+        {
+            get
+            {
+
+                if (_feedbackRepository == null)
+                {
+                    _feedbackRepository = new GenericRepository<Feedback>(_context);
+                }
+                return _feedbackRepository;
+            }
+        }
+
+        public IGenericRepository<PaymentHistory> PaymentHistoryRepository
+        {
+            get
+            {
+
+                if (_paymentHistoryRepository == null)
+                {
+                    _paymentHistoryRepository = new GenericRepository<PaymentHistory>(_context);
+                }
+                return _paymentHistoryRepository;
+            }
+        }
+
+        public IGenericRepository<Role> RoleRepository
+        {
+            get
+            {
+
+                if (_roleRepository == null)
+                {
+                    _roleRepository = new GenericRepository<Role>(_context);
+                }
+                return _roleRepository;
+            }
+        }
+
+        public IGenericRepository<Table> TableRepository
+        {
+            get
+            {
+
+                if (_tableRepository == null)
+                {
+                    _tableRepository = new GenericRepository<Table>(_context);
+                }
+                return _tableRepository;
+            }
+        }
+
+        public IGenericRepository<TableType> TableTypeRepository
+        {
+            get
+            {
+
+                if (_tableTypeRepository == null)
+                {
+                    _tableTypeRepository = new GenericRepository<TableType>(_context);
+                }
+                return _tableTypeRepository;
+            }
+        }
 
 
         public async Task SaveAsync()
@@ -39,6 +217,8 @@ namespace Persistence.Repository
         }
 
         private bool disposed = false;
+
+
 
         protected virtual void Dispose(bool disposing)
         {
