@@ -20,6 +20,7 @@ namespace Domain.Entities
         public string Email { get; set; }
         public string Password { get; set; }
         public string Fullname { get; set; }
+        public DateTimeOffset Dob {  get; set; }
         public string Phone {  get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
