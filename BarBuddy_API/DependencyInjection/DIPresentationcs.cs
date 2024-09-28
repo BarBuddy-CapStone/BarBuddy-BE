@@ -1,4 +1,5 @@
-﻿using Infrastructure.DependencyInjection;
+﻿using Application.DependencyInjection;
+using Infrastructure.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Persistence.DependencyInjection;
 
@@ -17,6 +18,9 @@ namespace BarBuddy_API.DependencyInjection
 
             //DI Persistence
             services.AddPersistence(configuration);
+
+            //DI Application
+            services.AddApplication();
             return services;
         }
 
