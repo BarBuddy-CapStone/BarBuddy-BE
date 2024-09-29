@@ -1,4 +1,5 @@
-﻿using Firebase.Auth;
+﻿using Application.Interfaces;
+using Firebase.Auth;
 using Firebase.Storage;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure
 {
-    public class Firebase
+    public class Firebase : IFirebase
     {
         private readonly IConfiguration _configuration;
 
@@ -68,7 +69,6 @@ namespace Infrastructure
                 var storageReference = storage.Child(folderName).Child(fileName);
                 await storageReference.PutAsync(stream);
 
-                // Get the public download URL of the uploaded image
                 return await storageReference.GetDownloadUrlAsync();
             }
         }

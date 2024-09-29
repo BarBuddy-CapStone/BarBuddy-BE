@@ -12,10 +12,9 @@ namespace Domain.Entities
     public class DrinkEmotionalCategory
     {
         [Key]
-        public string DrinkEmotionalCategoryId  { get; set; }
-        public string EmotionalDrinkCategoryId { get; set; }
-        public string DrinkId { get; set; }
-
+        public Guid DrinkEmotionalCategoryId  { get; set; } = Guid.NewGuid();
+        public Guid EmotionalDrinkCategoryId { get; set; }
+        public Guid DrinkId { get; set; }
 
         [ForeignKey("EmotionalDrinkCategoryId")]
         public virtual EmotionalDrinkCategory EmotionalDrinkCategory { get; set; }

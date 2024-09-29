@@ -12,9 +12,9 @@ namespace Domain.Entities
     public class BookingDrink
     {
         [Key]
-        public string BookingDrinkId { get; set; }
-        public string DrinkId { get; set; }
-        public string BookingId { get; set; }
+        public Guid BookingDrinkId { get; set; } = Guid.NewGuid();
+        public Guid DrinkId { get; set; }
+        public Guid BookingId { get; set; }
         public double ActualPrice { get; set; }
         public int Quantity { get; set; }
 

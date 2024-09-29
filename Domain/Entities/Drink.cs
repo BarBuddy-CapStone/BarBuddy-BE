@@ -12,8 +12,9 @@ namespace Domain.Entities
     public class Drink
     {
         [Key]
-        public string DrinkId { get; set; }
-        public string DrinkCategoryId { get; set; }
+        public Guid DrinkId { get; set; } = Guid.NewGuid();
+        public string DrinkCode { get; set; }
+        public Guid DrinkCategoryId { get; set; }
         public string DrinkName { get; set; }
         public string Description { get; set; }
         public double Price { get; set; }

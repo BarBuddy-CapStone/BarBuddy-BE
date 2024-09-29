@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using FarmerOnlineDomain.Utils;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -13,9 +14,9 @@ namespace Domain.Entities
     public class Account
     {
         [Key]
-        public string AccountId { get; set; }
-        public string? BarId {  get; set; }
-        public string RoleId {  get; set; }
+        public Guid AccountId { get; set; } = Guid.NewGuid();
+        public Guid? BarId {  get; set; }
+        public Guid RoleId {  get; set; }
         [EmailAddress]
         public string Email { get; set; }
         public string Password { get; set; }
@@ -36,6 +37,11 @@ namespace Domain.Entities
 
         [ForeignKey("BarId")]
         public virtual Bar Bar { get; set; }
+
+        public Account()
+        {
+            CreatedAt = CoreHelper.SystemTimeNow;
+        }
 
     }
 }

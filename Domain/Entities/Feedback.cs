@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FarmerOnlineDomain.Utils;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -12,10 +13,10 @@ namespace Domain.Entities
     public class Feedback
     {
         [Key]
-        public string FeedbackId { get; set; }
-        public string AccountId {  get; set; }
-        public string BookingId { get; set; }
-        public string BarId { get; set; }
+        public Guid FeedbackId { get; set; } = Guid.NewGuid();
+        public Guid AccountId {  get; set; }
+        public Guid BookingId { get; set; }
+        public Guid BarId { get; set; }
         public int Rating { get; set; }
         public string Comment { get; set; }
         public DateTimeOffset FeedbackDate { get; set; }
@@ -28,5 +29,10 @@ namespace Domain.Entities
 
         [ForeignKey("AccountId")]
         public virtual Account Account { get; set; }
+
+        public Feedback()
+        {
+            FeedbackDate = CoreHelper.SystemTimeNow;
+        }
     }
 }

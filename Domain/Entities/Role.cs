@@ -14,7 +14,7 @@ namespace Domain.Entities
     public class Role
     {
         [Key]
-        public string RoleId { get; set; }
+        public Guid RoleId { get; set; } = Guid.NewGuid();
         public string RoleName { get; set; }
         public virtual ICollection<Account> Accounts { get; set;}
     }

@@ -12,7 +12,7 @@ namespace Domain.Entities
     public class TableType
     {
         [Key]
-        public string TableTypeId { get; set; }
+        public Guid TableTypeId { get; set; } = Guid.NewGuid();
         public string TypeName { get; set; }
         public string Description { get; set; }
         public int MinimumGuest {  get; set; }
