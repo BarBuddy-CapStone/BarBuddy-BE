@@ -15,8 +15,8 @@ namespace Domain.Entities
     {
         [Key]
         public Guid AccountId { get; set; } = Guid.NewGuid();
-        public string? BarId {  get; set; }
-        public string RoleId {  get; set; }
+        public Guid? BarId {  get; set; }
+        public Guid RoleId {  get; set; }
         [EmailAddress]
         public string Email { get; set; }
         public string Password { get; set; }
