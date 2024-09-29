@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.DTOs.TableTypeDto
+namespace Application.DTOs.TableType
 {
-    public class TableTypeDtoRequest
+    public class TableTypeRequest
     {
         [Required]
         public string? TypeName { get; set; }
