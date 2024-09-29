@@ -15,6 +15,7 @@ namespace Domain.Entities
         public Guid DrinksCategoryId {  get; set; } = Guid.NewGuid();
         public string DrinksCategoryName { get; set; }
         public string Description { get; set; }
+        public bool IsDrinkCategory { get; set; }
 
         public virtual ICollection<Drink> Drinks { get; set; }
     }

@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Transactions;
 using Domain.Constants;
 using Microsoft.AspNetCore.Http;
+using Application.Common;
 
 namespace Application.Service
 {
@@ -36,17 +37,7 @@ namespace Application.Service
             {
                 try
                 {
-                    if (!request.Images.IsNullOrEmpty())
-                    {
-                        foreach (var image in request.Images)
-                        {
-                            if (image.Length > 10 * 1024 * 1024)
-                            {
-                                throw new CustomException.InvalidDataException("File size exceeds the maximum allowed limit.");
-                            }
-                            fileToUpload.Add(image);
-                        }
-                    }
+                    fileToUpload = Utils.CheckValidateImageFile(request.Images);
 
                     //Create với img là ""
                     var mapper = _mapper.Map<Bar>(request);
@@ -93,7 +84,7 @@ namespace Application.Service
             return response;
         }
 
-        public async Task<BarResponse> GetBarById(string barId)
+        public async Task<BarResponse> GetBarById(Guid barId)
         {
             var getBarById = await _unitOfWork.BarRepository.GetByIdAsync(barId);
 
@@ -106,7 +97,7 @@ namespace Application.Service
             return response;
         }
 
-        public async Task<BarResponse> UpdateBarById(string barId, BarRequest request)
+        public async Task<BarResponse> UpdateBarById(Guid barId, BarRequest request)
         {
             var response = new BarResponse();
             string imageUrl = null;
@@ -124,17 +115,7 @@ namespace Application.Service
                         throw new CustomException.DataNotFoundException("Data not Found !");
                     }
 
-                    if (!request.Images.IsNullOrEmpty())
-                    {
-                        foreach (var image in request.Images)
-                        {
-                            if (image.Length > 10 * 1024 * 1024)
-                            {
-                                throw new CustomException.InvalidDataException("File size exceeds the maximum allowed limit.");
-                            }
-                            imgsUpload.Add(image);
-                        }
-                    }
+                    imgsUpload = Utils.CheckValidateImageFile(request.Images);
 
                     _mapper.Map(request, getBarById);
                     //Update với img là ""
