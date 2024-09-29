@@ -1,4 +1,4 @@
-﻿using Application.DTOs.TableTypeDto;
+﻿using Application.DTOs.TableType;
 using Application.IService;
 using AutoMapper;
 using Azure.Core;
@@ -23,13 +23,13 @@ namespace Application.Service
             _mapper = mapper;
         }
 
-        public async Task CreateTableType(TableTypeDtoRequest request)
+        public async Task CreateTableType(TableTypeRequest request)
         {
             try
             {
                 var tableType = new TableType
                 {
-                    TableTypeId = Guid.NewGuid().ToString(),
+                    TableTypeId = Guid.NewGuid(),
                     Description = request.Description,
                     MaximumGuest = request.MaximumGuest,
                     MinimumGuest = request.MinimumGuest,
@@ -45,7 +45,7 @@ namespace Application.Service
             }
         }
 
-        public async Task<int> DeleteTableType(string TableTypeId)
+        public async Task<int> DeleteTableType(Guid TableTypeId)
         {
             try
             {
@@ -70,17 +70,17 @@ namespace Application.Service
             }
         }
 
-        public async Task<List<TableTypeDtoResponse>> GetAll()
+        public async Task<List<TableTypeResponse>> GetAll()
         {
             try
             {
-                List<TableTypeDtoResponse> responses = new List<TableTypeDtoResponse>();
+                List<TableTypeResponse> responses = new List<TableTypeResponse>();
 
                 var tableTypes = (await _unitOfWork.TableTypeRepository.GetAsync(filter: t => t.IsDeleted == false, orderBy: o => o.OrderByDescending(t => t.MinimumPrice))).ToList();
 
                 foreach ( var tableType in tableTypes)
                 {
-                    var tableTypeDto = _mapper.Map<TableTypeDtoResponse>(tableType);
+                    var tableTypeDto = _mapper.Map<TableTypeResponse>(tableType);
                     responses.Add(tableTypeDto);
                 }
 
@@ -91,17 +91,17 @@ namespace Application.Service
             }
         }
 
-        public async Task<TableTypeDtoResponse?> GetById(string TableTypeId)
+        public async Task<TableTypeResponse?> GetById(Guid TableTypeId)
         {
             try
             {
-                TableTypeDtoResponse? tableTypeDto = null;
+                TableTypeResponse? tableTypeDto = null;
 
                 var tableType = (await _unitOfWork.TableTypeRepository.GetAsync(filter: t => t.TableTypeId == TableTypeId && t.IsDeleted == false)).FirstOrDefault();
 
                 if(tableType != null)
                 {
-                    tableTypeDto = _mapper.Map<TableTypeDtoResponse>(tableType);
+                    tableTypeDto = _mapper.Map<TableTypeResponse>(tableType);
                 }
                 return tableTypeDto;
             }
@@ -111,7 +111,7 @@ namespace Application.Service
             }
         }
 
-        public async Task<bool> UpdateTableType(TableTypeDtoRequest request, string TableTypeId)
+        public async Task<bool> UpdateTableType(TableTypeRequest request, Guid TableTypeId)
         {
             try
             {

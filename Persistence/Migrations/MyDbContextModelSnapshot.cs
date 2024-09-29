@@ -24,11 +24,12 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Account", b =>
                 {
-                    b.Property<string>("AccountId")
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("AccountId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
 
-                    b.Property<string>("BarId")
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid?>("BarId")
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetime(6)");
@@ -56,9 +57,8 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("RoleId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -77,8 +77,9 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Bar", b =>
                 {
-                    b.Property<string>("BarId")
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("BarId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -123,16 +124,19 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Booking", b =>
                 {
-                    b.Property<string>("BookingId")
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("BookingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
 
-                    b.Property<string>("AccountId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("char(36)");
 
-                    b.Property<string>("BarId")
+                    b.Property<Guid>("BarId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("BookingCode")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("longtext");
 
                     b.Property<DateTimeOffset>("BookingDate")
                         .HasColumnType("datetime(6)");
@@ -160,19 +164,18 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.BookingDrink", b =>
                 {
-                    b.Property<string>("BookingDrinkId")
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("BookingDrinkId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
 
                     b.Property<double>("ActualPrice")
                         .HasColumnType("double");
 
-                    b.Property<string>("BookingId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("BookingId")
+                        .HasColumnType("char(36)");
 
-                    b.Property<string>("DrinkId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("DrinkId")
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -188,12 +191,12 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.BookingTable", b =>
                 {
-                    b.Property<string>("BookingTableId")
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("BookingTableId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
 
-                    b.Property<string>("BookingId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("BookingId")
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTimeOffset>("ReservationDate")
                         .HasColumnType("datetime(6)");
@@ -201,9 +204,8 @@ namespace Persistence.Migrations
                     b.Property<TimeSpan>("ReservationTime")
                         .HasColumnType("time(6)");
 
-                    b.Property<string>("TableId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("TableId")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("BookingTableId");
 
@@ -216,16 +218,20 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Drink", b =>
                 {
-                    b.Property<string>("DrinkId")
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("DrinkId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("DrinkCategoryId")
+                    b.Property<Guid>("DrinkCategoryId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("DrinkCode")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("DrinkName")
                         .IsRequired()
@@ -250,8 +256,9 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.DrinkCategory", b =>
                 {
-                    b.Property<string>("DrinksCategoryId")
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("DrinksCategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -268,16 +275,15 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.DrinkEmotionalCategory", b =>
                 {
-                    b.Property<string>("DrinkEmotionalCategoryId")
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("DrinkEmotionalCategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
 
-                    b.Property<string>("DrinkId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("DrinkId")
+                        .HasColumnType("char(36)");
 
-                    b.Property<string>("EmotionalDrinkCategoryId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("EmotionalDrinkCategoryId")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("DrinkEmotionalCategoryId");
 
@@ -290,8 +296,9 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.EmotionalDrinkCategory", b =>
                 {
-                    b.Property<string>("EmotionalDrinksCategoryId")
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("EmotionalDrinksCategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("CategoryName")
                         .IsRequired()
@@ -304,20 +311,18 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Feedback", b =>
                 {
-                    b.Property<string>("FeedbackId")
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("FeedbackId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
 
-                    b.Property<string>("AccountId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("char(36)");
 
-                    b.Property<string>("BarId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("BarId")
+                        .HasColumnType("char(36)");
 
-                    b.Property<string>("BookingId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("BookingId")
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Comment")
                         .IsRequired()
@@ -342,16 +347,15 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.PaymentHistory", b =>
                 {
-                    b.Property<string>("PaymentHistoryId")
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("PaymentHistoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
 
-                    b.Property<string>("AccountId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("char(36)");
 
-                    b.Property<string>("BookingId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("BookingId")
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Note")
                         .HasColumnType("longtext");
@@ -380,8 +384,9 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Role", b =>
                 {
-                    b.Property<string>("RoleId")
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("RoleId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("RoleName")
                         .IsRequired()
@@ -394,12 +399,12 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Table", b =>
                 {
-                    b.Property<string>("TableId")
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("TableId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
 
-                    b.Property<string>("BarId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("BarId")
+                        .HasColumnType("char(36)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
@@ -411,9 +416,8 @@ namespace Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("TableTypeId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("TableTypeId")
+                        .HasColumnType("char(36)");
 
                     b.HasKey("TableId");
 
@@ -426,8 +430,9 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.TableType", b =>
                 {
-                    b.Property<string>("TableTypeId")
-                        .HasColumnType("varchar(255)");
+                    b.Property<Guid>("TableTypeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
 
                     b.Property<string>("Description")
                         .IsRequired()

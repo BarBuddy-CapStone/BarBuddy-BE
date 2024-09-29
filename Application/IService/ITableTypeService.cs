@@ -1,4 +1,4 @@
-﻿using Application.DTOs.TableTypeDto;
+﻿using Application.DTOs.TableType;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +9,10 @@ namespace Application.IService
 {
     public interface ITableTypeService
     {
-        Task<List<TableTypeDtoResponse>> GetAll();
-        Task<TableTypeDtoResponse?> GetById(string TableTypeId);
-        Task CreateTableType(TableTypeDtoRequest request);
-        Task<bool> UpdateTableType(TableTypeDtoRequest request, string TableTypeId);
-        Task<int> DeleteTableType(string TableTypeId);
+        Task<List<TableTypeResponse>> GetAll();
+        Task<TableTypeResponse?> GetById(Guid TableTypeId);
+        Task CreateTableType(TableTypeRequest request);
+        Task<bool> UpdateTableType(TableTypeRequest request, Guid TableTypeId);
+        Task<int> DeleteTableType(Guid TableTypeId);
     }
 }

@@ -1,4 +1,4 @@
-﻿using Application.DTOs.TableTypeDto;
+﻿using Application.DTOs.TableType;
 using Application.IService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -30,7 +30,7 @@ namespace BarBuddy_API.Controllers
         }
 
         [HttpGet("{TableTypeId}")]
-        public async Task<IActionResult> GetById(string TableTypeId)
+        public async Task<IActionResult> GetById(Guid TableTypeId)
         {
             try
             {
@@ -48,7 +48,7 @@ namespace BarBuddy_API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(TableTypeDtoRequest request)
+        public async Task<IActionResult> Post(TableTypeRequest request)
         {
             try
             {
@@ -65,7 +65,7 @@ namespace BarBuddy_API.Controllers
         }
 
         [HttpPut("{TableTypeId}")]
-        public async Task<IActionResult> Put([FromBody] TableTypeDtoRequest request, string TableTypeId)
+        public async Task<IActionResult> Put([FromBody] TableTypeRequest request, Guid TableTypeId)
         {
             try
             {
@@ -87,7 +87,7 @@ namespace BarBuddy_API.Controllers
         }
 
         [HttpDelete("{TableTypeId}")]
-        public async Task<IActionResult> Delete(string TableTypeId)
+        public async Task<IActionResult> Delete(Guid TableTypeId)
         {
             try
             {

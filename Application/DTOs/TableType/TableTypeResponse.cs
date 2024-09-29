@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.DTOs.TableTypeDto
+namespace Application.DTOs.TableType
 {
-    public class TableTypeDtoResponse
+    public class TableTypeResponse
     {
         public string? TableTypeId { get; set; }
         public string? TypeName { get; set; }
