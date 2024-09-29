@@ -3,7 +3,7 @@ using Application.IService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BarBuddy_API.Controllers
+namespace BarBuddy_API.Controllers.TableType
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -35,7 +35,7 @@ namespace BarBuddy_API.Controllers
             try
             {
                 var tableType = await _tableTypeService.GetById(TableTypeId);
-                if(tableType == null)
+                if (tableType == null)
                 {
                     return NotFound("Không tìm thấy loại bàn");
                 }
@@ -52,7 +52,8 @@ namespace BarBuddy_API.Controllers
         {
             try
             {
-                if (request.MaximumGuest < request.MinimumGuest) {
+                if (request.MaximumGuest < request.MinimumGuest)
+                {
                     return BadRequest("Số lượng đa tối thiểu phải bé hơn số lượng khách tối đa");
                 }
                 await _tableTypeService.CreateTableType(request);
@@ -64,7 +65,7 @@ namespace BarBuddy_API.Controllers
             }
         }
 
-        [HttpPut("{TableTypeId}")]
+        [HttpPatch("{TableTypeId}")]
         public async Task<IActionResult> Put([FromBody] TableTypeRequest request, Guid TableTypeId)
         {
             try
@@ -75,7 +76,8 @@ namespace BarBuddy_API.Controllers
                     return BadRequest("Số lượng đa tối thiểu phải bé hơn số lượng khách tối đa");
                 }
                 var isUpdated = await _tableTypeService.UpdateTableType(request, TableTypeId);
-                if (!isUpdated) { 
+                if (!isUpdated)
+                {
                     return NotFound("Loại bàn không tồn tại");
                 }
                 return Ok("Cập nhật thành công");
@@ -96,7 +98,8 @@ namespace BarBuddy_API.Controllers
                 {
                     return NotFound("Loại bàn không tồn tại");
                 }
-                if (failedNum == 2) {
+                if (failedNum == 2)
+                {
                     return StatusCode(202, "Vẫn còn bàn đang hoạt động thuộc loại bàn này, vui lòng cập nhật lại tất cả bàn của các chi nhánh trước khi xóa loại bàn này");
                 }
                 return Ok("Cập nhật thành công");
