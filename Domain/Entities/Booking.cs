@@ -1,4 +1,4 @@
-﻿using FarmerOnlineDomain.Utils;
+﻿using Domain.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

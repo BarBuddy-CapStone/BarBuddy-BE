@@ -16,6 +16,7 @@ namespace Application.Mappers.EmotionCategory
         {
             CreateMap<EmotionalDrinkCategory, EmotionCategoryResponse>().ReverseMap();
             CreateMap<CreateEmotionCategoryRequest, EmotionalDrinkCategory>().ReverseMap();
+            CreateMap<UpdateEmotionCategoryRequest, EmotionalDrinkCategory>().ReverseMap();
         }
     }
 }

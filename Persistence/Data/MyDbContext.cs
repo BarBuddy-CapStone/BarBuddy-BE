@@ -45,5 +45,52 @@ namespace Persistence.Data
                 optionsBuilder.UseMySql(configuration.GetConnectionString("MyDB"), new MySqlServerVersion(new Version(8, 0, 23)));
             }
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Generate new GUIDs for each category
+            // EmotionCategoryDrink
+            var vuiId = Guid.NewGuid();
+            var buonId = Guid.NewGuid();
+            var hanhPhucId = Guid.NewGuid();
+            var tucGianId = Guid.NewGuid();
+            var chanNanId = Guid.NewGuid();
+            var dangYeuId = Guid.NewGuid();
+
+            // Seed data for EmotionalDrinkCategory
+            modelBuilder.Entity<EmotionalDrinkCategory>().HasData(
+                new EmotionalDrinkCategory
+                {
+                    EmotionalDrinksCategoryId = vuiId,
+                    CategoryName = "vui"
+                },
+                new EmotionalDrinkCategory
+                {
+                    EmotionalDrinksCategoryId = buonId,
+                    CategoryName = "buồn"
+                },
+                new EmotionalDrinkCategory
+                {
+                    EmotionalDrinksCategoryId = hanhPhucId,
+                    CategoryName = "hạnh phúc"
+                },
+                new EmotionalDrinkCategory
+                {
+                    EmotionalDrinksCategoryId = tucGianId,
+                    CategoryName = "tức giận"
+                },
+                new EmotionalDrinkCategory
+                {
+                    EmotionalDrinksCategoryId = chanNanId,
+                    CategoryName = "chán nản"
+                },
+                new EmotionalDrinkCategory
+                {
+                    EmotionalDrinksCategoryId = dangYeuId,
+                    CategoryName = "đang yêu"
+                }
+            );
+        }
     }
 }

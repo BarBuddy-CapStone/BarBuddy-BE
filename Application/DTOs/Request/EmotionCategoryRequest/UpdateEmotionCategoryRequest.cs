@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Application.DTOs.Request.EmotionCategoryRequest
 {
-    public class CreateEmotionCategoryRequest
+    public class UpdateEmotionCategoryRequest
     {
         [Required(ErrorMessage = "Category name cannot be empty")]
         [StringLength(20, MinimumLength = 3, ErrorMessage = "Category name must be between 3 and 20 characters")]

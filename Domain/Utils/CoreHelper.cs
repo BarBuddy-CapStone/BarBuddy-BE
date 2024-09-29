@@ -1,5 +1,5 @@
 ﻿
-namespace FarmerOnlineDomain.Utils
+namespace Domain.Utils
 {
     public class CoreHelper
     {

@@ -1,4 +1,4 @@
-﻿using FarmerOnlineDomain.Utils;
+﻿using Domain.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -19,7 +19,9 @@ namespace Domain.Entities
         public Guid BarId { get; set; }
         public int Rating { get; set; }
         public string Comment { get; set; }
-        public DateTimeOffset FeedbackDate { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTimeOffset CreatedTime { get; set; }
+        public DateTimeOffset LastUpdatedTime { get; set; }
 
         [ForeignKey("BarId")]
         public virtual Bar Bar { get; set; }
@@ -32,7 +34,7 @@ namespace Domain.Entities
 
         public Feedback()
         {
-            FeedbackDate = CoreHelper.SystemTimeNow;
+            CreatedTime = LastUpdatedTime = CoreHelper.SystemTimeNow;
         }
     }
 }

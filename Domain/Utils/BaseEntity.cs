@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FarmerOnlineDomain.Utils
+namespace Domain.Utils
 {
     public abstract class BaseEntity
     {

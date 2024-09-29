@@ -1,8 +1,17 @@
 ﻿using Application.Interfaces;
+using Application.IService;
 using Application.Mappers;
+using Application.Service;
+using Domain.Entities;
+using Domain.Interfaces;
 using Domain.IRepository;
+using Firebase.Auth;
+using Infrastructure.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Persistence.Data;
 using Persistence.Repository;
 
 namespace Infrastructure.DependencyInjection
@@ -26,6 +35,9 @@ namespace Infrastructure.DependencyInjection
             // Services
             services.AddServices();
 
+            // Authentications
+            services.AddAuthentication(configuration);
+
             return services;
         }
 
@@ -36,6 +48,8 @@ namespace Infrastructure.DependencyInjection
         {
             //services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IFirebase, Firebase>();
+            services.AddScoped<IEmotionalDrinkCategoryService, EmotionalDrinkCategoryService>();
+            services.AddScoped<IFeedBackService, FeedBackService>();
             
         }
 
@@ -63,6 +77,52 @@ namespace Infrastructure.DependencyInjection
 
             //UnitOfWork
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+        }
+
+        public static void AddAuthentication(this IServiceCollection services, IConfiguration configuration)
+        {
+            //services.AddScoped<EmailTemplateBuilder>();
+            //services.AddIdentity<User, Role>().AddEntityFrameworkStores<MyDbContext>().AddDefaultTokenProviders();
+            //services.AddAuthentication(options =>
+            //{
+            //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            //}).AddJwtBearer(options =>
+            //{
+            //    options.TokenValidationParameters = new TokenValidationParameters
+            //    {
+            //        ValidateIssuer = true,
+            //        ValidateAudience = true,
+            //        ValidateIssuerSigningKey = true,
+            //        ValidateLifetime = true,
+            //        ValidIssuer = configuration["Jwt:Issuer"],
+            //        ValidAudience = configuration["Jwt:Audience"],
+            //        IssuerSigningKey = new SymmetricSecurityKey
+            //        (Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!))
+            //    };
+            //});
+
+            //services.Configure<IdentityOptions>(options =>
+            //{
+            //    // Set your desired password requirements here
+            //    options.Password.RequireDigit = false;
+            //    options.Password.RequireLowercase = false;
+            //    options.Password.RequireUppercase = false;
+            //    options.Password.RequireNonAlphanumeric = false;
+            //    options.Password.RequiredLength = 6;
+            //    options.Password.RequiredUniqueChars = 0;
+
+            //    // Lockout settings
+            //    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+            //    options.Lockout.MaxFailedAccessAttempts = 5;
+            //    options.Lockout.AllowedForNewUsers = true;
+
+            //    // User settings
+            //    options.User.RequireUniqueEmail = true;
+            //    options.SignIn.RequireConfirmedEmail = true;
+            //});
+
+            services.AddScoped<IAuthentication, Authen>();
         }
     }
 }
