@@ -6,7 +6,7 @@ namespace Application.IService
     {
         Task<IEnumerable<BarResponse>> GetAllBar();
         Task<BarResponse> CreateBar(BarRequest request);
-        Task<BarResponse> GetBarById(string barId);
-        Task<BarResponse> UpdateBarById(string barId, BarRequest request);
+        Task<BarResponse> GetBarById(Guid barId);
+        Task<BarResponse> UpdateBarById(Guid barId, BarRequest request);
     }
 }

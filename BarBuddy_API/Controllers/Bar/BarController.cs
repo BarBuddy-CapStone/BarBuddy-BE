@@ -39,7 +39,7 @@ namespace BarBuddy_API.Controllers.Bar
         }
 
         [HttpGet("admin/barProfile/{barId}")]
-        public async Task<IActionResult> GetBarById(string barId)
+        public async Task<IActionResult> GetBarById(Guid barId)
         {
             try
             {
@@ -82,7 +82,7 @@ namespace BarBuddy_API.Controllers.Bar
         }
 
         [HttpPut("admin/updateBar/{barId}")]
-        public async Task<IActionResult> UpdateBar(string barId, [FromForm] BarRequest request)
+        public async Task<IActionResult> UpdateBar(Guid barId, [FromForm] BarRequest request)
         {
             try
             {

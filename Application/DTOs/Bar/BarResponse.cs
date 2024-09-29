@@ -8,7 +8,7 @@ namespace Application.DTOs.Bar
 {
     public class BarResponse
     {
-        public string BarId { get; set; }
+        public Guid BarId { get; set; }
         public string BarName { get; set; }
         public string Address { get; set; }
         public string Description { get; set; }

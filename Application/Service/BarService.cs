@@ -93,7 +93,7 @@ namespace Application.Service
             return response;
         }
 
-        public async Task<BarResponse> GetBarById(string barId)
+        public async Task<BarResponse> GetBarById(Guid barId)
         {
             var getBarById = await _unitOfWork.BarRepository.GetByIdAsync(barId);
 
@@ -106,7 +106,7 @@ namespace Application.Service
             return response;
         }
 
-        public async Task<BarResponse> UpdateBarById(string barId, BarRequest request)
+        public async Task<BarResponse> UpdateBarById(Guid barId, BarRequest request)
         {
             var response = new BarResponse();
             string imageUrl = null;
