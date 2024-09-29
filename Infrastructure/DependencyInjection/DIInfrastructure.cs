@@ -1,4 +1,5 @@
-﻿using Application.Mappers;
+﻿using Application.Interfaces;
+using Application.Mappers;
 using Domain.IRepository;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +13,7 @@ namespace Infrastructure.DependencyInjection
         {
             //MediatR
             //services.AddMediatR(NewMethod().Assembly);
-            
+
             // CORS
             services.AddCORS();
 
@@ -34,7 +35,7 @@ namespace Infrastructure.DependencyInjection
         public static void AddServices(this IServiceCollection services)
         {
             //services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<Firebase>();
+            services.AddScoped<IFirebase, Firebase>();
             
         }
 
