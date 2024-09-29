@@ -50,7 +50,6 @@ namespace Application.Service
 
                     //Create với img là ""
                     var mapper = _mapper.Map<Bar>(request);
-                    mapper.BarId = string.Format("{0}{1}", PrefixKeyConstant.BAR, Guid.NewGuid().ToString("N").ToUpper());
                     mapper.Images = "";
                     await _unitOfWork.BarRepository.InsertAsync(mapper);
                     await Task.Delay(200);

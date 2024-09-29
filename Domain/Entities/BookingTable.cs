@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FarmerOnlineDomain.Utils;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -12,9 +13,9 @@ namespace Domain.Entities
     public class BookingTable
     {
         [Key]
-        public string BookingTableId { get; set; }
-        public string BookingId { get; set; }
-        public string TableId { get; set;}
+        public Guid BookingTableId { get; set; } = Guid.NewGuid();
+        public Guid BookingId { get; set; }
+        public Guid TableId { get; set;}
         public DateTimeOffset ReservationDate { get; set; }
         public TimeSpan ReservationTime { get; set; }
 
@@ -22,5 +23,10 @@ namespace Domain.Entities
         public virtual Booking Booking { get; set; }
         [ForeignKey("TableId")]
         public virtual Table Table { get; set; }
+
+        public BookingTable ()
+        {
+            ReservationDate = CoreHelper.SystemTimeNow;
+        }
     }
 }

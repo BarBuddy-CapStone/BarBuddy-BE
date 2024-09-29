@@ -5,14 +5,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+
 
 namespace Domain.Entities
 {
-    [Table("EmotionalDrinkCategory")]
-    public class EmotionalDrinkCategory
+    [Table("Role")]
+    public class Role
     {
         [Key]
-        public Guid EmotionalDrinksCategoryId { get; set; } = Guid.NewGuid();
-        public string CategoryName { get; set; }
+        public string RoleId { get; set; }
+        public string RoleName { get; set; }
+        public virtual ICollection<Account> Accounts { get; set;}
     }
 }

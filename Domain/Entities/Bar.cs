@@ -12,7 +12,7 @@ namespace Domain.Entities
     public class Bar
     {
         [Key]
-        public string BarId { get; set; }
+        public Guid BarId { get; set; } = Guid.NewGuid();
         public string BarName { get; set; }
         public string Address { get; set; }
         public string Description { get; set; }

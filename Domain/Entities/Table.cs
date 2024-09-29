@@ -12,9 +12,9 @@ namespace Domain.Entities
     public class Table
     {
         [Key]
-        public string TableId { get; set; }
-        public string BarId { get; set; }
-        public string TableTypeId { get; set; }
+        public Guid TableId { get; set; } = Guid.NewGuid();
+        public Guid BarId { get; set; }
+        public Guid TableTypeId { get; set; }
         public string TableName { get; set; }
         public int Status { get; set; }
         public bool IsDeleted { get; set; }

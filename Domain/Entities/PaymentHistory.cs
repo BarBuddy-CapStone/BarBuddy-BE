@@ -12,9 +12,9 @@ namespace Domain.Entities
     public class PaymentHistory
     {
         [Key]
-        public string PaymentHistoryId { get; set; }
-        public string AccountId { get; set; }
-        public string BookingId { get; set; }
+        public Guid PaymentHistoryId { get; set; } = Guid.NewGuid();
+        public Guid AccountId { get; set; }
+        public Guid BookingId { get; set; }
         public string TransactionCode { get; set; }
         public DateTime PaymentDate { get; set; }
         public double TotalPrice { get; set; }
