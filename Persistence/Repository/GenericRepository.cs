@@ -209,7 +209,11 @@ namespace Persistence.Repository
 
             if (pageIndex.HasValue && pageSize.HasValue)
             {
-                query = query.Skip((pageIndex.Value - 1) * pageSize.Value).Take(pageSize.Value);
+                //query = query.Skip((pageIndex.Value - 1) * pageSize.Value).Take(pageSize.Value);
+                int validPageIndex = pageIndex.Value > 0 ? pageIndex.Value - 1 : 0;
+                int validPageSize = pageSize.Value > 0 ? pageSize.Value : 10;
+
+                query = query.Skip(validPageIndex * validPageSize).Take(validPageSize);
             }
             return await query.ToListAsync();
         }

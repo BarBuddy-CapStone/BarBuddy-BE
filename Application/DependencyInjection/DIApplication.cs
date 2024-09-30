@@ -19,9 +19,6 @@ namespace Application.DependencyInjection
 
         public static void AddServices(this IServiceCollection services)
         {
-            services.AddScoped<IBarService, BarService>();
-            services.AddScoped<IDrinkCategoryService, DrinkCategoryService>();
-            services.AddScoped<IDrinkService, DrinkService>();
         }
     }
 }
