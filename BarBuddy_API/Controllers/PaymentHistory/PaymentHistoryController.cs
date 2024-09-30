@@ -17,15 +17,8 @@ namespace BarBuddy_API.Controllers.PaymentHistory
 
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] bool Status, [FromQuery] string? CustomerName, [FromQuery] string? PhoneNumber, [FromQuery] string? Email, [FromQuery] Guid? BarId, [FromQuery] DateTime? PaymentDate, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10) {
-            try
-            {
-                var response = await _service.Get(Status, CustomerName, PhoneNumber, Email, BarId, PaymentDate, PageIndex, PageSize);
-                return Ok(new { totalPage = response.totalPage, response = response.response });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            var response = await _service.Get(Status, CustomerName, PhoneNumber, Email, BarId, PaymentDate, PageIndex, PageSize);
+            return Ok(new { totalPage = response.totalPage, response = response.response });
         }
     }
 }

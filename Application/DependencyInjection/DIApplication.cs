@@ -19,6 +19,7 @@ namespace Application.DependencyInjection
 
         public static void AddServices(this IServiceCollection services)
         {
+            services.AddScoped<IBarService, BarService>();
         }
     }
 }

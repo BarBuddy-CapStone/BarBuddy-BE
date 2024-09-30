@@ -11,7 +11,7 @@ namespace Application.IService
     {
         Task<(List<TableResponse> response, int TotalPage, string TableTypeName)> GetAll(Guid? BarId, Guid TableTypeId, int? Status, int PageIndex, int PageSize);
         Task CreateTable(CreateTableRequest request);
-        Task<bool> UpdateTable(Guid TableId, UpdateTableRequest request);
-        Task<bool> DeleteTable(Guid TableId);
+        Task UpdateTable(Guid TableId, UpdateTableRequest request);
+        Task DeleteTable(Guid TableId);
     }
 }

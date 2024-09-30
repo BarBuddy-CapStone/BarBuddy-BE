@@ -9,10 +9,6 @@ using Persistence.DependencyInjection;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddScoped<IPaymentHistoryService, PaymentHistoryService>();
-builder.Services.AddScoped<ITableTypeService, TableTypeService>();
-builder.Services.AddScoped<ITableService, TableService>();
-
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();

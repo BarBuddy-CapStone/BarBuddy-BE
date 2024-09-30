@@ -20,64 +20,29 @@ namespace BarBuddy_API.Controllers.Table
         [HttpGet("staff")]
         public async Task<IActionResult> GetAllForStaff([FromQuery] Guid? BarId, [FromQuery][Required] Guid TableTypeId, [FromQuery] int? Status,[FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
-            try
-            {
-                var responses = await _tableService.GetAll(BarId, TableTypeId, Status, PageIndex, PageSize);
-                return Ok(new { TableTypeName = responses.TableTypeName, totalPage = responses.TotalPage, response = responses.response});
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            var responses = await _tableService.GetAll(BarId, TableTypeId, Status, PageIndex, PageSize);
+            return Ok(new { TableTypeName = responses.TableTypeName, totalPage = responses.TotalPage, response = responses.response });
         }
 
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] CreateTableRequest request)
         {
-            try
-            {
-                await _tableService.CreateTable(request);
-                return Ok("Tạo bàn thành công");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            await _tableService.CreateTable(request);
+            return Ok("Tạo bàn thành công");
         }
 
         [HttpPatch("{TableId}")]
         public async Task<IActionResult> Patch([FromBody] UpdateTableRequest request, Guid TableId)
         {
-            try
-            {
-                var isUpdated = await _tableService.UpdateTable(TableId, request);
-                if (!isUpdated) {
-                    return BadRequest("Table Id không tồn tại");
-                }
-                return Ok("Cập nhật bàn thành công");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            await _tableService.UpdateTable(TableId, request);
+            return Ok("Cập nhật bàn thành công");
         }
 
         [HttpDelete("{TableId}")]
         public async Task<IActionResult> Delete(Guid TableId)
         {
-            try
-            {
-                var isUpdated = await _tableService.DeleteTable(TableId);
-                if (!isUpdated)
-                {
-                    return BadRequest("Table Id không tồn tại");
-                }
-                return Ok("Xóa bàn thành công");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            await _tableService.DeleteTable(TableId);
+            return Ok("Xóa bàn thành công");
         }
     }
 }
