@@ -48,9 +48,14 @@ namespace Infrastructure.DependencyInjection
         {
             //services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IFirebase, Firebase>();
+
             services.AddScoped<IEmotionalDrinkCategoryService, EmotionalDrinkCategoryService>();
             services.AddScoped<IFeedBackService, FeedBackService>();
-            
+            services.AddScoped<IBarService, BarService>();
+            services.AddScoped<IDrinkCategoryService, DrinkCategoryService>();
+            services.AddScoped<IDrinkService, DrinkService>();
+            services.AddScoped<IAccountService, AccountService>();
+
         }
 
         public static void AddCORS(this IServiceCollection services)
