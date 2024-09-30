@@ -10,6 +10,7 @@ namespace Application.IService
     public interface ITableTypeService
     {
         Task<List<TableTypeResponse>> GetAll();
+        Task<List<TableTypeResponse>> GetAllForAdmin(int Status);
         Task<TableTypeResponse?> GetById(Guid TableTypeId);
         Task CreateTableType(TableTypeRequest request);
         Task UpdateTableType(TableTypeRequest request, Guid TableTypeId);

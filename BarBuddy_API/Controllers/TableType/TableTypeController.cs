@@ -2,6 +2,7 @@
 using Application.IService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace BarBuddy_API.Controllers.TableType
 {
@@ -19,6 +20,13 @@ namespace BarBuddy_API.Controllers.TableType
         public async Task<IActionResult> GetAll()
         {
             var tableTypes = await _tableTypeService.GetAll();
+            return Ok(tableTypes);
+        }
+
+        [HttpGet("admin")]
+        public async Task<IActionResult> GetAllForAdmin([FromQuery][Required] int Status)
+        {
+            var tableTypes = await _tableTypeService.GetAllForAdmin(Status);
             return Ok(tableTypes);
         }
 

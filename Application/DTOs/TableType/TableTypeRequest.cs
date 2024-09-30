@@ -19,7 +19,7 @@ namespace Application.DTOs.TableType
         [Range(1, 99, ErrorMessage = "Chỉ trong khoảng từ 1 - 99")]
         public int MaximumGuest { get; set; }
         [Required]
-        [Range(0, double.MaxValue, ErrorMessage = "Lớn hơn 0")]
+        [Range(0, 100000000, ErrorMessage = "Lớn hơn 0")]
         public double MinimumPrice { get; set; }
     }
 }
