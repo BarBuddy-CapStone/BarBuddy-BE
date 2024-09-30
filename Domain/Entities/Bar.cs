@@ -28,5 +28,6 @@ namespace Domain.Entities
         public virtual ICollection<Booking> Bookings { get; set; }
         public virtual ICollection<Feedback> Feedbacks { get; set; }
         public virtual ICollection<Table> Tables { get; set; }
+        public virtual ICollection<Drink> Drinks { get; set; }
     }
 }
