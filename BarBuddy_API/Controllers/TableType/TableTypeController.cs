@@ -18,96 +18,40 @@ namespace BarBuddy_API.Controllers.TableType
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            try
-            {
-                var tableTypes = await _tableTypeService.GetAll();
-                return Ok(tableTypes);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            var tableTypes = await _tableTypeService.GetAll();
+            return Ok(tableTypes);
         }
 
         [HttpGet("{TableTypeId}")]
         public async Task<IActionResult> GetById(Guid TableTypeId)
         {
-            try
-            {
-                var tableType = await _tableTypeService.GetById(TableTypeId);
-                if (tableType == null)
-                {
-                    return NotFound("Không tìm thấy loại bàn");
-                }
-                return Ok(tableType);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            var tableType = await _tableTypeService.GetById(TableTypeId);
+            return Ok(tableType);
         }
 
         [HttpPost]
         public async Task<IActionResult> Post(TableTypeRequest request)
         {
-            try
-            {
-                if (request.MaximumGuest < request.MinimumGuest)
-                {
-                    return BadRequest("Số lượng đa tối thiểu phải bé hơn số lượng khách tối đa");
-                }
-                await _tableTypeService.CreateTableType(request);
-                return Ok("Tạo thành công");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            await _tableTypeService.CreateTableType(request);
+            return Ok("Tạo thành công");
         }
 
         [HttpPatch("{TableTypeId}")]
         public async Task<IActionResult> Put([FromBody] TableTypeRequest request, Guid TableTypeId)
         {
-            try
-            {
-                Console.WriteLine("1");
-                if (request.MaximumGuest < request.MinimumGuest)
-                {
-                    return BadRequest("Số lượng đa tối thiểu phải bé hơn số lượng khách tối đa");
-                }
-                var isUpdated = await _tableTypeService.UpdateTableType(request, TableTypeId);
-                if (!isUpdated)
-                {
-                    return NotFound("Loại bàn không tồn tại");
-                }
-                return Ok("Cập nhật thành công");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            await _tableTypeService.UpdateTableType(request, TableTypeId);
+            return Ok("Cập nhật thành công");
         }
 
         [HttpDelete("{TableTypeId}")]
         public async Task<IActionResult> Delete(Guid TableTypeId)
         {
-            try
+            var failedNum = await _tableTypeService.DeleteTableType(TableTypeId);
+            if (!failedNum)
             {
-                var failedNum = await _tableTypeService.DeleteTableType(TableTypeId);
-                if (failedNum == 1)
-                {
-                    return NotFound("Loại bàn không tồn tại");
-                }
-                if (failedNum == 2)
-                {
-                    return StatusCode(202, "Vẫn còn bàn đang hoạt động thuộc loại bàn này, vui lòng cập nhật lại tất cả bàn của các chi nhánh trước khi xóa loại bàn này");
-                }
-                return Ok("Cập nhật thành công");
+                return StatusCode(202, "Vẫn còn bàn đang hoạt động thuộc loại bàn này, vui lòng cập nhật lại tất cả bàn của các chi nhánh trước khi xóa loại bàn này");
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            return Ok("Cập nhật thành công");
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.Table;
 using Application.IService;
+using Domain.CustomException;
 using Domain.Entities;
 using Domain.IRepository;
 using System;
@@ -36,27 +37,26 @@ namespace Application.Service
                 await _unitOfWork.SaveAsync();
             }
             catch (Exception ex) {
-                throw new Exception(ex.Message);
+                throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
 
-        public async Task<bool> DeleteTable(Guid TableId)
+        public async Task DeleteTable(Guid TableId)
         {
             try
             {
                 var existedTable = await _unitOfWork.TableRepository.GetByIdAsync(TableId);
                 if (existedTable == null)
                 {
-                    return false;
+                    throw new CustomException.DataNotFoundException("Table Id không tồn tại");
                 }
 
                 existedTable.IsDeleted = true;
                 await _unitOfWork.TableRepository.UpdateAsync(existedTable);
                 await _unitOfWork.SaveAsync();
-                return true;
             }
             catch (Exception ex) {
-                throw new Exception(ex.Message);
+                throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
 
@@ -115,29 +115,28 @@ namespace Application.Service
                 return (responses, totalPage, TableTypeName);
             } catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
 
-        public async Task<bool> UpdateTable(Guid TableId, UpdateTableRequest request)
+        public async Task UpdateTable(Guid TableId, UpdateTableRequest request)
         {
             try
             {
                 var existedTable = await _unitOfWork.TableRepository.GetByIdAsync(TableId);
                 if(existedTable == null)
                 {
-                    return false;
+                    throw new CustomException.DataNotFoundException("Table Id không tồn tại");
                 }
 
                 existedTable.TableName = request.TableName;
                 existedTable.Status = request.Status;
                 await _unitOfWork.TableRepository.UpdateAsync(existedTable);
                 await _unitOfWork.SaveAsync();
-                return true;
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
     }

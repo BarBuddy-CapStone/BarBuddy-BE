@@ -12,7 +12,7 @@ namespace Application.IService
         Task<List<TableTypeResponse>> GetAll();
         Task<TableTypeResponse?> GetById(Guid TableTypeId);
         Task CreateTableType(TableTypeRequest request);
-        Task<bool> UpdateTableType(TableTypeRequest request, Guid TableTypeId);
-        Task<int> DeleteTableType(Guid TableTypeId);
+        Task UpdateTableType(TableTypeRequest request, Guid TableTypeId);
+        Task<bool> DeleteTableType(Guid TableTypeId);
     }
 }

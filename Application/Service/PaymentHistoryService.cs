@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.PaymentHistory;
 using Application.IService;
+using Domain.CustomException;
 using Domain.Entities;
 using Domain.IRepository;
 using System;
@@ -68,7 +69,7 @@ namespace Application.Service
                 return (response, totalPage);
             }
             catch (Exception ex) { 
-                throw new Exception(ex.Message);
+                throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
     }

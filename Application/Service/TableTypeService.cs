@@ -2,6 +2,7 @@
 using Application.IService;
 using AutoMapper;
 using Azure.Core;
+using Domain.CustomException;
 using Domain.Entities;
 using Domain.IRepository;
 using System;
@@ -27,6 +28,10 @@ namespace Application.Service
         {
             try
             {
+                if (request.MaximumGuest < request.MinimumGuest)
+                {
+                    throw new CustomException.InvalidDataException("Số lượng đa tối thiểu phải bé hơn số lượng khách tối đa");
+                }
                 var tableType = new TableType
                 {
                     TableTypeId = Guid.NewGuid(),
@@ -40,33 +45,33 @@ namespace Application.Service
                 await _unitOfWork.TableTypeRepository.InsertAsync(tableType);
                 await _unitOfWork.SaveAsync();
             }
-            catch (Exception ex) { 
-                throw new Exception(ex.Message);
+            catch (Exception ex) {
+                throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
 
-        public async Task<int> DeleteTableType(Guid TableTypeId)
+        public async Task<bool> DeleteTableType(Guid TableTypeId)
         {
             try
             {
                 var existedTableType = (await _unitOfWork.TableTypeRepository.GetAsync(filter: t => t.TableTypeId == TableTypeId && t.IsDeleted == false)).FirstOrDefault();
                 if (existedTableType == null)
                 {
-                    return 1;
+                    throw new CustomException.DataNotFoundException("Loại bàn không tồn tại");
                 }
                 var tables = await _unitOfWork.TableRepository.GetAsync(t => t.TableTypeId == TableTypeId && t.IsDeleted == false);
                 if (tables.Any())
                 {
-                    return 2;
+                    return false;
                 }
                 existedTableType.IsDeleted = true;
                 await _unitOfWork.TableTypeRepository.UpdateAsync(existedTableType);
                 await _unitOfWork.SaveAsync();
-                return 0;
+                return true;
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
 
@@ -87,7 +92,7 @@ namespace Application.Service
                 return responses;
             }
             catch (Exception ex) {
-                throw new Exception(ex.Message);
+                throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
 
@@ -102,23 +107,30 @@ namespace Application.Service
                 if(tableType != null)
                 {
                     tableTypeDto = _mapper.Map<TableTypeResponse>(tableType);
+                } else
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy loại bàn");
                 }
                 return tableTypeDto;
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
 
-        public async Task<bool> UpdateTableType(TableTypeRequest request, Guid TableTypeId)
+        public async Task UpdateTableType(TableTypeRequest request, Guid TableTypeId)
         {
             try
             {
+                if (request.MaximumGuest < request.MinimumGuest)
+                {
+                    throw new CustomException.InvalidDataException("Số lượng đa tối thiểu phải bé hơn số lượng khách tối đa");
+                }
                 var existedTableType = await _unitOfWork.TableTypeRepository.GetByIdAsync(TableTypeId);
                 if (existedTableType == null)
                 {
-                    return false;
+                    throw new CustomException.DataNotFoundException("Loại bàn không tồn tại");
                 }
                 existedTableType.MinimumPrice = request.MinimumPrice;
                 existedTableType.MinimumGuest = request.MinimumGuest;
@@ -127,11 +139,10 @@ namespace Application.Service
                 existedTableType.TypeName = request.TypeName;
                 await _unitOfWork.TableTypeRepository.UpdateAsync(existedTableType);
                 await _unitOfWork.SaveAsync();
-                return true;
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
     }
