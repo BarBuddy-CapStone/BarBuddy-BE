@@ -96,6 +96,61 @@ namespace Application.Service
             }
         }
 
+        public async Task<List<TableTypeResponse>> GetAllForAdmin(int Status)
+        {
+            try
+            {
+                List<TableTypeResponse> responses = new List<TableTypeResponse>();
+                List<TableType> tableTypes = new List<TableType>();
+                int TotalPage = 1;
+
+                switch (Status)
+                {
+                    case 0:
+                        tableTypes = (await _unitOfWork.TableTypeRepository.GetAsync(filter: t => t.IsDeleted == false, orderBy: o => o.OrderByDescending(t => t.MinimumPrice))).ToList();
+                        break;
+                    case 1:
+                        var tableTypesTemp1 = await _unitOfWork.TableTypeRepository.GetAsync(filter: t => t.IsDeleted == false);
+                        foreach (var tableTypeTemp in tableTypesTemp1)
+                        {
+                            var isExistingTable = (await _unitOfWork.TableRepository.GetAsync(filter: t => t.TableTypeId == tableTypeTemp.TableTypeId && t.IsDeleted == false)).Any();
+                            if (isExistingTable)
+                            {
+                                tableTypes.Add(tableTypeTemp);
+                            }
+                        }
+                        break;
+                    case 2:
+                        var tableTypesTemp2 = await _unitOfWork.TableTypeRepository.GetAsync(filter: t => t.IsDeleted == false);
+                        foreach (var tableTypeTemp in tableTypesTemp2)
+                        {
+                            var numOfTables = (await _unitOfWork.TableRepository.GetAsync(filter: t => t.TableTypeId == tableTypeTemp.TableTypeId)).Count();
+                            var numOfDeletedTables = (await _unitOfWork.TableRepository.GetAsync(filter: t => t.TableTypeId == tableTypeTemp.TableTypeId && t.IsDeleted == true)).Count();
+                            int subtraction = numOfTables - numOfDeletedTables;
+                            if(subtraction == 0)
+                            {
+                                tableTypes.Add(tableTypeTemp);
+                            }
+                        }
+                        break;
+                    default:
+                        throw new CustomException.InvalidDataException("Trạng thái không tồn tại");
+                }
+
+                foreach (var tableType in tableTypes)
+                {
+                    var tableTypeDto = _mapper.Map<TableTypeResponse>(tableType);
+                    responses.Add(tableTypeDto);
+                }
+
+                return responses;
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
+
         public async Task<TableTypeResponse?> GetById(Guid TableTypeId)
         {
             try
