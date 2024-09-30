@@ -55,7 +55,7 @@ namespace BarBuddy_API.Controllers.Account
 
         [AllowAnonymous]
         [HttpGet("/api/v1/staff-account/detail")]
-        public async Task<IActionResult> GetStaffAccountById([FromQuery] string accountId)
+        public async Task<IActionResult> GetStaffAccountById([FromQuery] Guid accountId)
         {
             var staffAccount = await _accountService.GetStaffAccountById(accountId);
             return Ok(staffAccount);
@@ -63,15 +63,51 @@ namespace BarBuddy_API.Controllers.Account
 
         [AllowAnonymous]
         [HttpGet("/api/v1/customer-account/detail")]
-        public async Task<IActionResult> GetCustomerAccountByEmail([FromQuery] string accountId)
+        public async Task<IActionResult> GetCustomerAccountByEmail([FromQuery] Guid accountId)
         {
             var customerAccount = await _accountService.GetCustomerAccountById(accountId);
             return Ok(customerAccount);
         }
 
         [AllowAnonymous]
-        [HttpPut("/api/v1/customer-account")]
-        public async Task<IActionResult> UpdateCustomerAccount([FromQuery] string accountId, [FromBody] CustomerAccountRequest request)
+        [HttpPost("/api/v1/staff-account")]
+        public async Task<IActionResult> CreateStaffAccount([FromBody] StaffAccountRequest request)
+        {
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _accountService.CreateStaffAccount(request);
+            return Ok(result);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("/api/v1/customer-account")]
+        public async Task<IActionResult> CreateCustomerAccount([FromBody] CustomerAccountRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _accountService.CreateCustomerAccount(request);
+            return Ok(result);
+        }
+
+        [AllowAnonymous]
+        [HttpPatch("/api/v1/staff-account")]
+        public async Task<IActionResult> UpdateStaffAccount([FromQuery] Guid accountId, [FromBody] StaffAccountRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _accountService.UpdateStaffAccount(accountId, request);
+            return Ok(result);
+        }
+
+        [AllowAnonymous]
+        [HttpPatch("/api/v1/customer-account")]
+        public async Task<IActionResult> UpdateCustomerAccount([FromQuery] Guid accountId, [FromBody] CustomerAccountRequest request)
         {
             if(!ModelState.IsValid)
             {

@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Application.DTOs.Bar;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,7 +11,7 @@ namespace Application.DTOs.Account
 {
     public class StaffAccountResponse
     {
-        public string AccountId { get; set; }
+        public Guid AccountId { get; set; }
         public string Email { get; set; }
         public string Fullname { get; set; }
         public string Phone { get; set; }
@@ -19,7 +20,7 @@ namespace Application.DTOs.Account
         [DataType(DataType.Date)]
         public DateTimeOffset Dob { get; set; }
         public string BarId { get; set; }
-        public virtual Bar? Bar { get; set; }
+        public virtual BarResponse? Bar { get; set; }
         public int Status { get; set; }
     }
 }

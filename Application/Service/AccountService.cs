@@ -30,8 +30,8 @@ namespace Application.Service
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
-            _accountRepository = _unitOfWork.GetRepository<Account>();
-            _barRepository = _unitOfWork.GetRepository<Bar>();
+            _accountRepository = _unitOfWork.AccountRepository;
+            _barRepository = _unitOfWork.BarRepository;
             random = new Random();
         }
 
@@ -85,7 +85,6 @@ namespace Application.Service
             {
                 _unitOfWork.BeginTransaction();
                 var newAccount = _mapper.Map<Account>(request);
-                newAccount.AccountId = new Guid().ToString();
                 newAccount.Status = 1;
                 newAccount.CreatedAt = DateTime.Now;
                 newAccount.Password = await HashPassword(RandomString(10));
@@ -134,10 +133,9 @@ namespace Application.Service
                 .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
-        public async Task<StaffAccountResponse> UpdateStaffAccount(string accountId, StaffAccountRequest request)
+        public async Task<StaffAccountResponse> UpdateStaffAccount(Guid accountId, StaffAccountRequest request)
         {
-            var detachedAccountId = DecryptAccountId(accountId);
-            var existedAccount = _accountRepository.GetByID(detachedAccountId);
+            var existedAccount = _accountRepository.GetByID(accountId);
             var existedBar = await _barRepository.GetByIdAsync(request.BarId);
             if (existedAccount == null)
             {
@@ -156,7 +154,6 @@ namespace Application.Service
                 _unitOfWork.CommitTransaction();
                 _unitOfWork.Save();
                 var result = _mapper.Map<StaffAccountResponse>(updatedAccount);
-                result.AccountId = EncryptAccountId(result.AccountId);
                 return result;
             }
             catch (Exception ex)
@@ -170,10 +167,9 @@ namespace Application.Service
             }
         }
 
-        public async Task<CustomerAccountResponse> UpdateCustomerAccount(string accountId, CustomerAccountRequest request)
+        public async Task<CustomerAccountResponse> UpdateCustomerAccount(Guid accountId, CustomerAccountRequest request)
         {
-            var detachedAccountId = DecryptAccountId(accountId);
-            var existedAccount = await _accountRepository.GetByIdAsync(detachedAccountId);
+            var existedAccount = await _accountRepository.GetByIdAsync(accountId);
             if (existedAccount == null)
             {
                 throw new DataNotFoundException("Customer's account is not found in database");
@@ -187,7 +183,6 @@ namespace Application.Service
                 _unitOfWork.CommitTransaction();
                 _unitOfWork.Save();
                 var result = _mapper.Map<CustomerAccountResponse>(updatedAccount);
-                result.AccountId = EncryptAccountId(result.AccountId);
                 return result;
             }
             catch (Exception ex)
@@ -240,25 +235,18 @@ namespace Application.Service
         {
             try
             {
-                var accountIEnumerable = _accountRepository
-                    .Get(filter: a => a.RoleId == "550e8400-e29b-41d4-a716-446655440201", 
-                        pageSize: pageSize, pageIndex: pageIndex)
-                    .Select(account =>
-                    {
-                        account.AccountId = EncryptAccountId(account.AccountId);
-                        return account;
-                    })
-                    .ToList();
-                var items = _mapper.Map<IEnumerable<StaffAccountResponse>>(accountIEnumerable);
+                Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440201");
+                var accountIEnumerable = await _accountRepository.GetAsync(filter: a => a.RoleId.Equals(roleIdGuid),
+                    pageSize: pageSize, pageIndex: pageIndex,
+                    includeProperties: "Bar"); var items = _mapper.Map<IEnumerable<StaffAccountResponse>>(accountIEnumerable);
                 if (items == null || !items.Any())
                 {
                     throw new DataNotFoundException("Staff's accounts is empty list");
                 }
-                var count = await _accountRepository.CountAsync();
                 var result = new PaginationList<StaffAccountResponse>
                 {
                     items = items,
-                    count = count,
+                    count = items.Count(),
                     //pageIndex = pageIndex,
                     //pageSize = pageSize
                 };
@@ -277,25 +265,14 @@ namespace Application.Service
         {
             try
             {
-                var accountIEnumerable = _accountRepository
-                    .Get(filter: a => a.RoleId == "550e8400-e29b-41d4-a716-446655440202", 
-                        pageSize: pageSize, pageIndex: pageIndex)
-                    .Select(account =>
-                    {
-                        account.AccountId = EncryptAccountId(account.AccountId);
-                        return account;
-                    })
-                    .ToList();
+                Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440202");
+                var accountIEnumerable = await _accountRepository.GetAsync(filter: a => a.RoleId.Equals(roleIdGuid), 
+                    pageSize: pageSize, pageIndex: pageIndex);
                 var items = _mapper.Map<IEnumerable<CustomerAccountResponse>>(accountIEnumerable);
-                if (items == null || !items.Any())
-                {
-                    throw new DataNotFoundException("Customer's accounts is empty list");
-                }
-                var count = await _accountRepository.CountAsync();
                 var result = new PaginationList<CustomerAccountResponse>
                 {
                     items = items,
-                    count = count,
+                    count = items.Count(),
                     //pageIndex = pageIndex,
                     //pageSize = pageSize
                 };
@@ -311,12 +288,38 @@ namespace Application.Service
             }
         }
 
-        public async Task<StaffAccountResponse> GetStaffAccountByEmail(string email)
+        public async Task<CustomerAccountResponse> GetCustomerAccountById(Guid accountId)
         {
             try
             {
-                var staffAccount = (await _accountRepository.GetAsync(filter: a => a.Email == email
-                        && a.RoleId == "550e8400-e29b-41d4-a716-446655440201")).FirstOrDefault();
+                Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440202");
+                var customerAccount = (await _accountRepository.GetAsync(filter: a => a.AccountId == accountId
+                        && a.RoleId == roleIdGuid)).FirstOrDefault();
+                if (customerAccount == null)
+                {
+                    throw new DataNotFoundException("Customer's account not found");
+                }
+                var result = _mapper.Map<CustomerAccountResponse>(customerAccount);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new InternalServerErrorException($"An Internal error occurred: {ex.Message}");
+            }
+            finally
+            {
+                _unitOfWork.Dispose();
+            }
+        }
+
+        public async Task<StaffAccountResponse> GetStaffAccountById(Guid accountId)
+        {
+            try
+            {
+                Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440201");
+                var staffAccount = (await _accountRepository.GetAsync(filter: a => a.AccountId == accountId && a.RoleId == roleIdGuid,
+                        includeProperties: "Bar"))
+                    .FirstOrDefault();
                 if (staffAccount == null)
                 {
                     throw new DataNotFoundException("Staff's account not found");
@@ -334,121 +337,58 @@ namespace Application.Service
             }
         }
 
-        public async Task<CustomerAccountResponse> GetCustomerAccountByEmail(string email)
-        {
-            try
-            {
-                var customerAccount = (await _accountRepository.GetAsync(filter: a => a.Email == email
-                        && a.RoleId == "550e8400-e29b-41d4-a716-446655440202")).FirstOrDefault();
-                if (customerAccount == null)
-                {
-                    throw new DataNotFoundException("Customer's account not found");
-                }
-                var result = _mapper.Map<CustomerAccountResponse>(customerAccount);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new InternalServerErrorException($"An Internal error occurred: {ex.Message}");
-            }
-            finally
-            {
-                _unitOfWork.Dispose();
-            }
-        }
+        //private static Guid EncryptAccountId(Guid accountId)
+        //{
+        //    string accountIdString = accountId.ToString();
 
-        public async Task<CustomerAccountResponse> GetCustomerAccountById(string accountId)
-        {
-            try
-            {
-                var detachedAccountId = DecryptAccountId(accountId);
-                var customerAccount = (await _accountRepository.GetAsync(filter: a => a.AccountId == detachedAccountId
-                        && a.RoleId == "550e8400-e29b-41d4-a716-446655440202")).FirstOrDefault();
-                if (customerAccount == null)
-                {
-                    throw new DataNotFoundException("Customer's account not found");
-                }
-                var result = _mapper.Map<CustomerAccountResponse>(customerAccount);
-                result.AccountId = EncryptAccountId(result.AccountId);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new InternalServerErrorException($"An Internal error occurred: {ex.Message}");
-            }
-            finally
-            {
-                _unitOfWork.Dispose();
-            }
-        }
+        //    using (Aes aes = Aes.Create())
+        //    {
+        //        aes.Key = Encoding.UTF8.GetBytes(key);
+        //        aes.IV = new byte[16];
 
-        public async Task<CustomerAccountResponse> GetStaffAccountById(string accountId)
-        {
-            try
-            {
-                var detachedAccountId = DecryptAccountId(accountId);
-                var staffAccount = (await _accountRepository.GetAsync(filter: a => a.AccountId == detachedAccountId
-                        && a.RoleId == "550e8400-e29b-41d4-a716-446655440201")).FirstOrDefault();
-                if (staffAccount == null)
-                {
-                    throw new DataNotFoundException("Staff's account not found");
-                }
-                var result = _mapper.Map<CustomerAccountResponse>(staffAccount);
-                result.AccountId = EncryptAccountId(result.AccountId);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                throw new InternalServerErrorException($"An Internal error occurred: {ex.Message}");
-            }
-            finally
-            {
-                _unitOfWork.Dispose();
-            }
-        }
+        //        ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+        //        using (MemoryStream ms = new MemoryStream())
+        //        {
+        //            using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+        //            {
+        //                using (StreamWriter sw = new StreamWriter(cs))
+        //                {
+        //                    sw.Write(accountIdString);
+        //                }
+        //            }
 
-        private static string EncryptAccountId(string accountId)
-        {
-            using (Aes aes = Aes.Create())
-            {
-                aes.Key = Encoding.UTF8.GetBytes(key);
-                aes.IV = new byte[16]; // Sử dụng IV mặc định là các byte 0
+        //            // Chuyển kết quả mã hóa thành chuỗi Base64
+        //            string encryptedBase64 = Convert.ToBase64String(ms.ToArray());
 
-                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
-                    {
-                        using (StreamWriter sw = new StreamWriter(cs))
-                        {
-                            sw.Write(accountId);
-                        }
-                    }
+        //            // Giới hạn độ dài chuỗi Base64 để phù hợp với độ dài của GUID (32 ký tự)
+        //            string truncatedBase64 = encryptedBase64.Replace("=", "").Replace("/", "").Replace("+", "").Substring(0, 32);
 
-                    return Convert.ToBase64String(ms.ToArray());
-                }
-            }
-        }
+        //            return new Guid(truncatedBase64);
+        //        }
+        //    }
+        //}
 
-        private static string DecryptAccountId(string hashedAccountId)
-        {
-            using (Aes aes = Aes.Create())
-            {
-                aes.Key = Encoding.UTF8.GetBytes(key);
-                aes.IV = new byte[16]; // Sử dụng IV mặc định là các byte 0
+        //private static Guid DecryptAccountId(string hashedAccountId)
+        //{
+        //    using (Aes aes = Aes.Create())
+        //    {
+        //        aes.Key = Encoding.UTF8.GetBytes(key);
+        //        aes.IV = new byte[16];
 
-                ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
-                using (MemoryStream ms = new MemoryStream(Convert.FromBase64String(hashedAccountId)))
-                {
-                    using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
-                    {
-                        using (StreamReader sr = new StreamReader(cs))
-                        {
-                            return sr.ReadToEnd();
-                        }
-                    }
-                }
-            }
-        }
+        //        ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+        //        using (MemoryStream ms = new MemoryStream(Convert.FromBase64String(hashedAccountId)))
+        //        {
+        //            using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read))
+        //            {
+        //                using (StreamReader sr = new StreamReader(cs))
+        //                {
+        //                    string decryptedString = sr.ReadToEnd();
+        //                    return Guid.Parse(decryptedString);
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
+
     }
 }

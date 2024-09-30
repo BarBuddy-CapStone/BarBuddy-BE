@@ -20,19 +20,28 @@ namespace Application.DTOs.Account
         public string Phone { get; set; }
 
         [Required]
-        [DataType(DataType.Date)]
         [CustomValidation(typeof(CustomerAccountRequest), "ValidateAge", ErrorMessage = "Bạn phải đủ 18 tuổi.")]
-        public DateTime Birthdate { get; set; }
+        public DateTimeOffset Dob { get; set; }
 
-        public static ValidationResult? ValidateAge(DateTime birthdate, ValidationContext context)
+        public static ValidationResult? ValidateAge(DateTimeOffset birthdate, ValidationContext context)
         {
-            int age = DateTime.Today.Year - birthdate.Year;
-            if (birthdate > DateTime.Today.AddYears(-age)) age--;
+            // Lấy giá trị hiện tại theo DateTimeOffset
+            DateTimeOffset today = DateTimeOffset.Now;
 
+            // Tính toán tuổi
+            int age = today.Year - birthdate.Year;
+
+            // Kiểm tra xem sinh nhật trong năm nay đã qua chưa
+            if (birthdate > today.AddYears(-age))
+            {
+                age--;
+            }
+
+            // Kiểm tra tuổi có lớn hơn hoặc bằng 18 không
             return age >= 18 ? ValidationResult.Success : new ValidationResult("Bạn phải đủ 18 tuổi.");
         }
-        public string BarId { get; set; } //BarId
-
+        public Guid BarId { get; set; } //BarId
+        public string Image { get => "default"; }
         public string RoleId { get => "550e8400-e29b-41d4-a716-446655440201"; } //RoleId Staff
         public int Status { get; set; }
     }
