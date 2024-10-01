@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Application.DTOs.Response.EmotionCategory;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,10 @@ namespace Application.DTOs.Drink
         public string DrinkName { get; set; }
         public string Description { get; set; }
         public double Price { get; set; }
-        public string Image { get; set; }
-        public int Status { get; set; }
+        public string Images { get; set; }
+        public List<EmotionCategoryResponse> EmotionsDrink { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public DateTime UpdatedDate { get; set; }
+        public bool Status { get; set; }
     }
 }

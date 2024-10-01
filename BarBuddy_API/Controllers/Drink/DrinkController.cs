@@ -2,6 +2,7 @@
 using Application.IService;
 using CoreApiResponse;
 using Domain.CustomException;
+using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BarBuddy_API.Controllers.Drink
@@ -41,6 +42,23 @@ namespace BarBuddy_API.Controllers.Drink
             try
             {
                 var response = await _drinkService.GetDrink(drinkId);
+                return CustomResult("Data loaded", response);
+            }
+            catch (CustomException.DataNotFoundException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.NotFound);
+            }
+            catch (CustomException.InternalServerErrorException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
+        }
+        [HttpGet("getDrinkBaedCate/{cateId}")]
+        public async Task<IActionResult> GetAllDrinkBasedCateId(Guid cateId)
+        {
+            try
+            {
+                var response = await _drinkService.GetAllDrinkBasedCateId(cateId);
                 return CustomResult("Data loaded", response);
             }
             catch (CustomException.DataNotFoundException e)

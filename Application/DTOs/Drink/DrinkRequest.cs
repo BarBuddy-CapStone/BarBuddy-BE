@@ -21,7 +21,9 @@ namespace Application.DTOs.Drink
         [Required]
         public double Price { get; set; }
         [Required]
-        public List<IFormFile> Images { get; set; }
+        public List<Guid> DrinkBaseEmo {  get; set; }
+        public List<IFormFile>? Images { get; set; }
+        public List<string>? OldImages { get; set; }
         [Required]
         public bool Status { get; set; }
     }
