@@ -12,7 +12,7 @@ using Persistence.Data;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20240929103515_BarBuddy")]
+    [Migration("20241001154503_BarBuddy")]
     partial class BarBuddy
     {
         /// <inheritdoc />
@@ -146,6 +146,9 @@ namespace Persistence.Migrations
 
                     b.Property<TimeSpan>("BookingTime")
                         .HasColumnType("time(6)");
+
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<bool>("IsIncludeDrink")
                         .HasColumnType("tinyint(1)");
@@ -365,6 +368,13 @@ namespace Persistence.Migrations
 
                     b.Property<DateTime>("PaymentDate")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<double>("PaymentFee")
+                        .HasColumnType("double");
+
+                    b.Property<string>("ProviderName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("Status")
                         .HasColumnType("tinyint(1)");

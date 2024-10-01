@@ -144,6 +144,9 @@ namespace Persistence.Migrations
                     b.Property<TimeSpan>("BookingTime")
                         .HasColumnType("time(6)");
 
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<bool>("IsIncludeDrink")
                         .HasColumnType("tinyint(1)");
 
@@ -362,6 +365,13 @@ namespace Persistence.Migrations
 
                     b.Property<DateTime>("PaymentDate")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<double>("PaymentFee")
+                        .HasColumnType("double");
+
+                    b.Property<string>("ProviderName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("Status")
                         .HasColumnType("tinyint(1)");

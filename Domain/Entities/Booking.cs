@@ -21,6 +21,7 @@ namespace Domain.Entities
         public TimeSpan BookingTime { get; set; }
         public string? Note {  get; set; }
         public bool IsIncludeDrink {  get; set; }
+        public DateTime CreateAt { get; set; } = DateTime.Now;
         public int Status { get; set; }
 
         public virtual ICollection<BookingDrink> BookingDrinks { get; set; }
