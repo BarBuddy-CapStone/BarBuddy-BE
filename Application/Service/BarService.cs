@@ -37,6 +37,11 @@ namespace Application.Service
             {
                 try
                 {
+                    if(request.Images.IsNullOrEmpty())
+                    {
+                        throw new CustomException.InvalidDataException("Invalid data");
+                    }
+
                     fileToUpload = Utils.CheckValidateImageFile(request.Images);
 
                     //Create với img là ""
@@ -101,6 +106,7 @@ namespace Application.Service
         {
             var response = new BarResponse();
             string imageUrl = null;
+            string imgsUploaed = string.Empty;
             List<string> imgsList = new List<string>();
             List<IFormFile> imgsUpload = new List<IFormFile>();
 
@@ -115,7 +121,15 @@ namespace Application.Service
                         throw new CustomException.DataNotFoundException("Data not Found !");
                     }
 
-                    imgsUpload = Utils.CheckValidateImageFile(request.Images);
+                    if (!request.Images.IsNullOrEmpty())
+                    {
+                        imgsUpload = Utils.CheckValidateImageFile(request.Images);
+                    }
+
+                    if(request.imgsAsString.IsNullOrEmpty() && getBarById.Images.IsNullOrEmpty())
+                    {
+                        throw new CustomException.InvalidDataException("Invalid data");
+                    }
 
                     _mapper.Map(request, getBarById);
                     //Update với img là ""
@@ -131,9 +145,14 @@ namespace Application.Service
                         imgsList.Add(imageUrl);
                     }
 
+
+
                     var imgsAsString = string.Join(",", imgsList);
+                    imgsUploaed = string.Join(",", request.imgsAsString);
+
+                    var allImg = string.IsNullOrEmpty(imgsAsString) ? imgsUploaed : $"{imgsUploaed},{imgsAsString}";
                     //Sau khi Upd ở trên thành công => lưu img lên firebase
-                    getBarById.Images = imgsAsString;
+                    getBarById.Images = allImg;
                     await _unitOfWork.BarRepository.UpdateAsync(getBarById);
                     await Task.Delay(200);
                     await _unitOfWork.SaveAsync();

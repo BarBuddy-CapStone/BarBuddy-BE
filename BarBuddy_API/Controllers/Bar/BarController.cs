@@ -81,7 +81,7 @@ namespace BarBuddy_API.Controllers.Bar
             }
         }
 
-        [HttpPut("admin/updateBar/{barId}")]
+        [HttpPatch("admin/updateBar/{barId}")]
         public async Task<IActionResult> UpdateBar(Guid barId, [FromForm] BarRequest request)
         {
             try
