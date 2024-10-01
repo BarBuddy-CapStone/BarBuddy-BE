@@ -23,6 +23,7 @@ namespace Application.DependencyInjection
             services.AddScoped<IPaymentHistoryService, PaymentHistoryService>();
             services.AddScoped<ITableTypeService, TableTypeService>();
             services.AddScoped<ITableService, TableService>();
+            services.AddScoped<IBookingService, BookingService>();
         }
     }
 }

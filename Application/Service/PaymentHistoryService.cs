@@ -51,17 +51,80 @@ namespace Application.Service
 
                 var paymentsWithPagination = await _unitOfWork.PaymentHistoryRepository.GetAsync(filter: filter, includeProperties: "Account,Booking", pageIndex: PageIndex, pageSize: PageSize);
 
-                foreach (var payment in paymentsWithPagination) { 
-                    var paymentResponse = new PaymentHistoryResponse();
+                foreach (var payment in paymentsWithPagination) {
+                    var paymentResponse = new PaymentHistoryResponse
+                    {
+                        CustomerName = payment.Account.Fullname,
+                        PhoneNumber = payment.Account.Phone,
+                        BarName = (await _unitOfWork.BarRepository.GetByIdAsync(payment.Booking.BarId)).BarName,
+                        TransactionCode = payment.TransactionCode,
+                        Status = payment.Status,
+                        Note = payment.Note,
+                        PaymentDate = payment.PaymentDate,
+                        TotalPrice = payment.TotalPrice
+                    };
 
-                    paymentResponse.CustomerName = payment.Account.Fullname;
-                    paymentResponse.PhoneNumber = payment.Account.Phone;
-                    paymentResponse.BarName = (await _unitOfWork.BarRepository.GetByIdAsync(payment.Booking.BarId)).BarName;
-                    paymentResponse.TransactionCode = payment.TransactionCode;
-                    paymentResponse.Status = payment.Status;
-                    paymentResponse.Note = payment.Note;
-                    paymentResponse.PaymentDate = payment.PaymentDate;
-                    paymentResponse.TotalPrice = payment.TotalPrice;
+                    response.Add(paymentResponse);
+                }
+
+                return (response, totalPage);
+            }
+            catch (Exception ex) { 
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
+
+        public async Task<(List<PaymentHistoryByCustomerResponse> response, int totalPage)> GetByCustomerId(Guid customerId, bool? Status, int PageIndex, int PageSize)
+        {
+            try
+            {
+                var response = new List<PaymentHistoryByCustomerResponse>();
+                int totalPage = 1;
+
+                // *** find role id temporarily
+                var role = (await _unitOfWork.RoleRepository.GetAsync(r => r.RoleName == "CUSTOMER")).FirstOrDefault();
+                if (role == null)
+                {
+                    throw new CustomException.InternalServerErrorException("Cannot find role");
+                }
+
+                var customer = await _unitOfWork.AccountRepository.GetAsync(a => a.AccountId == customerId && a.RoleId == role.RoleId);
+                if(customer == null)
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy khách hàng");
+                }
+                
+                var payments = await _unitOfWork.PaymentHistoryRepository.GetAsync(filter: p => (Status == null || p.Status == Status) && p.AccountId == customerId);
+
+                if (payments.Count() > PageSize)
+                {
+                    if (PageSize == 1)
+                    {
+                        totalPage = (payments.Count() / PageSize);
+                    }
+                    else
+                    {
+                        totalPage = (payments.Count() / PageSize) + 1;
+                    }
+                }
+
+                var paymentsWithPagination = await _unitOfWork.PaymentHistoryRepository.GetAsync(filter: p => (Status == null || p.Status == Status) && p.AccountId == customerId, includeProperties: "Account,Booking", pageIndex: PageIndex, pageSize: PageSize);
+
+                foreach (var payment in paymentsWithPagination)
+                {
+                    var paymentResponse = new PaymentHistoryByCustomerResponse
+                    {
+                        CustomerName = payment.Account.Fullname,
+                        PhoneNumber = payment.Account.Phone,
+                        BarName = (await _unitOfWork.BarRepository.GetByIdAsync(payment.Booking.BarId)).BarName,
+                        TransactionCode = payment.TransactionCode,
+                        Status = payment.Status,
+                        Note = payment.Note,
+                        PaymentDate = payment.PaymentDate,
+                        TotalPrice = payment.TotalPrice,
+                        ProviderName = payment.ProviderName,
+                        PaymentFee = payment.PaymentFee
+                    };
 
                     response.Add(paymentResponse);
                 }
