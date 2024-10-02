@@ -235,7 +235,13 @@ namespace Application.Service
         {
             try
             {
-                Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440201");
+                //Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440201");
+                var role = (await _unitOfWork.RoleRepository.GetAsync(r => r.RoleName == "STAFF")).FirstOrDefault();
+                if (role == null)
+                {
+                    throw new DataNotFoundException("Failed to get role info");
+                }
+                var roleIdGuid = role.RoleId;
                 var accountIEnumerable = await _accountRepository.GetAsync(filter: a => a.RoleId.Equals(roleIdGuid),
                     pageSize: pageSize, pageIndex: pageIndex,
                     includeProperties: "Bar"); var items = _mapper.Map<IEnumerable<StaffAccountResponse>>(accountIEnumerable);
@@ -265,7 +271,13 @@ namespace Application.Service
         {
             try
             {
-                Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440202");
+                //Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440202");
+                var role = (await _unitOfWork.RoleRepository.GetAsync(r => r.RoleName == "CUSTOMER")).FirstOrDefault();
+                if (role == null)
+                {
+                    throw new DataNotFoundException("Failed to get role info");
+                }
+                var roleIdGuid = role.RoleId;
                 var accountIEnumerable = await _accountRepository.GetAsync(filter: a => a.RoleId.Equals(roleIdGuid), 
                     pageSize: pageSize, pageIndex: pageIndex);
                 var items = _mapper.Map<IEnumerable<CustomerAccountResponse>>(accountIEnumerable);
@@ -292,7 +304,13 @@ namespace Application.Service
         {
             try
             {
-                Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440202");
+                //Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440202");
+                var role = (await _unitOfWork.RoleRepository.GetAsync(r => r.RoleName == "CUSTOMER")).FirstOrDefault();
+                if (role == null)
+                {
+                    throw new DataNotFoundException("Failed to get role info");
+                }
+                var roleIdGuid = role.RoleId;
                 var customerAccount = (await _accountRepository.GetAsync(filter: a => a.AccountId == accountId
                         && a.RoleId == roleIdGuid)).FirstOrDefault();
                 if (customerAccount == null)
@@ -316,7 +334,13 @@ namespace Application.Service
         {
             try
             {
-                Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440201");
+                //Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440201");
+                var role = (await _unitOfWork.RoleRepository.GetAsync(r => r.RoleName == "STAFF")).FirstOrDefault();
+                if (role == null)
+                {
+                    throw new DataNotFoundException("Failed to get role info");
+                }
+                var roleIdGuid = role.RoleId;
                 var staffAccount = (await _accountRepository.GetAsync(filter: a => a.AccountId == accountId && a.RoleId == roleIdGuid,
                         includeProperties: "Bar"))
                     .FirstOrDefault();
