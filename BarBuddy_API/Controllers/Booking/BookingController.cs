@@ -2,6 +2,7 @@
 using Azure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace BarBuddy_API.Controllers.Booking
 {
@@ -27,6 +28,13 @@ namespace BarBuddy_API.Controllers.Booking
         public async Task<IActionResult> GetBookingById(Guid BookingId) {
             var response = await _bookingService.GetBookingById(BookingId);
             return Ok(response);
+        }
+
+        [HttpGet("top-booking")]
+        public async Task<IActionResult> GetTopBookingByCustomer([FromQuery] [Required] Guid CustomerId, [FromQuery] int NumOfBookings = 4)
+        {
+            var responses = await _bookingService.GetTopBookingByCustomer(CustomerId, NumOfBookings);
+            return Ok(responses);
         }
 
         [HttpPatch("cancel/{BookingId}")]

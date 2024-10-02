@@ -43,7 +43,7 @@ namespace Application.Service
                 }
 
                 // Cancelled status (temp)
-                booking.Status = 2;
+                booking.Status = 1;
 
                 await _unitOfWork.BookingRepository.UpdateAsync(booking);
                 await _unitOfWork.SaveAsync();
@@ -146,6 +146,34 @@ namespace Application.Service
                 return response;
             }
             catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
+
+        public async Task<List<TopBookingResponse>> GetTopBookingByCustomer(Guid CustomerId, int NumOfBookings)
+        {
+            try
+            {
+                var responses = new List<TopBookingResponse>();
+
+                var bookings = await _unitOfWork.BookingRepository.GetAsync(b => b.AccountId == CustomerId, pageIndex: 1, pageSize: NumOfBookings, orderBy: o => o.OrderByDescending(b => b.CreateAt), includeProperties: "Bar");
+                foreach (var booking in bookings) {
+                    var response = new TopBookingResponse
+                    {
+                        BarName = booking.Bar.BarName,
+                        BookingDate = booking.BookingDate,
+                        BookingId = booking.BookingId,
+                        BookingTime = booking.BookingTime,
+                        CreateAt = booking.CreateAt,
+                        Status = booking.Status,
+                        Image = booking.Bar.Images.Split(',')[0]
+                    };
+                    responses.Add(response);
+                }
+
+                return responses;
+            } catch (Exception ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }

@@ -1,9 +1,14 @@
 ﻿using Application.DTOs.Account;
 using Application.IService;
+using Application.Service;
+using Azure.Core;
+using Domain.CustomException;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace BarBuddy_API.Controllers.Account
 {
@@ -69,6 +74,13 @@ namespace BarBuddy_API.Controllers.Account
             return Ok(customerAccount);
         }
 
+        [HttpGet("/api/v1/customer/{accountId}")]
+        public async Task<IActionResult> GetCustomerAccountById(Guid accountId)
+        {
+            var customerAccount = await _accountService.GetCustomerInfoById(accountId);
+            return Ok(customerAccount);
+        }
+
         [AllowAnonymous]
         [HttpPost("/api/v1/staff-account")]
         public async Task<IActionResult> CreateStaffAccount([FromBody] StaffAccountRequest request)
@@ -115,6 +127,26 @@ namespace BarBuddy_API.Controllers.Account
             }
             var result = await _accountService.UpdateCustomerAccount(accountId, request);
             return Ok(result);
+        }
+
+        [AllowAnonymous]
+        [HttpPatch("/api/v1/customer/{accountId}")]
+        public async Task<IActionResult> UpdateCustomerAccountByCustomer(Guid accountId, [FromBody] CustomerInfoRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            await _accountService.UpdateCustomerAccountByCustomer(accountId, request);
+            return Ok("Update thành công");
+        }
+
+        [AllowAnonymous]
+        [HttpPatch("/api/v1/customer/avatar/{accountId}")]
+        public async Task<IActionResult> UpdateCustomerAvatar(Guid accountId, [FromForm] IFormFile Image)
+        {
+            var res = await _accountService.UpdateCustomerAvatar(accountId, Image);
+            return Ok(new {url = res});
         }
     }
 }

@@ -17,6 +17,8 @@ namespace Application.Mappers.AccountMapper
             CreateMap<Account, CustomerAccountResponse>();
             CreateMap<StaffAccountRequest, Account>();
             CreateMap<Account, StaffAccountResponse>();
+            CreateMap<Account, CustomerInfoResponse>().ReverseMap();
+            CreateMap<CustomerInfoRequest, Account>().ReverseMap();
         }
     }
 }
