@@ -55,11 +55,11 @@ namespace Application.Service
             }
         }
 
-        public async Task<(List<AllCustomerBookingResponse> responses, int TotalPage)> GetAllCustomerBooking(Guid CustomerId, int? Status, int PageIndex = 1, int PageSize = 10)
+        public async Task<(List<TopBookingResponse> responses, int TotalPage)> GetAllCustomerBooking(Guid CustomerId, int? Status, int PageIndex = 1, int PageSize = 10)
         {
             try
             {
-                var responses = new List<AllCustomerBookingResponse>();
+                var responses = new List<TopBookingResponse>();
                 int TotalPage = 1;
 
                 var bookings = await _unitOfWork.BookingRepository.GetAsync(b => b.AccountId == CustomerId && (Status == null || b.Status == Status));
@@ -76,20 +76,21 @@ namespace Application.Service
                     }
                 }
 
-                var bookingsWithPagination = await _unitOfWork.BookingRepository.GetAsync(b => b.AccountId == CustomerId && (Status == null || b.Status == Status), includeProperties: "Bar", pageSize: PageSize, pageIndex: PageIndex);
+                var bookingsWithPagination = await _unitOfWork.BookingRepository.GetAsync(b => b.AccountId == CustomerId && (Status == null || b.Status == Status), includeProperties: "Bar", pageSize: PageSize, pageIndex: PageIndex, orderBy: o => o.OrderByDescending(b => b.CreateAt).ThenByDescending(b => b.BookingDate));
 
                 foreach (var booking in bookingsWithPagination)
                 {
-                    var bookingResponse = new AllCustomerBookingResponse
+                    var response = new TopBookingResponse
                     {
                         BarName = booking.Bar.BarName,
                         BookingDate = booking.BookingDate,
                         BookingId = booking.BookingId,
                         BookingTime = booking.BookingTime,
                         CreateAt = booking.CreateAt,
-                        Status = booking.Status
+                        Status = booking.Status,
+                        Image = booking.Bar.Images.Split(',')[0]
                     };
-                    responses.Add(bookingResponse);
+                    responses.Add(response);
                 }
 
                 return (responses, TotalPage);
@@ -157,7 +158,7 @@ namespace Application.Service
             {
                 var responses = new List<TopBookingResponse>();
 
-                var bookings = await _unitOfWork.BookingRepository.GetAsync(b => b.AccountId == CustomerId, pageIndex: 1, pageSize: NumOfBookings, orderBy: o => o.OrderByDescending(b => b.CreateAt), includeProperties: "Bar");
+                var bookings = await _unitOfWork.BookingRepository.GetAsync(b => b.AccountId == CustomerId, pageIndex: 1, pageSize: NumOfBookings, orderBy: o => o.OrderByDescending(b => b.CreateAt).ThenByDescending(b => b.BookingDate), includeProperties: "Bar");
                 foreach (var booking in bookings) {
                     var response = new TopBookingResponse
                     {
