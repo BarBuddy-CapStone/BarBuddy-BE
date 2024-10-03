@@ -118,12 +118,14 @@ namespace Application.Service
                 response.Status = booking.Status;
                 response.CreateAt = booking.CreateAt;
                 response.BookingDate = booking.BookingDate;
-                response.BarAddress = booking.Bar.BarName;
+                response.BarName = booking.Bar.BarName;
                 response.BarAddress = booking.Bar.Address;
                 response.CustomerPhone = booking.Account.Phone;
                 response.CustomerName = booking.Account.Fullname;
                 response.CustomerEmail = booking.Account.Email;
                 response.BookingCode = booking.BookingCode;
+                response.Note = booking.Note;
+                response.Images = booking.Bar.Images.Split(',').ToList();
 
                 if (booking.IsIncludeDrink) {
                     var bookingDrinks = await _unitOfWork.BookingDrinkRepository.GetAsync(bd => bd.BookingId == booking.BookingId, includeProperties: "Drink");
@@ -133,7 +135,8 @@ namespace Application.Service
                             ActualPrice = drink.ActualPrice,
                             DrinkId = drink.DrinkId,
                             DrinkName = drink.Drink.DrinkName,
-                            Quantity = drink.Quantity
+                            Quantity = drink.Quantity,
+                            Image = drink.Drink.Image.Split(',')[0]
                         };
                         response.bookingDrinksList.Add(drinkResponse);
                     }

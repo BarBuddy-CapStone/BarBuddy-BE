@@ -16,9 +16,11 @@ namespace Application.DTOs.Booking
         public string CustomerName { get; set; }
         public string CustomerPhone { get; set; }
         public string CustomerEmail { get; set; }
+        public string? Note { get; set; }
         public DateTimeOffset BookingDate { get; set; }
         public TimeSpan BookingTime { get; set; }
         public DateTime CreateAt { get; set; }
+        public List<string> Images { get; set; }
         public int Status { get; set; }
         public List<string> TableNameList { get; set; } = new List<string>();
         public List<BookingDrinkDetailResponse> bookingDrinksList { get; set; } = new List<BookingDrinkDetailResponse>();

@@ -12,5 +12,6 @@ namespace Application.DTOs.BookingDrink
         public string DrinkName { get; set; }
         public double ActualPrice { get; set; }
         public int Quantity { get; set; }
+        public string Image { get; set; }
     }
 }
