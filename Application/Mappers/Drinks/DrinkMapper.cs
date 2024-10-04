@@ -10,17 +10,14 @@ namespace Application.Mappers.Drinks
         {
             CreateMap<DrinkRequest, Drink>().ReverseMap();
             CreateMap<Drink, DrinkResponse>()
-            .ForMember(dst => dst.DrinksCategoryName, src => src.MapFrom(x => x.DrinkCategory.DrinksCategoryName))
+            .ForMember(dst => dst.DrinkCategoryResponse, src => src.MapFrom(x => x.DrinkCategory))
             .ForMember(dst => dst.BarName, src => src.MapFrom(x => x.Bar.BarName))
             .ForMember(dst => dst.Images, src => src.MapFrom(x => x.Image))
             .ForMember(dst => dst.EmotionsDrink, src => src.MapFrom(x => x.DrinkEmotionalCategories))
             .ReverseMap();
 
                     CreateMap<DrinkEmotionalCategory, EmotionCategoryResponse>()
-            .ForMember(dest => dest.EmotionalDrinksCategoryId, opt => opt.MapFrom(src => src.EmotionalDrinkCategoryId))
-            .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.EmotionalDrinkCategory.CategoryName));
-
-            CreateMap<DrinkEmotionalCategory, EmotionCategoryResponse>()
+            .ForMember(dest => dest.EmotionalDrinksCategoryId, opt => opt.MapFrom(src => src.EmotionalDrinkCategory.EmotionalDrinksCategoryId))
             .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.EmotionalDrinkCategory.CategoryName));
         }
     }

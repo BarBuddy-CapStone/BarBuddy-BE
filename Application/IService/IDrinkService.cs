@@ -14,5 +14,6 @@ namespace Application.IService
         Task<DrinkResponse> CreateDrink(DrinkRequest request);
         Task<DrinkResponse> UpdateDrink(Guid drinkId,DrinkRequest request);
         Task<IEnumerable<DrinkResponse>> GetAllDrinkBasedCateId(Guid cateId);
+        Task<IEnumerable<DrinkResponse>> GetAllDrinkBasedBarId(Guid barId);
     }
 }

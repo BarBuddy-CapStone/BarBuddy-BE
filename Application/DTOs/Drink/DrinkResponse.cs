@@ -1,4 +1,5 @@
-﻿using Application.DTOs.Response.EmotionCategory;
+﻿using Application.DTOs.DrinkCategory;
+using Application.DTOs.Response.EmotionCategory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace Application.DTOs.Drink
     public class DrinkResponse
     {
         public Guid DrinkId { get; set; }
-        public string DrinksCategoryName { get; set; }
+        public DrinkCategoryResponse DrinkCategoryResponse { get; set; }
         public string BarName { get; set; }
         public string DrinkName { get; set; }
         public string Description { get; set; }
