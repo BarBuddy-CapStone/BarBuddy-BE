@@ -57,6 +57,25 @@ namespace BarBuddy_API.Controllers.Bar
             }
         }
 
+        [HttpGet("/api/v1/bar-detail")]
+        public async Task<IActionResult> GetBarWithFeedbackById(Guid barId)
+        {
+            try
+            {
+                var response = await _barService.GetBarByIdWithFeedback(barId);
+                return CustomResult("Data loaded", response);
+            }
+            catch (CustomException.DataNotFoundException e)
+            {
+                return CustomResult(e.Message, HttpStatusCode.NotFound);
+            }
+
+            catch (Exception e)
+            {
+                return CustomResult(e.Message, HttpStatusCode.InternalServerError);
+            }
+        }
+
         [HttpGet("admin/barProfile/{barId}")]
         public async Task<IActionResult> GetBarById(Guid barId)
         {

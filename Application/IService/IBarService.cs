@@ -9,5 +9,6 @@ namespace Application.IService
         Task<BarResponse> GetBarById(Guid barId);
         Task<BarResponse> UpdateBarById(Guid barId, BarRequest request);
         Task<IEnumerable<BarResponse>> GetAllBarWithFeedback();
+        Task<BarResponse> GetBarByIdWithFeedback(Guid barId);
     }
 }
