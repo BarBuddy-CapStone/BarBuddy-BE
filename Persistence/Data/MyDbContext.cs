@@ -121,7 +121,7 @@ namespace Persistence.Data
                     BarName = "Bar Buddy 1",
                     Description = "Trải nghiệm không gian âm nhạc sống động, nơi bạn có thể tạm quên đi nhịp sống hối hả và thả mình vào những giai điệu sâu lắng.",
                     Discount = 10,
-                     = "contact@barbuddy1.com",
+                    Email = "contact@barbuddy1.com",
                     EndTime = new TimeSpan(2, 00, 00),
                     StartTime = new TimeSpan(18, 00, 00),
                     Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/a0d4292c13b0cc51b2487f4c276cd7c0d96510872c4a855db190ff2db8e692d2?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
