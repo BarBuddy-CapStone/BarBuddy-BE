@@ -55,6 +55,9 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<IDrinkCategoryService, DrinkCategoryService>();
             services.AddScoped<IDrinkService, DrinkService>();
             services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IPaymentHistoryService, PaymentHistoryService>();
+            services.AddScoped<ITableTypeService, TableTypeService>();
+            services.AddScoped<ITableService, TableService>();
 
         }
 

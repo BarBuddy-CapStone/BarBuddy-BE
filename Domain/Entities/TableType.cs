@@ -15,9 +15,9 @@ namespace Domain.Entities
         public Guid TableTypeId { get; set; } = Guid.NewGuid();
         public string TypeName { get; set; }
         public string Description { get; set; }
-        public string MinimumGuest {  get; set; }
-        public string MaximumGuest { get; set; }
-        public double MiniumPrice { get; set; }
+        public int MinimumGuest {  get; set; }
+        public int MaximumGuest { get; set; }
+        public double MinimumPrice { get; set; }
         public bool IsDeleted { get; set; }
 
         public virtual ICollection<Table> Tables { get; set;}

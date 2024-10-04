@@ -1,3 +1,5 @@
+using Application.IService;
+using Application.Service;
 using BarBuddy_API.DependencyInjection;
 using BarBuddy_API.Middleware;
 using Infrastructure.DependencyInjection;
@@ -7,7 +9,6 @@ using Persistence.DependencyInjection;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();

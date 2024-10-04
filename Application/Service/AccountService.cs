@@ -1,9 +1,16 @@
-﻿using Application.DTOs.Account;
+﻿using Application.Common;
+using Application.DTOs.Account;
+using Application.DTOs.Bar;
+using Application.Interfaces;
 using Application.IService;
 using AutoMapper;
+using Azure;
 using Azure.Core;
+using Domain.CustomException;
 using Domain.Entities;
 using Domain.IRepository;
+using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
@@ -13,7 +20,10 @@ using System.Security.Principal;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Transactions;
 using static Domain.CustomException.CustomException;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Application.Service
 {
@@ -23,15 +33,17 @@ namespace Application.Service
         private readonly IUnitOfWork _unitOfWork;
         private readonly IGenericRepository<Account> _accountRepository;
         private readonly IGenericRepository<Bar> _barRepository;
+        private readonly IFirebase _fireBase;
         private static Random random;
         private static readonly string key = "1234567890123456";
 
-        public AccountService(IMapper mapper, IUnitOfWork unitOfWork)
+        public AccountService(IMapper mapper, IUnitOfWork unitOfWork, IFirebase fireBase)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _accountRepository = _unitOfWork.AccountRepository;
             _barRepository = _unitOfWork.BarRepository;
+            _fireBase = fireBase;
             random = new Random();
         }
 
@@ -235,7 +247,13 @@ namespace Application.Service
         {
             try
             {
-                Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440201");
+                //Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440201");
+                var role = (await _unitOfWork.RoleRepository.GetAsync(r => r.RoleName == "STAFF")).FirstOrDefault();
+                if (role == null)
+                {
+                    throw new DataNotFoundException("Failed to get role info");
+                }
+                var roleIdGuid = role.RoleId;
                 var accountIEnumerable = await _accountRepository.GetAsync(filter: a => a.RoleId.Equals(roleIdGuid),
                     pageSize: pageSize, pageIndex: pageIndex,
                     includeProperties: "Bar"); var items = _mapper.Map<IEnumerable<StaffAccountResponse>>(accountIEnumerable);
@@ -265,7 +283,13 @@ namespace Application.Service
         {
             try
             {
-                Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440202");
+                //Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440202");
+                var role = (await _unitOfWork.RoleRepository.GetAsync(r => r.RoleName == "CUSTOMER")).FirstOrDefault();
+                if (role == null)
+                {
+                    throw new DataNotFoundException("Failed to get role info");
+                }
+                var roleIdGuid = role.RoleId;
                 var accountIEnumerable = await _accountRepository.GetAsync(filter: a => a.RoleId.Equals(roleIdGuid), 
                     pageSize: pageSize, pageIndex: pageIndex);
                 var items = _mapper.Map<IEnumerable<CustomerAccountResponse>>(accountIEnumerable);
@@ -292,7 +316,13 @@ namespace Application.Service
         {
             try
             {
-                Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440202");
+                //Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440202");
+                var role = (await _unitOfWork.RoleRepository.GetAsync(r => r.RoleName == "CUSTOMER")).FirstOrDefault();
+                if (role == null)
+                {
+                    throw new DataNotFoundException("Failed to get role info");
+                }
+                var roleIdGuid = role.RoleId;
                 var customerAccount = (await _accountRepository.GetAsync(filter: a => a.AccountId == accountId
                         && a.RoleId == roleIdGuid)).FirstOrDefault();
                 if (customerAccount == null)
@@ -316,7 +346,13 @@ namespace Application.Service
         {
             try
             {
-                Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440201");
+                //Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440201");
+                var role = (await _unitOfWork.RoleRepository.GetAsync(r => r.RoleName == "STAFF")).FirstOrDefault();
+                if (role == null)
+                {
+                    throw new DataNotFoundException("Failed to get role info");
+                }
+                var roleIdGuid = role.RoleId;
                 var staffAccount = (await _accountRepository.GetAsync(filter: a => a.AccountId == accountId && a.RoleId == roleIdGuid,
                         includeProperties: "Bar"))
                     .FirstOrDefault();
@@ -334,6 +370,80 @@ namespace Application.Service
             finally
             {
                 _unitOfWork.Dispose();
+            }
+        }
+
+        public async Task<CustomerInfoResponse> GetCustomerInfoById(Guid accountId)
+        {
+            try
+            {
+                var account = await _accountRepository.GetByIdAsync(accountId);
+                if (account == null)
+                {
+                    throw new CustomException.DataNotFoundException("Khách hàng không tồn tại.");
+                }
+                var role = await _unitOfWork.RoleRepository.GetByIdAsync(account.RoleId);
+                if (role.RoleName != "CUSTOMER") {
+                    throw new ForbbidenException("Bạn không thể truy cập");
+                }
+                var response = _mapper.Map<CustomerInfoResponse>(account);
+                return response;
+            }
+            catch (Exception ex) {
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
+
+        public async Task UpdateCustomerAccountByCustomer(Guid accountId, CustomerInfoRequest request)
+        {
+            try
+            {
+                var account = await _accountRepository.GetByIdAsync(accountId);
+                if (account == null)
+                {
+                    throw new CustomException.DataNotFoundException("Khách hàng không tồn tại.");
+                }
+                var role = await _unitOfWork.RoleRepository.GetByIdAsync(account.RoleId);
+                if (role.RoleName != "CUSTOMER")
+                {
+                    throw new ForbbidenException("Bạn không thể truy cập");
+                }
+                var updatedAccount = _mapper.Map(request, account);
+                updatedAccount.UpdatedAt = DateTime.Now;
+                await _unitOfWork.AccountRepository.UpdateAsync(updatedAccount);
+                await _unitOfWork.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
+
+        public async Task<string> UpdateCustomerAvatar(Guid accountId, IFormFile Image)
+        {
+            try
+            {
+                string imageUrl = "default";
+                var account = await _accountRepository.GetByIdAsync(accountId);
+                if (account == null)
+                {
+                    throw new CustomException.DataNotFoundException("Tài khoản không tồn tại");
+                }
+
+                // upload image
+                var fileToUpload = Utils.CheckValidateSingleImageFile(Image);
+
+                imageUrl = await _fireBase.UploadImageAsync(Image);
+
+                account.Image = imageUrl;
+                await _unitOfWork.AccountRepository.UpdateAsync(account);
+                await Task.Delay(200);
+                await _unitOfWork.SaveAsync();
+                return imageUrl;
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
 
