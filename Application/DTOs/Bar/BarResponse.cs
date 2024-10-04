@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Application.DTOs.Response.FeedBack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,5 +20,6 @@ namespace Application.DTOs.Bar
         public string Images { get; set; }
         public double Discount { get; set; }
         public bool Status { get; set; }
+        public ICollection<FeedBackResponse> FeedBacks { get; set; }
     }
 }

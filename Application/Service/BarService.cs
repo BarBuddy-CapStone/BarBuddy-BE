@@ -84,6 +84,17 @@ namespace Application.Service
             return response;
         }
 
+        public async Task<IEnumerable<BarResponse>> GetAllBarWithFeedback()
+        {
+            var bars = await _unitOfWork.BarRepository.GetAsync(includeProperties: "Feedbacks");
+            if (bars.IsNullOrEmpty() || !bars.Any())
+            {
+                throw new CustomException.DataNotFoundException("The list is empty !");
+            }
+            var response = _mapper.Map<IEnumerable<BarResponse>>(bars);
+            return response;
+        }
+
         public async Task<BarResponse> GetBarById(Guid barId)
         {
             var getBarById = await _unitOfWork.BarRepository.GetByIdAsync(barId);

@@ -29,10 +29,6 @@ namespace BarBuddy_API.Controllers.Account
         {
             var accountList = await _accountService.GetPaginationCustomerAccount(pageSize, pageIndex);
 
-            if (accountList == null || !accountList.items.Any())
-            {
-                return NotFound("No customers found.");
-            }
             var result = new
             {
                 items = accountList.items,
