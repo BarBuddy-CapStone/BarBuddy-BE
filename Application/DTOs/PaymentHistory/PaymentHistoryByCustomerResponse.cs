@@ -8,6 +8,7 @@ namespace Application.DTOs.PaymentHistory
 {
     public class PaymentHistoryByCustomerResponse
     {
+        public Guid BookingId { get; set; }
         public string? CustomerName { get; set; }
         public string? PhoneNumber { get; set; }
         public string? BarName { get; set; }
