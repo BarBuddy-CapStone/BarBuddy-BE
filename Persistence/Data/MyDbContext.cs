@@ -97,170 +97,172 @@ namespace Persistence.Data
             modelBuilder.Entity<Role>().HasData(
                 new Role
                 {
-                    RoleId = Guid.NewGuid(),
+                    RoleId = Guid.Parse("b3b5a546-519d-411b-89d0-20c824e18d11"),
                     RoleName = "ADMIN"
                 },
                 new Role
                 {
-                    RoleId = Guid.NewGuid(),
+                    RoleId = Guid.Parse("a3438270-b7ed-4222-b3d8-aee52fc58805"),
                     RoleName = "STAFF"
                 },
                 new Role
                 {
-                    RoleId = Guid.NewGuid(),
+                    RoleId = Guid.Parse("70a545c0-6156-467c-a86f-547370ea4552"),
                     RoleName = "CUSTOMER"
                 }
             );
 
             // Bar Data
             modelBuilder.Entity<Bar>().HasData(
-                new Bar
-                {
-                    BarId = Guid.NewGuid(),
-                    Address = "87A Hàm Nghi, Phường Nguyễn Thái Bình, Quận 1",
-                    BarName = "Bar Buddy 1",
-                    Description = "Trải nghiệm không gian âm nhạc sống động, nơi bạn có thể tạm quên đi nhịp sống hối hả và thả mình vào những giai điệu sâu lắng.",
-                    Discount = 10,
-                     = "contact@barbuddy1.com",
-                    EndTime = new TimeSpan(2, 00, 00),
-                    StartTime = new TimeSpan(18, 00, 00),
-                    Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/a0d4292c13b0cc51b2487f4c276cd7c0d96510872c4a855db190ff2db8e692d2?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
-                    PhoneNumber = "0901234567",
-                    Status = true
-                },
-                new Bar
-                {
-                    BarId = Guid.NewGuid(),
-                    Address = "153 Tôn Thất Đạm, Bến Nghé, quận 1, Hồ Chí Minh",
-                    BarName = "Bar Buddy 2",
-                    Description = "Phong cách trẻ trung, năng động, nơi diễn ra các sự kiện giải trí đa dạng dành cho những tâm hồn thích khám phá và kết nối.",
-                    Discount = 15,
-                    Email = "contact@barbuddy2.com",
-                    EndTime = new TimeSpan(3, 00, 00),
-                    StartTime = new TimeSpan(17, 00, 00),
-                    Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/7cbd7d84e2ff7b5156aa5241bd27de56fe00bcb6e309e2c77ff2c39bf3b0b236?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
-                    PhoneNumber = "0901234568",
-                    Status = true
-                },
-                new Bar
-                {
-                    BarId = Guid.NewGuid(),
-                    Address = "264 Đ. Nam Kỳ Khởi Nghĩa, Phường 8, Quận 3",
-                    BarName = "Bar Buddy 3",
-                    Description = "Hòa mình vào không gian sang trọng với dịch vụ đẳng cấp, nơi mọi chi tiết đều được chăm chút để mang đến trải nghiệm tuyệt vời nhất.",
-                    Discount = 20,
-                    Email = "contact@barbuddy3.com",
-                    EndTime = new TimeSpan(1, 00, 00),
-                    StartTime = new TimeSpan(19, 00, 00),
-                    Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/2f3601dbe8c6d0a812bccaf7ecf02686ec5b99038e314c058a00a37c16840608?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
-                    PhoneNumber = "0901234569",
-                    Status = true
-                },
-                new Bar
-                {
-                    BarId = Guid.NewGuid(),
-                    Address = "3C Đ. Tôn Đức Thắng, Bến Nghé, Quận 1, Thành phố Hồ Chí Minh",
-                    BarName = "Bar Buddy 4",
-                    Description = "Chuyên về cocktail cao cấp, đây là điểm đến lý tưởng để thưởng thức những món đồ uống tinh tế trong không gian thời thượng.",
-                    Discount = 25,
-                    Email = "contact@barbuddy4.com",
-                    EndTime = new TimeSpan(4, 00, 00),
-                    StartTime = new TimeSpan(20, 00, 00),
-                    Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/677e2c38ccd2ea07e8a72aa6262c873572a4cfd3da719a1e25c2152169bb47c6?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
-                    PhoneNumber = "0901234570",
-                    Status = true
-                },
-                new Bar
-                {
-                    BarId = Guid.NewGuid(),
-                    Address = "11 Đ. Nam Quốc Cang, Phường Phạm Ngũ Lão, Quận 1",
-                    BarName = "Bar Buddy 5",
-                    Description = "Kết hợp hoàn hảo giữa âm nhạc sống động và DJ, tạo nên bầu không khí náo nhiệt phù hợp cho các cuộc vui thâu đêm.",
-                    Discount = 5,
-                    Email = "contact@barbuddy5.com",
-                    EndTime = new TimeSpan(2, 30, 00),
-                    StartTime = new TimeSpan(18, 30, 00),
-                    Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/fc1f4652930fe4a25d46a46d1933e950912b6ceace8e777840ceccd123995783?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
-                    PhoneNumber = "0901234571",
-                    Status = true
-                },
-                new Bar
-                {
-                    BarId = Guid.NewGuid(),
-                    Address = "41 Nam Kỳ Khởi Nghĩa, Phường Nguyễn Thái Bình, Quận 1, Hồ Chí Minh",
-                    BarName = "Bar Buddy 6",
-                    Description = "Không gian thư giãn lý tưởng, nơi bạn có thể thỏa sức giải trí với các trò chơi thú vị cùng bạn bè và người thân.",
-                    Discount = 10,
-                    Email = "contact@barbuddy6.com",
-                    EndTime = new TimeSpan(3, 30, 00),
-                    StartTime = new TimeSpan(17, 30, 00),
-                    Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/4f4bc5cae670ae75847bb24a78027e45ce8487386c0a1043f999381ae9fa4831?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
-                    PhoneNumber = "0901234572",
-                    Status = true
-                },
-                new Bar
-                {
-                    BarId = Guid.NewGuid(),
-                    Address = "20 Đ. Nguyễn Công Trứ, Phường Nguyễn Thái Bình, Quận 1",
-                    BarName = "Bar Buddy 7",
-                    Description = "Nếu bạn là một tín đồ âm nhạc, Bar Buddy 7 là nơi hội tụ những bản nhạc tuyệt vời giúp bạn phiêu theo từng giai điệu.",
-                    Discount = 30,
-                    Email = "contact@barbuddy7.com",
-                    EndTime = new TimeSpan(1, 00, 00),
-                    StartTime = new TimeSpan(19, 00, 00),
-                    Images = "https://vietnamnightlife.com/uploads/images/2020/02/1580805657-multi_product20-bambamoverview1.jpg.webp",
-                    PhoneNumber = "0901234573",
-                    Status = true
-                },
-                new Bar
-                {
-                    BarId = Guid.NewGuid(),
-                    Address = "120 Đ. Nguyễn Huệ, Bến Nghé, Quận 1",
-                    BarName = "Bar Buddy 8",
-                    Description = "Một trong những rooftop bar với tầm nhìn tuyệt đẹp, nơi lý tưởng để vừa thưởng thức đồ uống vừa ngắm nhìn cảnh đêm Sài Gòn.",
-                    Discount = 20,
-                    Email = "contact@barbuddy8.com",
-                    EndTime = new TimeSpan(2, 00, 00),
-                    StartTime = new TimeSpan(17, 00, 00),
-                    Images = "default",
-                    PhoneNumber = "0901234574",
-                    Status = true
-                },
-                new Bar
-                {
-                    BarId = Guid.NewGuid(),
-                    Address = "30 Đ. Tôn Thất Tùng, Quận 1",
-                    BarName = "Bar Buddy 9",
-                    Description = "Quán bar độc đáo chuyên về craft beer, dành cho những ai yêu thích hương vị đặc biệt và trải nghiệm ẩm thực thú vị.",
-                    Discount = 15,
-                    Email = "contact@barbuddy9.com",
-                    EndTime = new TimeSpan(3, 00, 00),
-                    StartTime = new TimeSpan(18, 00, 00),
-                    Images = "default",
-                    PhoneNumber = "0901234575",
-                    Status = true
-                },
-                new Bar
-                {
-                    BarId = Guid.NewGuid(),
-                    Address = "25 Đ. Lê Duẩn, Quận 1",
-                    BarName = "Bar Buddy 10",
-                    Description = "Mang đến không gian ấm cúng với ánh sáng nhẹ nhàng và những ly cocktail độc đáo, lý tưởng cho những buổi tối thư giãn.",
-                    Discount = 10,
-                    Email = "contact@barbuddy10.com",
-                    EndTime = new TimeSpan(1, 30, 00),
-                    StartTime = new TimeSpan(17, 00, 00),
-                    Images = "default",
-                    PhoneNumber = "0901234576",
-                    Status = true
-                }
-            );
+    new Bar
+    {
+        BarId = new Guid("550e8400-e29b-41d4-a716-446655440000"),
+        Address = "87A Hàm Nghi, Phường Nguyễn Thái Bình, Quận 1",
+        BarName = "Bar Buddy 1",
+        Description = "Nơi lý tưởng để thư giãn và tận hưởng âm nhạc.",
+        Discount = 10,
+        Email = "contact@barbuddy1.com",
+        EndTime = new TimeSpan(2, 0, 0),
+        StartTime = new TimeSpan(18, 0, 0),
+        Images = "barbuddy1.png",
+        PhoneNumber = "0901234567",
+        Status = true
+    },
+    new Bar
+    {
+        BarId = new Guid("550e8400-e29b-41d4-a716-446655440001"),
+        Address = "153 Tôn Thất Đạm, Bến Nghé, quận 1, Hồ Chí Minh",
+        BarName = "Bar Buddy 2",
+        Description = "Quán bar phong cách trẻ trung với nhiều sự kiện thú vị.",
+        Discount = 15,
+        Email = "contact@barbuddy2.com",
+        EndTime = new TimeSpan(3, 0, 0),
+        StartTime = new TimeSpan(17, 0, 0),
+        Images = "barbuddy2.png",
+        PhoneNumber = "0901234568",
+        Status = true
+    },
+    new Bar
+    {
+        BarId = new Guid("550e8400-e29b-41d4-a716-446655440002"),
+        Address = "264 Đ. Nam Kỳ Khởi Nghĩa, Phường 8, Quận 3",
+        BarName = "Bar Buddy 3",
+        Description = "Không gian sang trọng và dịch vụ tận tâm.",
+        Discount = 20,
+        Email = "contact@barbuddy3.com",
+        EndTime = new TimeSpan(1, 0, 0),
+        StartTime = new TimeSpan(19, 0, 0),
+        Images = "barbuddy3.png",
+        PhoneNumber = "0901234569",
+        Status = true
+    },
+    new Bar
+    {
+        BarId = new Guid("550e8400-e29b-41d4-a716-446655440003"),
+        Address = "3C Đ. Tôn Đức Thắng, Bến Nghé, Quận 1, Thành phố Hồ Chí Minh",
+        BarName = "Bar Buddy 4",
+        Description = "Chuyên phục vụ cocktail và đồ uống cao cấp.",
+        Discount = 25,
+        Email = "contact@barbuddy4.com",
+        EndTime = new TimeSpan(4, 0, 0),
+        StartTime = new TimeSpan(20, 0, 0),
+        Images = "barbuddy4.png",
+        PhoneNumber = "0901234570",
+        Status = true
+    },
+    new Bar
+    {
+        BarId = new Guid("550e8400-e29b-41d4-a716-446655440004"),
+        Address = "11 Đ.Nam Quốc Cang, Phường Phạm Ngũ Lão, Quận 1",
+        BarName = "Bar Buddy 5",
+        Description = "Quán bar kết hợp giữa nhạc sống và DJ.",
+        Discount = 5,
+        Email = "contact@barbuddy5.com",
+        EndTime = new TimeSpan(2, 30, 0),
+        StartTime = new TimeSpan(18, 30, 0),
+        Images = "barbuddy5.png",
+        PhoneNumber = "0901234571",
+        Status = true
+    },
+    new Bar
+    {
+        BarId = new Guid("550e8400-e29b-41d4-a716-446655440005"),
+        Address = "41 Nam Kỳ Khởi Nghĩa, Phường Nguyễn Thái Bình, Quận 1, Hồ Chí Minh",
+        BarName = "Bar Buddy 6",
+        Description = "Không gian thoải mái với nhiều trò chơi giải trí.",
+        Discount = 10,
+        Email = "contact@barbuddy6.com",
+        EndTime = new TimeSpan(3, 30, 0),
+        StartTime = new TimeSpan(17, 30, 0),
+        Images = "barbuddy6.png",
+        PhoneNumber = "0901234572",
+        Status = true
+    },
+    new Bar
+    {
+        BarId = new Guid("550e8400-e29b-41d4-a716-446655440006"),
+        Address = "20 Đ. Nguyễn Công Trứ, Phường Nguyễn Thái Bình, Quận 1",
+        BarName = "Bar Buddy 7",
+        Description = "Nơi hội tụ của những tâm hồn yêu thích âm nhạc.",
+        Discount = 30,
+        Email = "contact@barbuddy7.com",
+        EndTime = new TimeSpan(1, 0, 0),
+        StartTime = new TimeSpan(19, 0, 0),
+        Images = "barbuddy7.png",
+        PhoneNumber = "0901234573",
+        Status = true
+    },
+    new Bar
+    {
+        BarId = new Guid("550e8400-e29b-41d4-a716-446655440007"),
+        Address = "120 Đ. Nguyễn Huệ, Bến Nghé, Quận 1",
+        BarName = "Bar Buddy 8",
+        Description = "Quán bar rooftop với tầm nhìn đẹp.",
+        Discount = 20,
+        Email = "contact@barbuddy8.com",
+        EndTime = new TimeSpan(2, 0, 0),
+        StartTime = new TimeSpan(17, 0, 0),
+        Images = "barbuddy8.png",
+        PhoneNumber = "0901234574",
+        Status = true
+    },
+    new Bar
+    {
+        BarId = new Guid("550e8400-e29b-41d4-a716-446655440008"),
+        Address = "30 Đ. Tôn Thất Tùng, Quận 1",
+        BarName = "Bar Buddy 9",
+        Description = "Quán bar dành cho các tín đồ yêu thích craft beer.",
+        Discount = 15,
+        Email = "contact@barbuddy9.com",
+        EndTime = new TimeSpan(3, 0, 0),
+        StartTime = new TimeSpan(18, 0, 0),
+        Images = "barbuddy9.png",
+        PhoneNumber = "0901234575",
+        Status = true
+    },
+    new Bar
+    {
+        BarId = new Guid("550e8400-e29b-41d4-a716-446655440009"),
+        Address = "25 Đ. Lê Duẩn, Quận 1",
+        BarName = "Bar Buddy 10",
+        Description = "Không gian ấm cúng với các loại cocktail độc đáo.",
+        Discount = 10,
+        Email = "contact@barbuddy10.com",
+        EndTime = new TimeSpan(2, 0, 0),
+        StartTime = new TimeSpan(19, 0, 0),
+        Images = "barbuddy10.png",
+        PhoneNumber = "0901234576",
+        Status = true
+    }
+);
+
+
 
             //Account
             modelBuilder.Entity<Account>().HasData(
                 new Account
                 {
-                    AccountId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440001"),
                     BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     RoleId = Guid.Parse("b3b5a546-519d-411b-89d0-20c824e18d11"),
                     Email = "admin1@barbuddy1.com",
@@ -275,7 +277,7 @@ namespace Persistence.Data
                 },
                 new Account
                 {
-                    AccountId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440002"),
                     BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     RoleId = Guid.Parse("a3438270-b7ed-4222-b3d8-aee52fc58805"),
                     Email = "staff1@barbuddy2.com",
@@ -290,7 +292,7 @@ namespace Persistence.Data
                 },
                 new Account
                 {
-                    AccountId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"),
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440003"),
                     BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
                     RoleId = Guid.Parse("a3438270-b7ed-4222-b3d8-aee52fc58805"),
                     Email = "staff2@barbuddy3.com",
@@ -305,7 +307,7 @@ namespace Persistence.Data
                 },
                 new Account
                 {
-                    AccountId = Guid.Parse("550e8400-e29b-41d4-a716-446655440004"),
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440004"),
                     BarId = null,
                     RoleId = Guid.Parse("70a545c0-6156-467c-a86f-547370ea4552"),
                     Email = "customer1@barbuddy4.com",
@@ -320,7 +322,7 @@ namespace Persistence.Data
                 },
                 new Account
                 {
-                    AccountId = Guid.Parse("550e8400-e29b-41d4-a716-446655440006"),
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440006"),
                     BarId = null,
                     RoleId = Guid.Parse("70a545c0-6156-467c-a86f-547370ea4552"),
                     Email = "customer2@barbuddy6.com",
@@ -335,7 +337,7 @@ namespace Persistence.Data
                 },
                 new Account
                 {
-                    AccountId = Guid.Parse("550e8400-e29b-41d4-a716-446655440007"),
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440007"),
                     BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440006"),
                     RoleId = Guid.Parse("a3438270-b7ed-4222-b3d8-aee52fc58805"),
                     Email = "staff3@barbuddy7.com",
@@ -350,7 +352,7 @@ namespace Persistence.Data
                 },
                 new Account
                 {
-                    AccountId = Guid.Parse("550e8400-e29b-41d4-a716-446655440009"),
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440009"),
                     BarId = null,
                     RoleId = Guid.Parse("70a545c0-6156-467c-a86f-547370ea4552"),
                     Email = "customer3@barbuddy9.com",
@@ -365,7 +367,7 @@ namespace Persistence.Data
                 },
                 new Account
                 {
-                    AccountId = Guid.Parse("550e8400-e29b-41d4-a716-446655440010"),
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440010"),
                     BarId = null,
                     RoleId = Guid.Parse("70a545c0-6156-467c-a86f-547370ea4552"),
                     Email = "customer4@barbuddy10.com",
