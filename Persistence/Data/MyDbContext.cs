@@ -124,7 +124,7 @@ namespace Persistence.Data
         Email = "contact@barbuddy1.com",
         EndTime = new TimeSpan(2, 0, 0),
         StartTime = new TimeSpan(18, 0, 0),
-        Images = "barbuddy1.png",
+        Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/a0d4292c13b0cc51b2487f4c276cd7c0d96510872c4a855db190ff2db8e692d2?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
         PhoneNumber = "0901234567",
         Status = true
     },
@@ -138,7 +138,7 @@ namespace Persistence.Data
         Email = "contact@barbuddy2.com",
         EndTime = new TimeSpan(3, 0, 0),
         StartTime = new TimeSpan(17, 0, 0),
-        Images = "barbuddy2.png",
+        Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/7cbd7d84e2ff7b5156aa5241bd27de56fe00bcb6e309e2c77ff2c39bf3b0b236?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
         PhoneNumber = "0901234568",
         Status = true
     },
@@ -152,7 +152,7 @@ namespace Persistence.Data
         Email = "contact@barbuddy3.com",
         EndTime = new TimeSpan(1, 0, 0),
         StartTime = new TimeSpan(19, 0, 0),
-        Images = "barbuddy3.png",
+        Images = "https://vietnamnightlife.com/uploads/images/2020/02/1580805657-multi_product20-bambamoverview1.jpg.webp",
         PhoneNumber = "0901234569",
         Status = true
     },
@@ -166,7 +166,7 @@ namespace Persistence.Data
         Email = "contact@barbuddy4.com",
         EndTime = new TimeSpan(4, 0, 0),
         StartTime = new TimeSpan(20, 0, 0),
-        Images = "barbuddy4.png",
+        Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/4f4bc5cae670ae75847bb24a78027e45ce8487386c0a1043f999381ae9fa4831?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
         PhoneNumber = "0901234570",
         Status = true
     },
@@ -180,7 +180,7 @@ namespace Persistence.Data
         Email = "contact@barbuddy5.com",
         EndTime = new TimeSpan(2, 30, 0),
         StartTime = new TimeSpan(18, 30, 0),
-        Images = "barbuddy5.png",
+        Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/fc1f4652930fe4a25d46a46d1933e950912b6ceace8e777840ceccd123995783?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
         PhoneNumber = "0901234571",
         Status = true
     },
@@ -194,8 +194,64 @@ namespace Persistence.Data
         Email = "contact@barbuddy6.com",
         EndTime = new TimeSpan(3, 30, 0),
         StartTime = new TimeSpan(17, 30, 0),
-        Images = "barbuddy6.png",
+        Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/677e2c38ccd2ea07e8a72aa6262c873572a4cfd3da719a1e25c2152169bb47c6?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
         PhoneNumber = "0901234572",
+        Status = true
+    },
+    new Bar
+    {
+        BarId = new Guid("550e8400-e29b-41d4-a716-446655440006"),
+        Address = "20 Đ. Nguyễn Công Trứ, Phường Nguyễn Thái Bình, Quận 1",
+        BarName = "Bar Buddy 7",
+        Description = "Nơi hội tụ của những tâm hồn yêu thích âm nhạc.",
+        Discount = 30,
+        Email = "contact@barbuddy7.com",
+        EndTime = new TimeSpan(1, 0, 0),
+        StartTime = new TimeSpan(19, 0, 0),
+        Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/2f3601dbe8c6d0a812bccaf7ecf02686ec5b99038e314c058a00a37c16840608?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
+        PhoneNumber = "0901234573",
+        Status = true
+    },
+    new Bar
+    {
+        BarId = new Guid("550e8400-e29b-41d4-a716-446655440007"),
+        Address = "120 Đ. Nguyễn Huệ, Bến Nghé, Quận 1",
+        BarName = "Bar Buddy 8",
+        Description = "Quán bar rooftop với tầm nhìn đẹp.",
+        Discount = 20,
+        Email = "contact@barbuddy8.com",
+        EndTime = new TimeSpan(2, 0, 0),
+        StartTime = new TimeSpan(17, 0, 0),
+        Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/7cbd7d84e2ff7b5156aa5241bd27de56fe00bcb6e309e2c77ff2c39bf3b0b236?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
+        PhoneNumber = "0901234574",
+        Status = true
+    },
+    new Bar
+    {
+        BarId = new Guid("550e8400-e29b-41d4-a716-446655440008"),
+        Address = "30 Đ. Tôn Thất Tùng, Quận 1",
+        BarName = "Bar Buddy 9",
+        Description = "Quán bar dành cho các tín đồ yêu thích craft beer.",
+        Discount = 15,
+        Email = "contact@barbuddy9.com",
+        EndTime = new TimeSpan(3, 0, 0),
+        StartTime = new TimeSpan(18, 0, 0),
+        Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/7cbd7d84e2ff7b5156aa5241bd27de56fe00bcb6e309e2c77ff2c39bf3b0b236?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
+        PhoneNumber = "0901234575",
+        Status = true
+    },
+    new Bar
+    {
+        BarId = new Guid("550e8400-e29b-41d4-a716-446655440009"),
+        Address = "25 Đ. Lê Duẩn, Quận 1",
+        BarName = "Bar Buddy 10",
+        Description = "Không gian ấm cúng với các loại cocktail độc đáo.",
+        Discount = 10,
+        Email = "contact@barbuddy10.com",
+        EndTime = new TimeSpan(2, 0, 0),
+        StartTime = new TimeSpan(19, 0, 0),
+        Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/a0d4292c13b0cc51b2487f4c276cd7c0d96510872c4a855db190ff2db8e692d2?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
+        PhoneNumber = "0901234576",
         Status = true
     }
 );
