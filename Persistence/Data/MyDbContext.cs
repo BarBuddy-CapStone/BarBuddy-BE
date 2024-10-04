@@ -197,62 +197,6 @@ namespace Persistence.Data
         Images = "barbuddy6.png",
         PhoneNumber = "0901234572",
         Status = true
-    },
-    new Bar
-    {
-        BarId = new Guid("550e8400-e29b-41d4-a716-446655440006"),
-        Address = "20 Đ. Nguyễn Công Trứ, Phường Nguyễn Thái Bình, Quận 1",
-        BarName = "Bar Buddy 7",
-        Description = "Nơi hội tụ của những tâm hồn yêu thích âm nhạc.",
-        Discount = 30,
-        Email = "contact@barbuddy7.com",
-        EndTime = new TimeSpan(1, 0, 0),
-        StartTime = new TimeSpan(19, 0, 0),
-        Images = "barbuddy7.png",
-        PhoneNumber = "0901234573",
-        Status = true
-    },
-    new Bar
-    {
-        BarId = new Guid("550e8400-e29b-41d4-a716-446655440007"),
-        Address = "120 Đ. Nguyễn Huệ, Bến Nghé, Quận 1",
-        BarName = "Bar Buddy 8",
-        Description = "Quán bar rooftop với tầm nhìn đẹp.",
-        Discount = 20,
-        Email = "contact@barbuddy8.com",
-        EndTime = new TimeSpan(2, 0, 0),
-        StartTime = new TimeSpan(17, 0, 0),
-        Images = "barbuddy8.png",
-        PhoneNumber = "0901234574",
-        Status = true
-    },
-    new Bar
-    {
-        BarId = new Guid("550e8400-e29b-41d4-a716-446655440008"),
-        Address = "30 Đ. Tôn Thất Tùng, Quận 1",
-        BarName = "Bar Buddy 9",
-        Description = "Quán bar dành cho các tín đồ yêu thích craft beer.",
-        Discount = 15,
-        Email = "contact@barbuddy9.com",
-        EndTime = new TimeSpan(3, 0, 0),
-        StartTime = new TimeSpan(18, 0, 0),
-        Images = "barbuddy9.png",
-        PhoneNumber = "0901234575",
-        Status = true
-    },
-    new Bar
-    {
-        BarId = new Guid("550e8400-e29b-41d4-a716-446655440009"),
-        Address = "25 Đ. Lê Duẩn, Quận 1",
-        BarName = "Bar Buddy 10",
-        Description = "Không gian ấm cúng với các loại cocktail độc đáo.",
-        Discount = 10,
-        Email = "contact@barbuddy10.com",
-        EndTime = new TimeSpan(2, 0, 0),
-        StartTime = new TimeSpan(19, 0, 0),
-        Images = "barbuddy10.png",
-        PhoneNumber = "0901234576",
-        Status = true
     }
 );
 
