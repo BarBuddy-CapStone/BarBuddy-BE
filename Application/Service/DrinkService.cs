@@ -124,6 +124,21 @@ namespace Application.Service
                 throw new CustomException.InternalServerErrorException(e.Message);
             }
         }
+        public async Task<IEnumerable<DrinkResponse>> GetAllDrinkCustomer()
+        {
+            try
+            {
+                var getAllDrink = await _unitOfWork.DrinkRepository
+                                        .GetAsync(filter: x => x.Status == PrefixKeyConstant.TRUE,
+                                                includeProperties: "DrinkCategory,Bar,DrinkEmotionalCategories.EmotionalDrinkCategory");
+                var response = _mapper.Map<IEnumerable<DrinkResponse>>(getAllDrink);
+                return response;
+            }
+            catch (CustomException.InternalServerErrorException e)
+            {
+                throw new CustomException.InternalServerErrorException(e.Message);
+            }
+        }
 
         public async Task<IEnumerable<DrinkResponse>> GetAllDrinkBasedBarId(Guid barId)
         {
