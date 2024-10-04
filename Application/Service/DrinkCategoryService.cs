@@ -47,15 +47,10 @@ namespace Application.Service
             }
         }
 
-        public async Task<bool> DeleteDrinkCategory(Guid drinkCateId, DeleteDrinkCateRequest request)
+        public async Task<bool> DeleteDrinkCategory(Guid drinkCateId)
         {
             try
             {
-                if (request.IsDeleted == PrefixKeyConstant.TRUE)
-                {
-                    throw new CustomException.InvalidDataException("Invalid data");
-                }
-
                 var getDrinkCateById = await _unitOfWork.DrinkCategoryRepository
                                                         .GetAsync(filter: x => x.DrinksCategoryId.Equals(drinkCateId)
                                                                             && x.IsDrinkCategory == PrefixKeyConstant.TRUE);
@@ -66,8 +61,8 @@ namespace Application.Service
                     throw new CustomException.DataNotFoundException("Category Drink not found !");
                 }
 
-                var mapper = _mapper.Map(request, getOne);
-                await _unitOfWork.DrinkCategoryRepository.UpdateAsync(mapper);
+                getOne.IsDrinkCategory = PrefixKeyConstant.FALSE;
+                await _unitOfWork.DrinkCategoryRepository.UpdateAsync(getOne);
                 await Task.Delay(200);
                 await _unitOfWork.SaveAsync();
 

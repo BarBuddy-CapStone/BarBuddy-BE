@@ -13,6 +13,6 @@ namespace Application.IService
         Task<DrinkCategoryResponse> GetDrinkCategoryById(Guid drinkCateId);
         Task<DrinkCategoryResponse> CreateDrinkCategory(DrinkCategoryRequest request);
         Task<DrinkCategoryResponse> UpdateDrinkCategory(Guid drinkCateId, DrinkCategoryRequest request);
-        Task<bool> DeleteDrinkCategory(Guid drinkCateId, DeleteDrinkCateRequest request);
+        Task<bool> DeleteDrinkCategory(Guid drinkCateId);
     }
 }

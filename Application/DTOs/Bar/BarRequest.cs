@@ -26,8 +26,8 @@ namespace Application.DTOs.Bar
         public TimeSpan StartTime { get; set; }
         [Required]
         public TimeSpan EndTime { get; set; }
-        [Required]
-        public List<IFormFile> Images { get; set; }
+        public List<IFormFile>? Images { get; set; }
+        public List<string>? imgsAsString { get; set; }
         [Range(0,100)]
         [Required(ErrorMessage = "More than or equal 0 and less than or equal 100")]
         public double Discount { get; set; }

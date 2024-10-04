@@ -85,12 +85,12 @@ namespace BarBuddy_API.Controllers.DrinkCategory
             }
         }
 
-        [HttpDelete("/deleteCateDrink/{cateDrinkId}")]
-        public async Task<IActionResult> DeleteDrinkCategory(Guid cateDrinkId, [FromBody] DeleteDrinkCateRequest request)
+        [HttpPatch("/deleteCateDrink/{cateDrinkId}")]
+        public async Task<IActionResult> DeleteDrinkCategory(Guid cateDrinkId)
         {
             try
             {
-                var response = await _drinkCategoryService.DeleteDrinkCategory(cateDrinkId, request);
+                var response = await _drinkCategoryService.DeleteDrinkCategory(cateDrinkId);
                 return CustomResult("Deleted Successfully", response);
             }
             catch (CustomException.DataNotFoundException e)
