@@ -1,5 +1,5 @@
 using BarBuddy_API.DependencyInjection;
-using FarmerOnlineApi.Middleware;
+using BarBuddy_API.Middleware;
 using Infrastructure.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Persistence.DependencyInjection;

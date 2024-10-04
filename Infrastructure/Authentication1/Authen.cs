@@ -10,7 +10,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace Infrastructure.Authentication
+namespace Infrastructure.Authentication1
 {
     public class Authen : IAuthentication
     {

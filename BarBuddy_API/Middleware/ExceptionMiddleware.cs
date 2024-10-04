@@ -9,7 +9,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using static Domain.CustomException.CustomException;
 
-namespace FarmerOnlineApi.Middleware
+namespace BarBuddy_API.Middleware
 {
     public class ExceptionMiddleware
     {
@@ -66,7 +66,7 @@ namespace FarmerOnlineApi.Middleware
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             var code = HttpStatusCode.InternalServerError;
-            string result;
+            string result = string.Empty;
 
             switch (exception)
             {
@@ -95,7 +95,7 @@ namespace FarmerOnlineApi.Middleware
                     result = internalServerEx.Message;
                     break;
                 default:
-                    _logger.LogError(exception, "Đã xảy ra lỗi không xác định.");
+                    _logger.LogError(exception, $"Unhandled exception: {exception.GetType().Name} - {exception.Message}");
                     result = "Đã xảy ra lỗi không xác định.";
                     break;
             }
