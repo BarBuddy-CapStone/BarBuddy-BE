@@ -14,7 +14,6 @@ namespace Domain.Entities
         [Key]
         public Guid DrinkId { get; set; } = Guid.NewGuid();
         public string DrinkCode { get; set; }
-        public Guid BarId { get; set; }
         public Guid DrinkCategoryId { get; set; }
         public string DrinkName { get; set; }
         public string Description { get; set; }
@@ -29,8 +28,6 @@ namespace Domain.Entities
 
         [ForeignKey("DrinkCategoryId")]
         public virtual DrinkCategory DrinkCategory { get; set; }
-        [ForeignKey("BarId")]
-        public virtual Bar Bar { get; set; }
 
     }
 }
