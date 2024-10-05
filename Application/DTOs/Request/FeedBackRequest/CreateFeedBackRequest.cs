@@ -10,7 +10,7 @@ namespace Application.DTOs.Request.FeedBackRequest
     public class CreateFeedBackRequest
     {
         public Guid BookingId { get; set; }
-        public Guid BarId { get; set; }
+        //public Guid BarId { get; set; }
 
         [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5.")]
         public int Rating { get; set; }

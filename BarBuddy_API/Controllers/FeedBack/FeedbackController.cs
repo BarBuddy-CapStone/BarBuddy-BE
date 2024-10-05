@@ -31,6 +31,13 @@ namespace BarBuddy_API.Controllers.FeedBack
             return CustomResult("Tải dữ liệu thành công", feedback);
         }
 
+        [HttpGet("booking/{bookingId}")]
+        public async Task<IActionResult> GetFeedBackByBookingID(Guid bookingId)
+        {
+            var feedback = await _feedBackService.GetFeedBackByBookingId(bookingId);
+            return CustomResult("Tải dữ liệu thành công", feedback);
+        }
+
         [HttpPost("createFeedBack")]
         public async Task<IActionResult> CreateFeedBack(CreateFeedBackRequest request)
         {

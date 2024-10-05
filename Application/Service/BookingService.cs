@@ -80,6 +80,18 @@ namespace Application.Service
 
                 foreach (var booking in bookingsWithPagination)
                 {
+                    var feedback = await _unitOfWork.FeedbackRepository.GetAsync(f => f.BookingId == booking.BookingId);
+                    bool? checkIsRated = null;
+                    if (booking.Status == 3)
+                    {
+                        if (feedback.Any())
+                        {
+                            checkIsRated = true;
+                        } else
+                        {
+                            checkIsRated = false;
+                        }
+                    }
                     var response = new TopBookingResponse
                     {
                         BarName = booking.Bar.BarName,
@@ -88,7 +100,8 @@ namespace Application.Service
                         BookingTime = booking.BookingTime,
                         CreateAt = booking.CreateAt,
                         Status = booking.Status,
-                        Image = booking.Bar.Images.Split(',')[0]
+                        Image = booking.Bar.Images.Split(',')[0],
+                        IsRated = checkIsRated
                     };
                     responses.Add(response);
                 }
@@ -163,6 +176,19 @@ namespace Application.Service
 
                 var bookings = await _unitOfWork.BookingRepository.GetAsync(b => b.AccountId == CustomerId, pageIndex: 1, pageSize: NumOfBookings, orderBy: o => o.OrderByDescending(b => b.CreateAt).ThenByDescending(b => b.BookingDate), includeProperties: "Bar");
                 foreach (var booking in bookings) {
+                    var feedback = await _unitOfWork.FeedbackRepository.GetAsync(f => f.BookingId == booking.BookingId);
+                    bool? checkIsRated = null;
+                    if (booking.Status == 3)
+                    {
+                        if (feedback.Any())
+                        {
+                            checkIsRated = true;
+                        }
+                        else
+                        {
+                            checkIsRated = false;
+                        }
+                    }
                     var response = new TopBookingResponse
                     {
                         BarName = booking.Bar.BarName,
@@ -171,7 +197,8 @@ namespace Application.Service
                         BookingTime = booking.BookingTime,
                         CreateAt = booking.CreateAt,
                         Status = booking.Status,
-                        Image = booking.Bar.Images.Split(',')[0]
+                        Image = booking.Bar.Images.Split(',')[0],
+                        IsRated = checkIsRated
                     };
                     responses.Add(response);
                 }

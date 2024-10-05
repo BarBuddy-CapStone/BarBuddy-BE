@@ -15,5 +15,6 @@ namespace Application.DTOs.Booking
         public int Status { get; set; }
         public DateTime CreateAt { get; set; }
         public string Image {  get; set; }
+        public bool? IsRated { get; set; }
     }
 }
