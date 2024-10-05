@@ -88,6 +88,23 @@ namespace BarBuddy_API.Controllers.Drink
                 return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
             }
         }
+        [HttpGet("getDrinkBaedEmo/{emoId}")]
+        public async Task<IActionResult> GetAllDrinkBasedEmoId(Guid emoId)
+        {
+            try
+            {
+                var response = await _drinkService.GetAllDrinkBasedEmoId(emoId);
+                return CustomResult("Data loaded", response);
+            }
+            catch (CustomException.DataNotFoundException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.NotFound);
+            }
+            catch (CustomException.InternalServerErrorException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
+        }
 
         [HttpPost("/addDrink")]
         public async Task<IActionResult> CreateDrink([FromForm] DrinkRequest request)
@@ -120,22 +137,5 @@ namespace BarBuddy_API.Controllers.Drink
                 return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
             }
         }
-        [HttpGet("/getDrink/{barId}")]
-        public async Task<IActionResult> GetAllDrinkByBarId(Guid barId)
-        {
-            try
-            {
-                var response = await _drinkService.GetAllDrinkBasedBarId(barId);
-                return CustomResult("Data loaded", response);
-            }
-            catch (CustomException.DataNotFoundException e)
-            {
-                return CustomResult(e.Message, System.Net.HttpStatusCode.NotFound);
-            }
-            catch (CustomException.InternalServerErrorException e)
-            {
-                return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
-            }
-        } 
     }
 }
