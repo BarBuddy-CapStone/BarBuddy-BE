@@ -42,7 +42,6 @@ namespace Application.DTOs.Account
         }
         public Guid BarId { get; set; } //BarId
         public string Image { get => "default"; }
-        public string RoleId { get => "550e8400-e29b-41d4-a716-446655440201"; } //RoleId Staff
         public int Status { get; set; }
     }
 }

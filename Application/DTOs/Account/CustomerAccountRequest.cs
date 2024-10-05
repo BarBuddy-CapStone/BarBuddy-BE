@@ -42,7 +42,6 @@ namespace Application.DTOs.Account
         }
 
         public string Image { get => "default"; }
-        public string RoleId { get => "550e8400-e29b-41d4-a716-446655440202"; } //RoleId Customer
         public int Status { get; set; }
     }
 }
