@@ -49,46 +49,50 @@ namespace Application.Service
 
         public async Task<CustomerAccountResponse> CreateCustomerAccount(CustomerAccountRequest request)
         {
-            var existedAccount = (await _accountRepository.GetAsync(a => a.Email.Equals(request.Email))).FirstOrDefault();
+            var existedAccount = (await _accountRepository.GetAsync(a => a.Email.Equals(request.Email)))
+                .FirstOrDefault();
             if (existedAccount != null)
             {
                 throw new DataExistException("Email is existed");
             }
-            else
+
+            var customerRole = (await _unitOfWork.RoleRepository.GetAsync(filter: r => r.RoleName == "CUSTOMER")).FirstOrDefault();
+            
+            var newAccount = _mapper.Map<Account>(request);
+            newAccount.RoleId = customerRole.RoleId;
+            newAccount.Status = 1;
+            newAccount.CreatedAt = DateTime.Now;
+            newAccount.Password = await HashPassword(RandomString(10));
+
+            try
             {
-                try
-                {
-                    _unitOfWork.BeginTransaction();
-                    var newAccount = _mapper.Map<Account>(request);
-                    newAccount.Status = 1;
-                    newAccount.CreatedAt = DateTime.Now;
-                    newAccount.Password = await HashPassword(RandomString(10));
-                    _accountRepository.Insert(newAccount);
-                    _unitOfWork.CommitTransaction();
-                    _unitOfWork.Save();
-                    var result = _mapper.Map<CustomerAccountResponse>(newAccount);
-                    return result;
-                }
-                catch (Exception ex)
-                {
-                    _unitOfWork.RollBack();
-                    throw new InternalServerErrorException($"An Internal error occurred while creating customer: {ex.Message}");
-                }
-                finally
-                {
-                    _unitOfWork.Dispose();
-                }
+                _unitOfWork.BeginTransaction();
+                _accountRepository.Insert(newAccount);
+                _unitOfWork.CommitTransaction();
             }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollBack();
+                throw new InternalServerErrorException($"An Internal error occurred while creating customer: {ex.Message}");
+            }
+            finally
+            {
+                _unitOfWork.Dispose();
+            }
+
+            return _mapper.Map<CustomerAccountResponse>(newAccount);
         }
+
 
         public async Task<StaffAccountResponse> CreateStaffAccount(StaffAccountRequest request)
         {
             var existedAccount = (await _accountRepository.GetAsync(a => a.Email.Equals(request.Email))).FirstOrDefault();
-            var existedBar = await _barRepository.GetByIdAsync(request.BarId);
             if (existedAccount != null)
             {
                 throw new DataExistException("Email is existed");
             }
+            var staffRole = (await _unitOfWork.RoleRepository.GetAsync(filter: r => r.RoleName == "STAFF")).FirstOrDefault();
+            var existedBar = await _barRepository.GetByIdAsync(request.BarId);
             if (existedBar == null)
             {
                 throw new DataNotFoundException("Bar is not found in database");
@@ -97,6 +101,7 @@ namespace Application.Service
             {
                 _unitOfWork.BeginTransaction();
                 var newAccount = _mapper.Map<Account>(request);
+                newAccount.RoleId = staffRole.RoleId;
                 newAccount.Status = 1;
                 newAccount.CreatedAt = DateTime.Now;
                 newAccount.Password = await HashPassword(RandomString(10));
@@ -147,7 +152,8 @@ namespace Application.Service
 
         public async Task<StaffAccountResponse> UpdateStaffAccount(Guid accountId, StaffAccountRequest request)
         {
-            var existedAccount = _accountRepository.GetByID(accountId);
+            var existedAccount = (await _accountRepository.GetAsync(filter: a => a.AccountId == accountId && a.Role.RoleName == "STAFF"))
+                .FirstOrDefault();
             var existedBar = await _barRepository.GetByIdAsync(request.BarId);
             if (existedAccount == null)
             {
@@ -181,7 +187,8 @@ namespace Application.Service
 
         public async Task<CustomerAccountResponse> UpdateCustomerAccount(Guid accountId, CustomerAccountRequest request)
         {
-            var existedAccount = await _accountRepository.GetByIdAsync(accountId);
+            var existedAccount = (await _accountRepository.GetAsync(filter: a => a.AccountId == accountId && a.Role.RoleName == "CUSTOMER"))
+                .FirstOrDefault();
             if (existedAccount == null)
             {
                 throw new DataNotFoundException("Customer's account is not found in database");
