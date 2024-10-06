@@ -1,19 +1,12 @@
-﻿using Application.DTOs.Bar;
-using Application.DTOs.Request.FeedBackRequest;
-using Application.DTOs.Response.EmotionCategory;
+﻿using Application.DTOs.Request.FeedBackRequest;
 using Application.DTOs.Response.FeedBack;
+using Application.Interfaces;
 using Application.IService;
 using AutoMapper;
 using Domain.CustomException;
 using Domain.Entities;
-using Domain.Interfaces;
 using Domain.IRepository;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Service
 {
@@ -24,7 +17,7 @@ namespace Application.Service
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IAuthentication _authentication;
 
-        public FeedBackService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor ,IAuthentication authentication)
+        public FeedBackService(IUnitOfWork unitOfWork, IMapper mapper, IHttpContextAccessor httpContextAccessor, IAuthentication authentication)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -110,6 +103,6 @@ namespace Application.Service
             await _unitOfWork.SaveAsync();
             return true;
         }
-        
+
     }
 }
