@@ -3,6 +3,8 @@ using Application.Service;
 using BarBuddy_API.DependencyInjection;
 using BarBuddy_API.Middleware;
 using Infrastructure.DependencyInjection;
+using Infrastructure.Vnpay.Config;
+using Infrastructure.Zalopay.Config;
 using Microsoft.OpenApi.Models;
 using Persistence.DependencyInjection;
 
@@ -17,7 +19,10 @@ builder.Services.AddHttpContextAccessor();
 // DI
 builder.Services.AddPresentation(builder.Configuration);
 
-
+builder.Services.Configure<ZalopayConfig>(
+              builder.Configuration.GetSection(ZalopayConfig.ConfigName));
+builder.Services.Configure<VnpayConfig>(
+              builder.Configuration.GetSection(VnpayConfig.ConfigName));
 
 var app = builder.Build();
 

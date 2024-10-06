@@ -7,6 +7,7 @@ using Domain.Interfaces;
 using Domain.IRepository;
 using Firebase.Auth;
 using Infrastructure.Authentication1;
+using Infrastructure.Payment.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -59,6 +60,7 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<ITableTypeService, TableTypeService>();
             services.AddScoped<ITableService, TableService>();
 
+            services.AddScoped<IPaymentService, PaymentService>();
         }
 
         public static void AddCORS(this IServiceCollection services)
