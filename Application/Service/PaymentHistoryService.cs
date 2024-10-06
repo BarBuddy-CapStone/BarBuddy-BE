@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.PaymentHistory;
 using Application.IService;
+using AutoMapper;
 using Domain.CustomException;
 using Domain.Entities;
 using Domain.IRepository;
@@ -15,9 +16,11 @@ namespace Application.Service
     public class PaymentHistoryService : IPaymentHistoryService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public PaymentHistoryService(IUnitOfWork unitOfWork) { 
+        public PaymentHistoryService(IUnitOfWork unitOfWork, IMapper mapper) { 
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task<(List<PaymentHistoryResponse> response, int totalPage)> Get(int Status, string? CustomerName, string? PhoneNumber, string? Email, Guid? BarId, DateTime? PaymentDate, int PageIndex, int PageSize)
