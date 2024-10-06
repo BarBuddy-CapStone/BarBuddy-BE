@@ -18,7 +18,7 @@ namespace Domain.Entities
         public Guid BookingId { get; set; }
         public Guid BarId { get; set; }
         public int Rating { get; set; }
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
         public bool IsDeleted { get; set; }
         public DateTimeOffset CreatedTime { get; set; }
         public DateTimeOffset LastUpdatedTime { get; set; }

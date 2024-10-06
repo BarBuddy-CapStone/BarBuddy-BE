@@ -23,7 +23,7 @@ namespace Application.Service
             _mapper = mapper;
         }
 
-        public async Task<(List<PaymentHistoryResponse> response, int totalPage)> Get(bool Status, string? CustomerName, string? PhoneNumber, string? Email, Guid? BarId, DateTime? PaymentDate, int PageIndex, int PageSize)
+        public async Task<(List<PaymentHistoryResponse> response, int totalPage)> Get(int Status, string? CustomerName, string? PhoneNumber, string? Email, Guid? BarId, DateTime? PaymentDate, int PageIndex, int PageSize)
         {
             try
             {
@@ -77,7 +77,7 @@ namespace Application.Service
             }
         }
 
-        public async Task<(List<PaymentHistoryByCustomerResponse> response, int totalPage)> GetByCustomerId(Guid customerId, bool? Status, int PageIndex, int PageSize)
+        public async Task<(List<PaymentHistoryByCustomerResponse> response, int totalPage)> GetByCustomerId(Guid customerId, int? Status, int PageIndex, int PageSize)
         {
             try
             {

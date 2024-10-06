@@ -16,6 +16,6 @@ namespace Application.DTOs.PaymentHistory
         public DateTime PaymentDate { get; set; }
         public double TotalPrice { get; set; }
         public string? Note { get; set; }
-        public bool Status { get; set; }
+        public int Status { get; set; }
     }
 }

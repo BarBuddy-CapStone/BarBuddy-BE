@@ -21,7 +21,7 @@ namespace Domain.Entities
         public double PaymentFee { get; set; }
         public double TotalPrice { get; set; }
         public string? Note {  get; set; }
-        public bool Status { get; set; }
+        public int Status { get; set; }
 
         [ForeignKey("AccountId")]
         public virtual Account Account { get; set; }
