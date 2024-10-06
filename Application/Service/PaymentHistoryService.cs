@@ -117,6 +117,7 @@ namespace Application.Service
                 {
                     var paymentResponse = new PaymentHistoryByCustomerResponse
                     {
+                        BookingId = payment.BookingId,
                         CustomerName = payment.Account.Fullname,
                         PhoneNumber = payment.Account.Phone,
                         BarName = (await _unitOfWork.BarRepository.GetByIdAsync(payment.Booking.BarId)).BarName,

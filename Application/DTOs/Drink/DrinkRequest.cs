@@ -13,8 +13,6 @@ namespace Application.DTOs.Drink
         [Required]
         public Guid DrinkCategoryId { get; set; }
         [Required]
-        public Guid BarId { get; set; }
-        [Required]
         public string DrinkName { get; set; }
         [Required]
         public string Description { get; set; }

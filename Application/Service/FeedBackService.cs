@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Bar;
+using Application.DTOs.Feedback;
 using Application.DTOs.Request.FeedBackRequest;
 using Application.DTOs.Response.EmotionCategory;
 using Application.DTOs.Response.FeedBack;
@@ -59,15 +60,39 @@ namespace Application.Service
 
         public async Task<FeedBackResponse> CreateFeedBack(CreateFeedBackRequest request)
         {
-            var userId = _authentication.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
+            //var userId = _authentication.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
 
-            var user = _unitOfWork.AccountRepository.Get(u => u.AccountId == userId).FirstOrDefault();
+            //var user = _unitOfWork.AccountRepository.Get(u => u.AccountId == userId).FirstOrDefault();
 
-            var feedbackRequest = _mapper.Map<EmotionalDrinkCategory>(request);
-            _unitOfWork.EmotionalDrinkCategoryRepository.Insert(feedbackRequest);
+            //var feedbackRequest = _mapper.Map<EmotionalDrinkCategory>(request);
+            //_unitOfWork.EmotionalDrinkCategoryRepository.Insert(feedbackRequest);
+            //await _unitOfWork.SaveAsync();
+
+            var booking = (await _unitOfWork.BookingRepository.GetAsync(b => b.BookingId == request.BookingId)).FirstOrDefault();
+
+            if (booking == null)
+            {
+                throw new CustomException.DataNotFoundException("Không tìm thấy booking");
+            }
+
+            var createTime = DateTimeOffset.Now;
+
+            var feedback = new Feedback
+            {
+                BarId = booking.BarId,
+                AccountId = booking.AccountId,
+                BookingId = booking.BookingId,
+                Comment = request.Comment,
+                CreatedTime = createTime,
+                IsDeleted = false,
+                LastUpdatedTime = createTime,
+                Rating = request.Rating
+            };
+
+            await _unitOfWork.FeedbackRepository.InsertAsync(feedback);
             await _unitOfWork.SaveAsync();
 
-            var feedbackResponse = _mapper.Map<FeedBackResponse>(feedbackRequest);
+            var feedbackResponse = _mapper.Map<FeedBackResponse>(feedback);
             return feedbackResponse;
         }
 
@@ -110,6 +135,36 @@ namespace Application.Service
             await _unitOfWork.SaveAsync();
             return true;
         }
-        
+
+        public async Task<CustomerFeedbackResponse> GetFeedBackByBookingId(Guid BookingId)
+        {
+            try
+            {
+                var feedback = (await _unitOfWork.FeedbackRepository.GetAsync(f => f.BookingId == BookingId, includeProperties: "Account,Bar")).FirstOrDefault();
+                if (feedback == null)
+                {
+                    throw new CustomException.DataNotFoundException("Đã có lỗi xảy ra, đánh giá không tồn tại");
+                }
+                var response = new CustomerFeedbackResponse
+                {
+                    BarAddress = feedback.Bar.Address,
+                    BarImage = feedback.Bar.Images.Split(',')[0],
+                    BarName = feedback.Bar.BarName,
+                    Comment = feedback.Comment,
+                    CreatedTime = feedback.CreatedTime,
+                    CustomerAvatar = feedback.Account.Image,
+                    CustomerName = feedback.Account.Fullname,
+                    FeedbackId = feedback.FeedbackId,
+                    LastUpdatedTime = feedback.LastUpdatedTime,
+                    Rating = feedback.Rating,
+                    EndTime = feedback.Bar.EndTime,
+                    StartTime = feedback.Bar.StartTime
+                };
+                return response;
+            }
+            catch (Exception ex) {
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
     }
 }

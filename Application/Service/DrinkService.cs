@@ -111,7 +111,7 @@ namespace Application.Service
         {
             try
             {
-                var getAllDrink = await _unitOfWork.DrinkRepository.GetAsync(includeProperties: "DrinkCategory,Bar");
+                var getAllDrink = await _unitOfWork.DrinkRepository.GetAsync(includeProperties: "DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory");
                 if (getAllDrink.IsNullOrEmpty())
                 {
                     throw new CustomException.DataNotFoundException("Data not found !");
@@ -130,7 +130,7 @@ namespace Application.Service
             {
                 var getAllDrink = await _unitOfWork.DrinkRepository
                                         .GetAsync(filter: x => x.Status == PrefixKeyConstant.TRUE,
-                                                includeProperties: "DrinkCategory,Bar,DrinkEmotionalCategories.EmotionalDrinkCategory");
+                                                includeProperties: "DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory");
                 var response = _mapper.Map<IEnumerable<DrinkResponse>>(getAllDrink);
                 return response;
             }
@@ -140,23 +140,13 @@ namespace Application.Service
             }
         }
 
-        public async Task<IEnumerable<DrinkResponse>> GetAllDrinkBasedBarId(Guid barId)
-        {
-            var getAllDrink = await _unitOfWork.DrinkRepository
-                                        .GetAsync(filter: x => x.Bar.BarId.Equals(barId) 
-                                                    && x.Status == PrefixKeyConstant.TRUE,
-                                                includeProperties: "DrinkCategory,Bar,DrinkEmotionalCategories.EmotionalDrinkCategory");
-            var response = _mapper.Map<IEnumerable<DrinkResponse>>(getAllDrink);
-            return response;
-        }
-
         public async Task<IEnumerable<DrinkResponse>> GetAllDrinkBasedCateId(Guid cateId)
         {
             try
             {
                 var getAllDrink = await _unitOfWork.DrinkRepository
                                     .GetAsync(filter: x => x.DrinkCategory.DrinksCategoryId.Equals(cateId)
-                                    , includeProperties: "DrinkCategory,Bar");
+                                    , includeProperties: "DrinkCategory");
 
                 if (getAllDrink.IsNullOrEmpty())
                 {
@@ -177,7 +167,7 @@ namespace Application.Service
             {
                 var getAllDrink = await _unitOfWork.DrinkRepository
                                         .GetAsync(filter: x => x.DrinkId.Equals(drinkId),
-                                                includeProperties: "DrinkCategory,Bar,DrinkEmotionalCategories.EmotionalDrinkCategory");
+                                                includeProperties: "DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory");
                 var getOne = getAllDrink.FirstOrDefault();
 
                 if (getOne == null)
@@ -288,7 +278,7 @@ namespace Application.Service
 
                     var getAllDrink = await _unitOfWork.DrinkRepository
                                         .GetAsync(filter: x => x.DrinkId.Equals(mapper.DrinkId),
-                                                includeProperties: "DrinkCategory,Bar,DrinkEmotionalCategories.EmotionalDrinkCategory");
+                                                includeProperties: "DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory");
                     var getOne = getAllDrink.FirstOrDefault();
                     transaction.Complete();
                     response = _mapper.Map<DrinkResponse>(getOne);
@@ -299,6 +289,25 @@ namespace Application.Service
                     transaction.Dispose();
                     throw new CustomException.InternalServerErrorException(e.Message);
                 }
+            }
+        }
+
+        public async Task<IEnumerable<DrinkResponse>> GetAllDrinkBasedEmoId(Guid emoId)
+        {
+            try
+            {
+                var getAllDrink = await _unitOfWork.DrinkRepository.GetAsync(includeProperties: "DrinkCategory");
+
+                if (getAllDrink.IsNullOrEmpty())
+                {
+                    throw new CustomException.DataNotFoundException("Data not found !");
+                }
+                var response = _mapper.Map<IEnumerable<DrinkResponse>>(getAllDrink);
+                return response;
+            }
+            catch (CustomException.InternalServerErrorException e)
+            {
+                throw new CustomException.InternalServerErrorException(e.Message);
             }
         }
     }

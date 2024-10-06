@@ -1,4 +1,5 @@
-﻿using Application.DTOs.Request.FeedBackRequest;
+﻿using Application.DTOs.Feedback;
+using Application.DTOs.Request.FeedBackRequest;
 using Application.DTOs.Response.EmotionCategory;
 using Application.DTOs.Response.FeedBack;
 using System;
@@ -14,6 +15,7 @@ namespace Application.IService
     {
         Task<IEnumerable<FeedBackResponse>> GetFeedBack();
         Task<FeedBackResponse> GetFeedBackByID(Guid id);
+        Task<CustomerFeedbackResponse> GetFeedBackByBookingId(Guid BookingId);
         Task<FeedBackResponse> CreateFeedBack(CreateFeedBackRequest request);
         Task<FeedBackResponse> UpdateFeedBack(Guid id, UpdateFeedBackRequest request);
         Task<bool> DeleteUpdateFeedBack(Guid id);
