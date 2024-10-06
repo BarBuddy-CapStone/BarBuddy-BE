@@ -2,8 +2,7 @@
 using Application.IService;
 using Application.Mappers;
 using Application.Service;
-using Firebase.Auth;
-using Infrastructure.Authentication1;
+using Infrastructure.Integrations;
 using Infrastructure.Payment.Service;
 using Infrastructure.Email;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Persistence.Repository;
 using System.Text;
+using Domain.IRepository;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -43,11 +43,10 @@ namespace Infrastructure.DependencyInjection
 
 
 
-
         public static void AddServices(this IServiceCollection services)
         {
             //services.AddScoped<IAuthService, AuthService>();
-            services.AddScoped<IFirebase, Firebase>();
+            services.AddScoped<IFirebase, FirebaseService>();
             services.AddTransient<IAuthentication, Authentication>();
             services.AddMemoryCache(); 
             services.AddTransient<IEmailSender, EmailSender>();

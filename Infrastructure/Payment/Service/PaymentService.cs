@@ -64,7 +64,7 @@ namespace Infrastructure.Payment.Service
             {
                 var paymentHistoryRequest = mapper.Map<PaymentHistoryRequest>(request);
                 var paymentHistory = mapper.Map<PaymentHistory>(paymentHistoryRequest);
-                paymentHistory.Status = false;
+                //paymentHistory.Status = false;
                 unitOfWork.PaymentHistoryRepository.Insert(paymentHistory);
                 unitOfWork.Save();
 
@@ -137,7 +137,7 @@ namespace Infrastructure.Payment.Service
                 {
                     try
                     {
-                        paymentHistory.Status = true;
+                        //paymentHistory.Status = true;
                         await unitOfWork.PaymentHistoryRepository.UpdateAsync(paymentHistory);
                         await unitOfWork.SaveAsync();
                         return $"{paymentHistory.PaymentHistoryId}-{paymentHistory.BookingId}";

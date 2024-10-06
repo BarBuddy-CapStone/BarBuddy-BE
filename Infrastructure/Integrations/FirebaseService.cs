@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Integrations
 {
-    public class Firebase : IFirebase
+    public class FirebaseService : IFirebase
     {
         private readonly IConfiguration _configuration;
 
-        public Firebase(IConfiguration configuration)
+        public FirebaseService(IConfiguration configuration)
         {
             _configuration = configuration;
         }
