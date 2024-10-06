@@ -9,7 +9,7 @@ namespace Application.IService
 {
     public interface IPaymentHistoryService
     {
-        Task<(List<PaymentHistoryResponse> response, int totalPage)> Get(bool Status, string? CustomerName, string? PhoneNumber, string? Email, Guid? BarId, DateTime? PaymentDate, int PageIndex, int PageSize);
-        Task<(List<PaymentHistoryByCustomerResponse> response, int totalPage)> GetByCustomerId(Guid customerId, bool? Status, int PageIndex, int PageSize);
+        Task<(List<PaymentHistoryResponse> response, int totalPage)> Get(int Status, string? CustomerName, string? PhoneNumber, string? Email, Guid? BarId, DateTime? PaymentDate, int PageIndex, int PageSize);
+        Task<(List<PaymentHistoryByCustomerResponse> response, int totalPage)> GetByCustomerId(Guid customerId, int? Status, int PageIndex, int PageSize);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Application.DependencyInjection;
 using Infrastructure.DependencyInjection;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using Persistence.DependencyInjection;
 
@@ -30,34 +31,32 @@ namespace BarBuddy_API.DependencyInjection
             {
                 option.SwaggerDoc("v1", new OpenApiInfo { Title = "BarBuddy API", Version = "v1" });
 
-                option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                var jwtSecurityScheme = new OpenApiSecurityScheme
                 {
-                    In = ParameterLocation.Header,
-                    Description = "Please enter a valid token",
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.Http,
                     BearerFormat = "JWT",
-                    Scheme = "Bearer"
-                });
-
-                option.AddSecurityRequirement(new OpenApiSecurityRequirement
-        {
-            {
-                new OpenApiSecurityScheme
-                {
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = JwtBearerDefaults.AuthenticationScheme,
+                    Description = "Put Bearer + your token in the box below",
                     Reference = new OpenApiReference
                     {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
-                    },
-                    Scheme = "oauth2",
-                    Name = "Bearer",
-                    In = ParameterLocation.Header
-                },
-                new List<string>()
-            }
-        });
+                        Id = JwtBearerDefaults.AuthenticationScheme,
+                        Type = ReferenceType.SecurityScheme
+                    }
+                };
+
+                option.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
+
+                option.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        jwtSecurityScheme, Array.Empty<string>()
+                    }
+                });
+
             });
+
         }
 
     }

@@ -29,5 +29,11 @@ namespace Domain.Constants
         public static readonly bool TRUE = true;
         public static readonly bool FALSE = false;
         #endregion
+
+        #region Role Name
+        public static string ADMIN = "ADMIN";
+        public static string STAFF = "STAFF";
+        public static string CUSTOMER = "CUSTOMER";
+        #endregion
     }
 }

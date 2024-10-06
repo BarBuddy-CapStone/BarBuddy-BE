@@ -46,6 +46,7 @@ app.UseRouting();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthorization();
 

@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Account;
+using Application.DTOs.Authen;
 using AutoMapper;
 using Domain.Entities;
 using System;
@@ -19,6 +20,8 @@ namespace Application.Mappers.AccountMapper
             CreateMap<Account, StaffAccountResponse>();
             CreateMap<Account, CustomerInfoResponse>().ReverseMap();
             CreateMap<CustomerInfoRequest, Account>().ReverseMap();
+            CreateMap<Account, LoginResponse>();
+            CreateMap<RegisterRequest, Account>();
         }
     }
 }

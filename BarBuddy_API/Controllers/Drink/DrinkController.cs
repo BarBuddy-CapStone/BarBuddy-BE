@@ -2,7 +2,8 @@
 using Application.IService;
 using CoreApiResponse;
 using Domain.CustomException;
-using Domain.Entities;
+using Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BarBuddy_API.Controllers.Drink
@@ -17,7 +18,7 @@ namespace BarBuddy_API.Controllers.Drink
         {
             _drinkService = drinkService;
         }
-
+        [Authorize(Roles = "ADMIN")]
         [HttpGet]
         public async Task<IActionResult> GetAllDrink()
         {
@@ -36,6 +37,7 @@ namespace BarBuddy_API.Controllers.Drink
                 return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
             }
         }
+
         [HttpGet("customer")]
         public async Task<IActionResult> GetAllDrinkCustomer()
         {

@@ -266,7 +266,7 @@ namespace Persistence.Data
                     BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     RoleId = Guid.Parse("b3b5a546-519d-411b-89d0-20c824e18d11"),
                     Email = "admin1@barbuddy1.com",
-                    Password = "password123",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
                     Fullname = "Admin Bar Buddy1",
                     Dob = new DateTime(1980, 5, 1),
                     Phone = "0901234567",
