@@ -127,6 +127,20 @@ namespace Application.Service
             return response;
         }
 
+        public async Task<BarResponse> GetBarByIdWithTable(Guid barId)
+        {
+            var getBarById = (await _unitOfWork.BarRepository.GetAsync(filter: a => a.BarId == barId,
+                    includeProperties: "Tables,Tables.TableType")).FirstOrDefault();
+
+            if (getBarById == null)
+            {
+                throw new CustomException.DataNotFoundException("Data not Found !");
+            }
+
+            var response = _mapper.Map<BarResponse>(getBarById);
+            return response;
+        }
+
         public async Task<BarResponse> UpdateBarById(Guid barId, BarRequest request)
         {
             var response = new BarResponse();

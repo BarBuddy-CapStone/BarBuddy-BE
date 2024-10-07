@@ -13,7 +13,11 @@ namespace Application.Mappers.Table
     {
         public TableMapper()
         {
-            CreateMap<Domain.Entities.Table, TableResponse>();
+            CreateMap<Domain.Entities.Table, TableResponse>()
+                .ForMember(a => a.TableTypeName, opt => opt.MapFrom(b => b.TableType.TypeName))
+                .ForMember(a => a.MaximumGuest, opt => opt.MapFrom(b => b.TableType.MaximumGuest))
+                .ForMember(a => a.MinimumGuest, opt => opt.MapFrom(b => b.TableType.MinimumGuest))
+                .ForMember(a => a.MinimumPrice, opt => opt.MapFrom(b => b.TableType.MinimumPrice));
         }
     }
 }
