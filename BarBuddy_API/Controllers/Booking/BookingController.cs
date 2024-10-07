@@ -37,6 +37,28 @@ namespace BarBuddy_API.Controllers.Booking
             return Ok(responses);
         }
 
+        [HttpGet("staff")]
+        public async Task<IActionResult> GetListBookingByStaff([FromQuery][Required] Guid BarId, [FromQuery] string? CustomerName, [FromQuery] string? Phone, [FromQuery] string? Email, 
+            [FromQuery] DateTimeOffset? bookingDate, [FromQuery] TimeSpan? bookingTime, [FromQuery] int? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
+        {
+            var responses = await _bookingService.GetListBookingByStaff(BarId, CustomerName, Phone, Email, bookingDate, bookingTime, Status, PageIndex, PageSize);
+            return Ok(new { totalPage = responses.TotalPage, startTime = responses.startTime, endTime = responses.endTime , response = responses.responses});
+        }
+
+        [HttpGet("staff/{bookingId}")]
+        public async Task<IActionResult> GetBookingDetailByStaff(Guid bookingId)
+        {
+            var responses = await _bookingService.GetBookingDetailByStaff(bookingId);
+            return Ok(responses);
+        }
+
+        [HttpPatch("status")]
+        public async Task<IActionResult> CancelBooking([FromQuery][Required] Guid BookingId, [FromQuery][Required] int Status)
+        {
+            await _bookingService.UpdateBookingStatus(BookingId, Status);
+            return Ok("Cập nhật trạng thái thành công");
+        }
+
         [HttpPatch("cancel/{BookingId}")]
         public async Task<IActionResult> CancelBooking(Guid BookingId)
         {
