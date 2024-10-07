@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Booking;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -14,5 +15,6 @@ namespace Application.IService
         Task<List<TopBookingResponse>> GetTopBookingByCustomer(Guid CustomerId, int NumOfBookings);
         Task<BookingByIdResponse> GetBookingById(Guid BookingId);
         Task<bool> CancelBooking(Guid BookingId);
+        BookingResponse CreateBookingTableOnly(BookingTableRequest request, HttpContext httpContext);
     }
 }

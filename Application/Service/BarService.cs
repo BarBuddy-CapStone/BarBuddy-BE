@@ -91,7 +91,7 @@ namespace Application.Service
 
         public async Task<IEnumerable<BarResponse>> GetAllBarWithFeedback()
         {
-            var bars = await _unitOfWork.BarRepository.GetAsync(includeProperties: "Feedbacks");
+            var bars = await _unitOfWork.BarRepository.GetAsync(includeProperties: "Feedbacks,Tables");
             if (bars.IsNullOrEmpty() || !bars.Any())
             {
                 throw new CustomException.DataNotFoundException("The list is empty !");
@@ -116,7 +116,7 @@ namespace Application.Service
         public async Task<BarResponse> GetBarByIdWithFeedback(Guid barId)
         {
             var getBarById = (await _unitOfWork.BarRepository.GetAsync(filter: a => a.BarId == barId, 
-                    includeProperties: "Feedbacks")).FirstOrDefault();
+                    includeProperties: "Feedbacks,Tables")).FirstOrDefault();
 
             if (getBarById == null)
             {
