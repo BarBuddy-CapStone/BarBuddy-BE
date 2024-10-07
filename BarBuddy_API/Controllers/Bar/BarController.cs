@@ -57,7 +57,7 @@ namespace BarBuddy_API.Controllers.Bar
             }
         }
 
-        [HttpGet("/api/v1/bar-detail")]
+        [HttpGet("/api/v1/bar-detail/{barId}")]
         public async Task<IActionResult> GetBarWithFeedbackById(Guid barId)
         {
             try
@@ -94,6 +94,8 @@ namespace BarBuddy_API.Controllers.Bar
                 return CustomResult(e.Message, HttpStatusCode.InternalServerError);
             }
         }
+
+
 
         [HttpPost("admin/addBar")]
         public async Task<IActionResult> CreateBar([FromForm] BarRequest request)
