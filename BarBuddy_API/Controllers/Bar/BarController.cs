@@ -58,7 +58,6 @@ namespace BarBuddy_API.Controllers.Bar
         }
 
         [HttpGet("/api/v1/bar-detail/{barId}")]
-        [HttpGet("/api/v1/{barId}")]
         public async Task<IActionResult> GetBarWithFeedbackById(Guid barId)
         {
             try
