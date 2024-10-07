@@ -28,7 +28,8 @@ namespace Infrastructure.Payment.Service
         private readonly IBookingService bookingService;
         private static Random random;
 
-        public PaymentService(IOptions<ZalopayConfig> zaloPayConfigOptions,
+        public PaymentService(
+            IOptions<ZalopayConfig> zaloPayConfigOptions,
             IOptions<VnpayConfig> vnPayConfigOptions,
             IHttpContextAccessor httpContextAccessor,
             IUnitOfWork unitOfWork,
@@ -49,7 +50,7 @@ namespace Infrastructure.Payment.Service
             switch (request.PaymentDestinationId)
             {
                 case "VNPAY":
-                    return GetVnpayPaymentLinkAsync(request);
+                    return GetVnpayPaymentLink(request);
                 case "ZALOPAY":
                     return GetZalopayPaymentLink(request);
                 default:
@@ -58,33 +59,36 @@ namespace Infrastructure.Payment.Service
         }
 
 
-        private PaymentLink GetVnpayPaymentLinkAsync(CreatePayment request)
+        private PaymentLink GetVnpayPaymentLink(CreatePayment request)
         {
             try
             {
-                var paymentHistoryRequest = mapper.Map<PaymentHistoryRequest>(request);
-                var paymentHistory = mapper.Map<PaymentHistory>(paymentHistoryRequest);
-                //paymentHistory.Status = false;
-                unitOfWork.PaymentHistoryRepository.Insert(paymentHistory);
-                unitOfWork.Save();
+                //var paymentHistoryRequest = mapper.Map<PaymentHistoryRequest>(request);
+                //var paymentHistory = mapper.Map<PaymentHistory>(paymentHistoryRequest);
+                ////paymentHistory.Status = false;
+                //unitOfWork.PaymentHistoryRepository.Insert(paymentHistory);
+                //unitOfWork.Save();
 
-                var booking = unitOfWork.BookingRepository.Get(filter: b => b.BookingId == request.BookingId,
-                    includeProperties: "BookingDrinks,BookingTables").FirstOrDefault();
-                decimal totalPrice = 0;
-                if (booking.IsIncludeDrink)
-                {
-                    totalPrice = booking.BookingDrinks.Sum(drink => (decimal)drink.ActualPrice * drink.Quantity);
-                    //tính chiết khấu
-                }
+                //var booking = unitOfWork.BookingRepository.Get(filter: b => b.BookingId == request.BookingId,
+                //    includeProperties: "BookingDrinks,BookingTables").FirstOrDefault();
+                //decimal totalPrice = 0;
+                //if (booking.IsIncludeDrink)
+                //{
+                //    totalPrice = booking.BookingDrinks.Sum(drink => (decimal)drink.ActualPrice * drink.Quantity);
+                //    //tính chiết khấu
+                //}
 
-                request.RequiredAmount = totalPrice;
-                request.PaymentContent = paymentHistory.PaymentHistoryId.ToString();
+                //request.RequiredAmount = totalPrice;
+                //request.PaymentContent = paymentHistory.PaymentHistoryId.ToString();
+                var transactionCode = Guid.NewGuid();
                 var outputIdParam = RandomHelper.GenerateRandomNumberString();
                 var IpAddress = httpContextAccessor?.HttpContext?.Connection?.LocalIpAddress?.ToString();
-                var vnpayPayRequest = new VnpayRequest(vnPayConfig.Version,
-                            vnPayConfig.TmnCode, DateTime.Now, IpAddress ?? string.Empty,
+                var vnpayPayRequest = new VnpayRequest(vnPayConfig.Version, vnPayConfig.TmnCode, 
+                            DateTime.Now, IpAddress ?? string.Empty,
                             request.RequiredAmount ?? 0, request.PaymentCurrency ?? string.Empty,
-                            "other", request.PaymentContent ?? string.Empty, vnPayConfig.ReturnUrl, DateTime.Now.ToString("yymmdd") + "_" + outputIdParam!.ToString() ?? string.Empty);
+                            "other", request.PaymentContent ?? string.Empty, 
+                            vnPayConfig.ReturnUrl, transactionCode.ToString() ?? string.Empty);
+                
                 var paymentUrl = vnpayPayRequest.GetLink(vnPayConfig.PaymentUrl, vnPayConfig.HashSecret);
                 var vnPayResult = new PaymentLink
                 {
