@@ -54,14 +54,14 @@ namespace BarBuddy_API.Controllers.Booking
         public IActionResult CreateBookingTableOnly([FromBody] BookingTableRequest request)
         {
             var response = _bookingService.CreateBookingTableOnly(request, HttpContext);
-            return CustomResult(response);
+            return CustomResult("Đặt bàn thành công", response);
         }
 
         [HttpPost("booking-drink")]
         public IActionResult CreateBookingTableWithDrinks([FromBody] BookingDrinkRequest request)
         {
             var response = _bookingService.CreateBookingTableWithDrinks(request, HttpContext);
-            return CustomResult(response);
+            return CustomResult("Đặt bàn kèm đồ uống thành công", response);
         }
     }
 }
