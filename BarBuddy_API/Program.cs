@@ -19,11 +19,6 @@ builder.Services.AddHttpContextAccessor();
 // DI
 builder.Services.AddPresentation(builder.Configuration);
 
-builder.Services.Configure<ZalopayConfig>(
-              builder.Configuration.GetSection(ZalopayConfig.ConfigName));
-builder.Services.Configure<VnpayConfig>(
-              builder.Configuration.GetSection(VnpayConfig.ConfigName));
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
