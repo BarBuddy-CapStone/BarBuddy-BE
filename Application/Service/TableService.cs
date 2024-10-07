@@ -30,7 +30,7 @@ namespace Application.Service
                     BarId = request.BarId,
                     TableTypeId = request.TableTypeId,
                     TableName = request.TableName,
-                    Status = 1,
+                    Status = request.Status,
                     IsDeleted = false
                 };
                 await _unitOfWork.TableRepository.InsertAsync(Table);
@@ -41,7 +41,7 @@ namespace Application.Service
             }
         }
 
-        public async Task DeleteTable(Guid TableId)
+        public async Task<bool> DeleteTable(Guid TableId)
         {
             try
             {
@@ -50,29 +50,45 @@ namespace Application.Service
                 {
                     throw new CustomException.DataNotFoundException("Table Id không tồn tại");
                 }
+                // Check future booking
+                var bookingTable = await _unitOfWork.BookingTableRepository.GetAsync(filter: bt => bt.TableId == TableId && bt.ReservationDate >= DateTimeOffset.Now);
+                if (bookingTable.Any())
+                {
+                    return false;
+                }
 
                 existedTable.IsDeleted = true;
                 await _unitOfWork.TableRepository.UpdateAsync(existedTable);
                 await _unitOfWork.SaveAsync();
+                return true;
             }
             catch (Exception ex) {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
 
-        public async Task<(List<TableResponse> response, int TotalPage, string TableTypeName)> GetAll(Guid? BarId, Guid TableTypeId, int? Status, int PageIndex, int PageSize)
+        public async Task<(List<TableResponse> response, int TotalPage, string TableTypeName, Guid TableTypeId)> GetAll(Guid? BarId, Guid TableTypeId, int? Status, int PageIndex, int PageSize)
         {
             try
             {
                 var responses = new List<TableResponse>();
                 int totalPage = 1;
-                string TableTypeName = "N/A";
+
+                var tableType = await _unitOfWork.TableTypeRepository.GetByIdAsync(TableTypeId);
+
+                if (tableType == null) {
+                    throw new Exception("Table Type not found");
+                }
+
+                string TableTypeName = tableType.TypeName;
+                Guid tableTypeId = tableType.TableTypeId;
 
                 // filter expression
                 Expression<Func<Table, bool>> filter = t =>
                 (Status == null || t.Status == Status) &&
                 (BarId == null || t.BarId == BarId) &&
-                t.TableTypeId == TableTypeId;
+                t.TableTypeId == TableTypeId &&
+                t.IsDeleted == false;
                 
                 var totalTable = (await _unitOfWork.TableRepository.GetAsync(filter: filter)).Count();
 
@@ -103,16 +119,14 @@ namespace Application.Service
                             MinimumPrice = table.TableType.MinimumPrice,
                             Status = table.Status,
                             TableName = table.TableName,
-                            TableTypeName = table.TableName,
+                            TableTypeName = table.TableType.TypeName,
                             TableId = table.TableId
                         };
                         responses.Add(tableResponse);
                     }
-
-                    TableTypeName = responses[0].TableTypeName;
                 }
 
-                return (responses, totalPage, TableTypeName);
+                return (responses, totalPage, TableTypeName, tableTypeId);
             } catch (Exception ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);

@@ -12,5 +12,6 @@ namespace Application.DTOs.Table
         public Guid BarId { get; set; }
         public Guid TableTypeId { get; set; }
         public string TableName { get; set; }
+        public int Status { get; set; }
     }
 }

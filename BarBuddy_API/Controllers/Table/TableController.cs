@@ -21,7 +21,7 @@ namespace BarBuddy_API.Controllers.Table
         public async Task<IActionResult> GetAllForStaff([FromQuery] Guid? BarId, [FromQuery][Required] Guid TableTypeId, [FromQuery] int? Status,[FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
             var responses = await _tableService.GetAll(BarId, TableTypeId, Status, PageIndex, PageSize);
-            return Ok(new { TableTypeName = responses.TableTypeName, totalPage = responses.TotalPage, response = responses.response });
+            return Ok(new { TableTypeId = responses.TableTypeId, TableTypeName = responses.TableTypeName, totalPage = responses.TotalPage, response = responses.response });
         }
 
         [HttpPost]
@@ -41,7 +41,11 @@ namespace BarBuddy_API.Controllers.Table
         [HttpDelete("{TableId}")]
         public async Task<IActionResult> Delete(Guid TableId)
         {
-            await _tableService.DeleteTable(TableId);
+            var isDeleted = await _tableService.DeleteTable(TableId);
+            if (!isDeleted)
+            {
+                return StatusCode(202, "Vẫn còn lịch đặt chỗ của bàn này trong tương lai, hãy cập nhật trước khi xóa");
+            }
             return Ok("Xóa bàn thành công");
         }
     }
