@@ -1,15 +1,12 @@
-﻿using Domain.Utils;
-using Infrastructure.Vnpay.Lib;
+﻿using Application.DTOs.Payment.Lib;
+using Domain.Utils;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace Infrastructure.Vnpay.Response
+namespace Application.DTOs.Payment
 {
+
     [BindProperties]
     public class VnpayResponse
     {

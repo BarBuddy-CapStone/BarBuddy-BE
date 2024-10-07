@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Booking;
+using Application.DTOs.BookingDrink;
 using Application.DTOs.BookingTable;
 using AutoMapper;
 using Domain.Entities;
@@ -25,6 +26,8 @@ namespace Application.Mappers.Booking
 
             CreateMap<BookingTableRequest, Domain.Entities.Booking>();
 
+            CreateMap<BookingDrink, BookingDrinkDetailResponse>()
+                .ForMember(x => x.DrinkName, opt => opt.MapFrom(y => y.Drink.DrinkName));
         }
     }
 }

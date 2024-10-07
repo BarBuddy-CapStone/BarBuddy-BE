@@ -9,7 +9,7 @@ namespace Application.DTOs.Payment
     public class CreatePayment
     {
         public string PaymentContent { get; set; } = string.Empty;
-        public string PaymentCurrency { get; set; }
+        public string PaymentCurrency { get => "VND"; }
         public string PaymentRefId { get; set; } = string.Empty;
         public decimal? RequiredAmount { get; set; }
         public DateTime? PaymentDate { get; set; } = DateTime.Now;
