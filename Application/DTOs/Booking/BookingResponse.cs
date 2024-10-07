@@ -25,6 +25,6 @@ namespace Application.DTOs.Booking
         public List<string> Images { get; set; }
         public int Status { get; set; }
         public List<BookingTableResponse> BookingTables { get; set; } = new List<BookingTableResponse>();
-        public List<BookingDrinkDetailResponse> bookingDrinksList { get; set; } = new List<BookingDrinkDetailResponse>();
+        public List<BookingDrinkDetailResponse> BookinDrinks { get; set; } = new List<BookingDrinkDetailResponse>();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.Booking;
 using Application.DTOs.BookingDrink;
+using Application.DTOs.Payment;
 using Application.Interfaces;
 using Application.IService;
 using AutoMapper;
@@ -23,12 +24,14 @@ namespace Application.Service
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IAuthentication _authentication;
+        private readonly IPaymentService _paymentService;
 
-        public BookingService(IUnitOfWork unitOfWork, IMapper mapper, IAuthentication authentication)
+        public BookingService(IUnitOfWork unitOfWork, IMapper mapper, IAuthentication authentication, IPaymentService paymentService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _authentication = authentication;
+            _paymentService = paymentService;
         }
 
         public async Task<bool> CancelBooking(Guid BookingId)
@@ -230,6 +233,7 @@ namespace Application.Service
                 booking.BookingTables = booking.BookingTables ?? new List<BookingTable>();
                 booking.BookingCode = $"BOOKING-{RandomHelper.GenerateRandomNumberString()}";
                 booking.Status = (int)PaymentStatusEnum.Pending;
+                booking.IsIncludeDrink = false; 
 
                 if (request.TableIds != null && request.TableIds.Count > 0)
                 {
@@ -282,6 +286,88 @@ namespace Application.Service
             }
         }
 
+        public PaymentLink CreateBookingTableWithDrinks(BookingDrinkRequest request, HttpContext httpContext)
+        {
+            try
+            {
+                var booking = _mapper.Map<Booking>(request);
+                booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext)) ?? throw new DataNotFoundException("account not found");
+                booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId) ?? throw new DataNotFoundException("Bar not found");
+                booking.BookingTables = booking.BookingTables ?? new List<BookingTable>();
+                booking.BookingDrinks = booking.BookingDrinks ?? new List<BookingDrink>();
+                booking.BookingCode = $"BOOKING-{RandomHelper.GenerateRandomNumberString()}";
+                booking.Status = (int)PaymentStatusEnum.Pending;
+                booking.IsIncludeDrink = true;
 
+                double totalPrice = 0;
+
+                if (request.TableIds != null && request.TableIds.Count > 0)
+                {
+                    var existingTables = _unitOfWork.TableRepository.Get(t => request.TableIds.Contains(t.TableId) && t.BarId == request.BarId);
+                    if (existingTables.Count() != request.TableIds.Count)
+                    {
+                        throw new CustomException.InvalidDataException("Some TableIds do not exist.");
+                    }
+                    foreach (var tableId in request.TableIds)
+                    {
+                        var bookingTable = new BookingTable
+                        {
+                            BookingId = booking.BookingId,
+                            TableId = tableId,
+                            ReservationDate = request.BookingDate,
+                            ReservationTime = request.BookingTime
+                        };
+
+                        booking.BookingTables?.Add(bookingTable);
+                    }
+                }
+                if (request.Drinks != null && request.Drinks.Count > 0)
+                {
+                    var drinkIds = request.Drinks.Select(drink => drink.DrinkId).ToList();
+                    var existingDrinks = _unitOfWork.DrinkRepository.Get(d => drinkIds.Contains(d.DrinkId));
+                    if (existingDrinks.Count() != request.Drinks.Count)
+                    {
+                        throw new CustomException.InvalidDataException("Some DrinkIds do not exist.");
+                    }
+                    foreach (var drink in request.Drinks)
+                    {
+                        var bookingDrink = new BookingDrink
+                        {
+                            BookingId = booking.BookingId,
+                            DrinkId = drink.DrinkId,
+                            ActualPrice = existingDrinks.FirstOrDefault(e => e.DrinkId == drink.DrinkId).Price,
+                            Quantity = drink.Quantity
+                        };
+                        totalPrice += bookingDrink.ActualPrice * bookingDrink.Quantity;
+                        booking.BookingDrinks?.Add(bookingDrink);
+                    }
+                    totalPrice = totalPrice - totalPrice * booking.Bar.Discount/100;
+                }
+                else
+                {
+                    throw new CustomException.InvalidDataException("Booking request does not have table field");
+                }
+                try
+                {
+                    _unitOfWork.BeginTransaction();
+                    _unitOfWork.BookingRepository.Insert(booking);
+                    _unitOfWork.CommitTransaction();
+                }
+                catch (Exception ex)
+                {
+                    _unitOfWork.RollBack();
+                    throw new InternalServerErrorException($"An Internal error occurred while creating customer: {ex.Message}");
+                }
+                return _paymentService.GetPaymentLink(booking.BookingId, booking.AccountId, request.PaymentDestination, totalPrice);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                throw new CustomException.InvalidDataException(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
     }
 }
