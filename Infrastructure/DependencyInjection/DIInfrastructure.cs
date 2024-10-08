@@ -12,6 +12,8 @@ using Microsoft.IdentityModel.Tokens;
 using Persistence.Repository;
 using System.Text;
 using Domain.IRepository;
+using Infrastructure.Vnpay.Config;
+using Infrastructure.Zalopay.Config;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -30,6 +32,10 @@ namespace Infrastructure.DependencyInjection
 
             // Mapper
             services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
+
+            //Config
+            services.Configure<ZalopayConfig>(configuration.GetSection(ZalopayConfig.ConfigName));
+            services.Configure<VnpayConfig>(configuration.GetSection(VnpayConfig.ConfigName));
 
             // Services
             services.AddServices();
@@ -63,6 +69,7 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<IAuthenService, AuthenService>();
 
             services.AddScoped<IPaymentService, PaymentService>();
+
         }
 
         public static void AddCORS(this IServiceCollection services)
