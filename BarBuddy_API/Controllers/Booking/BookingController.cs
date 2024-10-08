@@ -1,4 +1,5 @@
-﻿using Application.IService;
+﻿using Application.DTOs.Booking;
+using Application.IService;
 using Azure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -68,6 +69,13 @@ namespace BarBuddy_API.Controllers.Booking
                 return StatusCode(202, "Bạn chỉ có thể hủy bàn trước 2 giờ đồng hồ đến giờ phục vụ.");
             }
             return Ok("Hủy đặt bàn thành công");
+        }
+
+        [HttpPost("booking-table")]
+        public IActionResult CreateBookingTableOnly([FromBody] BookingTableRequest request)
+        {
+            var response = _bookingService.CreateBookingTableOnly(request, HttpContext);
+            return Ok(response);
         }
     }
 }

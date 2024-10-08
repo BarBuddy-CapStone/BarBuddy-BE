@@ -1,6 +1,7 @@
 ﻿using Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 
 namespace Persistence.Data
@@ -383,10 +384,16 @@ namespace Persistence.Data
             );
 
             // TableTypeData
+            var svip = Guid.NewGuid();
+            var vip = Guid.NewGuid();
+            var tc1 = Guid.NewGuid();
+            var tc2 = Guid.NewGuid();
+            var qb = Guid.NewGuid();
+
             modelBuilder.Entity<TableType>().HasData(
                 new TableType
                 {
-                    TableTypeId = Guid.NewGuid(),
+                    TableTypeId = svip,
                     TypeName = "Bàn SVIP",
                     Description = "Bàn SVIP phù hợp cho khách hàng muốn trải nghiệm dịch vụ chất lượng cao nhất tại quán, phù hợp cho nhóm khách hàng từ 1-15 người, mức giá tối thiểu chỉ từ 10.000.000 VND.",
                     MaximumGuest = 15,
@@ -396,7 +403,7 @@ namespace Persistence.Data
                 },
                 new TableType
                 {
-                    TableTypeId = Guid.NewGuid(),
+                    TableTypeId = vip,
                     TypeName = "Bàn VIP",
                     Description = "Bàn VIP phù hợp cho khách hàng muốn trải nghiệm dịch vụ chất lượng cao tại quán, phù hợp cho nhóm khách hàng từ 1-10 người, mức giá tối thiểu chỉ từ 5.000.000 VND.",
                     MaximumGuest = 10,
@@ -406,7 +413,7 @@ namespace Persistence.Data
                 },
                 new TableType
                 {
-                    TableTypeId = Guid.NewGuid(),
+                    TableTypeId = tc1,
                     TypeName = "Bàn Tiêu chuẩn 1",
                     Description = "Bàn Tiêu chuẩn 1 phù hợp cho khách hàng muốn trải nghiệm dịch vụ tiêu chuẩn tại quán, phù hợp cho nhóm khách hàng từ 1-4 người, mức giá tối thiểu chỉ từ 200.000 VND.",
                     MaximumGuest = 4,
@@ -416,7 +423,7 @@ namespace Persistence.Data
                 },
                 new TableType
                 {
-                    TableTypeId = Guid.NewGuid(),
+                    TableTypeId = tc2,
                     TypeName = "Bàn Tiêu chuẩn 2",
                     Description = "Bàn Tiêu chuẩn 2 phù hợp cho khách hàng muốn trải nghiệm dịch vụ tiêu chuẩn tại quán, phù hợp cho nhóm khách hàng từ 4-6 người, mức giá tối thiểu chỉ từ 500.000 VND.",
                     MaximumGuest = 6,
@@ -426,7 +433,7 @@ namespace Persistence.Data
                 },
                 new TableType
                 {
-                    TableTypeId = Guid.NewGuid(),
+                    TableTypeId = qb,
                     TypeName = "Bàn Quầy Bar",
                     Description = "Bàn Quầy Bar phù hợp cho khách hàng muốn trải nghiệm dịch vụ tiêu chuẩn tại quán và được phụ vụ trực tiếp bởi các Bartender, mức giá tối thiểu chỉ từ 200.000 VND.",
                     MaximumGuest = 1,
@@ -436,72 +443,355 @@ namespace Persistence.Data
                 }
             );
 
+            //Table
+            modelBuilder.Entity<Table>().HasData(
+                new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330000"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
+                    TableTypeId = tc1,
+                    TableName = "Table A1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330001"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
+                    TableTypeId = qb,
+                    TableName = "Table B1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330002"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
+                    TableTypeId = tc2,
+                    TableName = "Table C1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330003"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
+                    TableTypeId = svip,
+                    TableName = "Table A2",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330004"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+                    TableTypeId = vip,
+                    TableName = "Table B2",
+                    Status = 0,
+                    IsDeleted = false
+                }, new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330005"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+                    TableTypeId = vip,
+                    TableName = "Table B2",
+                    Status = 0,
+                    IsDeleted = false
+                }, new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330006"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+                    TableTypeId = vip,
+                    TableName = "Table B2",
+                    Status = 0,
+                    IsDeleted = false
+                }, new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330007"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+                    TableTypeId = vip,
+                    TableName = "Table B2",
+                    Status = 0,
+                    IsDeleted = false
+                }, new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330008"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+                    TableTypeId = vip,
+                    TableName = "Table B2",
+                    Status = 0,
+                    IsDeleted = false
+                }, new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330009"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+                    TableTypeId = vip,
+                    TableName = "Table B2",
+                    Status = 0,
+                    IsDeleted = false
+                }, new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330010"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+                    TableTypeId = vip,
+                    TableName = "Table B2",
+                    Status = 0,
+                    IsDeleted = false
+                }, new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330011"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+                    TableTypeId = vip,
+                    TableName = "Table B2",
+                    Status = 0,
+                    IsDeleted = false
+                }
+            );
+
+
             // DrinkCategoryData
+            var drinkCate1 = Guid.NewGuid();
+            var drinkCate2 = Guid.NewGuid();
+            var drinkCate3 = Guid.NewGuid();
+            var drinkCate4 = Guid.NewGuid();
+            var drinkCate5 = Guid.NewGuid();
+            var drinkCate6 = Guid.NewGuid();
+            var drinkCate7 = Guid.NewGuid();
+            var drinkCate8 = Guid.NewGuid();
+            var drinkCate9 = Guid.NewGuid();
+
             modelBuilder.Entity<DrinkCategory>().HasData(
                 new DrinkCategory
                 {
-                    DrinksCategoryId = Guid.NewGuid(),
+                    DrinksCategoryId = drinkCate1,
                     DrinksCategoryName = "Nước ngọt",
                     Description = "Đồ uống không cồn như soda, nước ngọt có ga, và nước ngọt có hương vị.",
                     IsDrinkCategory = true
                 },
                 new DrinkCategory
                 {
-                    DrinksCategoryId = Guid.NewGuid(),
+                    DrinksCategoryId = drinkCate2,
                     DrinksCategoryName = "Cocktail",
                     Description = "Đồ uống pha trộn thường chứa cồn, kết hợp với nước trái cây, soda hoặc các nguyên liệu khác.",
                     IsDrinkCategory = true
                 },
                 new DrinkCategory
                 {
-                    DrinksCategoryId = Guid.NewGuid(),
+                    DrinksCategoryId = drinkCate3,
                     DrinksCategoryName = "Mocktail",
                     Description = "Phiên bản không cồn của các loại cocktail, phù hợp cho những người không uống rượu.",
                     IsDrinkCategory = true
                 },
                 new DrinkCategory
                 {
-                    DrinksCategoryId = Guid.NewGuid(),
+                    DrinksCategoryId = drinkCate4,
                     DrinksCategoryName = "Rượu mạnh",
                     Description = "Đồ uống có cồn mạnh như vodka, whisky, gin, rum, v.v.",
                     IsDrinkCategory = true
                 },
                 new DrinkCategory
                 {
-                    DrinksCategoryId = Guid.NewGuid(),
+                    DrinksCategoryId = drinkCate5,
                     DrinksCategoryName = "Bia",
                     Description = "Đồ uống có cồn được ủ từ lúa mạch, hoa bia và nước. Có nhiều loại khác nhau như lager, ale, stout.",
                     IsDrinkCategory = true
                 },
                 new DrinkCategory
                 {
-                    DrinksCategoryId = Guid.NewGuid(),
+                    DrinksCategoryId = drinkCate6,
                     DrinksCategoryName = "Rượu vang",
                     Description = "Đồ uống có cồn được làm từ nho lên men, có nhiều loại như vang đỏ, vang trắng và vang hồng.",
                     IsDrinkCategory = true
                 },
                 new DrinkCategory
                 {
-                    DrinksCategoryId = Guid.NewGuid(),
+                    DrinksCategoryId = drinkCate7,
                     DrinksCategoryName = "Trà",
                     Description = "Đồ uống nóng hoặc lạnh được pha từ lá trà, có nhiều loại như trà đen, trà xanh và trà thảo mộc.",
                     IsDrinkCategory = true
                 },
                 new DrinkCategory
                 {
-                    DrinksCategoryId = Guid.NewGuid(),
+                    DrinksCategoryId = drinkCate8,
                     DrinksCategoryName = "Cà phê",
                     Description = "Đồ uống nóng hoặc lạnh được pha từ hạt cà phê rang, bao gồm espresso, cappuccino, latte và nhiều loại khác.",
                     IsDrinkCategory = true
                 },
                 new DrinkCategory
                 {
-                    DrinksCategoryId = Guid.NewGuid(),
+                    DrinksCategoryId = drinkCate9,
                     DrinksCategoryName = "Nước ép",
                     Description = "Đồ uống tự nhiên được làm từ nước ép trái cây hoặc rau củ. Các loại phổ biến gồm nước cam, nước táo, và nước ép cà rốt.",
                     IsDrinkCategory = true
                 }
             );
+
+            //Drink Data
+            modelBuilder.Entity<Drink>().HasData(
+            new Drink
+            {
+                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330000"),
+                DrinkCode = "D0001",
+                DrinkCategoryId = drinkCate1,
+                DrinkName = "Coca Cola",
+                Description = "Nước ngọt có ga phổ biến.",
+                Price = 15000,
+                CreatedDate = DateTime.Now,
+                UpdatedDate = DateTime.Now,
+                Image = "https://www.coca-cola.com/content/dam/onexp/vn/home-image/coca-cola/Coca-Cola_OT%20320ml_VN-EX_Desktop.png",
+                Status = true
+            },
+            new Drink
+            {
+                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330001"),
+                DrinkCode = "D0002",
+                DrinkCategoryId = drinkCate2,
+                DrinkName = "Mojito",
+                Description = "Cocktail nổi tiếng pha từ rượu rum và bạc hà.",
+                Price = 70000,
+                CreatedDate = DateTime.Now,
+                UpdatedDate = DateTime.Now,
+                Image = "https://www.liquor.com/thmb/MJRVqf-itJGY90nwUOYGXnyG-HA=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/mojito-720x720-primary-6a57f80e200c412e9a77a1687f312ff7.jpg",
+                Status = true
+            },
+            new Drink
+            {
+                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330002"),
+                DrinkCode = "D0003",
+                DrinkCategoryId = drinkCate3,
+                DrinkName = "Trà Đào",
+                Description = "Trà xanh kết hợp với vị ngọt của đào.",
+                Price = 35000,
+                CreatedDate = DateTime.Now,
+                UpdatedDate = DateTime.Now,
+                Image = "https://file.hstatic.net/200000684957/article/tra-dao_e022b1a9ac564ee186007875701ac643.jpg",
+                Status = true
+            },
+            new Drink
+            {
+                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330003"),
+                DrinkCode = "D0004",
+                DrinkCategoryId = drinkCate1,
+                DrinkName = "Pepsi",
+                Description = "Nước ngọt có ga, phổ biến tương tự Coca Cola.",
+                Price = 15000,
+                CreatedDate = DateTime.Now,
+                UpdatedDate = DateTime.Now,
+                Image = "http://thepizzacompany.vn/images/thumbs/000/0002364_pepsi-15l-pet_500.jpeg",
+                Status = true
+            },
+            new Drink
+            {
+                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330004"),
+                DrinkCode = "D0005",
+                DrinkCategoryId = drinkCate4,
+                DrinkName = "Screwdriver",
+                Description = "Cocktail kết hợp giữa rượu vodka và nước cam.",
+                Price = 80000,
+                CreatedDate = DateTime.Now,
+                UpdatedDate = DateTime.Now,
+                Image = "https://www.liquor.com/thmb/RnOVWoIXp7OAJRS-NSDIF9Bglbc=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/LQR-screwdriver-original-4000x4000-edb2f56dd69146bba9f7fafbf69e00a0.jpg",
+                Status = true
+            },
+            new Drink
+            {
+                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330005"),
+                DrinkCode = "D0006",
+                DrinkCategoryId = drinkCate8,
+                DrinkName = "Cà phê đen",
+                Description = "Cà phê đen pha đậm, không đường, không sữa.",
+                Price = 15000,
+                CreatedDate = DateTime.Now,
+                UpdatedDate = DateTime.Now,
+                Image = "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/8/14/2121767707dcce179f6866d132a2d6a384312f9-1723600454996-1723600455541950721311.jpg",
+                Status = true
+            }
+            );
+            modelBuilder.Entity<Booking>().HasData(
+    new Booking
+    {
+        BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
+        BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Bar Buddy 1
+        AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440001"), // Admin Bar Buddy 1
+        BookingCode = "BB0001", // Custom booking code
+        BookingDate = DateTime.Now.AddDays(-5),
+        Status = 1, // Confirmed
+    },
+    new Booking
+    {
+        BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+        BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"), // Bar Buddy 2
+        AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440002"), // Staff Bar Buddy 2
+        BookingCode = "BB0002", // Custom booking code
+        BookingDate = DateTime.Now.AddDays(-7),
+        Status = 2, // Completed
+    },
+    new Booking
+    {
+        BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
+        BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"), // Bar Buddy 3
+        AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440003"), // Customer Bar Buddy 3
+        BookingCode = "BB0003", // Custom booking code
+        BookingDate = DateTime.Now.AddDays(-3),
+        Status = 1, // Confirmed
+    },
+    new Booking
+    {
+        BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"),
+        BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Bar Buddy 4
+        AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440004"), // Customer Bar Buddy 4
+        BookingCode = "BB0004", // Custom booking code
+        BookingDate = DateTime.Now.AddDays(-2),
+        Status = 1, // Confirmed
+    }
+);
+            // BookingTable Data
+            // BookingTable Data
+            modelBuilder.Entity<BookingTable>().HasData(
+                new BookingTable
+                {
+                    BookingTableId = Guid.NewGuid(),
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Booking 1 (Bar Buddy 1)
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330000"), // Table A1 - Bar Buddy 1
+                },
+                new BookingTable
+                {
+                    BookingTableId = Guid.NewGuid(),
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"), // Booking 2 (Bar Buddy 2)
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330001"), // Table B1 - Bar Buddy 2
+                },
+                new BookingTable
+                {
+                    BookingTableId = Guid.NewGuid(),
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"), // Booking 3 (Bar Buddy 3)
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330002"), // Table C1 - Bar Buddy 3
+                },
+                new BookingTable
+                {
+                    BookingTableId = Guid.NewGuid(),
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 4)
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330005"), // Table D1 - Bar Buddy 4
+                },
+                new BookingTable
+                {
+                    BookingTableId = Guid.NewGuid(),
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 4)
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330006"), // Table D1 - Bar Buddy 4
+                }, new BookingTable
+                {
+                    BookingTableId = Guid.NewGuid(),
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 4)
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330007"), // Table D1 - Bar Buddy 4
+                },
+                new BookingTable
+                {
+                    BookingTableId = Guid.NewGuid(),
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 4)
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330008"), // Table D1 - Bar Buddy 4
+                }
+            );
+
+
         }
     }
 }

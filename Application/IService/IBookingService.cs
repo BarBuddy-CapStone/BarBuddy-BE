@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Booking;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -18,5 +19,6 @@ namespace Application.IService
         Task<(List<StaffBookingReponse> responses, int TotalPage, TimeSpan startTime, TimeSpan endTime)> GetListBookingByStaff(Guid BarId, string? CustomerName, string? Phone, string? Email, DateTimeOffset? bookingDate, TimeSpan? bookingTime, int? Status, int PageIndex, int PageSize);
         Task UpdateBookingStatus(Guid BookingId, int Status);
         Task<bool> CancelBooking(Guid BookingId);
+        BookingResponse CreateBookingTableOnly(BookingTableRequest request, HttpContext httpContext);
     }
 }

@@ -57,12 +57,31 @@ namespace BarBuddy_API.Controllers.Bar
             }
         }
 
-        [HttpGet("/api/v1/bar-detail")]
+        [HttpGet("/api/v1/bar-detail/{barId}")]
         public async Task<IActionResult> GetBarWithFeedbackById(Guid barId)
         {
             try
             {
                 var response = await _barService.GetBarByIdWithFeedback(barId);
+                return CustomResult("Data loaded", response);
+            }
+            catch (CustomException.DataNotFoundException e)
+            {
+                return CustomResult(e.Message, HttpStatusCode.NotFound);
+            }
+
+            catch (Exception e)
+            {
+                return CustomResult(e.Message, HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpGet("/api/v1/bar-table/{barId}")]
+        public async Task<IActionResult> GetBarWithTableById(Guid barId)
+        {
+            try
+            {
+                var response = await _barService.GetBarByIdWithTable(barId);
                 return CustomResult("Data loaded", response);
             }
             catch (CustomException.DataNotFoundException e)
@@ -94,6 +113,8 @@ namespace BarBuddy_API.Controllers.Bar
                 return CustomResult(e.Message, HttpStatusCode.InternalServerError);
             }
         }
+
+
 
         [HttpPost("admin/addBar")]
         public async Task<IActionResult> CreateBar([FromForm] BarRequest request)

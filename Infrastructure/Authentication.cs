@@ -53,7 +53,8 @@ namespace Infrastructure
             {
                 new Claim(JwtRegisteredClaimNames.Jti, account.RoleId.ToString()),
                 new Claim(JwtRegisteredClaimNames.Sub, account.Email.ToString()),
-                new Claim(ClaimTypes.Role, account.Role.RoleName)
+                new Claim(ClaimTypes.Role, account.Role.RoleName),
+                new Claim("id", account.AccountId.ToString()),
             };
 
             var expired = DateTime.UtcNow.AddMinutes(30);
