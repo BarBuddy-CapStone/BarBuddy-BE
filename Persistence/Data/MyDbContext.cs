@@ -449,7 +449,7 @@ namespace Persistence.Data
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330000"),
                     BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
-                    TableTypeId = tc1, 
+                    TableTypeId = tc1,
                     TableName = "Table A1",
                     Status = 0,
                     IsDeleted = true
@@ -484,6 +484,62 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330004"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+                    TableTypeId = vip,
+                    TableName = "Table B2",
+                    Status = 0,
+                    IsDeleted = true
+                }, new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330005"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+                    TableTypeId = vip,
+                    TableName = "Table B2",
+                    Status = 0,
+                    IsDeleted = true
+                }, new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330006"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+                    TableTypeId = vip,
+                    TableName = "Table B2",
+                    Status = 0,
+                    IsDeleted = true
+                }, new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330007"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+                    TableTypeId = vip,
+                    TableName = "Table B2",
+                    Status = 0,
+                    IsDeleted = true
+                }, new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330008"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+                    TableTypeId = vip,
+                    TableName = "Table B2",
+                    Status = 0,
+                    IsDeleted = true
+                }, new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330009"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+                    TableTypeId = vip,
+                    TableName = "Table B2",
+                    Status = 0,
+                    IsDeleted = true
+                }, new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330010"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+                    TableTypeId = vip,
+                    TableName = "Table B2",
+                    Status = 0,
+                    IsDeleted = true
+                }, new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330011"),
                     BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     TableTypeId = vip,
                     TableName = "Table B2",
@@ -651,6 +707,91 @@ namespace Persistence.Data
                 Status = true
             }
             );
+            modelBuilder.Entity<Booking>().HasData(
+    new Booking
+    {
+        BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
+        BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Bar Buddy 1
+        AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440001"), // Admin Bar Buddy 1
+        BookingCode = "BB0001", // Custom booking code
+        BookingDate = DateTime.Now.AddDays(-5),
+        Status = 1, // Confirmed
+    },
+    new Booking
+    {
+        BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+        BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"), // Bar Buddy 2
+        AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440002"), // Staff Bar Buddy 2
+        BookingCode = "BB0002", // Custom booking code
+        BookingDate = DateTime.Now.AddDays(-7),
+        Status = 2, // Completed
+    },
+    new Booking
+    {
+        BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
+        BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"), // Bar Buddy 3
+        AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440003"), // Customer Bar Buddy 3
+        BookingCode = "BB0003", // Custom booking code
+        BookingDate = DateTime.Now.AddDays(-3),
+        Status = 1, // Confirmed
+    },
+    new Booking
+    {
+        BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"),
+        BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Bar Buddy 4
+        AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440004"), // Customer Bar Buddy 4
+        BookingCode = "BB0004", // Custom booking code
+        BookingDate = DateTime.Now.AddDays(-2),
+        Status = 1, // Confirmed
+    }
+);
+            // BookingTable Data
+            // BookingTable Data
+            modelBuilder.Entity<BookingTable>().HasData(
+                new BookingTable
+                {
+                    BookingTableId = Guid.NewGuid(),
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Booking 1 (Bar Buddy 1)
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330000"), // Table A1 - Bar Buddy 1
+                },
+                new BookingTable
+                {
+                    BookingTableId = Guid.NewGuid(),
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"), // Booking 2 (Bar Buddy 2)
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330001"), // Table B1 - Bar Buddy 2
+                },
+                new BookingTable
+                {
+                    BookingTableId = Guid.NewGuid(),
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"), // Booking 3 (Bar Buddy 3)
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330002"), // Table C1 - Bar Buddy 3
+                },
+                new BookingTable
+                {
+                    BookingTableId = Guid.NewGuid(),
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 4)
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330005"), // Table D1 - Bar Buddy 4
+                },
+                new BookingTable
+                {
+                    BookingTableId = Guid.NewGuid(),
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 4)
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330006"), // Table D1 - Bar Buddy 4
+                }, new BookingTable
+                {
+                    BookingTableId = Guid.NewGuid(),
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 4)
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330007"), // Table D1 - Bar Buddy 4
+                },
+                new BookingTable
+                {
+                    BookingTableId = Guid.NewGuid(),
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 4)
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330008"), // Table D1 - Bar Buddy 4
+                }
+            );
+
+
         }
     }
 }
