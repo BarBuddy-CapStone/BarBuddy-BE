@@ -3,9 +3,12 @@ using Application.DTOs.Table;
 using Application.DTOs.TableType;
 using Application.IService;
 using AutoMapper;
+using Domain.Constants;
 using Domain.CustomException;
 using Domain.Entities;
 using Domain.IRepository;
+using Domain.Utils;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,16 +32,24 @@ namespace Application.Service
         {
             try
             {
+                if(TimeHelper.ConvertToUtcPlus7(request.Date.Date) <= TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now))
+                {
+                    throw new CustomException.InvalidDataException("Invalid data");
+                }
+
                 var data = await _unitOfWork.TableRepository.GetAsync(
                                                 filter: x => x.BarId.Equals(request.BarId)
-                                                          && x.TableTypeId.Equals(request.TableTypeId),
+                                                          && x.TableTypeId.Equals(request.TableTypeId)
+                                                          && x.IsDeleted == PrefixKeyConstant.FALSE,
                                                 includeProperties: "BookingTables.Booking,TableType,Bar");
 
-                var getOne = data.Where(x => x.BookingTables != null && x.BookingTables.Any()).FirstOrDefault();
-                if (getOne == null)
+                if(data.IsNullOrEmpty())
                 {
-                    return null; 
+                    throw new CustomException.InvalidDataException("Invalid data");
                 }
+
+                var getOne = data.Where(x => x.BookingTables != null && x.BookingTables.Any()).FirstOrDefault();
+
 
                 var response = _mapper.Map<FilterTableTypeReponse>(getOne.TableType);
 

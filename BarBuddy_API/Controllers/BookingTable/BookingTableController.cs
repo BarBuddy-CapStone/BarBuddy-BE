@@ -26,7 +26,7 @@ namespace BarBuddy_API.Controllers.BookingTable
             try
             {
                 var data = await _bookingTableService.FilterTableTypeReponse(request);
-                return CustomResult("ok", data);
+                return CustomResult("Đã tải dữ liệu", data);
             }
             catch (CustomException.InternalServerErrorException ex)
             {

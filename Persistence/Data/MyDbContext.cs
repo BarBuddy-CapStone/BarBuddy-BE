@@ -452,7 +452,7 @@ namespace Persistence.Data
                     TableTypeId = tc1,
                     TableName = "Table A1",
                     Status = 0,
-                    IsDeleted = true
+                    IsDeleted = false
                 },
                 new Table
                 {
@@ -461,7 +461,7 @@ namespace Persistence.Data
                     TableTypeId = qb,
                     TableName = "Table B1",
                     Status = 0,
-                    IsDeleted = true
+                    IsDeleted = false
                 },
                 new Table
                 {
@@ -470,7 +470,7 @@ namespace Persistence.Data
                     TableTypeId = tc2,
                     TableName = "Table C1",
                     Status = 0,
-                    IsDeleted = true
+                    IsDeleted = false
                 },
                 new Table
                 {
@@ -479,7 +479,7 @@ namespace Persistence.Data
                     TableTypeId = svip,
                     TableName = "Table A2",
                     Status = 0,
-                    IsDeleted = true
+                    IsDeleted = false
                 },
                 new Table
                 {
@@ -488,7 +488,7 @@ namespace Persistence.Data
                     TableTypeId = vip,
                     TableName = "Table B2",
                     Status = 0,
-                    IsDeleted = true
+                    IsDeleted = false
                 }, new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330005"),
@@ -496,7 +496,7 @@ namespace Persistence.Data
                     TableTypeId = vip,
                     TableName = "Table B2",
                     Status = 0,
-                    IsDeleted = true
+                    IsDeleted = false
                 }, new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330006"),
@@ -504,7 +504,7 @@ namespace Persistence.Data
                     TableTypeId = vip,
                     TableName = "Table B2",
                     Status = 0,
-                    IsDeleted = true
+                    IsDeleted = false
                 }, new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330007"),
@@ -512,7 +512,7 @@ namespace Persistence.Data
                     TableTypeId = vip,
                     TableName = "Table B2",
                     Status = 0,
-                    IsDeleted = true
+                    IsDeleted = false
                 }, new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330008"),
@@ -520,7 +520,7 @@ namespace Persistence.Data
                     TableTypeId = vip,
                     TableName = "Table B2",
                     Status = 0,
-                    IsDeleted = true
+                    IsDeleted = false
                 }, new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330009"),
@@ -528,7 +528,7 @@ namespace Persistence.Data
                     TableTypeId = vip,
                     TableName = "Table B2",
                     Status = 0,
-                    IsDeleted = true
+                    IsDeleted = false
                 }, new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330010"),
@@ -536,7 +536,7 @@ namespace Persistence.Data
                     TableTypeId = vip,
                     TableName = "Table B2",
                     Status = 0,
-                    IsDeleted = true
+                    IsDeleted = false
                 }, new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330011"),
@@ -544,7 +544,7 @@ namespace Persistence.Data
                     TableTypeId = vip,
                     TableName = "Table B2",
                     Status = 0,
-                    IsDeleted = true
+                    IsDeleted = false
                 }
             );
 
