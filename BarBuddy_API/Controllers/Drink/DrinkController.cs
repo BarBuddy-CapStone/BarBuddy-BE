@@ -18,7 +18,7 @@ namespace BarBuddy_API.Controllers.Drink
         {
             _drinkService = drinkService;
         }
-        [Authorize(Roles = "ADMIN")]
+        //[Authorize(Roles = "ADMIN")]
         [HttpGet]
         public async Task<IActionResult> GetAllDrink()
         {

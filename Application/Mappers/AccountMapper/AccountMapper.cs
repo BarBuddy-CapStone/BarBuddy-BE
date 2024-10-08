@@ -20,7 +20,8 @@ namespace Application.Mappers.AccountMapper
             CreateMap<Account, StaffAccountResponse>();
             CreateMap<Account, CustomerInfoResponse>().ReverseMap();
             CreateMap<CustomerInfoRequest, Account>().ReverseMap();
-            CreateMap<Account, LoginResponse>();
+            CreateMap<Account, LoginResponse>()
+                .ForMember(dst => dst.IdentifyId, src => src.MapFrom(x => x.BarId));
             CreateMap<RegisterRequest, Account>();
         }
     }

@@ -11,7 +11,9 @@ namespace Application.DTOs.Authen
         public Guid AccountId { get; set; }
         public string Fullname { get; set; }
         public string Email { get; set; }
+        public string Phone { get; set; }
         public string Image { get; set; }
         public string AccessToken { get; set; }
+        public Guid? IdentifyId { get; set; }
     }
 }
