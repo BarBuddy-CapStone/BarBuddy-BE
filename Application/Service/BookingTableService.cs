@@ -32,7 +32,7 @@ namespace Application.Service
         {
             try
             {
-                if(TimeHelper.ConvertToUtcPlus7(request.Date.Date) <= TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now))
+                if(TimeHelper.ConvertToUtcPlus7(request.Date.Date) < TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now.Date))
                 {
                     throw new CustomException.InvalidDataException("Invalid data");
                 }

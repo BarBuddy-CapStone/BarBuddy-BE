@@ -23,10 +23,5 @@ namespace Domain.Entities
         public virtual Booking Booking { get; set; }
         [ForeignKey("TableId")]
         public virtual Table Table { get; set; }
-
-        public BookingTable ()
-        {
-            ReservationDate = CoreHelper.SystemTimeNow;
-        }
     }
 }
