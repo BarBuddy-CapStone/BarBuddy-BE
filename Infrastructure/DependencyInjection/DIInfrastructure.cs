@@ -14,6 +14,7 @@ using System.Text;
 using Domain.IRepository;
 using Infrastructure.Vnpay.Config;
 using Infrastructure.Zalopay.Config;
+using Infrastructure.SignalR;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -43,6 +44,8 @@ namespace Infrastructure.DependencyInjection
             // Authentications
             services.AddAuthentication(configuration);
 
+            //SignalR
+            services.AddSignalR();
             return services;
         }
 
@@ -56,6 +59,7 @@ namespace Infrastructure.DependencyInjection
             services.AddMemoryCache(); 
             services.AddTransient<IEmailSender, EmailSender>();
             services.AddTransient<IOtpSender, OtpSender>();
+            services.AddTransient<IBookingHubService, BookingHubService>();
 
             services.AddScoped<IEmotionalDrinkCategoryService, EmotionalDrinkCategoryService>();
             services.AddScoped<IFeedBackService, FeedBackService>();
