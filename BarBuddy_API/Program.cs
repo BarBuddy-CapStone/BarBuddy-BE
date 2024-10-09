@@ -3,6 +3,7 @@ using Application.Service;
 using BarBuddy_API.DependencyInjection;
 using BarBuddy_API.Middleware;
 using Infrastructure.DependencyInjection;
+using Infrastructure.SignalR;
 using Infrastructure.Vnpay.Config;
 using Infrastructure.Zalopay.Config;
 using Microsoft.OpenApi.Models;
@@ -49,6 +50,12 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<BookingHub>("/bookingHub");
+    endpoints.MapControllers();
+});
 
 app.MapControllers();
 
