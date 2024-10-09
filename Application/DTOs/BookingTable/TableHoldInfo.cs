@@ -11,5 +11,6 @@ namespace Application.DTOs.BookingTable
         public Guid? AccountId { get; set; }
         public bool IsHeld { get; set; }
         public DateTimeOffset HoldExpiry { get; set; }
+        public Guid TableId { get; set; }
     }
 }
