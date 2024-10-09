@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Booking;
+using Application.DTOs.Payment;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -20,5 +21,6 @@ namespace Application.IService
         Task UpdateBookingStatus(Guid BookingId, int Status);
         Task<bool> CancelBooking(Guid BookingId);
         BookingResponse CreateBookingTableOnly(BookingTableRequest request, HttpContext httpContext);
+        PaymentLink CreateBookingTableWithDrinks(BookingDrinkRequest request, HttpContext httpContext);
     }
 }

@@ -1,13 +1,9 @@
-﻿using Domain.Utils;
-using Infrastructure.Vnpay.Lib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Application.DTOs.Payment.Lib;
+using Domain.Utils;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace Infrastructure.Vnpay.Request
+namespace Application.DTOs.Payment
 {
     public class VnpayRequest
     {

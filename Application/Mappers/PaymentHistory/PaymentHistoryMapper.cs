@@ -13,11 +13,8 @@ public class PaymentHistoryMapper : Profile
     public PaymentHistoryMapper()
     {
         CreateMap<PaymentHistoryRequest, PaymentHistory>().ReverseMap();
-        CreateMap<PaymentHistoryRequest, CreatePayment>()
-            .ForMember(cp => cp.PaymentDestinationId, opt => opt.MapFrom(phr => phr.ProviderName))
-            .ForMember(cp => cp.RequiredAmount, opt => opt.MapFrom(phr => phr.TotalPrice))
-            .ForMember(cp => cp.PaymentRefId, opt => opt.MapFrom(phr => phr.TransactionCode))
-            .ReverseMap();
+        CreateMap<PaymentHistory, PaymentDetailResponse>();
+
         CreateMap<PaymentHistory, PaymentHistoryResponse>()
             .ForMember(ph => ph.CustomerName, opt => opt.MapFrom(ph => ph.Account.Fullname))
             .ForMember(ph => ph.PhoneNumber, opt => opt.MapFrom(ph => ph.Account.Phone))

@@ -1,8 +1,6 @@
 ﻿using Application.DTOs.Payment;
+using Application.Interfaces;
 using CoreApiResponse;
-using Infrastructure.Payment.Service;
-using Infrastructure.Vnpay.Response;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BarBuddy_API.Controllers.Payment
@@ -12,18 +10,20 @@ namespace BarBuddy_API.Controllers.Payment
     public class PaymentController : BaseController
     {
         private readonly IPaymentService _paymentService;
+        private readonly IConfiguration _configuration;
 
-        public PaymentController(IPaymentService paymentService)
+        public PaymentController(IPaymentService paymentService, IConfiguration configuration)
         {
             _paymentService = paymentService;
+            _configuration = configuration;
         }
 
-        [HttpPost("")]
-        public Task<IActionResult> CreatePayment([FromBody] CreatePayment request)
-        {
-            var response = _paymentService.GetPaymentLink(request);
-            return Task.FromResult(CustomResult("Get Payment", response));
-        }
+        //[HttpPost("")]
+        //public Task<IActionResult> CreatePayment([FromBody] CreatePayment request)
+        //{
+        //    var response = _paymentService.GetPaymentLink(request);
+        //    return Task.FromResult(CustomResult("Get Payment", response));
+        //}
 
         [HttpGet("vnpay-return")]
         public async Task<IActionResult> GetVnpayReturn([FromQuery] VnpayResponse vnpayReturn)
@@ -31,7 +31,7 @@ namespace BarBuddy_API.Controllers.Payment
             try
             {
                 var result = await _paymentService.ProcessVnpayPaymentReturn(vnpayReturn);
-                string redirectUrl = $"http://localhost:5173/payment-detail/{result}";
+                string? redirectUrl = _configuration["Vnpay:RedirectUrl"] + result;
                 return Redirect(redirectUrl);
             }
             catch (Exception ex)
@@ -40,11 +40,11 @@ namespace BarBuddy_API.Controllers.Payment
             }
         }
 
-        [HttpGet("payment-detail/{apiId}")]
-        public async Task<IActionResult> GetPaymentDetail(string apiId)
+        [HttpGet("payment-detail/{paymentHistoryId}")]
+        public async Task<IActionResult> GetPaymentDetail(Guid paymentHistoryId)
         {
-            var result = await _paymentService.GetPaymentDetail(apiId);
-            return Ok(result);
+            var result = await _paymentService.GetPaymentDetail(paymentHistoryId);
+            return CustomResult(result);
         }
     }
 }

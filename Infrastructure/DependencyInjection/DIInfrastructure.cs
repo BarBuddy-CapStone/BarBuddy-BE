@@ -6,13 +6,14 @@ using Infrastructure.Integrations;
 using Infrastructure.Payment.Service;
 using Infrastructure.Email;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Persistence.Repository;
 using System.Text;
 using Domain.IRepository;
+using Infrastructure.Vnpay.Config;
+using Infrastructure.Zalopay.Config;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -31,6 +32,10 @@ namespace Infrastructure.DependencyInjection
 
             // Mapper
             services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
+
+            //Config
+            services.Configure<ZalopayConfig>(configuration.GetSection(ZalopayConfig.ConfigName));
+            services.Configure<VnpayConfig>(configuration.GetSection(VnpayConfig.ConfigName));
 
             // Services
             services.AddServices();
