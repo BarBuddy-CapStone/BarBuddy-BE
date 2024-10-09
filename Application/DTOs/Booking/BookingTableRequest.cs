@@ -13,7 +13,7 @@ namespace Application.DTOs.Booking
 
         public static ValidationResult? ValidateBookingDate(DateTimeOffset bookingDate, ValidationContext context)
         {
-            return bookingDate < DateTimeOffset.Now ? new ValidationResult("Ngày đặt sai") : ValidationResult.Success;
+            return bookingDate < DateTimeOffset.Now.Date ? new ValidationResult("Ngày đặt sai") : ValidationResult.Success;
         }
     }
 }
