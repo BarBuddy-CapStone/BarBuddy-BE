@@ -186,7 +186,7 @@ namespace Application.Service
             {
                 tableHoldInfo.AccountId = Guid.Empty;   
                 tableHoldInfo.IsHeld = false;
-                
+                tableHoldInfo.TableId = Guid.Empty;
             }
             cacheEntry[request.TableId] = tableHoldInfo;
             await _bookingHub.ReleaseTable(request.TableId);
