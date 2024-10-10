@@ -24,6 +24,13 @@ namespace BarBuddy_API.Controllers.FeedBack
             return CustomResult("Tải dữ liệu thành công", feedback);
         }
 
+        [HttpGet("admin")]
+        public async Task<IActionResult> GetFeedBackAdmin([FromQuery] Guid? BarId, [FromQuery] bool? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
+        {
+            var responses = await _feedBackService.GetFeedBackAdmin(BarId, Status, PageIndex, PageSize);
+            return Ok(new { totalPage = responses.TotalPage, response = responses.responses});
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFeedBackByID(Guid id)
         {
@@ -50,6 +57,13 @@ namespace BarBuddy_API.Controllers.FeedBack
         {
             var feedback = await _feedBackService.UpdateFeedBack(id, request);
             return CustomResult("Cập Nhật Feedback thành công.", feedback);
+        }
+        
+        [HttpPatch("status")]
+        public async Task<IActionResult> UpdateFeedBack([FromQuery] Guid FeedbackId, [FromQuery] bool Status)
+        {
+            await _feedBackService.UpdateFeedBackByAdmin(FeedbackId, Status);
+            return CustomResult("Cập Nhật Feedback thành công.");
         }
 
         [HttpPatch("deleteEmotionCategory/{id}")]

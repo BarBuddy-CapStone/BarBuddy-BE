@@ -1,4 +1,5 @@
-﻿using Application.DTOs.Request.FeedBackRequest;
+﻿using Application.DTOs.Feedback;
+using Application.DTOs.Request.FeedBackRequest;
 using Application.DTOs.Response.FeedBack;
 using AutoMapper;
 using Domain.Entities;
@@ -18,6 +19,9 @@ namespace Application.Mappers.FeedBack
             CreateMap<CreateFeedBackRequest, Feedback>().ReverseMap();
             CreateMap<UpdateFeedBackRequest, Feedback>().ReverseMap();
             CreateMap<DeleteFeedBackRequest, Feedback>().ReverseMap();
+            CreateMap<Feedback, AdminFeedbackResponse>()
+                .ForMember(x => x.CustomerName, opt => opt.MapFrom(x => x.Account.Fullname))
+                .ForMember(x => x.BarName, opt => opt.MapFrom(x => x.Bar.BarName));
         }
     }
 }

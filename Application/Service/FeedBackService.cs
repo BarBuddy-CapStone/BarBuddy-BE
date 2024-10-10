@@ -160,5 +160,67 @@ namespace Application.Service
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
+
+        public async Task<(List<AdminFeedbackResponse> responses, int TotalPage)> GetFeedBackAdmin(Guid? BarId, bool? Status, int PageIndex, int PageSize)
+        {
+            try
+            {
+                var responses = new List<AdminFeedbackResponse>();
+
+                var feedbacks = await _unitOfWork.FeedbackRepository.GetAsync(f => (BarId == null || f.BarId == BarId) && (Status == null || f.IsDeleted == Status));
+
+                int totalPage = 1;
+                if (feedbacks.Count() > PageSize)
+                {
+                    if (PageSize == 1)
+                    {
+                        totalPage = (feedbacks.Count() / PageSize);
+                    }
+                    else
+                    {
+                        if(feedbacks.Count() % PageSize != 0)
+                        {
+                            totalPage = (feedbacks.Count() / PageSize) + 1;
+                        }
+                        else
+                        {
+                            totalPage = (feedbacks.Count() / PageSize);
+                        }
+                    }
+                }
+
+                var feedbacksWithPagination = await _unitOfWork.FeedbackRepository.GetAsync(f => (BarId == null || f.BarId == BarId) && (Status == null || f.IsDeleted == Status), pageIndex: PageIndex, pageSize: PageSize, includeProperties: "Account,Bar", orderBy: o => o.OrderByDescending(f => f.CreatedTime).ThenByDescending(f => f.LastUpdatedTime));
+
+                foreach (var feedback in feedbacksWithPagination)
+                {
+                    var response = _mapper.Map<AdminFeedbackResponse>(feedback);
+                    responses.Add(response);
+                }
+
+                return (responses, totalPage);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
+
+        public async Task UpdateFeedBackByAdmin(Guid FeedbackId, bool Status)
+        {
+            try
+            {
+                var feedback = await _unitOfWork.FeedbackRepository.GetByIdAsync(FeedbackId);
+                if (feedback == null)
+                {
+                    throw new Exception("Không thể tìm thấy đánh giá");
+                }
+                feedback.IsDeleted = Status;
+                await _unitOfWork.FeedbackRepository.UpdateAsync(feedback);
+                await _unitOfWork.SaveAsync();
+            }
+            catch (Exception ex) { 
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
     }
 }
