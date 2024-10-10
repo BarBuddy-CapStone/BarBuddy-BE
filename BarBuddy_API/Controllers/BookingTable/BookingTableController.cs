@@ -34,6 +34,20 @@ namespace BarBuddy_API.Controllers.BookingTable
             }
         }
 
+        [HttpGet("getHoldTable/{barId}")]
+        public async Task<IActionResult> GetAllHoldTable(string barId)
+        {
+            try
+            {
+                var data = await _bookingTableService.HoldTableList(Guid.Parse(barId));
+                return CustomResult("Đã tải dữ liệu", data);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.InternalServerError);
+            }
+        }
+
         [HttpPost("holdTable")]
         public async Task<IActionResult> HoldTable([FromBody] TablesRequest request)
         {
