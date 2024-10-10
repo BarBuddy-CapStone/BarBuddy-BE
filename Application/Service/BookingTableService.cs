@@ -7,6 +7,7 @@ using AutoMapper;
 using Azure.Core;
 using Domain.Constants;
 using Domain.CustomException;
+using Domain.Enums;
 using Domain.IRepository;
 using Domain.Utils;
 using Microsoft.AspNetCore.Http;
@@ -86,8 +87,8 @@ namespace Application.Service
                                                     ? bt.BookingTables
                                                     .Where(x => x.ReservationDate.Date.Equals(request.Date.Date)
                                                             && x.ReservationTime == request.Time)
-                                                    .FirstOrDefault()?.Booking.Status ?? 0
-                                                    : 0
+                                                    .FirstOrDefault()?.Booking.Status ?? (int)PrefixValueEnum.Peding
+                                                    : (int)PrefixValueEnum.Cancelled
                                     }).ToList()
                     }
                 };
