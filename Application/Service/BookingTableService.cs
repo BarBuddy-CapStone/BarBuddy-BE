@@ -4,6 +4,7 @@ using Application.DTOs.TableType;
 using Application.Interfaces;
 using Application.IService;
 using AutoMapper;
+using Azure.Core;
 using Domain.Constants;
 using Domain.CustomException;
 using Domain.IRepository;
@@ -152,6 +153,7 @@ namespace Application.Service
             {
                 AccountId = accountId,
                 TableId = tableIsExist.TableId,
+                TableName = tableIsExist.TableName,
                 IsHeld = true,
                 HoldExpiry = DateTimeOffset.Now.AddMinutes(5)
             };
@@ -166,6 +168,33 @@ namespace Application.Service
             });
 
             return tableHoldInfo;
+        }
+
+        public Task<List<TableHoldInfo>> HoldTableList(Guid barId)
+        {
+            var tableIsExist = _unitOfWork.TableRepository
+                                        .Get(filter: x => x.BarId.Equals(barId)
+                                                            && x.IsDeleted == PrefixKeyConstant.FALSE);
+
+            List<TableHoldInfo> tableHolds = new List<TableHoldInfo>();
+            foreach (var table in tableIsExist)
+            {
+                var cacheKey = $"{barId}_{table.TableId}";
+                var cacheEntry = _memoryCache.GetOrCreate(cacheKey, entry =>
+                {
+                    return new Dictionary<Guid, TableHoldInfo>();
+                });
+
+                foreach (var tbHeld in cacheEntry)
+                {
+                    if (tbHeld.Key.ToString().Contains(table.TableId.ToString()))
+                    {
+                        tableHolds.Add(tbHeld.Value);
+                    }
+                }
+            }
+
+            return Task.FromResult(tableHolds);
         }
 
         public async Task<TableHoldInfo> ReleaseTable(TablesRequest request)
