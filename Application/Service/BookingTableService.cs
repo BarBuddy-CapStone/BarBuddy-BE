@@ -105,7 +105,7 @@ namespace Application.Service
             var cacheKey = $"{request.BarId}_{request.TableId}";
             var cacheEntry = _memoryCache.GetOrCreate(cacheKey, entry =>
             {
-                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
 
                 entry.RegisterPostEvictionCallback((key, value, reason, state) =>
                 {
@@ -142,8 +142,9 @@ namespace Application.Service
             var tableHoldInfo = new TableHoldInfo
             {
                 AccountId = accountId,
+                TableId = tableIsExist.TableId,
                 IsHeld = true,
-                HoldExpiry = DateTimeOffset.Now.AddMinutes(1)
+                HoldExpiry = DateTimeOffset.Now.AddMinutes(5)
             };
 
             cacheEntry[request.TableId] = tableHoldInfo;
@@ -152,7 +153,7 @@ namespace Application.Service
 
             _memoryCache.Set(cacheKey, cacheEntry, new MemoryCacheEntryOptions
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
             });
 
             return tableHoldInfo;
@@ -185,7 +186,7 @@ namespace Application.Service
             {
                 tableHoldInfo.AccountId = Guid.Empty;   
                 tableHoldInfo.IsHeld = false;
-                
+                tableHoldInfo.TableId = Guid.Empty;
             }
             cacheEntry[request.TableId] = tableHoldInfo;
             await _bookingHub.ReleaseTable(request.TableId);
