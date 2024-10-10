@@ -55,9 +55,11 @@ namespace Application.Service
                                                           && x.IsDeleted == PrefixKeyConstant.FALSE,
                                                 includeProperties: "BookingTables.Booking,TableType,Bar");
 
+
+
                 if (data.IsNullOrEmpty())
                 {
-                    throw new CustomException.InvalidDataException("Invalid data");
+                    throw new CustomException.InvalidDataException("Data not found !");
                 }
 
                 var getOne = data.Where(x => x.BookingTables != null && x.BookingTables.Any()).FirstOrDefault();
@@ -69,15 +71,22 @@ namespace Application.Service
                 {
                     new FilterBkTableResponse
                     {
-                        ReservationDate = getOne.BookingTables.FirstOrDefault().ReservationDate,
-                        ReservationTime = getOne.BookingTables.FirstOrDefault().ReservationTime,
+                        ReservationDate = request.Date,
+                        ReservationTime = request.Time,
                         Tables = data.Select(bt => new FilterTableResponse
                                     {
                                         TableId = bt.TableId,
                                         TableName = bt.TableName,
-                                        Status = bt.BookingTables != null && bt.BookingTables.Any()
-                                                ? bt.BookingTables.FirstOrDefault()?.Booking.Status ?? 0
-                                                : 0
+                                        Status = bt.BookingTables != null
+                                                    && bt.BookingTables
+                                                    .Where(x => x.ReservationDate.Date.Equals(request.Date.Date)
+                                                            && x.ReservationTime == request.Time)
+                                                    .Any()
+                                                    ? bt.BookingTables
+                                                    .Where(x => x.ReservationDate.Date.Equals(request.Date.Date)
+                                                            && x.ReservationTime == request.Time)
+                                                    .FirstOrDefault()?.Booking.Status ?? 0
+                                                    : 0
                                     }).ToList()
                     }
                 };
@@ -184,7 +193,7 @@ namespace Application.Service
                 && cacheEntry[request.TableId].AccountId.Equals(accountId)
                 && cacheEntry[request.TableId].HoldExpiry <= DateTime.Now)
             {
-                tableHoldInfo.AccountId = Guid.Empty;   
+                tableHoldInfo.AccountId = Guid.Empty;
                 tableHoldInfo.IsHeld = false;
                 tableHoldInfo.TableId = Guid.Empty;
             }
