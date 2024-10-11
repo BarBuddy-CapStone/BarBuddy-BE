@@ -12,6 +12,19 @@ namespace Domain.Enums
         [Description("Active")]
         Active = 1,
         [Description("Inactive")]
-        Inactive = 0
+        Inactive = 0,
+        [Description("Pending")]
+        Pending = 2,
+
+        [Description("Peding")]
+        Peding = 0,
+        [Description("Cancelled")]
+        Cancelled = 1,
+        [Description("Serving")]
+        Serving = 2,
+        [Description("Completed")]
+        Completed = 3
+
+
     }
 }

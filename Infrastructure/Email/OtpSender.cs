@@ -19,7 +19,7 @@ namespace Infrastructure.Email
         {
             string otp = GenerateOtp();
 
-            _cache.Set(email, otp, TimeSpan.FromSeconds(60));
+            _cache.Set(email, otp, TimeSpan.FromSeconds(120));
 
             await _emailSender.SendEmail(email, "OTP Code", $"Your OTP code is {otp}. It will expire in 60 seconds.");
         }

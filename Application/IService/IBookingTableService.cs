@@ -11,5 +11,8 @@ namespace Application.IService
     public interface IBookingTableService
     {
         Task<FilterTableTypeReponse> FilterTableTypeReponse(FilterTableDateTimeRequest request);
+        Task<TableHoldInfo> HoldTable(TablesRequest request);
+        Task<TableHoldInfo> ReleaseTable (TablesRequest request);
+        Task<List<TableHoldInfo>> HoldTableList (Guid barId);
     }
 }

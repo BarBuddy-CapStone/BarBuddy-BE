@@ -21,12 +21,58 @@ namespace BarBuddy_API.Controllers.BookingTable
         }
 
         [HttpGet("filter")]
-        public async Task<IActionResult> FilterDateTime ([FromQuery] FilterTableDateTimeRequest request)
+        public async Task<IActionResult> FilterDateTime([FromQuery] FilterTableDateTimeRequest request)
         {
             try
             {
                 var data = await _bookingTableService.FilterTableTypeReponse(request);
                 return CustomResult("Đã tải dữ liệu", data);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpGet("getHoldTable/{barId}")]
+        public async Task<IActionResult> GetAllHoldTable(string barId)
+        {
+            try
+            {
+                var data = await _bookingTableService.HoldTableList(Guid.Parse(barId));
+                return CustomResult("Đã tải dữ liệu", data);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpPost("holdTable")]
+        public async Task<IActionResult> HoldTable([FromBody] TablesRequest request)
+        {
+            try
+            {
+                var response = await _bookingTableService.HoldTable(request);
+                return CustomResult("Đang giữ chỗ", response);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.BadRequest);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpPost("releaseTable")]
+        public async Task<IActionResult> ReleaseTable([FromBody] TablesRequest request)
+        {
+            try
+            {
+                var data = await _bookingTableService.ReleaseTable(request);
+                return CustomResult("Đã xóa", data);
             }
             catch (CustomException.InternalServerErrorException ex)
             {

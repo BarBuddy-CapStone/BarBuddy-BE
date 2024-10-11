@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using Persistence.Repository;
 using System.Text;
 using Domain.IRepository;
+using Infrastructure.SignalR;
 using Infrastructure.Vnpay.Config;
 using Infrastructure.Zalopay.Config;
 
@@ -43,6 +44,8 @@ namespace Infrastructure.DependencyInjection
             // Authentications
             services.AddAuthentication(configuration);
 
+            //SignalR
+            services.AddSignalR();
             return services;
         }
 
@@ -56,6 +59,7 @@ namespace Infrastructure.DependencyInjection
             services.AddMemoryCache(); 
             services.AddTransient<IEmailSender, EmailSender>();
             services.AddTransient<IOtpSender, OtpSender>();
+            services.AddTransient<IBookingHubService, BookingHubService>();
 
             services.AddScoped<IEmotionalDrinkCategoryService, EmotionalDrinkCategoryService>();
             services.AddScoped<IFeedBackService, FeedBackService>();
@@ -71,6 +75,23 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<IBookingTableService, BookingTableService>();
         }
 
+        //public static void AddCORS(this IServiceCollection services)
+        //{
+        //    services.AddCors(options =>
+        //    {
+        //        options.AddPolicy("AllowReactBarBuddy",
+        //            builder =>
+        //            {
+        //                builder.AllowAnyOrigin()
+        //                	   .WithOrigins("https://localhost:5173")
+        //                	   .AllowAnyHeader()
+        //                	   .AllowAnyMethod()
+        //                	   .AllowCredentials();
+        //                builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+        //            });
+        //    });
+        //}
+
         public static void AddCORS(this IServiceCollection services)
         {
             services.AddCors(options =>
@@ -78,12 +99,10 @@ namespace Infrastructure.DependencyInjection
                 options.AddPolicy("AllowReactBarBuddy",
                     builder =>
                     {
-                        //builder.AllowAnyOrigin()
-                        //	   .WithOrigins("https://localhost:5173")
-                        //	   .AllowAnyHeader()
-                        //	   .AllowAnyMethod()
-                        //	   .AllowCredentials();
-                        builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+                        builder.WithOrigins("http://localhost:5173") // Thay đổi URL này thành URL của frontend của bạn
+                               .AllowAnyHeader()
+                               .AllowAnyMethod()
+                               .AllowCredentials();
                     });
             });
         }
