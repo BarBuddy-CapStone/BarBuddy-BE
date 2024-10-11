@@ -156,7 +156,9 @@ namespace Application.Service
                 TableId = tableIsExist.TableId,
                 TableName = tableIsExist.TableName,
                 IsHeld = true,
-                HoldExpiry = DateTimeOffset.Now.AddMinutes(5)
+                HoldExpiry = DateTimeOffset.Now.AddMinutes(5),
+                Date = request.Date,
+                Time = request.Time,
             };
 
             cacheEntry[request.TableId] = tableHoldInfo;
