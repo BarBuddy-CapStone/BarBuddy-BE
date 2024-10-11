@@ -12,9 +12,10 @@ using Microsoft.IdentityModel.Tokens;
 using Persistence.Repository;
 using System.Text;
 using Domain.IRepository;
+using Infrastructure.SignalR;
 using Infrastructure.Vnpay.Config;
 using Infrastructure.Zalopay.Config;
-using Infrastructure.SignalR;
+
 
 namespace Infrastructure.DependencyInjection
 {

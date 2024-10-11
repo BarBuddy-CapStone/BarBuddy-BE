@@ -13,6 +13,8 @@ namespace Domain.Enums
         Active = 1,
         [Description("Inactive")]
         Inactive = 0,
+        [Description("Pending")]
+        Pending = 2,
 
         [Description("Peding")]
         Peding = 0,

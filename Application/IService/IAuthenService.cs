@@ -12,5 +12,7 @@ namespace Application.IService
     {
         Task<LoginResponse> Login(LoginRequest request);
         Task<CustomerAccountResponse> Register(RegisterRequest request);
+        Task<bool> ConfirmAccountByOtp(OtpVerificationRequest request);
+        Task<bool> RegisterWithOtp(RegisterRequest request);
     }
 }

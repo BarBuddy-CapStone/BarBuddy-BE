@@ -39,8 +39,10 @@ namespace BarBuddy_API.Controllers.Authencation
         {
             try
             {
-                var response = await _authenService.Register(request);
-                return CustomResult("Đăng kí thành công !", response);
+                
+                var response = await _authenService.RegisterWithOtp(request);
+                return response ? CustomResult("Đăng kí thành công ! Bạn có 2 phút để nhập OTP", response) : 
+                    CustomResult("Đăng kí không thành công !", HttpStatusCode.BadRequest);
             }
             catch (CustomException.InternalServerErrorException ex)
             {
@@ -56,11 +58,11 @@ namespace BarBuddy_API.Controllers.Authencation
         }
 
         [HttpPost("verify")]
-        public IActionResult VerifyOtp([FromBody] OtpVerificationRequest request)
+        public async Task<IActionResult> VerifyOtp([FromBody] OtpVerificationRequest request)
         {
-            bool isValid = _otpSender.VerifyOtp(request);
+            bool isValid = await _authenService.ConfirmAccountByOtp(request);
 
-            return isValid ? Ok("OTP hợp lệ.") : BadRequest("OTP không hợp lệ hoặc đã hết hạn.");
+            return isValid ? CustomResult("OTP hợp lệ.") : CustomResult("OTP không hợp lệ hoặc đã hết hạn.", HttpStatusCode.BadRequest);
         }
     }
 }

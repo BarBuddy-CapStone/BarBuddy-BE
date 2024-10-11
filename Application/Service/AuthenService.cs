@@ -4,10 +4,13 @@ using Application.DTOs.Authen;
 using Application.Interfaces;
 using Application.IService;
 using AutoMapper;
+using Azure.Core;
 using Domain.CustomException;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.IRepository;
+using Domain.Utils;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using static Domain.CustomException.CustomException;
 
@@ -18,13 +21,18 @@ namespace Application.Service
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IAuthentication _authentication;
+        private readonly IMemoryCache _cache;
+        private readonly IOtpSender _otpSender;
 
         public AuthenService(IUnitOfWork unitOfWork, IMapper mapper,
-                            IAuthentication authentication)
+                            IAuthentication authentication, IMemoryCache cache,
+                            IOtpSender otpSender)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _authentication = authentication;
+            _cache = cache;
+            _otpSender = otpSender;
         }
 
         public async Task<LoginResponse> Login(LoginRequest request)
@@ -98,8 +106,104 @@ namespace Application.Service
             }
             catch (Exception ex)
             {
-                throw new CustomException.InternalServerErrorException("asdasda");
+                throw new CustomException.InternalServerErrorException($"Internal error: {ex.Message}");
             }
+        }
+
+        public async Task<bool> RegisterWithOtp(RegisterRequest request)
+        {
+            bool flag = false;
+            var existEmail = _unitOfWork.AccountRepository
+                                   .Get(filter: x => x.Email.Equals(request.Email)).FirstOrDefault();
+            var role = _unitOfWork.RoleRepository.Get(x => x.RoleName == "CUSTOMER").FirstOrDefault();
+
+            if (role == null)
+            {
+                throw new ForbbidenException("Bạn không thể truy cập");
+            }
+
+            if (existEmail != null && existEmail.Status == (int)PrefixValueEnum.Pending)
+            {
+                _cache.Remove(existEmail);
+                await _otpSender.SendOtpAsync(existEmail.Email);
+                return flag = true;
+            }
+            else if (existEmail != null && existEmail.Status == (int)PrefixValueEnum.Active)
+            {
+                throw new DataExistException("Email đã tồn tại");
+            }
+
+            if (!request.Password.Equals(request.ConfirmPassword))
+            {
+                throw new CustomException.InvalidDataException("Mật khẩu không giống nhau! Vui lòng thử lại.");
+            }
+
+            try
+            {
+                var mapper = _mapper.Map<Account>(request);
+
+                mapper.Password = await _authentication.HashedPassword(request.Password);
+                mapper.CreatedAt = DateTimeOffset.Now;
+                mapper.UpdatedAt = mapper.CreatedAt;
+                mapper.RoleId = role.RoleId;
+                mapper.Status = (int)PrefixValueEnum.Pending;
+                mapper.Image = "https://th.bing.com/th/id/R.c2d58313dad3a99231d27d38bc77e9bb?rik=G%2bdXJz91ZlvDaw&pid=ImgRaw&r=0";
+
+                _unitOfWork.BeginTransaction();
+                await _unitOfWork.AccountRepository.InsertAsync(mapper);
+                _unitOfWork.CommitTransaction();
+                await _unitOfWork.SaveAsync();
+                await _otpSender.SendOtpAsync(mapper.Email);
+                flag = true;
+
+            } catch(Exception ex)
+            {
+                _unitOfWork.RollBack();
+                throw new Exception($"Internal error: {ex.Message}");
+            }
+            finally
+            {
+                _unitOfWork.Dispose();
+            }
+
+            return flag;
+        }
+
+        public async Task<bool> ConfirmAccountByOtp(OtpVerificationRequest request)
+        {
+            bool flag = false;
+            var existAccount = _unitOfWork.AccountRepository
+                .Get(filter: x => x.Email.Equals(request.Email)).FirstOrDefault();
+            if (existAccount == null)
+            {
+                throw new DataNotFoundException("Account không tồn tại");
+            } else if (existAccount.Status == (int)PrefixValueEnum.Active)
+            {
+                throw new ForbbidenException("Account đã được kích hoạt");
+            }
+
+            var validOtp = _cache.Get(request.Email)?.ToString();
+            if (validOtp.IsNullOrEmpty() || validOtp != request.Otp)
+            {
+                return flag;
+            }
+
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                existAccount.Status = (int)PrefixValueEnum.Active;
+                _unitOfWork.AccountRepository.Update(existAccount);
+                _unitOfWork.CommitTransaction();
+                await _unitOfWork.SaveAsync();
+                flag = true;
+            } catch (Exception ex)
+            {
+                _unitOfWork.RollBack();
+            } finally
+            {
+                _unitOfWork.Dispose();
+            }
+            return flag;
         }
     }
 }
