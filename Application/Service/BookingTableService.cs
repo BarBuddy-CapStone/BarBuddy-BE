@@ -223,11 +223,16 @@ namespace Application.Service
             var tableHoldInfo = new TableHoldInfo();
             if (cacheEntry.ContainsKey(request.TableId)
                 && cacheEntry[request.TableId].AccountId.Equals(accountId)
-                && cacheEntry[request.TableId].HoldExpiry <= DateTime.Now)
+                && cacheEntry[request.TableId].HoldExpiry >= DateTime.Now
+                && cacheEntry[request.TableId].Date.Date.Equals(request.Date.Date)
+                && cacheEntry[request.TableId].Time.Equals(request.Time))
             {
                 tableHoldInfo.AccountId = Guid.Empty;
                 tableHoldInfo.IsHeld = false;
-                tableHoldInfo.TableId = Guid.Empty;
+                tableHoldInfo.TableId = tableIsExist.TableId;
+                tableHoldInfo.TableName = tableHoldInfo.TableName;
+                tableHoldInfo.Date = request.Date.Date;
+                tableHoldInfo.Time = request.Time;
             }
             cacheEntry[request.TableId] = tableHoldInfo;
             await _bookingHub.ReleaseTable(request.TableId);
