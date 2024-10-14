@@ -1,4 +1,5 @@
-﻿using Application.DTOs.Payment;
+﻿using Application.DTOs.Payment.Momo;
+using Application.DTOs.Payment.Vnpay;
 using Application.Interfaces;
 using CoreApiResponse;
 using Microsoft.AspNetCore.Mvc;
@@ -28,16 +29,33 @@ namespace BarBuddy_API.Controllers.Payment
         [HttpGet("vnpay-return")]
         public async Task<IActionResult> GetVnpayReturn([FromQuery] VnpayResponse vnpayReturn)
         {
+            string? redirectUrl = _configuration["Vnpay:RedirectUrl"];
+            var result = Guid.Empty;
             try
             {
-                var result = await _paymentService.ProcessVnpayPaymentReturn(vnpayReturn);
-                string? redirectUrl = _configuration["Vnpay:RedirectUrl"] + result;
-                return Redirect(redirectUrl);
+                result = await _paymentService.ProcessVnpayPaymentReturn(vnpayReturn);
             }
             catch (Exception ex)
             {
-                return CustomResult($"Internal error: {ex.Message}", 500);
+               throw new Exception(ex.Message, ex);
             }
+            return Redirect($"{redirectUrl}{result}");
+        }
+
+        [HttpGet("momo-return")]
+        public async Task<IActionResult> GetMomoReturn([FromQuery] MomoOneTimePaymentResultRequest request)
+        {
+            string? redirectUrl = _configuration["Vnpay:RedirectUrl"];
+            var result = Guid.Empty;
+            try
+            {
+                result = await _paymentService.ProcessMomoPaymentReturn(request);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex);
+            }
+            return Redirect($"{redirectUrl}{result}");
         }
 
         [HttpGet("payment-detail/{paymentHistoryId}")]

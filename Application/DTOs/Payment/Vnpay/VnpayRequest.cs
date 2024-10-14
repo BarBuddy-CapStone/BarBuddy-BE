@@ -3,7 +3,7 @@ using Domain.Utils;
 using System.Net;
 using System.Text;
 
-namespace Application.DTOs.Payment
+namespace Application.DTOs.Payment.Vnpay
 {
     public class VnpayRequest
     {
@@ -14,18 +14,18 @@ namespace Application.DTOs.Payment
             decimal amount, string currCode, string orderType, string orderInfo,
             string returnUrl, string txnRef)
         {
-            this.vnp_Locale = "vn";
-            this.vnp_IpAddr = ipAddress;
-            this.vnp_Version = version;
-            this.vnp_CurrCode = currCode;
-            this.vnp_CreateDate = createDate.ToString("yyyyMMddHHmmss");
-            this.vnp_TmnCode = tmnCode;
-            this.vnp_Amount = (int)amount * 100;
-            this.vnp_Command = "pay";
-            this.vnp_OrderType = orderType;
-            this.vnp_OrderInfo = orderInfo;
-            this.vnp_ReturnUrl = returnUrl;
-            this.vnp_TxnRef = txnRef;
+            vnp_Locale = "vn";
+            vnp_IpAddr = ipAddress;
+            vnp_Version = version;
+            vnp_CurrCode = currCode;
+            vnp_CreateDate = createDate.ToString("yyyyMMddHHmmss");
+            vnp_TmnCode = tmnCode;
+            vnp_Amount = (int)amount * 100;
+            vnp_Command = "pay";
+            vnp_OrderType = orderType;
+            vnp_OrderInfo = orderInfo;
+            vnp_ReturnUrl = returnUrl;
+            vnp_TxnRef = txnRef;
         }
 
         public string GetLink(string baseUrl, string secretKey)
@@ -34,7 +34,7 @@ namespace Application.DTOs.Payment
             StringBuilder data = new StringBuilder();
             foreach (KeyValuePair<string, string> kv in requestData)
             {
-                if (!String.IsNullOrEmpty(kv.Value))
+                if (!string.IsNullOrEmpty(kv.Value))
                 {
                     data.Append(WebUtility.UrlEncode(kv.Key) + "=" + WebUtility.UrlEncode(kv.Value) + "&");
                 }

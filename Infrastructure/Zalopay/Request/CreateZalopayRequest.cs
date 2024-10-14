@@ -59,26 +59,33 @@ namespace Infrastructure.Zalopay.Request
 
         public (bool, string) GetLink(string paymentUrl)
         {
-            using var client = new HttpClient();
-            var content = new FormUrlEncodedContent(GetContent());
-            var response = client.PostAsync(paymentUrl, content).Result;
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var responseContent = response.Content.ReadAsStringAsync().Result;
-                var responseData = JsonConvert
-                    .DeserializeObject<CreateZalopayResponse>(responseContent);
-                if(responseData.returnCode == 1)
+                using var client = new HttpClient();
+                var content = new FormUrlEncodedContent(GetContent());
+                var response = client.PostAsync(paymentUrl, content).Result;
+                if (response.IsSuccessStatusCode)
                 {
-                    return (true, responseData.orderUrl);
+                    var responseContent = response.Content.ReadAsStringAsync().Result;
+                    var responseData = JsonConvert
+                        .DeserializeObject<CreateZalopayResponse>(responseContent);
+                    if (responseData.returnCode == 1)
+                    {
+                        return (true, responseData.orderUrl);
+                    }
+                    else
+                    {
+                        return (false, responseData.returnMessage);
+                    }
                 }
                 else
                 {
-                    return (false, responseData.returnMessage);
+                    return (false, response.ReasonPhrase ?? string.Empty);
                 }
             }
-            else
+            catch (Exception ex)
             {
-                return (false, response.ReasonPhrase ?? string.Empty);
+                return (false, ex.Message);
             }
         }
     }
