@@ -1,4 +1,5 @@
-﻿using Application.DTOs.BookingTable;
+﻿using Application.Common;
+using Application.DTOs.BookingTable;
 using Application.DTOs.Table;
 using Application.DTOs.TableType;
 using Application.Interfaces;
@@ -46,10 +47,14 @@ namespace Application.Service
         {
             try
             {
-                if (TimeHelper.ConvertToUtcPlus7(request.Date.Date) < TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now.Date))
-                {
-                    throw new CustomException.InvalidDataException("Invalid data");
-                }
+
+                var getOneBar = _unitOfWork.BarRepository.GetByID(request.BarId);
+
+                var requestDate = TimeHelper.ConvertToUtcPlus7(request.Date.Date);
+                var currentDate = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now.Date);
+                var currentTime = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.UtcNow);
+
+                Utils.ValidateOpenCloseTime(requestDate, request.Time, getOneBar.StartTime, getOneBar.EndTime);
 
                 var data = await _unitOfWork.TableRepository.GetAsync(
                                                 filter: x => x.BarId.Equals(request.BarId)
@@ -106,12 +111,16 @@ namespace Application.Service
             var accountId = _authentication.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
             var tableIsExist = _unitOfWork.TableRepository
                                         .Get(filter: x => x.BarId.Equals(request.BarId)
-                                                            && x.TableId.Equals(request.TableId))
+                                                            && x.TableId.Equals(request.TableId),
+                                                            includeProperties: "Bar")
                                         .FirstOrDefault();
+
             if (tableIsExist == null)
             {
                 throw new CustomException.DataNotFoundException("Không tìm thấy table trong quán bar!");
             }
+
+            Utils.ValidateOpenCloseTime(request.Date, request.Time, tableIsExist.Bar.StartTime, tableIsExist.Bar.EndTime);
 
             var cacheKey = $"{request.BarId}_{request.TableId}";
             var cacheEntry = _memoryCache.GetOrCreate(cacheKey, entry =>
@@ -156,7 +165,9 @@ namespace Application.Service
                 TableId = tableIsExist.TableId,
                 TableName = tableIsExist.TableName,
                 IsHeld = true,
-                HoldExpiry = DateTimeOffset.Now.AddMinutes(5)
+                HoldExpiry = DateTimeOffset.Now.AddMinutes(5),
+                Date = request.Date,
+                Time = request.Time,
             };
 
             cacheEntry[request.TableId] = tableHoldInfo;
@@ -221,11 +232,16 @@ namespace Application.Service
             var tableHoldInfo = new TableHoldInfo();
             if (cacheEntry.ContainsKey(request.TableId)
                 && cacheEntry[request.TableId].AccountId.Equals(accountId)
-                && cacheEntry[request.TableId].HoldExpiry <= DateTime.Now)
+                && cacheEntry[request.TableId].HoldExpiry >= DateTime.Now
+                && cacheEntry[request.TableId].Date.Date.Equals(request.Date.Date)
+                && cacheEntry[request.TableId].Time.Equals(request.Time))
             {
                 tableHoldInfo.AccountId = Guid.Empty;
                 tableHoldInfo.IsHeld = false;
-                tableHoldInfo.TableId = Guid.Empty;
+                tableHoldInfo.TableId = tableIsExist.TableId;
+                tableHoldInfo.TableName = tableHoldInfo.TableName;
+                tableHoldInfo.Date = request.Date.Date;
+                tableHoldInfo.Time = request.Time;
             }
             cacheEntry[request.TableId] = tableHoldInfo;
             await _bookingHub.ReleaseTable(request.TableId);

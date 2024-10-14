@@ -17,6 +17,7 @@ using Infrastructure.Vnpay.Config;
 using Infrastructure.Zalopay.Config;
 using Infrastructure.Momo.Config;
 
+using Quartz;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -49,6 +50,9 @@ namespace Infrastructure.DependencyInjection
 
             //SignalR
             services.AddSignalR();
+
+            //Quartz
+            services.AddQuartz();
             return services;
         }
 
@@ -59,7 +63,7 @@ namespace Infrastructure.DependencyInjection
             //services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IFirebase, FirebaseService>();
             services.AddTransient<IAuthentication, Authentication>();
-            services.AddMemoryCache(); 
+            services.AddMemoryCache();
             services.AddTransient<IEmailSender, EmailSender>();
             services.AddTransient<IOtpSender, OtpSender>();
             services.AddTransient<IBookingHubService, BookingHubService>();
@@ -134,6 +138,27 @@ namespace Infrastructure.DependencyInjection
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]))
                     };
                 });
+        }
+
+        public static void AddQuartz(this IServiceCollection services)
+        {
+            services.AddQuartz(options =>
+            {
+                options.UseMicrosoftDependencyInjectionJobFactory();
+                //Add cac Job vao day 
+                //AddJobWithTrigger<TJob>(options, nameOf(TJob), second)
+            });
+
+            services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
+        }
+
+        public static void AddJobWithTrigger<TJob>(QuartzOptions options, string jobName, int intervalInSeconds) where TJob : IJob
+        {
+            var jobKey = JobKey.Create(jobName);
+            options.AddJob<TJob>(joinBuilder => joinBuilder.WithIdentity(jobKey))
+                        .AddTrigger(trigger => trigger.ForJob(jobKey)
+                        .WithSimpleSchedule(schedule => schedule.WithIntervalInMinutes(intervalInSeconds)
+                                                                .RepeatForever()));
         }
     }
 }
