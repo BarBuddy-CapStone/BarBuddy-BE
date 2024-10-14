@@ -1,4 +1,5 @@
-﻿using Application.DTOs.BookingTable;
+﻿using Application.Common;
+using Application.DTOs.BookingTable;
 using Application.DTOs.Table;
 using Application.DTOs.TableType;
 using Application.Interfaces;
@@ -46,10 +47,14 @@ namespace Application.Service
         {
             try
             {
-                if (TimeHelper.ConvertToUtcPlus7(request.Date.Date) < TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now.Date))
-                {
-                    throw new CustomException.InvalidDataException("Invalid data");
-                }
+
+                var getOneBar = _unitOfWork.BarRepository.GetByID(request.BarId);
+
+                var requestDate = TimeHelper.ConvertToUtcPlus7(request.Date.Date);
+                var currentDate = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now.Date);
+                var currentTime = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.UtcNow);
+
+                Utils.ValidateOpenCloseTime(requestDate, request.Time, getOneBar.StartTime, getOneBar.EndTime);
 
                 var data = await _unitOfWork.TableRepository.GetAsync(
                                                 filter: x => x.BarId.Equals(request.BarId)
@@ -106,12 +111,16 @@ namespace Application.Service
             var accountId = _authentication.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
             var tableIsExist = _unitOfWork.TableRepository
                                         .Get(filter: x => x.BarId.Equals(request.BarId)
-                                                            && x.TableId.Equals(request.TableId))
+                                                            && x.TableId.Equals(request.TableId),
+                                                            includeProperties: "Bar")
                                         .FirstOrDefault();
+
             if (tableIsExist == null)
             {
                 throw new CustomException.DataNotFoundException("Không tìm thấy table trong quán bar!");
             }
+
+            Utils.ValidateOpenCloseTime(request.Date, request.Time, tableIsExist.Bar.StartTime, tableIsExist.Bar.EndTime);
 
             var cacheKey = $"{request.BarId}_{request.TableId}";
             var cacheEntry = _memoryCache.GetOrCreate(cacheKey, entry =>
