@@ -356,7 +356,7 @@ namespace Application.Service
                 catch (Exception ex)
                 {
                     _unitOfWork.RollBack();
-                    throw new InternalServerErrorException($"An Internal error occurred while creating customer: {ex.Message}");
+                    throw new InternalServerErrorException($"An Internal error occurred: {ex.Message}");
                 }
                 return _paymentService.GetPaymentLink(booking.BookingId, booking.AccountId, request.PaymentDestination, totalPrice);
             }
