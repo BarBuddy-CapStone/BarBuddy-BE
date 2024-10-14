@@ -15,10 +15,13 @@ namespace Application.DTOs.Authen
         [EmailAddress]
         public string Email { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Password cannot be empty")]
+        [StringLength(20, MinimumLength = 6, ErrorMessage = "Password must be between 6 and 20 characters")]
+
         public string Password { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Password cannot be empty")]
+        [StringLength(20, MinimumLength = 6, ErrorMessage = "Password must be between 6 and 20 characters")]
         public string ConfirmPassword { get; set; }
 
         [Required]

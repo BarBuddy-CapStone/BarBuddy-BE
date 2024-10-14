@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Text;
 
-namespace Application.DTOs.Payment
+namespace Application.DTOs.Payment.Vnpay
 {
 
     [BindProperties]
@@ -32,14 +32,14 @@ namespace Application.DTOs.Payment
             StringBuilder data = new StringBuilder();
             foreach (KeyValuePair<string, string> kv in responseData)
             {
-                if (!String.IsNullOrEmpty(kv.Value))
+                if (!string.IsNullOrEmpty(kv.Value))
                 {
                     data.Append(WebUtility.UrlEncode(kv.Key) + "=" + WebUtility.UrlEncode(kv.Value) + "&");
                 }
             }
             string checkSum = HashHelper.HmacSHA512(secretKey,
                 data.ToString().Remove(data.Length - 1, 1));
-            return checkSum.Equals(this.vnp_SecureHash, StringComparison.InvariantCultureIgnoreCase);
+            return checkSum.Equals(vnp_SecureHash, StringComparison.InvariantCultureIgnoreCase);
         }
 
         public void MakeResponseData()
