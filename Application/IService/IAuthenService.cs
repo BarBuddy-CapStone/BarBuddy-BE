@@ -11,6 +11,7 @@ namespace Application.IService
     public interface IAuthenService
     {
         Task<LoginResponse> Login(LoginRequest request);
+        Task<LoginResponse> GoogleLogin(string idToken);
         Task<CustomerAccountResponse> Register(RegisterRequest request);
         Task<bool> ConfirmAccountByOtp(OtpVerificationRequest request);
         Task<bool> RegisterWithOtp(RegisterRequest request);

@@ -53,6 +53,9 @@ namespace Infrastructure.DependencyInjection
 
             //Quartz
             services.AddQuartz();
+
+            services.AddHttpClient();
+
             return services;
         }
 
@@ -67,6 +70,7 @@ namespace Infrastructure.DependencyInjection
             services.AddTransient<IEmailSender, EmailSender>();
             services.AddTransient<IOtpSender, OtpSender>();
             services.AddTransient<IBookingHubService, BookingHubService>();
+            services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 
             services.AddScoped<IEmotionalDrinkCategoryService, EmotionalDrinkCategoryService>();
             services.AddScoped<IFeedBackService, FeedBackService>();

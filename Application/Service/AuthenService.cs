@@ -4,6 +4,7 @@ using Application.DTOs.Authen;
 using Application.Interfaces;
 using Application.IService;
 using AutoMapper;
+using Azure;
 using Azure.Core;
 using Domain.CustomException;
 using Domain.Entities;
@@ -23,16 +24,18 @@ namespace Application.Service
         private readonly IAuthentication _authentication;
         private readonly IMemoryCache _cache;
         private readonly IOtpSender _otpSender;
+        private readonly IGoogleAuthService _googleAuthService;
 
         public AuthenService(IUnitOfWork unitOfWork, IMapper mapper,
                             IAuthentication authentication, IMemoryCache cache,
-                            IOtpSender otpSender)
+                            IOtpSender otpSender, IGoogleAuthService googleAuthService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _authentication = authentication;
             _cache = cache;
             _otpSender = otpSender;
+            _googleAuthService = googleAuthService;
         }
 
         public async Task<LoginResponse> Login(LoginRequest request)
@@ -204,6 +207,65 @@ namespace Application.Service
                 _unitOfWork.Dispose();
             }
             return flag;
+        }
+
+        public async Task<LoginResponse> GoogleLogin(string idToken)
+        {
+            try
+            {
+                var googleUser = await _googleAuthService.AuthenticateGoogleUserAsync(idToken);
+
+                var isExist = (await _unitOfWork.AccountRepository
+                                        .GetAsync(filter: x => x.Email.Equals(googleUser.Email)
+                                        && x.Status == (int)PrefixValueEnum.Active,
+                                        includeProperties: "Role")).FirstOrDefault();
+
+                if (isExist == null)
+                {
+                    var Role = (await _unitOfWork.RoleRepository.GetAsync(r => r.RoleName == "CUSTOMER")).FirstOrDefault();
+
+                    var profilePictureUrl = await _googleAuthService.UploadProfilePictureAsync(googleUser.PictureUrl, googleUser.Email);
+
+                    var newCustomer = new Account
+                    {
+                        Fullname = googleUser.Name,
+                        Email = googleUser.Email,
+                        Image = profilePictureUrl,
+                        CreatedAt = DateTime.Now,
+                        Phone = "",
+                        Dob = DateTimeOffset.Now,
+                        Password = "HowWouldTheyKnow",
+                        RoleId = Role == null ? throw new CustomException.DataNotFoundException("Cannot get role data") : Role.RoleId,
+                        Status = (int)PrefixValueEnum.Active,
+                        UpdatedAt = DateTimeOffset.Now,
+                    };
+
+                    await _unitOfWork.AccountRepository.InsertAsync(newCustomer);
+                    await _unitOfWork.SaveAsync();
+
+                    // Tạo và trả về token JWT
+                    var response = _mapper.Map<LoginResponse>(newCustomer);
+                    response.AccessToken = _authentication.GenerteDefaultToken(newCustomer);
+
+                    return response;
+                }
+                else
+                {
+                    // Người dùng đã tồn tại, cập nhật thông tin nếu cần
+                    isExist.Fullname = googleUser.Name;
+                    isExist.Image = await _googleAuthService.UploadProfilePictureAsync(googleUser.PictureUrl, googleUser.Email);
+                    await _unitOfWork.AccountRepository.UpdateAsync(isExist);
+
+                    // Tạo và trả về token JWT
+                    var response = _mapper.Map<LoginResponse>(isExist);
+                    response.AccessToken = _authentication.GenerteDefaultToken(isExist);
+
+                    return response;
+                }
+            }
+            catch (Exception ex) { 
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
         }
     }
 }
