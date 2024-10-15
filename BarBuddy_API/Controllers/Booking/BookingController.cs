@@ -72,6 +72,11 @@ namespace BarBuddy_API.Controllers.Booking
             return CustomResult("Hủy đặt bàn thành công");
         }
 
+        /// <summary>
+        /// Booking table only
+        /// </summary>
+        /// <param name="request">BookingTableRequest</param>
+        /// <returns>Return Custom Result</returns>
         [HttpPost("booking-table")]
         public async Task<IActionResult> CreateBookingTableOnly([FromBody] BookingTableRequest request)
         {

@@ -29,6 +29,10 @@ namespace BarBuddy_API.DependencyInjection
         {
             services.AddSwaggerGen(option =>
             {
+                var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                option.IncludeXmlComments(xmlPath);
+
                 option.SwaggerDoc("v1", new OpenApiInfo { Title = "BarBuddy API", Version = "v1" });
 
                 var jwtSecurityScheme = new OpenApiSecurityScheme

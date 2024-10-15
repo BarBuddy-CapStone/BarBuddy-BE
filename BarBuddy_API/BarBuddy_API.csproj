@@ -5,6 +5,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>BarBuddy_API</RootNamespace>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<DocumentationFile>bin\Debug\net8.0\BarBuddy_API.xml</DocumentationFile>
+	<NoWarn>$(NoWarn);1591</NoWarn><!-- 1591 để tắt cảnh báo khi thiếu comment -->
   </PropertyGroup>
 
   <ItemGroup>
