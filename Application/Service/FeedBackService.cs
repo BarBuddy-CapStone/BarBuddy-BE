@@ -67,6 +67,9 @@ namespace Application.Service
             if (booking == null)
             {
                 throw new CustomException.DataNotFoundException("Không tìm thấy booking");
+            } else if(booking.Status != 3)
+            {
+                throw new CustomException.InvalidDataException("Không thể feedback, lịch đặt bàn chưa hoàn thành");
             }
 
             var createTime = DateTimeOffset.Now;
