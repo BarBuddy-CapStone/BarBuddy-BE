@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Application.DTOs.BookingTable;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,8 +9,8 @@ namespace Application.Interfaces
 {
     public interface IBookingHubService
     {
-        Task HoldTable(Guid tableId);
-        Task BookedTable(Guid tableId);
-        Task ReleaseTable(Guid tableId);
+        Task HoldTable(BookingHubResponse response);
+        Task BookedTable(BookingHubResponse response);
+        Task ReleaseTable(BookingHubResponse response);
     }
 }

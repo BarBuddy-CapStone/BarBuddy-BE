@@ -15,6 +15,8 @@ namespace Application.Mappers.BookingTables
                 .ForMember(dst => dst.ReservationDate, src => src.MapFrom(x => x.ReservationDate))
                 .ForMember(dst => dst.ReservationTime, src => src.MapFrom(x => x.ReservationTime));
             CreateMap<Domain.Entities.TableType, FilterTableTypeReponse>();
+
+            CreateMap<TableHoldInfo, BookingHubResponse>().ReverseMap();
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using Application.Interfaces;
+﻿using Application.DTOs.Booking;
+using Application.DTOs.BookingTable;
+using Application.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
@@ -17,19 +19,19 @@ namespace Infrastructure.SignalR
             _hubContext = hubContext;
         }
 
-        public async Task HoldTable(Guid tableId)
+        public async Task HoldTable(BookingHubResponse response)
         {
-            await _hubContext.Clients.All.SendAsync("TableHoId", tableId);
+            await _hubContext.Clients.All.SendAsync("TableHoId", response);
         }
 
-        public async Task BookedTable(Guid tableId)
+        public async Task BookedTable(BookingHubResponse response)
         {
-            await _hubContext.Clients.All.SendAsync("BookedTable", tableId);
+            await _hubContext.Clients.All.SendAsync("BookedTable", response);
         }
 
-        public async Task ReleaseTable(Guid tableId)
+        public async Task ReleaseTable(BookingHubResponse response)
         {
-            await _hubContext.Clients.All.SendAsync("TableReleased", tableId);
+            await _hubContext.Clients.All.SendAsync("TableReleased", response);
         }
     }
 }

@@ -172,7 +172,9 @@ namespace Application.Service
 
             cacheEntry[request.TableId] = tableHoldInfo;
 
-            await _bookingHub.HoldTable(request.TableId);
+            var bkHubResponse = _mapper.Map<BookingHubResponse>(tableHoldInfo);
+
+            await _bookingHub.HoldTable(bkHubResponse);
 
             _memoryCache.Set(cacheKey, cacheEntry, new MemoryCacheEntryOptions
             {
@@ -244,7 +246,10 @@ namespace Application.Service
                 tableHoldInfo.Time = request.Time;
             }
             cacheEntry[request.TableId] = tableHoldInfo;
-            await _bookingHub.ReleaseTable(request.TableId);
+
+            var bkHubResponse = _mapper.Map<BookingHubResponse>(tableHoldInfo);
+            await _bookingHub.ReleaseTable(bkHubResponse);
+
             _memoryCache.Set(request.TableId, cacheEntry);
             return tableHoldInfo;
         }
