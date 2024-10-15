@@ -10,7 +10,8 @@ namespace Application.DTOs.Bar
 {
     public class BarRequest
     {
-        [Required]
+        [Required(ErrorMessage = "BarName cannot be empty")]
+        [StringLength(50, MinimumLength = 7, ErrorMessage = "BarName must be between 7 and 50 characters")]
         public string BarName { get; set; }
         [Required]
         public string Address { get; set; }

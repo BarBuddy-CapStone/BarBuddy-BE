@@ -10,7 +10,7 @@ namespace Application.DTOs.DrinkCategory
     public class DrinkCategoryRequest
     {
 
-        [Required]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "DrinksCategoryName is required.")]
         public string DrinksCategoryName { get; set; }
 
         [Required]

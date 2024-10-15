@@ -15,6 +15,7 @@ using Domain.IRepository;
 using Infrastructure.SignalR;
 using Infrastructure.Vnpay.Config;
 using Infrastructure.Zalopay.Config;
+using Infrastructure.Momo.Config;
 
 using Quartz;
 
@@ -39,6 +40,7 @@ namespace Infrastructure.DependencyInjection
             //Config
             services.Configure<ZalopayConfig>(configuration.GetSection(ZalopayConfig.ConfigName));
             services.Configure<VnpayConfig>(configuration.GetSection(VnpayConfig.ConfigName));
+            services.Configure<MomoConfig>(configuration.GetSection(MomoConfig.ConfigName));
 
             // Services
             services.AddServices();

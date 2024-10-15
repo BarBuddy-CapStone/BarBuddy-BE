@@ -4,11 +4,13 @@ namespace Application.DTOs.Booking
 {
     public class BookingTableRequest
     {
+        [Required]
         public Guid BarId { get; set; }
         [CustomValidation(typeof(BookingTableRequest), "ValidateBookingDate", ErrorMessage = "Ngày đặt sai")]
         public DateTimeOffset BookingDate { get; set; }
         public TimeSpan BookingTime { get; set; }
         public string? Note { get; set; }
+        [Required]
         public List<Guid>? TableIds { get; set; }
 
         public static ValidationResult? ValidateBookingDate(DateTimeOffset bookingDate, ValidationContext context)

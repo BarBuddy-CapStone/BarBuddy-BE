@@ -12,7 +12,8 @@ namespace Application.DTOs.Drink
     {
         [Required]
         public Guid DrinkCategoryId { get; set; }
-        [Required]
+        [Required(ErrorMessage = "DrinkName cannot be empty")]
+        [StringLength(50, MinimumLength = 7, ErrorMessage = "DrinkName must be between 7 and 50 characters")]
         public string DrinkName { get; set; }
         [Required]
         public string Description { get; set; }
