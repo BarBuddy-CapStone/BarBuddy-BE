@@ -18,7 +18,10 @@ namespace BarBuddy_API.Controllers.Bar
         {
             _barService = barService;
         }
-
+        /// <summary>
+        /// Get All Bar
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("admin/barmanager")]
         public async Task<IActionResult> GetAllBar()
         {
@@ -38,6 +41,10 @@ namespace BarBuddy_API.Controllers.Bar
             }
         }
 
+        /// <summary>
+        /// Get All Bar With Feedback
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("/api/v1/bars")]
         public async Task<IActionResult> GetAllBarWithFeedback()
         {
@@ -57,6 +64,11 @@ namespace BarBuddy_API.Controllers.Bar
             }
         }
 
+        /// <summary>
+        /// Get Bar With Feedback By barId
+        /// </summary>
+        /// <param name="barId"></param>
+        /// <returns></returns>
         [HttpGet("/api/v1/bar-detail/{barId}")]
         public async Task<IActionResult> GetBarWithFeedbackById(Guid barId)
         {
@@ -76,6 +88,11 @@ namespace BarBuddy_API.Controllers.Bar
             }
         }
 
+        /// <summary>
+        /// Get Bar With Table By barId
+        /// </summary>
+        /// <param name="barId"></param>
+        /// <returns></returns>
         [HttpGet("/api/v1/bar-table/{barId}")]
         public async Task<IActionResult> GetBarWithTableById(Guid barId)
         {
@@ -94,7 +111,12 @@ namespace BarBuddy_API.Controllers.Bar
                 return CustomResult(e.Message, HttpStatusCode.InternalServerError);
             }
         }
-
+        
+        /// <summary>
+        /// Get Bar By Id
+        /// </summary>
+        /// <param name="barId"></param>
+        /// <returns></returns>
         [HttpGet("admin/barProfile/{barId}")]
         public async Task<IActionResult> GetBarById(Guid barId)
         {
@@ -114,8 +136,11 @@ namespace BarBuddy_API.Controllers.Bar
             }
         }
 
-
-
+        /// <summary>
+        /// Create a Bar
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("admin/addBar")]
         public async Task<IActionResult> CreateBar([FromForm] BarRequest request)
         {
@@ -140,6 +165,12 @@ namespace BarBuddy_API.Controllers.Bar
             }
         }
 
+        /// <summary>
+        /// Update Bar by BarId
+        /// </summary>
+        /// <param name="barId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPatch("admin/updateBar/{barId}")]
         public async Task<IActionResult> UpdateBar(Guid barId, [FromForm] BarRequest request)
         {

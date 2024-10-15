@@ -22,7 +22,12 @@ namespace BarBuddy_API.Controllers.Account
         {
             _accountService = accountService;
         }
-
+        /// <summary>
+        /// Get List Customer Accounts
+        /// </summary>
+        /// <param name="pageSize"></param>
+        /// <param name="pageIndex"></param>
+        /// <returns></returns>
         [AllowAnonymous] // Đổi khi có JWT
         [HttpGet("/api/v1/customer-accounts")]
         public async Task<IActionResult> GetCustomerAccounts([FromQuery] int pageSize, [FromQuery] int pageIndex)
@@ -39,6 +44,12 @@ namespace BarBuddy_API.Controllers.Account
             return Ok(result);
         }
 
+        /// <summary>
+        /// Get List Staff Accounts
+        /// </summary>
+        /// <param name="pageSize"></param>
+        /// <param name="pageIndex"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("/api/v1/staff-accounts")]
         public async Task<IActionResult> GetStaffAccounts([FromQuery] int pageSize, [FromQuery] int pageIndex)
@@ -54,6 +65,11 @@ namespace BarBuddy_API.Controllers.Account
             return Ok(result);
         }
 
+        /// <summary>
+        ///  Get Staff Account By Id
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("/api/v1/staff-account/detail")]
         public async Task<IActionResult> GetStaffAccountById([FromQuery] Guid accountId)
@@ -62,6 +78,11 @@ namespace BarBuddy_API.Controllers.Account
             return Ok(staffAccount);
         }
 
+        /// <summary>
+        /// Get Customer Account By Email
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("/api/v1/customer-account/detail")]
         public async Task<IActionResult> GetCustomerAccountByEmail([FromQuery] Guid accountId)
@@ -70,6 +91,11 @@ namespace BarBuddy_API.Controllers.Account
             return Ok(customerAccount);
         }
 
+        /// <summary>
+        /// Get Customer Account By Id
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <returns></returns>
         [HttpGet("/api/v1/customer/{accountId}")]
         public async Task<IActionResult> GetCustomerAccountById(Guid accountId)
         {
@@ -77,6 +103,11 @@ namespace BarBuddy_API.Controllers.Account
             return Ok(customerAccount);
         }
 
+        /// <summary>
+        /// Create Staff Account
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpPost("/api/v1/staff-account")]
         public async Task<IActionResult> CreateStaffAccount([FromBody] StaffAccountRequest request)
@@ -89,6 +120,11 @@ namespace BarBuddy_API.Controllers.Account
             return Ok(result);
         }
 
+        /// <summary>
+        /// Create Customer Account
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpPost("/api/v1/customer-account")]
         public async Task<IActionResult> CreateCustomerAccount([FromBody] CustomerAccountRequest request)
@@ -101,6 +137,12 @@ namespace BarBuddy_API.Controllers.Account
             return Ok(result);
         }
 
+        /// <summary>
+        /// Update Staff Account
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpPatch("/api/v1/staff-account")]
         public async Task<IActionResult> UpdateStaffAccount([FromQuery] Guid accountId, [FromBody] StaffAccountRequest request)
@@ -113,6 +155,12 @@ namespace BarBuddy_API.Controllers.Account
             return Ok(result);
         }
 
+        /// <summary>
+        /// Update Customer Account
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpPatch("/api/v1/customer-account")]
         public async Task<IActionResult> UpdateCustomerAccount([FromQuery] Guid accountId, [FromBody] CustomerAccountRequest request)
@@ -125,6 +173,12 @@ namespace BarBuddy_API.Controllers.Account
             return Ok(result);
         }
 
+        /// <summary>
+        /// Update Customer Account By Customer
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpPatch("/api/v1/customer/{accountId}")]
         public async Task<IActionResult> UpdateCustomerAccountByCustomer(Guid accountId, [FromBody] CustomerInfoRequest request)
@@ -137,6 +191,12 @@ namespace BarBuddy_API.Controllers.Account
             return Ok("Update thành công");
         }
 
+        /// <summary>
+        /// Update Customer Avatar
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <param name="Image"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpPatch("/api/v1/customer/avatar/{accountId}")]
         public async Task<IActionResult> UpdateCustomerAvatar(Guid accountId, [FromForm] IFormFile Image)

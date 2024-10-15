@@ -18,6 +18,10 @@ namespace BarBuddy_API.Controllers.Drink
         {
             _drinkService = drinkService;
         }
+        /// <summary>
+        /// Get All Drink By Admin
+        /// </summary>
+        /// <returns></returns>
         //[Authorize(Roles = "ADMIN")]
         [HttpGet]
         public async Task<IActionResult> GetAllDrink()
@@ -38,6 +42,10 @@ namespace BarBuddy_API.Controllers.Drink
             }
         }
 
+        /// <summary>
+        /// Get All Drink Customer diffenrence with Admin is Status = Inactive 
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("customer")]
         public async Task<IActionResult> GetAllDrinkCustomer()
         {
@@ -56,6 +64,12 @@ namespace BarBuddy_API.Controllers.Drink
                 return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
             }
         }
+
+        /// <summary>
+        /// Get Drink by Id
+        /// </summary>
+        /// <param name="drinkId"></param>
+        /// <returns></returns>
         [HttpGet("{drinkId}")]
         public async Task<IActionResult> GetDrink(Guid drinkId)
         {
@@ -73,6 +87,12 @@ namespace BarBuddy_API.Controllers.Drink
                 return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
             }
         }
+
+        /// <summary>
+        /// Get All Drink Based CateId
+        /// </summary>
+        /// <param name="cateId"></param>
+        /// <returns></returns>
         [HttpGet("getDrinkBaedCate/{cateId}")]
         public async Task<IActionResult> GetAllDrinkBasedCateId(Guid cateId)
         {
@@ -90,6 +110,12 @@ namespace BarBuddy_API.Controllers.Drink
                 return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
             }
         }
+
+        /// <summary>
+        /// Get All Drink Based EmoId
+        /// </summary>
+        /// <param name="emoId"></param>
+        /// <returns></returns>
         [HttpGet("getDrinkBaedEmo/{emoId}")]
         public async Task<IActionResult> GetAllDrinkBasedEmoId(Guid emoId)
         {
@@ -108,6 +134,11 @@ namespace BarBuddy_API.Controllers.Drink
             }
         }
 
+        /// <summary>
+        /// Create Drink By Admin
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("/addDrink")]
         public async Task<IActionResult> CreateDrink([FromForm] DrinkRequest request)
         {
@@ -122,6 +153,12 @@ namespace BarBuddy_API.Controllers.Drink
             }
         }
 
+        /// <summary>
+        /// Update Drink based DrinkId by Admin
+        /// </summary>
+        /// <param name="drinkId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPatch("/updateDrink/{drinkId}")]
         public async Task<IActionResult> UpdateDrink(Guid drinkId, [FromForm] DrinkRequest request)
         {

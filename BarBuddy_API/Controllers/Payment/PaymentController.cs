@@ -26,6 +26,12 @@ namespace BarBuddy_API.Controllers.Payment
         //    return Task.FromResult(CustomResult("Get Payment", response));
         //}
 
+        /// <summary>
+        /// Get Vnpay Return
+        /// </summary>
+        /// <param name="vnpayReturn"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         [HttpGet("vnpay-return")]
         public async Task<IActionResult> GetVnpayReturn([FromQuery] VnpayResponse vnpayReturn)
         {
@@ -41,7 +47,12 @@ namespace BarBuddy_API.Controllers.Payment
             }
             return Redirect($"{redirectUrl}{result}");
         }
-
+        /// <summary>
+        /// Get Momo Return
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         [HttpGet("momo-return")]
         public async Task<IActionResult> GetMomoReturn([FromQuery] MomoOneTimePaymentResultRequest request)
         {
@@ -58,6 +69,11 @@ namespace BarBuddy_API.Controllers.Payment
             return Redirect($"{redirectUrl}{result}");
         }
 
+        /// <summary>
+        /// Get Payment Detail by paymentHistoryId
+        /// </summary>
+        /// <param name="paymentHistoryId"></param>
+        /// <returns></returns>
         [HttpGet("payment-detail/{paymentHistoryId}")]
         public async Task<IActionResult> GetPaymentDetail(Guid paymentHistoryId)
         {

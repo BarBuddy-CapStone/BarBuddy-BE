@@ -16,7 +16,10 @@ namespace BarBuddy_API.Controllers.TableType
         {
             _tableTypeService = tableTypeService;
         }
-
+        /// <summary>
+        /// Get All TableType
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -24,6 +27,11 @@ namespace BarBuddy_API.Controllers.TableType
             return CustomResult("Dữ liệu đã tải lên", tableTypes);
         }
 
+        /// <summary>
+        /// Get All Table For Admin
+        /// </summary>
+        /// <param name="Status"></param>
+        /// <returns></returns>
         [HttpGet("admin")]
         public async Task<IActionResult> GetAllForAdmin([FromQuery][Required] int Status)
         {
@@ -31,6 +39,11 @@ namespace BarBuddy_API.Controllers.TableType
             return CustomResult("Dữ liệu đã tải lên", tableTypes);
         }
 
+        /// <summary>
+        /// Get Table By TableTypeId
+        /// </summary>
+        /// <param name="TableTypeId"></param>
+        /// <returns></returns>
         [HttpGet("{TableTypeId}")]
         public async Task<IActionResult> GetById(Guid TableTypeId)
         {
@@ -38,6 +51,11 @@ namespace BarBuddy_API.Controllers.TableType
             return CustomResult("Dữ liệu đã tải lên", tableType);
         }
 
+        /// <summary>
+        ///  Create TableType
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Post(TableTypeRequest request)
         {
@@ -45,6 +63,12 @@ namespace BarBuddy_API.Controllers.TableType
             return CustomResult("Tạo thành công");
         }
 
+        /// <summary>
+        /// Update TableType based TableTypeId
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="TableTypeId"></param>
+        /// <returns></returns>
         [HttpPatch("{TableTypeId}")]
         public async Task<IActionResult> Put([FromBody] TableTypeRequest request, Guid TableTypeId)
         {
@@ -52,6 +76,11 @@ namespace BarBuddy_API.Controllers.TableType
             return CustomResult("Cập nhật thành công");
         }
 
+        /// <summary>
+        /// Delete TableType based TableTypeId
+        /// </summary>
+        /// <param name="TableTypeId"></param>
+        /// <returns></returns>
         [HttpDelete("{TableTypeId}")]
         public async Task<IActionResult> Delete(Guid TableTypeId)
         {

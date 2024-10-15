@@ -20,6 +20,11 @@ namespace BarBuddy_API.Controllers.BookingTable
             _bookingTableService = bookingTableService;
         }
 
+        /// <summary>
+        /// Filter Table based Date Time
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpGet("filter")]
         public async Task<IActionResult> FilterDateTime([FromQuery] FilterTableDateTimeRequest request)
         {
@@ -34,6 +39,11 @@ namespace BarBuddy_API.Controllers.BookingTable
             }
         }
 
+        /// <summary>
+        /// Get All Hold Table of Bar
+        /// </summary>
+        /// <param name="barId"></param>
+        /// <returns></returns>
         [HttpGet("getHoldTable/{barId}")]
         public async Task<IActionResult> GetAllHoldTable(string barId)
         {
@@ -48,6 +58,11 @@ namespace BarBuddy_API.Controllers.BookingTable
             }
         }
 
+        /// <summary>
+        /// Hold Table Of Bar By Customer at Date time
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("holdTable")]
         public async Task<IActionResult> HoldTable([FromBody] TablesRequest request)
         {
@@ -66,6 +81,11 @@ namespace BarBuddy_API.Controllers.BookingTable
             }
         }
 
+        /// <summary>
+        /// Release Table Of Bar By Customer at Date time
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("releaseTable")]
         public async Task<IActionResult> ReleaseTable([FromBody] TablesRequest request)
         {
