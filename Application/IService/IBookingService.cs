@@ -20,7 +20,7 @@ namespace Application.IService
         Task<(List<StaffBookingReponse> responses, int TotalPage, TimeSpan startTime, TimeSpan endTime)> GetListBookingByStaff(Guid BarId, string? CustomerName, string? Phone, string? Email, DateTimeOffset? bookingDate, TimeSpan? bookingTime, int? Status, int PageIndex, int PageSize);
         Task UpdateBookingStatus(Guid BookingId, int Status);
         Task<bool> CancelBooking(Guid BookingId);
-        BookingResponse CreateBookingTableOnly(BookingTableRequest request, HttpContext httpContext);
-        PaymentLink CreateBookingTableWithDrinks(BookingDrinkRequest request, HttpContext httpContext);
+        Task<BookingResponse> CreateBookingTableOnly(BookingTableRequest request, HttpContext httpContext);
+        Task<PaymentLink> CreateBookingTableWithDrinks(BookingDrinkRequest request, HttpContext httpContext);
     }
 }

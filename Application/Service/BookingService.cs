@@ -19,6 +19,8 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using static Domain.CustomException.CustomException;
+using Application.Common;
+using Domain.Constants;
 
 namespace Application.Service
 {
@@ -28,13 +30,16 @@ namespace Application.Service
         private readonly IMapper _mapper;
         private readonly IAuthentication _authentication;
         private readonly IPaymentService _paymentService;
+        private readonly IEmailSender _emailSender;
 
-        public BookingService(IUnitOfWork unitOfWork, IMapper mapper, IAuthentication authentication, IPaymentService paymentService)
+        public BookingService(IUnitOfWork unitOfWork, IMapper mapper, IAuthentication authentication, 
+            IPaymentService paymentService, IEmailSender emailSender)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _authentication = authentication;
             _paymentService = paymentService;
+            _emailSender = emailSender;
         }
 
         public async Task<bool> CancelBooking(Guid BookingId)
@@ -352,20 +357,27 @@ namespace Application.Service
             }
         }
 
-        public BookingResponse CreateBookingTableOnly(BookingTableRequest request, HttpContext httpContext)
+        public async Task<BookingResponse> CreateBookingTableOnly(BookingTableRequest request, HttpContext httpContext)
         {
             try
             {
+                
                 var booking = _mapper.Map<Booking>(request);
                 booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext)) ?? throw new DataNotFoundException("account not found");
+                booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId) ?? throw new DataNotFoundException("Bar not found");
+
+                Utils.ValidateOpenCloseTime(request.BookingDate, request.BookingTime,
+                    booking.Bar.StartTime, booking.Bar.EndTime);
+
                 booking.BookingTables = booking.BookingTables ?? new List<BookingTable>();
-                booking.BookingCode = $"BOOKING-{RandomHelper.GenerateRandomNumberString()}";
+                booking.BookingCode = $"{booking.BookingDate.ToString("yymmdd")}{RandomHelper.GenerateRandomNumberString()}";
                 booking.Status = (int)PaymentStatusEnum.Pending;
-                booking.IsIncludeDrink = false; 
+                booking.IsIncludeDrink = false;
 
                 if (request.TableIds != null && request.TableIds.Count > 0)
                 {
-                    var existingTables = _unitOfWork.TableRepository.Get(t => request.TableIds.Contains(t.TableId) && t.BarId == request.BarId);
+                    var existingTables = _unitOfWork.TableRepository.Get(t => request.TableIds.Contains(t.TableId) && t.BarId == request.BarId, 
+                        includeProperties: "TableType");
                     if (existingTables.Count() != request.TableIds.Count)
                     {
                         throw new CustomException.InvalidDataException("Some TableIds do not exist.");
@@ -392,6 +404,7 @@ namespace Application.Service
                     _unitOfWork.BeginTransaction();
                     _unitOfWork.BookingRepository.Insert(booking);
                     _unitOfWork.CommitTransaction();
+                    await _emailSender.SendBookingInfo(booking);
                 }
                 catch (Exception ex)
                 {
@@ -459,13 +472,17 @@ namespace Application.Service
             }
         }
 
-        public PaymentLink CreateBookingTableWithDrinks(BookingDrinkRequest request, HttpContext httpContext)
+        public async Task<PaymentLink> CreateBookingTableWithDrinks(BookingDrinkRequest request, HttpContext httpContext)
         {
             try
             {
                 var booking = _mapper.Map<Booking>(request);
                 booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext)) ?? throw new DataNotFoundException("account not found");
                 booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId) ?? throw new DataNotFoundException("Bar not found");
+
+                Utils.ValidateOpenCloseTime(request.BookingDate, request.BookingTime, 
+                    booking.Bar.StartTime, booking.Bar.EndTime);
+
                 booking.BookingTables = booking.BookingTables ?? new List<BookingTable>();
                 booking.BookingDrinks = booking.BookingDrinks ?? new List<BookingDrink>();
                 booking.BookingCode = $"BOOKING-{RandomHelper.GenerateRandomNumberString()}";
@@ -473,11 +490,13 @@ namespace Application.Service
                 booking.IsIncludeDrink = true;
 
 
+
                 double totalPrice = 0;
 
                 if (request.TableIds != null && request.TableIds.Count > 0)
                 {
-                    var existingTables = _unitOfWork.TableRepository.Get(t => request.TableIds.Contains(t.TableId) && t.BarId == request.BarId);
+                    var existingTables = _unitOfWork.TableRepository.Get(t => request.TableIds.Contains(t.TableId) && t.BarId == request.BarId,
+                        includeProperties: "TableType");
                     if (existingTables.Count() != request.TableIds.Count)
                     {
                         throw new CustomException.InvalidDataException("Some TableIds do not exist.");
@@ -498,7 +517,8 @@ namespace Application.Service
                 if (request.Drinks != null && request.Drinks.Count > 0)
                 {
                     var drinkIds = request.Drinks.Select(drink => drink.DrinkId).ToList();
-                    var existingDrinks = _unitOfWork.DrinkRepository.Get(d => drinkIds.Contains(d.DrinkId));
+                    var existingDrinks = _unitOfWork.DrinkRepository.Get(d => drinkIds.Contains(d.DrinkId),
+                            includeProperties: "DrinkCategory");
                     if (existingDrinks.Count() != request.Drinks.Count)
                     {
                         throw new CustomException.InvalidDataException("Some DrinkIds do not exist.");
@@ -526,13 +546,15 @@ namespace Application.Service
                     _unitOfWork.BeginTransaction();
                     _unitOfWork.BookingRepository.Insert(booking);
                     _unitOfWork.CommitTransaction();
+                    await _emailSender.SendBookingInfo(booking, totalPrice);
                 }
                 catch (Exception ex)
                 {
                     _unitOfWork.RollBack();
                     throw new InternalServerErrorException($"An Internal error occurred: {ex.Message}");
                 }
-                return _paymentService.GetPaymentLink(booking.BookingId, booking.AccountId, request.PaymentDestination, totalPrice);
+                return _paymentService.GetPaymentLink(booking.BookingId, booking.AccountId, 
+                            request.PaymentDestination, totalPrice);
             }
             catch (CustomException.InvalidDataException ex)
             {

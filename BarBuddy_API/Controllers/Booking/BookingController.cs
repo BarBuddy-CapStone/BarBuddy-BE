@@ -73,16 +73,26 @@ namespace BarBuddy_API.Controllers.Booking
         }
 
         [HttpPost("booking-table")]
-        public IActionResult CreateBookingTableOnly([FromBody] BookingTableRequest request)
+        public async Task<IActionResult> CreateBookingTableOnly([FromBody] BookingTableRequest request)
         {
-            var response = _bookingService.CreateBookingTableOnly(request, HttpContext);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var response = await _bookingService.CreateBookingTableOnly(request, HttpContext);
             return CustomResult("Đặt bàn thành công", response);
         }
 
         [HttpPost("booking-drink")]
-        public IActionResult CreateBookingTableWithDrinks([FromBody] BookingDrinkRequest request)
+        public async Task<IActionResult> CreateBookingTableWithDrinks([FromBody] BookingDrinkRequest request)
         {
-            var response = _bookingService.CreateBookingTableWithDrinks(request, HttpContext);
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var response = await _bookingService.CreateBookingTableWithDrinks(request, HttpContext);
             return CustomResult("Đặt bàn kèm đồ uống thành công", response);
         }
     }
