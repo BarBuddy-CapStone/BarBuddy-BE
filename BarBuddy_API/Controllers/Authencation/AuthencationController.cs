@@ -21,6 +21,11 @@ namespace BarBuddy_API.Controllers.Authencation
             _otpSender = otpSender;
         }
 
+        /// <summary>
+        /// Login
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
@@ -34,6 +39,11 @@ namespace BarBuddy_API.Controllers.Authencation
             }
         }
 
+        /// <summary>
+        /// Register Account
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
@@ -50,6 +60,11 @@ namespace BarBuddy_API.Controllers.Authencation
             }
         }
 
+        /// <summary>
+        /// SendOtp From Email Bar to Email Register
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
         [HttpPost("send")]
         public async Task<IActionResult> SendOtp([FromBody] string email)
         {
@@ -57,6 +72,11 @@ namespace BarBuddy_API.Controllers.Authencation
             return Ok("OTP đã được gửi thành công.");
         }
 
+        /// <summary>
+        /// Verify Otp sended to Email Register
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("verify")]
         public async Task<IActionResult> VerifyOtp([FromBody] OtpVerificationRequest request)
         {

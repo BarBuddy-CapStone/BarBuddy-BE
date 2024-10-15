@@ -17,6 +17,15 @@ namespace BarBuddy_API.Controllers.Table
             _tableService = tableService;
         }
 
+        /// <summary>
+        /// Get All Table For Staff
+        /// </summary>
+        /// <param name="BarId"></param>
+        /// <param name="TableTypeId"></param>
+        /// <param name="Status"></param>
+        /// <param name="PageIndex"></param>
+        /// <param name="PageSize"></param>
+        /// <returns></returns>
         [HttpGet("staff")]
         public async Task<IActionResult> GetAllForStaff([FromQuery] Guid? BarId, [FromQuery][Required] Guid TableTypeId, [FromQuery] int? Status,[FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
@@ -24,6 +33,11 @@ namespace BarBuddy_API.Controllers.Table
             return Ok(new { TableTypeId = responses.TableTypeId, TableTypeName = responses.TableTypeName, totalPage = responses.TotalPage, response = responses.response });
         }
 
+        /// <summary>
+        /// Create Table
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] CreateTableRequest request)
         {
@@ -31,6 +45,12 @@ namespace BarBuddy_API.Controllers.Table
             return Ok("Tạo bàn thành công");
         }
 
+        /// <summary>
+        /// Update Table based TableId
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="TableId"></param>
+        /// <returns></returns>
         [HttpPatch("{TableId}")]
         public async Task<IActionResult> Patch([FromBody] UpdateTableRequest request, Guid TableId)
         {
@@ -38,6 +58,11 @@ namespace BarBuddy_API.Controllers.Table
             return Ok("Cập nhật bàn thành công");
         }
 
+        /// <summary>
+        /// Delete Table based tableId (change sts IsDelete true)
+        /// </summary>
+        /// <param name="TableId"></param>
+        /// <returns></returns>
         [HttpDelete("{TableId}")]
         public async Task<IActionResult> Delete(Guid TableId)
         {
