@@ -22,6 +22,8 @@ namespace Persistence.Repository
         private IGenericRepository<Role> _roleRepository;
         private IGenericRepository<Table> _tableRepository;
         private IGenericRepository<TableType> _tableTypeRepository;
+        private IGenericRepository<Notification> _notificationRepository;
+        private IGenericRepository<NotificationDetail> _notificationDetailRepository;
 
 
         public UnitOfWork()
@@ -210,7 +212,32 @@ namespace Persistence.Repository
             }
         }
 
+        public IGenericRepository<Notification> NotificationRepository
+        {
+            get
+            {
 
+                if (_notificationRepository == null)
+                {
+                    _notificationRepository = new GenericRepository<Notification>(_context);
+                }
+                return _notificationRepository;
+            }
+        }
+
+
+        public IGenericRepository<NotificationDetail> NotificationDetailRepository
+        {
+            get
+            {
+
+                if (_notificationDetailRepository == null)
+                {
+                    _notificationDetailRepository = new GenericRepository<NotificationDetail>(_context);
+                }
+                return _notificationDetailRepository;
+            }
+        }
         public async Task SaveAsync()
         {
             await _context.SaveChangesAsync();

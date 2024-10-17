@@ -1,26 +1,21 @@
-﻿using Application.DTOs.Booking;
+﻿using Application.Common;
+using Application.DTOs.Booking;
 using Application.DTOs.BookingDrink;
+using Application.DTOs.BookingTable;
+using Application.DTOs.Notification;
 using Application.DTOs.Payment;
 using Application.Interfaces;
-using Application.DTOs.BookingTable;
 using Application.IService;
 using AutoMapper;
+using Domain.Constants;
 using Domain.CustomException;
 using Domain.Entities;
 using Domain.Enums;
-using Domain.Entities;
 using Domain.IRepository;
 using Domain.Utils;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using static Domain.CustomException.CustomException;
-using Application.Common;
-using Domain.Constants;
 
 namespace Application.Service
 {
@@ -31,15 +26,16 @@ namespace Application.Service
         private readonly IAuthentication _authentication;
         private readonly IPaymentService _paymentService;
         private readonly IEmailSender _emailSender;
-
-        public BookingService(IUnitOfWork unitOfWork, IMapper mapper, IAuthentication authentication, 
-            IPaymentService paymentService, IEmailSender emailSender)
+        private readonly INotificationService _notificationService;
+        public BookingService(IUnitOfWork unitOfWork, IMapper mapper, IAuthentication authentication,
+            IPaymentService paymentService, IEmailSender emailSender, INotificationService notificationService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _authentication = authentication;
             _paymentService = paymentService;
             _emailSender = emailSender;
+            _notificationService = notificationService;
         }
 
         public async Task<bool> CancelBooking(Guid BookingId)
@@ -109,7 +105,8 @@ namespace Application.Service
                         if (feedback.Any())
                         {
                             checkIsRated = true;
-                        } else
+                        }
+                        else
                         {
                             checkIsRated = false;
                         }
@@ -130,7 +127,8 @@ namespace Application.Service
 
                 return (responses, TotalPage);
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
@@ -143,7 +141,7 @@ namespace Application.Service
 
                 var booking = (await _unitOfWork.BookingRepository.GetAsync(b => b.BookingId == BookingId, includeProperties: "Account,Bar")).FirstOrDefault();
 
-                if(booking == null)
+                if (booking == null)
                 {
                     throw new CustomException.DataNotFoundException("Không tìm thấy Id Đặt bàn");
                 }
@@ -162,9 +160,11 @@ namespace Application.Service
                 response.Note = booking.Note;
                 response.Images = booking.Bar.Images.Split(',').ToList();
 
-                if (booking.IsIncludeDrink) {
+                if (booking.IsIncludeDrink)
+                {
                     var bookingDrinks = await _unitOfWork.BookingDrinkRepository.GetAsync(bd => bd.BookingId == booking.BookingId, includeProperties: "Drink");
-                    foreach (var drink in bookingDrinks) {
+                    foreach (var drink in bookingDrinks)
+                    {
                         var drinkResponse = new BookingDrinkDetailResponse
                         {
                             ActualPrice = drink.ActualPrice,
@@ -178,7 +178,8 @@ namespace Application.Service
                 }
 
                 var bookingTables = await _unitOfWork.BookingTableRepository.GetAsync(bt => bt.BookingId == BookingId, includeProperties: "Table");
-                foreach (var table in bookingTables) { 
+                foreach (var table in bookingTables)
+                {
                     response.TableNameList.Add(table.Table.TableName);
                 }
 
@@ -293,7 +294,8 @@ namespace Application.Service
 
                 var bookingsWithPagination = await _unitOfWork.BookingRepository.GetAsync(filter: filter, includeProperties: "Account,Bar", pageIndex: PageIndex, pageSize: PageSize, orderBy: o => o.OrderByDescending(b => b.BookingDate).ThenByDescending(b => b.BookingTime));
 
-                foreach (var booking in bookingsWithPagination) {
+                foreach (var booking in bookingsWithPagination)
+                {
                     var response = new StaffBookingReponse
                     {
                         BookingDate = booking.BookingDate,
@@ -310,7 +312,8 @@ namespace Application.Service
 
                 return (responses, totalPage, startTime, endTime);
             }
-            catch (Exception ex) { 
+            catch (Exception ex)
+            {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
@@ -322,7 +325,8 @@ namespace Application.Service
                 var responses = new List<TopBookingResponse>();
 
                 var bookings = await _unitOfWork.BookingRepository.GetAsync(b => b.AccountId == CustomerId, pageIndex: 1, pageSize: NumOfBookings, orderBy: o => o.OrderByDescending(b => b.CreateAt).ThenByDescending(b => b.BookingDate), includeProperties: "Bar");
-                foreach (var booking in bookings) {
+                foreach (var booking in bookings)
+                {
                     var feedback = await _unitOfWork.FeedbackRepository.GetAsync(f => f.BookingId == booking.BookingId);
                     bool? checkIsRated = null;
                     if (booking.Status == 3)
@@ -351,7 +355,8 @@ namespace Application.Service
                 }
 
                 return responses;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
@@ -361,12 +366,12 @@ namespace Application.Service
         {
             try
             {
-                
+
                 var booking = _mapper.Map<Booking>(request);
                 booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext)) ?? throw new DataNotFoundException("account not found");
                 booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId) ?? throw new DataNotFoundException("Bar not found");
 
-                Utils.ValidateOpenCloseTime(request.BookingDate, request.BookingTime,
+                Utils.ValidateOpenCloseTime(request.BookingDate.Date, request.BookingTime,
                     booking.Bar.StartTime, booking.Bar.EndTime);
 
                 booking.BookingTables = booking.BookingTables ?? new List<BookingTable>();
@@ -376,7 +381,7 @@ namespace Application.Service
 
                 if (request.TableIds != null && request.TableIds.Count > 0)
                 {
-                    var existingTables = _unitOfWork.TableRepository.Get(t => request.TableIds.Contains(t.TableId) && t.BarId == request.BarId, 
+                    var existingTables = _unitOfWork.TableRepository.Get(t => request.TableIds.Contains(t.TableId) && t.BarId == request.BarId,
                         includeProperties: "TableType");
                     if (existingTables.Count() != request.TableIds.Count)
                     {
@@ -399,10 +404,18 @@ namespace Application.Service
                 {
                     throw new CustomException.InvalidDataException("Booking request does not have table field");
                 }
+
+                var creNoti = new NotificationRequest
+                {
+                    Title = booking.Bar.BarName,
+                    Message = PrefixKeyConstant.BOOKING_SUCCESS
+                };
+
                 try
                 {
                     _unitOfWork.BeginTransaction();
                     _unitOfWork.BookingRepository.Insert(booking);
+                    await _notificationService.CreateNotification(creNoti);
                     _unitOfWork.CommitTransaction();
                     await _emailSender.SendBookingInfo(booking);
                 }
@@ -480,7 +493,7 @@ namespace Application.Service
                 booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext)) ?? throw new DataNotFoundException("account not found");
                 booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId) ?? throw new DataNotFoundException("Bar not found");
 
-                Utils.ValidateOpenCloseTime(request.BookingDate, request.BookingTime, 
+                Utils.ValidateOpenCloseTime(request.BookingDate, request.BookingTime,
                     booking.Bar.StartTime, booking.Bar.EndTime);
 
                 booking.BookingTables = booking.BookingTables ?? new List<BookingTable>();
@@ -535,16 +548,24 @@ namespace Application.Service
                         totalPrice += bookingDrink.ActualPrice * bookingDrink.Quantity;
                         booking.BookingDrinks?.Add(bookingDrink);
                     }
-                    totalPrice = totalPrice - totalPrice * booking.Bar.Discount/100;
+                    totalPrice = totalPrice - totalPrice * booking.Bar.Discount / 100;
                 }
                 else
                 {
                     throw new CustomException.InvalidDataException("Booking request does not have table field");
                 }
+
+                var creNoti = new NotificationRequest
+                {
+                    Title = booking.Bar.BarName,
+                    Message = PrefixKeyConstant.BOOKING_SUCCESS
+                };
+
                 try
                 {
                     _unitOfWork.BeginTransaction();
                     _unitOfWork.BookingRepository.Insert(booking);
+                    await _notificationService.CreateNotification(creNoti);
                     _unitOfWork.CommitTransaction();
                     await _emailSender.SendBookingInfo(booking, totalPrice);
                 }
@@ -553,7 +574,7 @@ namespace Application.Service
                     _unitOfWork.RollBack();
                     throw new InternalServerErrorException($"An Internal error occurred: {ex.Message}");
                 }
-                return _paymentService.GetPaymentLink(booking.BookingId, booking.AccountId, 
+                return _paymentService.GetPaymentLink(booking.BookingId, booking.AccountId,
                             request.PaymentDestination, totalPrice);
             }
             catch (CustomException.InvalidDataException ex)

@@ -35,5 +35,9 @@ namespace Domain.Constants
         public static string STAFF = "STAFF";
         public static string CUSTOMER = "CUSTOMER";
         #endregion
+
+        #region Notification
+        public static string BOOKING_SUCCESS = "Bạn đã đặt bàn thành công!";
+        #endregion
     }
 }
