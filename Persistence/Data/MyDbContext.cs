@@ -450,7 +450,52 @@ namespace Persistence.Data
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330000"),
                     BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = tc1,
-                    TableName = "Table A1",
+                    TableName = "Table TC1-A1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330331"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
+                    TableTypeId = tc1,
+                    TableName = "Table TC1-B1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330231"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
+                    TableTypeId = tc1,
+                    TableName = "Table TC1-C1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330232"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
+                    TableTypeId = tc1,
+                    TableName = "Table TC1-D1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330233"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
+                    TableTypeId = tc1,
+                    TableName = "Table TC1-E1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330234"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
+                    TableTypeId = tc1,
+                    TableName = "Table TC1-F1",
                     Status = 0,
                     IsDeleted = false
                 },
@@ -459,10 +504,56 @@ namespace Persistence.Data
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330001"),
                     BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = qb,
-                    TableName = "Table B1",
+                    TableName = "Table QA-1",
                     Status = 0,
                     IsDeleted = false
                 },
+                new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330021"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
+                    TableTypeId = qb,
+                    TableName = "Table QB-1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330013"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
+                    TableTypeId = qb,
+                    TableName = "Table QC-1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330014"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
+                    TableTypeId = qb,
+                    TableName = "Table QD-1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330015"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
+                    TableTypeId = qb,
+                    TableName = "Table QE-1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                new Table
+                {
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330016"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
+                    TableTypeId = qb,
+                    TableName = "Table QF-1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                ////////////////////////
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330002"),
