@@ -111,6 +111,14 @@ namespace Infrastructure.DependencyInjection
                                .AllowAnyMethod()
                                .AllowCredentials();
                     });
+                options.AddPolicy("AllowEditorSwagger",
+                    builder =>
+                    {
+                        builder.WithOrigins("https://editor.swagger.io")
+                               .AllowAnyHeader()
+                               .AllowAnyMethod()
+                               .AllowCredentials();
+                    });
             });
         }
 
