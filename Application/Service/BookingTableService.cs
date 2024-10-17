@@ -208,7 +208,7 @@ namespace Application.Service
                 }
             }
 
-            return Task.FromResult(tableHolds);
+            return Task.FromResult(tableHolds.Where(x => x.IsHeld == true).ToList());
         }
 
         public async Task<TableHoldInfo> ReleaseTable(TablesRequest request)
