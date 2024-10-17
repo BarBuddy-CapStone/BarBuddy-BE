@@ -8,6 +8,7 @@ namespace Application.DTOs.BookingTable
 {
     public class BookingHubResponse
     {
+        public Guid AccountId { get; set; }
         public Guid BarId { get; set; }
         public Guid TableId { get; set; }
         public DateTimeOffset Date {  get; set; }
