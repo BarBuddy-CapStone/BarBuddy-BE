@@ -52,7 +52,7 @@ else
 
 app.UseHttpsRedirection();
 //app.UseCors("AllowAll");
-app.UseCors("AllowEditorSwagger");
+//app.UseCors("AllowEditorSwagger");
 app.UseCors("AllowReactBarBuddy");
 
 // Middleware configuration

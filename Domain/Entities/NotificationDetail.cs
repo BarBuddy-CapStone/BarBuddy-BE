@@ -14,6 +14,7 @@ namespace Domain.Entities
         public Guid NotificationDetailId { get; set; } = Guid.NewGuid();
         public Guid AccountId { get; set; }
         public Guid NotificationId { get; set; }
+        public bool IsRead { get; set; }
         [ForeignKey("AccountId")]
         public virtual Account Account { get; set; }
         [ForeignKey("NotificationId")]
