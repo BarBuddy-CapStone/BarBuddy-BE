@@ -16,7 +16,7 @@ namespace Domain.Entities
         public Guid NotificationId { get; set; } = Guid.NewGuid();
         public string Title { get; set; }
         public string Message { get; set; }
-        public bool isRead { get; set; }
+        public bool IsRead { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }
         public Notification()

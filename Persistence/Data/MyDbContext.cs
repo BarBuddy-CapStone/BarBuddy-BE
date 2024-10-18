@@ -30,6 +30,8 @@ namespace Persistence.Data
         public DbSet<Table> Tables { get; set; }
         public DbSet<TableType> TableTypes { get; set; }
         public DbSet<PaymentHistory> PaymentHistories { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<NotificationDetail> NotificationDetails { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
