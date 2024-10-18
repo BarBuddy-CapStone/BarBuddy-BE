@@ -211,7 +211,7 @@ namespace Application.Service
             return Task.FromResult(tableHolds.Where(x => x.IsHeld == true).ToList());
         }
 
-        public async Task<TableHoldInfo> ReleaseTable(TablesRequest request)
+        public async Task ReleaseTable(TablesRequest request)
         {
 
             var accountId = _authentication.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
@@ -231,27 +231,43 @@ namespace Application.Service
                 return new Dictionary<Guid, TableHoldInfo>();
             });
 
-            var tableHoldInfo = new TableHoldInfo();
             if (cacheEntry.ContainsKey(request.TableId)
                 && cacheEntry[request.TableId].AccountId.Equals(accountId)
                 && cacheEntry[request.TableId].HoldExpiry >= DateTime.Now
                 && cacheEntry[request.TableId].Date.Date.Equals(request.Date.Date)
                 && cacheEntry[request.TableId].Time.Equals(request.Time))
             {
-                tableHoldInfo.AccountId = Guid.Empty;
-                tableHoldInfo.IsHeld = false;
-                tableHoldInfo.TableId = tableIsExist.TableId;
-                tableHoldInfo.TableName = tableHoldInfo.TableName;
-                tableHoldInfo.Date = request.Date.Date;
-                tableHoldInfo.Time = request.Time;
+                _memoryCache.Remove(cacheKey);
             }
-            cacheEntry[request.TableId] = tableHoldInfo;
+            await _bookingHub.ReleaseListTablee(request.BarId);
+        }
 
-            var bkHubResponse = _mapper.Map<BookingHubResponse>(tableHoldInfo);
-            await _bookingHub.ReleaseTable(bkHubResponse);
+        public async Task ReleaseListTable(ReleaseListTableRequest request)
+        {
+            var accountId = _authentication.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
 
-            _memoryCache.Set(request.TableId, cacheEntry);
-            return tableHoldInfo;
+            foreach (var table in request.Table)
+            {
+                var tableExist = await _unitOfWork.TableRepository.GetByIdAsync(table.TableId);
+                if (tableExist == null)
+                {
+                    throw new CustomException.InvalidDataException("Không hợp lệ");
+                }
+                var cacheKey = $"{request.BarId}_{table.TableId}";
+                if (_memoryCache.TryGetValue(cacheKey, out Dictionary<Guid, TableHoldInfo>? cacheTbHold))
+                {
+                    if (cacheTbHold.TryGetValue(table.TableId, out var tbHold))
+                    {
+                        if (tbHold.Date.Date.Equals(tbHold.Date)
+                            && tbHold.Time.Equals(table.Time)
+                            && tbHold.AccountId.Equals(accountId))
+                        {
+                            _memoryCache.Remove(cacheKey);
+                            await _bookingHub.ReleaseListTablee(request.BarId);
+                        }
+                    }
+                };
+            }
         }
     }
 }

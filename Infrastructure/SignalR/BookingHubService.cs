@@ -29,9 +29,14 @@ namespace Infrastructure.SignalR
             await _hubContext.Clients.All.SendAsync("BookedTable", response);
         }
 
-        public async Task ReleaseTable(BookingHubResponse response)
+        public async Task ReleaseTable(Guid barId)
         {
-            await _hubContext.Clients.All.SendAsync("TableReleased", response);
+            await _hubContext.Clients.All.SendAsync("TableReleased", barId);
+        }
+
+        public async Task ReleaseListTablee(Guid barId)
+        {
+            await _hubContext.Clients.All.SendAsync("TableListReleased", barId);
         }
     }
 }

@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 
 namespace Application.DTOs.BookingTable
 {
-    public class TablesRequest : ReleaseTableRequest
+    public class ReleaseListTableRequest
     {
         [Required]
         public Guid BarId { get; set; }
         [Required]
         public DateTimeOffset Date { get; set; }
+        [Required]
+        public List<ReleaseTableRequest>? Table { get; set; }
     }
 }
