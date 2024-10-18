@@ -84,6 +84,8 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<IAuthenService, AuthenService>();
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<IBookingTableService, BookingTableService>();
+            services.AddScoped<INotificationDetailService, NotificationDetailService>();
+            services.AddScoped<INotificationService, NotificationService>();
         }
 
         //public static void AddCORS(this IServiceCollection services)
