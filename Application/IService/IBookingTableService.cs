@@ -12,7 +12,8 @@ namespace Application.IService
     {
         Task<FilterTableTypeReponse> FilterTableTypeReponse(FilterTableDateTimeRequest request);
         Task<TableHoldInfo> HoldTable(TablesRequest request);
-        Task<TableHoldInfo> ReleaseTable (TablesRequest request);
+        Task ReleaseTable (TablesRequest request);
         Task<List<TableHoldInfo>> HoldTableList (Guid barId);
+        Task ReleaseListTable(ReleaseListTableRequest request);
     }
 }

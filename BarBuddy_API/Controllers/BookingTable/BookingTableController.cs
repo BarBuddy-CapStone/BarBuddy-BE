@@ -91,8 +91,22 @@ namespace BarBuddy_API.Controllers.BookingTable
         {
             try
             {
-                var data = await _bookingTableService.ReleaseTable(request);
-                return CustomResult("Đã xóa", data);
+                await _bookingTableService.ReleaseTable(request);
+                return CustomResult("Đã xóa bàn đã đặt");
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpPost("releaseListTable")]
+        public async Task<IActionResult> ReleaseListTable([FromBody] ReleaseListTableRequest request)
+        {
+            try
+            {
+                await _bookingTableService.ReleaseListTable(request);
+                return CustomResult("Đã xóa danh sach đặt chỗ");
             }
             catch (CustomException.InternalServerErrorException ex)
             {
