@@ -314,7 +314,7 @@ namespace Persistence.Data
                     BarId = null,
                     RoleId = Guid.Parse("70a545c0-6156-467c-a86f-547370ea4552"),
                     Email = "customer1@barbuddy4.com",
-                    Password = "password321",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
                     Fullname = "Customer Bar Buddy4",
                     Dob = new DateTime(1985, 11, 30),
                     Phone = "0901234570",
@@ -1330,7 +1330,6 @@ namespace Persistence.Data
                     NotificationId = Guid.Parse("660d7300-f30c-40c3-b827-335544330160"),
                     Title = "Welcome Notification",
                     Message = "Welcome to the system!",
-                    IsRead = false,
                     CreatedAt = DateTimeOffset.Now,
                     UpdatedAt = DateTimeOffset.Now
                 },
@@ -1339,7 +1338,6 @@ namespace Persistence.Data
                     NotificationId = Guid.Parse("660d7300-f30c-40c3-b827-335544330161"),
                     Title = "System Maintenance",
                     Message = "System will undergo maintenance at midnight.",
-                    IsRead = false,
                     CreatedAt = DateTimeOffset.Now,
                     UpdatedAt = DateTimeOffset.Now
                 },
@@ -1349,7 +1347,6 @@ namespace Persistence.Data
                     NotificationId = Guid.Parse("660d7300-f30c-40c3-b827-335544330162"),
                     Title = "Booking Confirmation",
                     Message = "Your table reservation is confirmed!",
-                    IsRead = false,
                     CreatedAt = DateTimeOffset.Now,
                     UpdatedAt = DateTimeOffset.Now
                 },
@@ -1359,7 +1356,6 @@ namespace Persistence.Data
                     NotificationId = Guid.Parse("660d7300-f30c-40c3-b827-335544330163"),
                     Title = "Happy Hour Reminder",
                     Message = "Don't forget, Happy Hour starts at 5 PM today!",
-                    IsRead = false,
                     CreatedAt = DateTimeOffset.Now,
                     UpdatedAt = DateTimeOffset.Now
                 }
@@ -1370,27 +1366,31 @@ namespace Persistence.Data
                 {
                     NotificationDetailId = Guid.Parse("660d7300-f30c-40c3-b827-335544330170"),
                     AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440004"),
-                    NotificationId = Guid.Parse("660d7300-f30c-40c3-b827-335544330160")
+                    NotificationId = Guid.Parse("660d7300-f30c-40c3-b827-335544330160"),
+                    IsRead = false,
                 },
                 new NotificationDetail
                 {
                     NotificationDetailId = Guid.Parse("660d7300-f30c-40c3-b827-335544330171"),
                     AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440004"),
-                    NotificationId = Guid.Parse("660d7300-f30c-40c3-b827-335544330161")
+                    NotificationId = Guid.Parse("660d7300-f30c-40c3-b827-335544330161"),
+                    IsRead = false,
                 },
                 // Thêm chi tiết thông báo thứ 3
                 new NotificationDetail
                 {
                     NotificationDetailId = Guid.Parse("660d7300-f30c-40c3-b827-335544330172"),
                     AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440004"),
-                    NotificationId = Guid.Parse("660d7300-f30c-40c3-b827-335544330162")
+                    NotificationId = Guid.Parse("660d7300-f30c-40c3-b827-335544330162"),
+                    IsRead = false,
                 },
                 // Thêm chi tiết thông báo thứ 4
                 new NotificationDetail
                 {
                     NotificationDetailId = Guid.Parse("660d7300-f30c-40c3-b827-335544330173"),
                     AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440004"),
-                    NotificationId = Guid.Parse("660d7300-f30c-40c3-b827-335544330163")
+                    NotificationId = Guid.Parse("660d7300-f30c-40c3-b827-335544330163"),
+                    IsRead = false,
                 }
                 );
         }

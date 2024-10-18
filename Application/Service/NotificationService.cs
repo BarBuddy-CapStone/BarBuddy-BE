@@ -44,7 +44,7 @@ namespace Application.Service
             try
             {
                 var mapper  = _mapper.Map<Notification>(request);
-                mapper.IsRead = false;
+                //mapper.IsRead = false;
                 mapper.UpdatedAt = mapper.CreatedAt;
 
                 var notiDetailMapper = new NotificationDetailRequest
@@ -77,8 +77,8 @@ namespace Application.Service
                 {
                     var isExist = _unitOfWork.NotificationDetailRepository
                                                 .Get(filter: x => x.AccountId.Equals(userId)
-                                                                && x.NotificationId.Equals(notiId)
-                                                                && x.Notification.IsRead == PrefixKeyConstant.FALSE,
+                                                                && x.NotificationId.Equals(notiId),
+                                                                //&& x.Notification.IsRead == PrefixKeyConstant.FALSE,
                                                             includeProperties: "Notification")
                                                 .FirstOrDefault();
                     if (isExist == null)
@@ -86,7 +86,7 @@ namespace Application.Service
                         continue;
                     }
 
-                    isExist.Notification.IsRead = PrefixKeyConstant.TRUE;
+                    //isExist.Notification.IsRead = PrefixKeyConstant.TRUE;
                     isExist.Notification.UpdatedAt = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.UtcNow);
                     await _unitOfWork.NotificationRepository.UpdateAsync(isExist.Notification);
                     listNoti.Add(isExist.Notification);
