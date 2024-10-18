@@ -1330,7 +1330,7 @@ namespace Persistence.Data
                     NotificationId = Guid.Parse("660d7300-f30c-40c3-b827-335544330160"),
                     Title = "Welcome Notification",
                     Message = "Welcome to the system!",
-                    isRead = false,
+                    IsRead = false,
                     CreatedAt = DateTimeOffset.Now,
                     UpdatedAt = DateTimeOffset.Now
                 },
@@ -1339,7 +1339,7 @@ namespace Persistence.Data
                     NotificationId = Guid.Parse("660d7300-f30c-40c3-b827-335544330161"),
                     Title = "System Maintenance",
                     Message = "System will undergo maintenance at midnight.",
-                    isRead = false,
+                    IsRead = false,
                     CreatedAt = DateTimeOffset.Now,
                     UpdatedAt = DateTimeOffset.Now
                 },
@@ -1349,7 +1349,7 @@ namespace Persistence.Data
                     NotificationId = Guid.Parse("660d7300-f30c-40c3-b827-335544330162"),
                     Title = "Booking Confirmation",
                     Message = "Your table reservation is confirmed!",
-                    isRead = false,
+                    IsRead = false,
                     CreatedAt = DateTimeOffset.Now,
                     UpdatedAt = DateTimeOffset.Now
                 },
@@ -1359,7 +1359,7 @@ namespace Persistence.Data
                     NotificationId = Guid.Parse("660d7300-f30c-40c3-b827-335544330163"),
                     Title = "Happy Hour Reminder",
                     Message = "Don't forget, Happy Hour starts at 5 PM today!",
-                    isRead = false,
+                    IsRead = false,
                     CreatedAt = DateTimeOffset.Now,
                     UpdatedAt = DateTimeOffset.Now
                 }
