@@ -8,6 +8,7 @@ using AutoMapper;
 using Azure.Core;
 using Domain.Constants;
 using Domain.CustomException;
+using Domain.Entities;
 using Domain.Enums;
 using Domain.IRepository;
 using Domain.Utils;
@@ -122,7 +123,7 @@ namespace Application.Service
 
             Utils.ValidateOpenCloseTime(request.Date, request.Time, tableIsExist.Bar.StartTime, tableIsExist.Bar.EndTime);
 
-            var cacheKey = $"{request.BarId}_{request.TableId}";
+            var cacheKey = $"{request.BarId}_{request.TableId}_{request.Date.Date.Date}_{request.Time}";
             var cacheEntry = _memoryCache.GetOrCreate(cacheKey, entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
@@ -184,7 +185,7 @@ namespace Application.Service
             return tableHoldInfo;
         }
 
-        public Task<List<TableHoldInfo>> HoldTableList(Guid barId)
+        public Task<List<TableHoldInfo>> HoldTableList(Guid barId, DateTimeRequest request)
         {
             var tableIsExist = _unitOfWork.TableRepository
                                         .Get(filter: x => x.BarId.Equals(barId)
@@ -193,7 +194,7 @@ namespace Application.Service
             List<TableHoldInfo> tableHolds = new List<TableHoldInfo>();
             foreach (var table in tableIsExist)
             {
-                var cacheKey = $"{barId}_{table.TableId}";
+                var cacheKey = $"{barId}_{table.TableId}_{request.Date.Date.Date}_{request.Time}";
                 var cacheEntry = _memoryCache.GetOrCreate(cacheKey, entry =>
                 {
                     return new Dictionary<Guid, TableHoldInfo>();
@@ -224,7 +225,7 @@ namespace Application.Service
                 throw new CustomException.DataNotFoundException("Không tìm thấy table trong quán bar!");
             }
 
-            var cacheKey = $"{request.BarId}_{request.TableId}";
+            var cacheKey = $"{request.BarId}_{request.TableId}_{request.Date.Date.Date}_{request.Time}";
 
             var cacheEntry = _memoryCache.GetOrCreate(cacheKey, entry =>
             {
@@ -253,12 +254,12 @@ namespace Application.Service
                 {
                     throw new CustomException.InvalidDataException("Không hợp lệ");
                 }
-                var cacheKey = $"{request.BarId}_{table.TableId}";
+                var cacheKey = $"{request.BarId}_{table.TableId}_{request.Date.Date.Date}_{table.Time}";
                 if (_memoryCache.TryGetValue(cacheKey, out Dictionary<Guid, TableHoldInfo>? cacheTbHold))
                 {
                     if (cacheTbHold.TryGetValue(table.TableId, out var tbHold))
                     {
-                        if (tbHold.Date.Date.Equals(tbHold.Date)
+                        if (tbHold.Date.Date.Date.Equals(request.Date.Date.Date)
                             && tbHold.Time.Equals(table.Time)
                             && tbHold.AccountId.Equals(accountId))
                         {

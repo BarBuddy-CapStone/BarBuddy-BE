@@ -45,11 +45,11 @@ namespace BarBuddy_API.Controllers.BookingTable
         /// <param name="barId"></param>
         /// <returns></returns>
         [HttpGet("getHoldTable/{barId}")]
-        public async Task<IActionResult> GetAllHoldTable(string barId)
+        public async Task<IActionResult> GetAllHoldTable(string barId, [FromQuery] DateTimeRequest request)
         {
             try
             {
-                var data = await _bookingTableService.HoldTableList(Guid.Parse(barId));
+                var data = await _bookingTableService.HoldTableList(Guid.Parse(barId), request);
                 return CustomResult("Đã tải dữ liệu", data);
             }
             catch (CustomException.InternalServerErrorException ex)

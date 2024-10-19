@@ -13,7 +13,7 @@ namespace Application.IService
         Task<FilterTableTypeReponse> FilterTableTypeReponse(FilterTableDateTimeRequest request);
         Task<TableHoldInfo> HoldTable(TablesRequest request);
         Task ReleaseTable (TablesRequest request);
-        Task<List<TableHoldInfo>> HoldTableList (Guid barId);
+        Task<List<TableHoldInfo>> HoldTableList (Guid barId, DateTimeRequest request);
         Task ReleaseListTable(ReleaseListTableRequest request);
     }
 }
