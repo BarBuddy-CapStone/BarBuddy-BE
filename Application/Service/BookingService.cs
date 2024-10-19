@@ -527,6 +527,10 @@ namespace Application.Service
                         booking.BookingTables?.Add(bookingTable);
                     }
                 }
+                else
+                {
+                    throw new CustomException.InvalidDataException("Booking request does not have table field");
+                }
                 if (request.Drinks != null && request.Drinks.Count > 0)
                 {
                     var drinkIds = request.Drinks.Select(drink => drink.DrinkId).ToList();
@@ -549,10 +553,6 @@ namespace Application.Service
                         booking.BookingDrinks?.Add(bookingDrink);
                     }
                     totalPrice = totalPrice - totalPrice * booking.Bar.Discount / 100;
-                }
-                else
-                {
-                    throw new CustomException.InvalidDataException("Booking request does not have table field");
                 }
 
                 var creNoti = new NotificationRequest

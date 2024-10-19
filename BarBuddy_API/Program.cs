@@ -1,4 +1,4 @@
-using Application.IService;
+﻿using Application.IService;
 using Application.Service;
 using BarBuddy_API.DependencyInjection;
 using BarBuddy_API.Middleware;
@@ -20,6 +20,17 @@ builder.Services.AddHttpContextAccessor();
 // DI
 builder.Services.AddPresentation(builder.Configuration);
 
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowAll",
+//        builder =>
+//        {
+//            builder.AllowAnyOrigin()
+//                   .AllowAnyHeader()
+//                   .AllowAnyMethod();
+//        });
+//});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -40,6 +51,8 @@ else
 }
 
 app.UseHttpsRedirection();
+//app.UseCors("AllowAll");
+//app.UseCors("AllowEditorSwagger");
 app.UseCors("AllowReactBarBuddy");
 
 // Middleware configuration

@@ -3,7 +3,10 @@ using Application.Interfaces;
 using Application.IService;
 using CoreApiResponse;
 using Domain.CustomException;
+using Firebase.Auth;
+using Infrastructure.Integrations;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 
 namespace BarBuddy_API.Controllers.Authencation
@@ -13,12 +16,14 @@ namespace BarBuddy_API.Controllers.Authencation
     public class AuthencationController : BaseController
     {
         private readonly IAuthenService _authenService;
+        private readonly IGoogleAuthService _googleAuthService;
         private readonly IOtpSender _otpSender;
 
-        public AuthencationController(IAuthenService authenService, IOtpSender otpSender)
+        public AuthencationController(IAuthenService authenService, IOtpSender otpSender, IGoogleAuthService googleAuthService)
         {
             _authenService = authenService;
             _otpSender = otpSender;
+            _googleAuthService = googleAuthService;
         }
 
         /// <summary>
@@ -36,6 +41,25 @@ namespace BarBuddy_API.Controllers.Authencation
             }
             catch (CustomException.InternalServerErrorException ex) {
                 return CustomResult(ex.Message, HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Login
+        /// </summary>
+        /// <param name="idToken"></param>
+        /// <returns></returns>
+        [HttpPost("google-login")]
+        public async Task<IActionResult> GoogleLogin([FromBody][Required] GoogleLoginRequest request)
+        {
+            try
+            {
+                var response = await _authenService.GoogleLogin(request.IdToken);
+                return CustomResult("Đăng nhập thành công !", response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Lỗi xác thực: {ex.Message}");
             }
         }
 
