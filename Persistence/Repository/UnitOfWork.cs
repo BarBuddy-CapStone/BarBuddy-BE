@@ -24,6 +24,10 @@ namespace Persistence.Repository
         private IGenericRepository<TableType> _tableTypeRepository;
         private IGenericRepository<Notification> _notificationRepository;
         private IGenericRepository<NotificationDetail> _notificationDetailRepository;
+        private IGenericRepository<BarEvent> _barEventRepository;
+        private IGenericRepository<Event> _eventRepository;
+        private IGenericRepository<TimeEvent> _timeEventRepository;
+        private IGenericRepository<EventVoucher> _eventVoucherRepository;
 
 
         public UnitOfWork()
@@ -225,7 +229,6 @@ namespace Persistence.Repository
             }
         }
 
-
         public IGenericRepository<NotificationDetail> NotificationDetailRepository
         {
             get
@@ -238,6 +241,59 @@ namespace Persistence.Repository
                 return _notificationDetailRepository;
             }
         }
+
+        public IGenericRepository<BarEvent> BarEventRepository
+        {
+            get
+            {
+
+                if (_barEventRepository == null)
+                {
+                    _barEventRepository = new GenericRepository<BarEvent>(_context);
+                }
+                return _barEventRepository;
+            }
+        }
+
+        public IGenericRepository<Event> EventRepository
+        {
+            get
+            {
+
+                if (_eventRepository == null)
+                {
+                    _eventRepository = new GenericRepository<Event>(_context);
+                }
+                return _eventRepository;
+            }
+        }
+
+        public IGenericRepository<TimeEvent> TimeEventRepository
+        {
+            get
+            {
+
+                if (_timeEventRepository == null)
+                {
+                    _timeEventRepository = new GenericRepository<TimeEvent>(_context);
+                }
+                return _timeEventRepository;
+            }
+        }
+
+        public IGenericRepository<EventVoucher> EventVoucherRepository
+        {
+            get
+            {
+
+                if (_eventVoucherRepository == null)
+                {
+                    _eventVoucherRepository = new GenericRepository<EventVoucher>(_context);
+                }
+                return _eventVoucherRepository;
+            }
+        }
+
         public async Task SaveAsync()
         {
             await _context.SaveChangesAsync();

@@ -32,6 +32,10 @@ namespace Persistence.Data
         public DbSet<PaymentHistory> PaymentHistories { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<NotificationDetail> NotificationDetails { get; set; }
+        public DbSet<BarEvent> BarEvents { get; set; }
+        public DbSet<Event> Events { get; set; }
+        public DbSet<TimeEvent> TimeEvents { get; set; }
+        public DbSet<EventVoucher> EventVouchers { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
