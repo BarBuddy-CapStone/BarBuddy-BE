@@ -194,7 +194,7 @@ namespace Application.Service
             List<TableHoldInfo> tableHolds = new List<TableHoldInfo>();
             foreach (var table in tableIsExist)
             {
-                var cacheKey = $"{barId}_{table.TableId}_{request.Date.Date.Date}_{request.Time}";
+                var cacheKey = $"{barId}_{table.TableId}_{request.Date.Date.Date.DayOfWeek}_{request.Time}";
                 var cacheEntry = _memoryCache.GetOrCreate(cacheKey, entry =>
                 {
                     return new Dictionary<Guid, TableHoldInfo>();

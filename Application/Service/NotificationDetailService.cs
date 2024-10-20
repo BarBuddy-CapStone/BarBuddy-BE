@@ -43,6 +43,7 @@ namespace Application.Service
                 }
 
                 var mapper = _mapper.Map<NotificationDetail>(request);
+                mapper.IsRead = false;
                 await _unitOfWork.NotificationDetailRepository.InsertAsync(mapper);
                 await Task.Delay(200);
                 await _unitOfWork.SaveAsync();

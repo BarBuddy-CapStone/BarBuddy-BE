@@ -14,6 +14,10 @@ namespace Application.Mappers.Notifications
         public NotificationMapper() {
             CreateMap<NotificationRequest, Notification>().ReverseMap();
             CreateMap<Notification, NotificationResponse>().ReverseMap();
+            CreateMap<NotificationDetail, NotificationResponse>()
+                .ForMember(dst => dst.IsRead, src => src.MapFrom(x => x.IsRead))
+                .ForMember(dst => dst.Title, src => src.MapFrom(x => x.Notification.Title))
+                .ForMember(dst => dst.Message, src => src.MapFrom(x => x.Notification.Message));
         }
     }
 }
