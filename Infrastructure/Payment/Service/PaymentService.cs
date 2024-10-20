@@ -254,7 +254,7 @@ namespace Infrastructure.Payment.Service
         {
             var paymentHistory = (await unitOfWork.PaymentHistoryRepository.GetAsync(
                 filter: p => p.PaymentHistoryId == paymentHistoryId,
-                includeProperties: "Account,Booking.BookingTables,Booking.BookinDrinks")).FirstOrDefault();
+                includeProperties: "Account,Booking.BookingTables.Table,Booking.BookingDrinks.Drink")).FirstOrDefault();
             if (paymentHistory == null) throw new DataNotFoundException("Not found PaymentHistory");
 
             var response = mapper.Map<PaymentDetailResponse>(paymentHistory);

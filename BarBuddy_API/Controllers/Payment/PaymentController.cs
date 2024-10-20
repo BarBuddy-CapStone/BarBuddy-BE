@@ -35,15 +35,19 @@ namespace BarBuddy_API.Controllers.Payment
         [HttpGet("vnpay-return")]
         public async Task<IActionResult> GetVnpayReturn([FromQuery] VnpayResponse vnpayReturn)
         {
-            string? redirectUrl = _configuration["Vnpay:RedirectUrl"];
+            string? redirectUrl = _configuration["Payment:SuccessUrl"];
             var result = Guid.Empty;
             try
             {
                 result = await _paymentService.ProcessVnpayPaymentReturn(vnpayReturn);
             }
+            catch (InvalidDataException)
+            {
+                redirectUrl = _configuration["Payment:FailedUrl"];
+            }
             catch (Exception ex)
             {
-               throw new Exception(ex.Message, ex);
+                redirectUrl = _configuration["Payment:Error"];
             }
             return Redirect($"{redirectUrl}{result}");
         }
@@ -56,15 +60,19 @@ namespace BarBuddy_API.Controllers.Payment
         [HttpGet("momo-return")]
         public async Task<IActionResult> GetMomoReturn([FromQuery] MomoOneTimePaymentResultRequest request)
         {
-            string? redirectUrl = _configuration["Vnpay:RedirectUrl"];
+            string? redirectUrl = _configuration["Payment:SuccessUrl"];
             var result = Guid.Empty;
             try
             {
                 result = await _paymentService.ProcessMomoPaymentReturn(request);
             }
+            catch (InvalidDataException)
+            {
+                redirectUrl = _configuration["Payment:FailedUrl"];
+            }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message, ex);
+                redirectUrl = _configuration["Payment:Error"];
             }
             return Redirect($"{redirectUrl}{result}");
         }
