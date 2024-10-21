@@ -86,6 +86,10 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<IBookingTableService, BookingTableService>();
             services.AddScoped<INotificationDetailService, NotificationDetailService>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IEventVoucherService, EventVoucherService>();
+            services.AddScoped<IEventBarService, EventBarService>();
+            services.AddScoped<IEventService, EventService>();
+            services.AddScoped<IEventTimeService, EventTimeService>();
         }
 
         //public static void AddCORS(this IServiceCollection services)

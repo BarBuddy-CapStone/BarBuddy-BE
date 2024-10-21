@@ -13,10 +13,10 @@ namespace Domain.Entities
         [Key]
         public Guid TimeEventId { get; set; }
         public Guid EventId { get; set; }
-        public DateTimeOffset Date {  get; set; }
+        public DateTimeOffset? Date {  get; set; }
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
-        public int DayOfWeek { get; set; }
+        public int? DayOfWeek { get; set; }
         [ForeignKey("EventId")]
         public virtual Event Event { get; set; }
         public virtual ICollection<EventVoucher>? EventVouchers { get; set; }
