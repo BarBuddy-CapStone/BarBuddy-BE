@@ -1307,24 +1307,24 @@ namespace Persistence.Data
                 {
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 3)
-                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330141"), // Table D1 - Bar Buddy 3
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330136"), // Table D1 - Bar Buddy 3
                 },
                 new BookingTable
                 {
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 3)
-                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330142"), // Table D1 - Bar Buddy 3
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330137"), // Table D1 - Bar Buddy 3
                 }, new BookingTable
                 {
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 3)
-                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330143"), // Table D1 - Bar Buddy 3
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330138"), // Table D1 - Bar Buddy 3
                 },
                 new BookingTable
                 {
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 3)
-                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330144"), // Table D1 - Bar Buddy 3
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330139"), // Table D1 - Bar Buddy 3
                 }
             );
 
