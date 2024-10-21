@@ -119,7 +119,10 @@ namespace Application.Service
                                                         , includeProperties: "NotificationDetails.Account");
                 var getInfo = getNotiOfCusById?.FirstOrDefault()?.NotificationDetails?.FirstOrDefault()?.Account;
                 var response = _mapper.Map<NotificationDetailResponse>(getInfo);
-                response.NotificationResponses = _mapper.Map<List<NotificationResponse>>(getNotiOfCusById);
+                if(getNotiOfCusById.Any())
+                {
+                    response.NotificationResponses = _mapper.Map<List<NotificationResponse>>(getNotiOfCusById);
+                }
 
                 return response;
             }
