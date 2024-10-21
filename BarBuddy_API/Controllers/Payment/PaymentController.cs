@@ -2,6 +2,7 @@
 using Application.DTOs.Payment.Vnpay;
 using Application.Interfaces;
 using CoreApiResponse;
+using Domain.CustomException;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BarBuddy_API.Controllers.Payment
@@ -41,7 +42,7 @@ namespace BarBuddy_API.Controllers.Payment
             {
                 result = await _paymentService.ProcessVnpayPaymentReturn(vnpayReturn);
             }
-            catch (InvalidDataException)
+            catch (CustomException.InvalidDataException)
             {
                 redirectUrl = _configuration["Payment:FailedUrl"];
             }
