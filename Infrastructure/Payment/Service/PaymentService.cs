@@ -20,6 +20,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Persistence.Repository;
 using static Domain.CustomException.CustomException;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace Infrastructure.Payment.Service
 {
@@ -162,6 +163,7 @@ namespace Infrastructure.Payment.Service
                     try
                     {
                         paymentHistory.Status = (int)PaymentStatusEnum.Success;
+                        paymentHistory.TransactionCode = $"{DateTime.Now.ToString("yyyyMMdd")}-{response.vnp_TransactionNo}";
                         await unitOfWork.PaymentHistoryRepository.UpdateAsync(paymentHistory);
                         await unitOfWork.SaveAsync();
                         return paymentHistory.PaymentHistoryId;
@@ -198,6 +200,7 @@ namespace Infrastructure.Payment.Service
                     try
                     {
                         paymentHistory.Status = (int)PaymentStatusEnum.Success;
+                        paymentHistory.TransactionCode = $"{DateTime.Now.ToString("yyyyMMdd")}-{request.transId}";
                         await unitOfWork.PaymentHistoryRepository.UpdateAsync(paymentHistory);
                         await unitOfWork.SaveAsync();
                         return paymentHistory.PaymentHistoryId;
@@ -254,7 +257,7 @@ namespace Infrastructure.Payment.Service
         {
             var paymentHistory = (await unitOfWork.PaymentHistoryRepository.GetAsync(
                 filter: p => p.PaymentHistoryId == paymentHistoryId,
-                includeProperties: "Account,Booking.BookingTables.Table,Booking.BookingDrinks.Drink")).FirstOrDefault();
+                includeProperties: "Account,Booking.BookingTables,Booking.BookingDrinks")).FirstOrDefault();
             if (paymentHistory == null) throw new DataNotFoundException("Not found PaymentHistory");
 
             var response = mapper.Map<PaymentDetailResponse>(paymentHistory);

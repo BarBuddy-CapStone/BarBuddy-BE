@@ -181,7 +181,7 @@ namespace Persistence.Data
                 {
                     BarId = new Guid("550e8400-e29b-41d4-a716-446655440004"),
                     Address = "11 Đ.Nam Quốc Cang, Phường Phạm Ngũ Lão, Quận 1",
-                    BarName = "Bar Buddy 4",
+                    BarName = "Bar Buddy 5",
                     Description = "Quán bar kết hợp giữa nhạc sống và DJ.",
                     Discount = 5,
                     Email = "contact@barbuddy5.com",
@@ -195,7 +195,7 @@ namespace Persistence.Data
                 {
                     BarId = new Guid("550e8400-e29b-41d4-a716-446655440005"),
                     Address = "41 Nam Kỳ Khởi Nghĩa, Phường Nguyễn Thái Bình, Quận 1, Hồ Chí Minh",
-                    BarName = "Bar Buddy 5",
+                    BarName = "Bar Buddy 6",
                     Description = "Không gian thoải mái với nhiều trò chơi giải trí.",
                     Discount = 10,
                     Email = "contact@barbuddy6.com",
@@ -209,7 +209,7 @@ namespace Persistence.Data
                 {
                     BarId = new Guid("550e8400-e29b-41d4-a716-446655440006"),
                     Address = "20 Đ. Nguyễn Công Trứ, Phường Nguyễn Thái Bình, Quận 1",
-                    BarName = "Bar Buddy 6",
+                    BarName = "Bar Buddy 7",
                     Description = "Nơi hội tụ của những tâm hồn yêu thích âm nhạc.",
                     Discount = 30,
                     Email = "contact@barbuddy7.com",
@@ -223,7 +223,7 @@ namespace Persistence.Data
                 {
                     BarId = new Guid("550e8400-e29b-41d4-a716-446655440007"),
                     Address = "120 Đ. Nguyễn Huệ, Bến Nghé, Quận 1",
-                    BarName = "Bar Buddy 7",
+                    BarName = "Bar Buddy 8",
                     Description = "Quán bar rooftop với tầm nhìn đẹp.",
                     Discount = 20,
                     Email = "contact@barbuddy8.com",
@@ -237,7 +237,7 @@ namespace Persistence.Data
                 {
                     BarId = new Guid("550e8400-e29b-41d4-a716-446655440008"),
                     Address = "30 Đ. Tôn Thất Tùng, Quận 1",
-                    BarName = "Bar Buddy 8",
+                    BarName = "Bar Buddy 9",
                     Description = "Quán bar dành cho các tín đồ yêu thích craft beer.",
                     Discount = 15,
                     Email = "contact@barbuddy9.com",
@@ -251,77 +251,7 @@ namespace Persistence.Data
                 {
                     BarId = new Guid("550e8400-e29b-41d4-a716-446655440009"),
                     Address = "25 Đ. Lê Duẩn, Quận 1",
-                    BarName = "Bar Buddy 9",
-                    Description = "Không gian ấm cúng với các loại cocktail độc đáo.",
-                    Discount = 10,
-                    Email = "contact@barbuddy10.com",
-                    EndTime = new TimeSpan(2, 0, 0),
-                    StartTime = new TimeSpan(19, 0, 0),
-                    Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/a0d4292c13b0cc51b2487f4c276cd7c0d96510872c4a855db190ff2db8e692d2?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
-                    PhoneNumber = "0901234576",
-                    Status = true
-                },
-                new Bar
-                {
-                    BarId = new Guid("550e8400-e29b-41d4-a716-446655440010"),
-                    Address = "25 Đ. Lê Duẩn, Quận 1",
                     BarName = "Bar Buddy 10",
-                    Description = "Không gian ấm cúng với các loại cocktail độc đáo.",
-                    Discount = 10,
-                    Email = "contact@barbuddy10.com",
-                    EndTime = new TimeSpan(2, 0, 0),
-                    StartTime = new TimeSpan(19, 0, 0),
-                    Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/a0d4292c13b0cc51b2487f4c276cd7c0d96510872c4a855db190ff2db8e692d2?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
-                    PhoneNumber = "0901234576",
-                    Status = true
-                },
-                new Bar
-                {
-                    BarId = new Guid("550e8400-e29b-41d4-a716-446655440011"),
-                    Address = "25 Đ. Lê Duẩn, Quận 1",
-                    BarName = "Bar Buddy 11",
-                    Description = "Không gian ấm cúng với các loại cocktail độc đáo.",
-                    Discount = 10,
-                    Email = "contact@barbuddy10.com",
-                    EndTime = new TimeSpan(2, 0, 0),
-                    StartTime = new TimeSpan(19, 0, 0),
-                    Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/a0d4292c13b0cc51b2487f4c276cd7c0d96510872c4a855db190ff2db8e692d2?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
-                    PhoneNumber = "0901234576",
-                    Status = true
-                },
-                new Bar
-                {
-                    BarId = new Guid("550e8400-e29b-41d4-a716-446655440012"),
-                    Address = "25 Đ. Lê Duẩn, Quận 1",
-                    BarName = "Bar Buddy 12",
-                    Description = "Không gian ấm cúng với các loại cocktail độc đáo.",
-                    Discount = 10,
-                    Email = "contact@barbuddy10.com",
-                    EndTime = new TimeSpan(2, 0, 0),
-                    StartTime = new TimeSpan(19, 0, 0),
-                    Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/a0d4292c13b0cc51b2487f4c276cd7c0d96510872c4a855db190ff2db8e692d2?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
-                    PhoneNumber = "0901234576",
-                    Status = true
-                },
-                new Bar
-                {
-                    BarId = new Guid("550e8400-e29b-41d4-a716-446655440013"),
-                    Address = "25 Đ. Lê Duẩn, Quận 1",
-                    BarName = "Bar Buddy 13",
-                    Description = "Không gian ấm cúng với các loại cocktail độc đáo.",
-                    Discount = 10,
-                    Email = "contact@barbuddy10.com",
-                    EndTime = new TimeSpan(2, 0, 0),
-                    StartTime = new TimeSpan(19, 0, 0),
-                    Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/a0d4292c13b0cc51b2487f4c276cd7c0d96510872c4a855db190ff2db8e692d2?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
-                    PhoneNumber = "0901234576",
-                    Status = true
-                },
-                new Bar
-                {
-                    BarId = new Guid("550e8400-e29b-41d4-a716-446655440014"),
-                    Address = "25 Đ. Lê Duẩn, Quận 1",
-                    BarName = "Bar Buddy 14",
                     Description = "Không gian ấm cúng với các loại cocktail độc đáo.",
                     Discount = 10,
                     Email = "contact@barbuddy10.com",
@@ -1257,189 +1187,7 @@ namespace Persistence.Data
             },
             new Drink
             {
-                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330006"),
-                DrinkCode = "D0006",
-                DrinkCategoryId = drinkCate8,
-                DrinkName = "Cà phê đen",
-                Description = "Cà phê đen pha đậm, không đường, không sữa.",
-                Price = 15000,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now,
-                Image = "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/8/14/2121767707dcce179f6866d132a2d6a384312f9-1723600454996-1723600455541950721311.jpg",
-                Status = true
-            },
-            new Drink
-            {
-                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330007"),
-                DrinkCode = "D0006",
-                DrinkCategoryId = drinkCate8,
-                DrinkName = "Cà phê đen",
-                Description = "Cà phê đen pha đậm, không đường, không sữa.",
-                Price = 15000,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now,
-                Image = "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/8/14/2121767707dcce179f6866d132a2d6a384312f9-1723600454996-1723600455541950721311.jpg",
-                Status = true
-            },
-            new Drink
-            {
-                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330008"),
-                DrinkCode = "D0006",
-                DrinkCategoryId = drinkCate8,
-                DrinkName = "Cà phê đen",
-                Description = "Cà phê đen pha đậm, không đường, không sữa.",
-                Price = 15000,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now,
-                Image = "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/8/14/2121767707dcce179f6866d132a2d6a384312f9-1723600454996-1723600455541950721311.jpg",
-                Status = true
-            },
-            new Drink
-            {
-                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330009"),
-                DrinkCode = "D0006",
-                DrinkCategoryId = drinkCate8,
-                DrinkName = "Cà phê đen",
-                Description = "Cà phê đen pha đậm, không đường, không sữa.",
-                Price = 15000,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now,
-                Image = "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/8/14/2121767707dcce179f6866d132a2d6a384312f9-1723600454996-1723600455541950721311.jpg",
-                Status = true
-            },
-            new Drink
-            {
-                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330010"),
-                DrinkCode = "D0006",
-                DrinkCategoryId = drinkCate8,
-                DrinkName = "Cà phê đen",
-                Description = "Cà phê đen pha đậm, không đường, không sữa.",
-                Price = 15000,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now,
-                Image = "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/8/14/2121767707dcce179f6866d132a2d6a384312f9-1723600454996-1723600455541950721311.jpg",
-                Status = true
-            },
-            new Drink
-            {
-                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330011"),
-                DrinkCode = "D0006",
-                DrinkCategoryId = drinkCate8,
-                DrinkName = "Cà phê đen",
-                Description = "Cà phê đen pha đậm, không đường, không sữa.",
-                Price = 15000,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now,
-                Image = "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/8/14/2121767707dcce179f6866d132a2d6a384312f9-1723600454996-1723600455541950721311.jpg",
-                Status = true
-            },
-            new Drink
-            {
-                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330012"),
-                DrinkCode = "D0006",
-                DrinkCategoryId = drinkCate8,
-                DrinkName = "Cà phê đen",
-                Description = "Cà phê đen pha đậm, không đường, không sữa.",
-                Price = 15000,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now,
-                Image = "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/8/14/2121767707dcce179f6866d132a2d6a384312f9-1723600454996-1723600455541950721311.jpg",
-                Status = true
-            },
-            new Drink
-            {
-                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330013"),
-                DrinkCode = "D0006",
-                DrinkCategoryId = drinkCate8,
-                DrinkName = "Cà phê đen",
-                Description = "Cà phê đen pha đậm, không đường, không sữa.",
-                Price = 15000,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now,
-                Image = "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/8/14/2121767707dcce179f6866d132a2d6a384312f9-1723600454996-1723600455541950721311.jpg",
-                Status = true
-            },
-            new Drink
-            {
-                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330014"),
-                DrinkCode = "D0006",
-                DrinkCategoryId = drinkCate8,
-                DrinkName = "Cà phê đen",
-                Description = "Cà phê đen pha đậm, không đường, không sữa.",
-                Price = 15000,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now,
-                Image = "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/8/14/2121767707dcce179f6866d132a2d6a384312f9-1723600454996-1723600455541950721311.jpg",
-                Status = true
-            },
-            new Drink
-            {
-                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330015"),
-                DrinkCode = "D0006",
-                DrinkCategoryId = drinkCate8,
-                DrinkName = "Cà phê đen",
-                Description = "Cà phê đen pha đậm, không đường, không sữa.",
-                Price = 15000,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now,
-                Image = "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/8/14/2121767707dcce179f6866d132a2d6a384312f9-1723600454996-1723600455541950721311.jpg",
-                Status = true
-            },
-            new Drink
-            {
-                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330016"),
-                DrinkCode = "D0006",
-                DrinkCategoryId = drinkCate8,
-                DrinkName = "Cà phê đen",
-                Description = "Cà phê đen pha đậm, không đường, không sữa.",
-                Price = 15000,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now,
-                Image = "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/8/14/2121767707dcce179f6866d132a2d6a384312f9-1723600454996-1723600455541950721311.jpg",
-                Status = true
-            },
-            new Drink
-            {
-                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330017"),
-                DrinkCode = "D0006",
-                DrinkCategoryId = drinkCate8,
-                DrinkName = "Cà phê đen",
-                Description = "Cà phê đen pha đậm, không đường, không sữa.",
-                Price = 15000,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now,
-                Image = "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/8/14/2121767707dcce179f6866d132a2d6a384312f9-1723600454996-1723600455541950721311.jpg",
-                Status = true
-            },
-            new Drink
-            {
-                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330018"),
-                DrinkCode = "D0006",
-                DrinkCategoryId = drinkCate8,
-                DrinkName = "Cà phê đen",
-                Description = "Cà phê đen pha đậm, không đường, không sữa.",
-                Price = 15000,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now,
-                Image = "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/8/14/2121767707dcce179f6866d132a2d6a384312f9-1723600454996-1723600455541950721311.jpg",
-                Status = true
-            },
-            new Drink
-            {
-                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330019"),
-                DrinkCode = "D0006",
-                DrinkCategoryId = drinkCate8,
-                DrinkName = "Cà phê đen",
-                Description = "Cà phê đen pha đậm, không đường, không sữa.",
-                Price = 15000,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now,
-                Image = "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/8/14/2121767707dcce179f6866d132a2d6a384312f9-1723600454996-1723600455541950721311.jpg",
-                Status = true
-            },
-            new Drink
-            {
-                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330020"),
+                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330005"),
                 DrinkCode = "D0006",
                 DrinkCategoryId = drinkCate8,
                 DrinkName = "Cà phê đen",
@@ -1514,24 +1262,24 @@ namespace Persistence.Data
                 {
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 3)
-                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330136"), // Table D1 - Bar Buddy 3
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330141"), // Table D1 - Bar Buddy 3
                 },
                 new BookingTable
                 {
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 3)
-                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330137"), // Table D1 - Bar Buddy 3
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330142"), // Table D1 - Bar Buddy 3
                 }, new BookingTable
                 {
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 3)
-                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330138"), // Table D1 - Bar Buddy 3
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330143"), // Table D1 - Bar Buddy 3
                 },
                 new BookingTable
                 {
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 3)
-                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330139"), // Table D1 - Bar Buddy 3
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330144"), // Table D1 - Bar Buddy 3
                 }
             );
 
@@ -1603,7 +1351,177 @@ namespace Persistence.Data
                     NotificationId = Guid.Parse("660d7300-f30c-40c3-b827-335544330163"),
                     IsRead = false,
                 }
-                );
+            );
+
+            modelBuilder.Entity<Event>().HasData(
+                new Event
+                {
+                    EventId = Guid.Parse("f32e6f00-a9b8-4d39-b47e-00bfc8d37000"),
+                    EventName = "Ladies Night",
+                    Description = "Enjoy a night of exciting DJ performances.",
+                    Images = "https://vietnamnightlife.com/uploads/images/2023/06/1685613730-single_product1-bambamladiesnight.png.webp",
+                    IsEveryWeek = true,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Guid.Parse("f32e6f00-a9b8-4d39-b47e-00bfc8d37001"),
+                    EventName = "Afterwork",
+                    Description = "Join us for a fun-filled karaoke night.",
+                    Images = "https://vietnamnightlife.com/uploads/images/2023/01/1673436242-single_product1-zionevent1.jpg.webp",
+                    IsEveryWeek = false,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Guid.Parse("f32e6f00-a9b8-4d39-b47e-00bfc8d37002"),
+                    EventName = "Fat Cash",
+                    Description = "Learn how to make amazing cocktails with our expert mixologist.",
+                    Images = "https://vietnamnightlife.com/uploads/images/2023/08/1692842361-single_product1-atmosclubevents1.png.webp",
+                    IsEveryWeek = false,
+                    IsDeleted = false
+                }
+            );
+
+            modelBuilder.Entity<TimeEvent>().HasData(
+                new TimeEvent
+                {
+                    TimeEventId = Guid.Parse("e4f23000-bd50-4f6a-9fa7-00bfc8d37010"),
+                    EventId = Guid.Parse("f32e6f00-a9b8-4d39-b47e-00bfc8d37000"),
+                    Date = new DateTimeOffset(2024, 1, 5, 0, 0, 0, TimeSpan.Zero),
+                    StartTime = new TimeSpan(20, 0, 0),
+                    EndTime = new TimeSpan(23, 0, 0),
+                    DayOfWeek = 5
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Guid.Parse("e4f23000-bd50-4f6a-9fa7-00bfc8d37011"),
+                    EventId = Guid.Parse("f32e6f00-a9b8-4d39-b47e-00bfc8d37001"),
+                    Date = new DateTimeOffset(2024, 2, 10, 0, 0, 0, TimeSpan.Zero),
+                    StartTime = new TimeSpan(19, 0, 0),
+                    EndTime = new TimeSpan(22, 0, 0),
+                    DayOfWeek = 6
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Guid.Parse("e4f23000-bd50-4f6a-9fa7-00bfc8d37012"),
+                    EventId = Guid.Parse("f32e6f00-a9b8-4d39-b47e-00bfc8d37002"),
+                    Date = null,
+                    StartTime = new TimeSpan(15, 0, 0),
+                    EndTime = new TimeSpan(18, 0, 0),
+                    DayOfWeek = 6
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Guid.Parse("e4f23000-bd50-4f6a-9fa7-00bfc8d37013"),
+                    EventId = Guid.Parse("f32e6f00-a9b8-4d39-b47e-00bfc8d37000"),
+                    Date = new DateTimeOffset(2024, 3, 15, 0, 0, 0, TimeSpan.Zero),
+                    StartTime = new TimeSpan(21, 0, 0),
+                    EndTime = new TimeSpan(23, 30, 0),
+                    DayOfWeek = 5
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Guid.Parse("e4f23000-bd50-4f6a-9fa7-00bfc8d37014"),
+                    EventId = Guid.Parse("f32e6f00-a9b8-4d39-b47e-00bfc8d37001"),
+                    Date = new DateTimeOffset(2024, 4, 1, 0, 0, 0, TimeSpan.Zero),
+                    StartTime = new TimeSpan(19, 30, 0),
+                    EndTime = new TimeSpan(22, 30, 0),
+                    DayOfWeek = 1
+                }
+            );
+
+            modelBuilder.Entity<BarEvent>().HasData(
+                new BarEvent
+                {
+                    BarEventId = Guid.Parse("a3f23000-bd50-4f6a-9fa7-00bfc8d37020"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
+                    EventId = Guid.Parse("f32e6f00-a9b8-4d39-b47e-00bfc8d37000")
+                },
+                new BarEvent
+                {
+                    BarEventId = Guid.Parse("a3f23000-bd50-4f6a-9fa7-00bfc8d37021"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+                    EventId = Guid.Parse("f32e6f00-a9b8-4d39-b47e-00bfc8d37001")
+                },
+                new BarEvent
+                {
+                    BarEventId = Guid.Parse("a3f23000-bd50-4f6a-9fa7-00bfc8d37022"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
+                    EventId = Guid.Parse("f32e6f00-a9b8-4d39-b47e-00bfc8d37002")
+                },
+                new BarEvent
+                {
+                    BarEventId = Guid.Parse("a3f23000-bd50-4f6a-9fa7-00bfc8d37023"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"),
+                    EventId = Guid.Parse("f32e6f00-a9b8-4d39-b47e-00bfc8d37000")
+                },
+                new BarEvent
+                {
+                    BarEventId = Guid.Parse("a3f23000-bd50-4f6a-9fa7-00bfc8d37024"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440004"),
+                    EventId = Guid.Parse("f32e6f00-a9b8-4d39-b47e-00bfc8d37001")
+                }
+            );
+
+            modelBuilder.Entity<EventVoucher>().HasData(
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.Parse("b3f23000-bd50-4f6a-9fa7-00bfc8d37030"),
+                    TimeEventId = Guid.Parse("e4f23000-bd50-4f6a-9fa7-00bfc8d37010"),
+                    EventVoucherName = "Ladies Night Discount",
+                    VoucherCode = "DJNIGHT10",
+                    Discount = 10,
+                    MaxPrice = 100,
+                    Quantity = 50,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.Parse("b3f23000-bd50-4f6a-9fa7-00bfc8d37031"),
+                    TimeEventId = Guid.Parse("e4f23000-bd50-4f6a-9fa7-00bfc8d37011"),
+                    EventVoucherName = "Afterwork Deal",
+                    VoucherCode = "KARAOKE20",
+                    Discount = 20,
+                    MaxPrice = 50,
+                    Quantity = 30,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.Parse("b3f23000-bd50-4f6a-9fa7-00bfc8d37032"),
+                    TimeEventId = Guid.Parse("e4f23000-bd50-4f6a-9fa7-00bfc8d37012"),
+                    EventVoucherName = "Fat Cash Offer",
+                    VoucherCode = "COCKTAIL15",
+                    Discount = 15,
+                    MaxPrice = 80,
+                    Quantity = 20,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.Parse("b3f23000-bd50-4f6a-9fa7-00bfc8d37033"),
+                    TimeEventId = Guid.Parse("e4f23000-bd50-4f6a-9fa7-00bfc8d37013"),
+                    EventVoucherName = "Late Night DJ Discount",
+                    VoucherCode = "LATEDJ10",
+                    Discount = 10,
+                    MaxPrice = 60,
+                    Quantity = 40,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.Parse("b3f23000-bd50-4f6a-9fa7-00bfc8d37034"),
+                    TimeEventId = Guid.Parse("e4f23000-bd50-4f6a-9fa7-00bfc8d37014"),
+                    EventVoucherName = "Monday Karaoke Special",
+                    VoucherCode = "MONKARAOKE5",
+                    Discount = 5,
+                    MaxPrice = 30,
+                    Quantity = 25,
+                    Status = true
+                }
+            );
+
         }
     }
 }
