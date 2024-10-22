@@ -157,7 +157,10 @@ namespace Infrastructure.Payment.Service
                 {
                     if (response.vnp_ResponseCode != "00" && response.vnp_TransactionStatus != "00")
                     {
+                        paymentHistory.Booking.Status = (int)PrefixValueEnum.Cancelled;
                         paymentHistory.Status = (int)PaymentStatusEnum.Failed;
+                        await unitOfWork.PaymentHistoryRepository.UpdateAsync(paymentHistory);
+                        await unitOfWork.SaveAsync();
                         throw new CustomException.InvalidDataException("Payment process failed");
                     }
                     try
@@ -194,7 +197,10 @@ namespace Infrastructure.Payment.Service
                 {
                     if (request.resultCode != 0)
                     {
+                        paymentHistory.Booking.Status = (int)PrefixValueEnum.Cancelled;
                         paymentHistory.Status = (int)PaymentStatusEnum.Failed;
+                        await unitOfWork.PaymentHistoryRepository.UpdateAsync(paymentHistory);
+                        await unitOfWork.SaveAsync();
                         throw new CustomException.InvalidDataException("Payment process failed");
                     }
                     try
