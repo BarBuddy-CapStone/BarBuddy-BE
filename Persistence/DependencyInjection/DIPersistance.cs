@@ -22,10 +22,10 @@ namespace Persistence.DependencyInjection
         public static void AddDatabase(this IServiceCollection services, IConfiguration configuration)
         {
 
-            var serverVersion = new MySqlServerVersion(new Version(8, 0, 23));
+            var serverVersion = new MySqlServerVersion(new Version(8, 0, 0));
             services.AddDbContext<MyDbContext>(options =>
             {
-                var connectionString = configuration.GetConnectionString("MyDB");
+                var connectionString = configuration.GetConnectionString("AzureDB");
                 options.UseMySql(connectionString, serverVersion, options => options.MigrationsAssembly("Persistence"));
             });
         }
