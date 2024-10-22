@@ -152,7 +152,11 @@ namespace Infrastructure.Payment.Service
             var isValidSignature = response.IsValidSignature(vnPayConfig.HashSecret);
             if (isValidSignature && !response.vnp_OrderInfo.IsNullOrEmpty())
             {
-                var paymentHistory = await unitOfWork.PaymentHistoryRepository.GetByIdAsync(Guid.Parse(response.vnp_OrderInfo));
+                var paymentHistory = (await unitOfWork.PaymentHistoryRepository
+                    .GetAsync(
+                        filter: x => x.PaymentHistoryId == Guid.Parse(response.vnp_OrderInfo), 
+                        includeProperties: "Booking"))
+                    .FirstOrDefault();
                 if (paymentHistory != null)
                 {
                     if (response.vnp_ResponseCode != "00" && response.vnp_TransactionStatus != "00")
@@ -192,7 +196,11 @@ namespace Infrastructure.Payment.Service
             var isValidSignature = request.IsValidSignature(momoConfig.AccessKey, momoConfig.SecretKey);
             if (isValidSignature && !request.orderInfo.IsNullOrEmpty())
             {
-                var paymentHistory = await unitOfWork.PaymentHistoryRepository.GetByIdAsync(Guid.Parse(request.orderInfo));
+                var paymentHistory = (await unitOfWork.PaymentHistoryRepository
+                    .GetAsync(
+                        filter: x => x.PaymentHistoryId == Guid.Parse(request.orderInfo),
+                        includeProperties: "Booking"))
+                    .FirstOrDefault(); 
                 if (paymentHistory != null)
                 {
                     if (request.resultCode != 0)
