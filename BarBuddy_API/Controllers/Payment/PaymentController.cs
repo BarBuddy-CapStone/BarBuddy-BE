@@ -36,7 +36,7 @@ namespace BarBuddy_API.Controllers.Payment
         [HttpGet("vnpay-return")]
         public async Task<IActionResult> GetVnpayReturn([FromQuery] VnpayResponse vnpayReturn)
         {
-            string? redirectUrl = _configuration["Vnpay:RedirectUrl"];
+            string? redirectUrl = _configuration["Payment:SuccessUrl"];
             var result = Guid.Empty;
             try
             {
@@ -61,7 +61,7 @@ namespace BarBuddy_API.Controllers.Payment
         [HttpGet("momo-return")]
         public async Task<IActionResult> GetMomoReturn([FromQuery] MomoOneTimePaymentResultRequest request)
         {
-            string? redirectUrl = _configuration["Vnpay:RedirectUrl"];
+            string? redirectUrl = _configuration["Payment:SuccessUrl"];
             var result = Guid.Empty;
             try
             {
