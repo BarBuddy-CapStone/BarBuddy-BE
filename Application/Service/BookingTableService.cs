@@ -70,10 +70,10 @@ namespace Application.Service
                     throw new CustomException.InvalidDataException("Data not found !");
                 }
 
-                var getOne = data.Where(x => x.BookingTables != null && x.BookingTables.Any()).FirstOrDefault();
+                var getOne = data.FirstOrDefault();
 
 
-                var response = _mapper.Map<FilterTableTypeReponse>(getOne.TableType);
+                var response = _mapper.Map<FilterTableTypeReponse>(getOne?.TableType);
 
                 response.BookingTables = new List<FilterBkTableResponse>
                 {

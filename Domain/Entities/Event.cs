@@ -15,7 +15,6 @@ namespace Domain.Entities
         public string Description { get; set; }
         public string Images { get; set; }
         public bool IsEveryWeek { get; set; }
-        public int Status { get; set; }
         public bool IsDeleted { get; set; }
         public virtual ICollection<TimeEvent> TimeEvent { get; set; }
         public virtual ICollection<BarEvent> BarEvent { get; set; }
