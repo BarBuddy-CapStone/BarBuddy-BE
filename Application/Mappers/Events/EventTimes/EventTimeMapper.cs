@@ -13,6 +13,7 @@ namespace Application.Mappers.Events.EventTimes
     {
         public EventTimeMapper() {
             CreateMap<EventTimeRequest, TimeEvent>().ReverseMap();
+            CreateMap<TimeEvent, EventTimeResponse>().ReverseMap();
         }
     }
 }

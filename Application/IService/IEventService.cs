@@ -1,4 +1,6 @@
 ﻿using Application.DTOs.Event;
+using Application.DTOs.Events;
+using Domain.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +12,7 @@ namespace Application.IService
     public interface IEventService
     {
         Task CreateEvent(EventRequest request);
+        Task<List<EventResponse>> GetAllEvent(EventQuery query);
+        Task<EventResponse> GetOneEvent(Guid eventId);
     }
 }

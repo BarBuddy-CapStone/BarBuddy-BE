@@ -1,8 +1,10 @@
 ﻿using Application.DTOs.Event;
+using Application.DTOs.Events;
 using Application.IService;
 using CoreApiResponse;
 using Domain.CustomException;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace BarBuddy_API.Controllers.Event
 {
@@ -16,7 +18,41 @@ namespace BarBuddy_API.Controllers.Event
         {
             _eventService = eventService;
         }
+        [HttpGet]
+        public async Task<IActionResult> GetAllEvent([FromQuery] EventQuery query)
+        {
+            try
+            {
+                var response = await _eventService.GetAllEvent(query);
+                return CustomResult("Đã tải dữ liệu thành công", response);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.NotFound);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.InternalServerError);
+            }
+        }
 
+        [HttpGet("getOne/{eventId}")]
+        public async Task<IActionResult> GetOneEvent(Guid eventId)
+        {
+            try
+            {
+                var response = await _eventService.GetOneEvent(eventId);
+                return CustomResult("Đã tải dữ liệu thành công", response);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.NotFound);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.InternalServerError);
+            }
+        }
         [HttpPost("createEvent")]
         public async Task<IActionResult> CreateEvent([FromBody] EventRequest request)
         {
@@ -24,9 +60,18 @@ namespace BarBuddy_API.Controllers.Event
             {
                 await _eventService.CreateEvent(request);
                 return CustomResult("Đã tạo thành công");
-            }catch(CustomException.InternalServerErrorException ex)
+            }
+            catch (CustomException.DataNotFoundException ex)
             {
-                throw new CustomException.InternalServerErrorException(ex.Message);
+                return CustomResult(ex.Message, HttpStatusCode.NotFound);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.BadRequest);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.InternalServerError);
             }
         }
     }
