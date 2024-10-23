@@ -218,5 +218,9 @@ namespace Persistence.Repository
             return await query.ToListAsync();
         }
 
+        public async Task<int> CountAsync()
+        {
+            return await dbSet.CountAsync();
+        }
     }
 }

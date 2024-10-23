@@ -42,5 +42,7 @@ namespace Domain.IRepository
         string includeProperties = "",
         int? pageIndex = null,
         int? pageSize = null);
+
+        Task<int> CountAsync();
     }
 }

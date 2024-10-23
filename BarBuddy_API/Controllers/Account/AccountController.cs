@@ -2,6 +2,7 @@
 using Application.IService;
 using Application.Service;
 using Azure.Core;
+using CoreApiResponse;
 using Domain.CustomException;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -14,7 +15,7 @@ namespace BarBuddy_API.Controllers.Account
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AccountController : ControllerBase
+    public class AccountController : BaseController
     {
         private readonly IAccountService _accountService;
 
@@ -37,11 +38,11 @@ namespace BarBuddy_API.Controllers.Account
             var result = new
             {
                 items = accountList.items,
-                count = accountList.count,
+                total = accountList.total,
                 pageIndex = pageIndex,
                 pageSize = pageSize
             };
-            return Ok(result);
+            return CustomResult(result);
         }
 
         /// <summary>
@@ -58,11 +59,11 @@ namespace BarBuddy_API.Controllers.Account
             var result = new
             {
                 items = accountList.items,
-                count = accountList.count,
+                total = accountList.total,
                 pageIndex = pageIndex,
                 pageSize = pageSize
             };
-            return Ok(result);
+            return CustomResult(result);
         }
 
         /// <summary>
@@ -75,7 +76,7 @@ namespace BarBuddy_API.Controllers.Account
         public async Task<IActionResult> GetStaffAccountById([FromQuery] Guid accountId)
         {
             var staffAccount = await _accountService.GetStaffAccountById(accountId);
-            return Ok(staffAccount);
+            return CustomResult(staffAccount);
         }
 
         /// <summary>
@@ -88,7 +89,7 @@ namespace BarBuddy_API.Controllers.Account
         public async Task<IActionResult> GetCustomerAccountByEmail([FromQuery] Guid accountId)
         {
             var customerAccount = await _accountService.GetCustomerAccountById(accountId);
-            return Ok(customerAccount);
+            return CustomResult(customerAccount);
         }
 
         /// <summary>
@@ -100,7 +101,7 @@ namespace BarBuddy_API.Controllers.Account
         public async Task<IActionResult> GetCustomerAccountById(Guid accountId)
         {
             var customerAccount = await _accountService.GetCustomerInfoById(accountId);
-            return Ok(customerAccount);
+            return CustomResult(customerAccount);
         }
 
         /// <summary>
@@ -117,7 +118,7 @@ namespace BarBuddy_API.Controllers.Account
                 return BadRequest(ModelState);
             }
             var result = await _accountService.CreateStaffAccount(request);
-            return Ok(result);
+            return CustomResult(result);
         }
 
         /// <summary>
@@ -134,7 +135,7 @@ namespace BarBuddy_API.Controllers.Account
                 return BadRequest(ModelState);
             }
             var result = await _accountService.CreateCustomerAccount(request);
-            return Ok(result);
+            return CustomResult(result);
         }
 
         /// <summary>
@@ -152,7 +153,7 @@ namespace BarBuddy_API.Controllers.Account
                 return BadRequest(ModelState);
             }
             var result = await _accountService.UpdateStaffAccount(accountId, request);
-            return Ok(result);
+            return CustomResult(result);
         }
 
         /// <summary>
@@ -170,7 +171,7 @@ namespace BarBuddy_API.Controllers.Account
                 return BadRequest(ModelState);
             }
             var result = await _accountService.UpdateCustomerAccount(accountId, request);
-            return Ok(result);
+            return CustomResult(result);
         }
 
         /// <summary>
@@ -188,7 +189,7 @@ namespace BarBuddy_API.Controllers.Account
                 return BadRequest(ModelState);
             }
             await _accountService.UpdateCustomerAccountByCustomer(accountId, request);
-            return Ok("Update thành công");
+            return CustomResult("Update thành công");
         }
 
         /// <summary>
@@ -202,7 +203,7 @@ namespace BarBuddy_API.Controllers.Account
         public async Task<IActionResult> UpdateCustomerAvatar(Guid accountId, [FromForm] IFormFile Image)
         {
             var res = await _accountService.UpdateCustomerAvatar(accountId, Image);
-            return Ok(new {url = res});
+            return CustomResult(new {url = res});
         }
     }
 }

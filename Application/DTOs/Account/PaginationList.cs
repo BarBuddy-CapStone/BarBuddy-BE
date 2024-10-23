@@ -10,7 +10,7 @@ namespace Application.DTOs.Account
     public class PaginationList<T> where T : class
     {
         public IEnumerable<T> items;
-        public int count;
+        public int total;
         //public int pageSize;
         //public int pageIndex;
     }

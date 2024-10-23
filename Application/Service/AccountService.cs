@@ -22,6 +22,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Transactions;
 using static Domain.CustomException.CustomException;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -261,9 +262,16 @@ namespace Application.Service
                     throw new DataNotFoundException("Failed to get role info");
                 }
                 var roleIdGuid = role.RoleId;
-                var accountIEnumerable = await _accountRepository.GetAsync(filter: a => a.RoleId.Equals(roleIdGuid),
-                    pageSize: pageSize, pageIndex: pageIndex,
-                    includeProperties: "Bar"); var items = _mapper.Map<IEnumerable<StaffAccountResponse>>(accountIEnumerable);
+                var accountIEnumerable = await _accountRepository.GetAsync(
+                    filter: a => a.RoleId.Equals(roleIdGuid),
+                    includeProperties: "Bar");
+                var total = accountIEnumerable.Count();
+
+                int validPageIndex = pageIndex > 0 ? pageIndex - 1 : 0;
+                int validPageSize = pageSize > 0 ? pageSize : 10;
+                accountIEnumerable = accountIEnumerable.Skip(validPageIndex * validPageSize).Take(validPageSize);
+
+                var items = _mapper.Map<IEnumerable<StaffAccountResponse>>(accountIEnumerable);
                 if (items == null || !items.Any())
                 {
                     throw new DataNotFoundException("Staff's accounts is empty list");
@@ -271,7 +279,7 @@ namespace Application.Service
                 var result = new PaginationList<StaffAccountResponse>
                 {
                     items = items,
-                    count = items.Count(),
+                    total = items.Count(),
                     //pageIndex = pageIndex,
                     //pageSize = pageSize
                 };
@@ -297,13 +305,19 @@ namespace Application.Service
                     throw new DataNotFoundException("Failed to get role info");
                 }
                 var roleIdGuid = role.RoleId;
-                var accountIEnumerable = await _accountRepository.GetAsync(filter: a => a.RoleId.Equals(roleIdGuid), 
-                    pageSize: pageSize, pageIndex: pageIndex);
+                var accountIEnumerable = await _accountRepository.GetAsync(
+                    filter: a => a.RoleId.Equals(roleIdGuid));
+                var total = accountIEnumerable.Count();
+
+                int validPageIndex = pageIndex > 0 ? pageIndex - 1 : 0;
+                int validPageSize = pageSize > 0 ? pageSize : 10;
+                accountIEnumerable = accountIEnumerable.Skip(validPageIndex * validPageSize).Take(validPageSize);
+
                 var items = _mapper.Map<IEnumerable<CustomerAccountResponse>>(accountIEnumerable);
                 var result = new PaginationList<CustomerAccountResponse>
                 {
                     items = items,
-                    count = items.Count(),
+                    total = total,
                     //pageIndex = pageIndex,
                     //pageSize = pageSize
                 };
