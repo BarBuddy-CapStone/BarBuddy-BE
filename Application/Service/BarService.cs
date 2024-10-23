@@ -10,6 +10,10 @@ using System.Transactions;
 using Domain.Constants;
 using Microsoft.AspNetCore.Http;
 using Application.Common;
+using Domain.Enums;
+using Domain.Utils;
+using Domain.Common;
+using System.Linq.Expressions;
 
 namespace Application.Service
 {
@@ -37,7 +41,7 @@ namespace Application.Service
             {
                 try
                 {
-                    if(request.Images.IsNullOrEmpty())
+                    if (request.Images.IsNullOrEmpty())
                     {
                         throw new CustomException.InvalidDataException("Invalid data");
                     }
@@ -89,14 +93,55 @@ namespace Application.Service
             return response;
         }
 
-        public async Task<IEnumerable<BarResponse>> GetAllBarWithFeedback()
+        public async Task<IEnumerable<BarResponse>> GetAllBarWithFeedback(ObjectQuery query)
         {
-            var bars = await _unitOfWork.BarRepository.GetAsync(includeProperties: "Feedbacks");
+
+            Expression<Func<Bar, bool>> filter = null;
+
+            if(!string.IsNullOrWhiteSpace(query.Search))
+            {
+                filter = barName => barName.BarName.Contains(query.Search);
+            }
+
+            var bars = await _unitOfWork.BarRepository
+                                    .GetAsync(filter: filter,
+                                                        pageIndex: query.PageIndex, 
+                                                        pageSize: query.PageSize,
+                                                        includeProperties: "Feedbacks");
+
+            var currentDateTime = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now);
+            var response = new List<BarResponse>();
+
+
+
             if (bars.IsNullOrEmpty() || !bars.Any())
             {
                 throw new CustomException.DataNotFoundException("The list is empty !");
             }
-            var response = _mapper.Map<IEnumerable<BarResponse>>(bars);
+
+            foreach (var bar in bars)
+            {
+                var tables = await _unitOfWork.TableRepository
+                                                .GetAsync(t => t.BarId == bar.BarId && t.IsDeleted == false);
+                bool isAnyTableAvailable = false;
+                foreach (var table in tables)
+                {
+                    var reservations = await _unitOfWork.BookingTableRepository
+                                                        .GetAsync(bt => bt.TableId == table.TableId &&
+                                                                         (bt.ReservationDate + bt.ReservationTime) >= currentDateTime &&
+                                                                         (bt.Booking.Status == (int)PrefixValueEnum.Pending ||
+                                                                            bt.Booking.Status == (int)PrefixValueEnum.Serving));
+
+                    if (!reservations.Any())
+                    {
+                        isAnyTableAvailable = true;
+                        break;
+                    }
+                }
+                var mapper = _mapper.Map<BarResponse>(bar);
+                mapper.IsAnyTableAvailable = isAnyTableAvailable;
+                response.Add(mapper);
+            }
             return response;
         }
 
@@ -115,7 +160,10 @@ namespace Application.Service
 
         public async Task<BarResponse> GetBarByIdWithFeedback(Guid barId)
         {
-            var getBarById = (await _unitOfWork.BarRepository.GetAsync(filter: a => a.BarId == barId, 
+            bool isAnyTableAvailable = false;
+            var response = new BarResponse();
+            var currentDateTime = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now);
+            var getBarById = (await _unitOfWork.BarRepository.GetAsync(filter: a => a.BarId == barId,
                     includeProperties: "Feedbacks")).FirstOrDefault();
 
             if (getBarById == null)
@@ -123,7 +171,25 @@ namespace Application.Service
                 throw new CustomException.DataNotFoundException("Data not Found !");
             }
 
-            var response = _mapper.Map<BarResponse>(getBarById);
+            var tables = await _unitOfWork.TableRepository
+                                                .GetAsync(t => t.BarId == getBarById.BarId && t.IsDeleted == false);
+
+            foreach (var table in tables)
+            {
+                var reservations = await _unitOfWork.BookingTableRepository
+                                                    .GetAsync(bt => bt.TableId == table.TableId &&
+                                                                     (bt.ReservationDate + bt.ReservationTime) >= currentDateTime &&
+                                                                     (bt.Booking.Status == (int)PrefixValueEnum.Pending ||
+                                                                        bt.Booking.Status == (int)PrefixValueEnum.Serving));
+
+                if (!reservations.Any())
+                {
+                    isAnyTableAvailable = true;
+                    break;
+                }
+                response = _mapper.Map<BarResponse>(getBarById);
+                response.IsAnyTableAvailable = isAnyTableAvailable;
+            }
             return response;
         }
 
@@ -165,7 +231,7 @@ namespace Application.Service
                         imgsUpload = Utils.CheckValidateImageFile(request.Images);
                     }
 
-                    if(request.imgsAsString.IsNullOrEmpty() && getBarById.Images.IsNullOrEmpty())
+                    if (request.imgsAsString.IsNullOrEmpty() && getBarById.Images.IsNullOrEmpty())
                     {
                         throw new CustomException.InvalidDataException("Invalid data");
                     }
