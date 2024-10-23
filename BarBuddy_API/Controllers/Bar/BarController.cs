@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.Bar;
 using Application.IService;
 using CoreApiResponse;
+using Domain.Common;
 using Domain.CustomException;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -46,11 +47,11 @@ namespace BarBuddy_API.Controllers.Bar
         /// </summary>
         /// <returns></returns>
         [HttpGet("/api/v1/bars")]
-        public async Task<IActionResult> GetAllBarWithFeedback()
+        public async Task<IActionResult> GetAllBarWithFeedback([FromQuery] ObjectQuery query)
         {
             try
             {
-                var response = await _barService.GetAllBarWithFeedback();
+                var response = await _barService.GetAllBarWithFeedback(query);
                 return CustomResult("Data loaded", response);
             }
             catch (CustomException.DataNotFoundException e)

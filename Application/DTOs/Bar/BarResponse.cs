@@ -21,6 +21,7 @@ namespace Application.DTOs.Bar
         public string Images { get; set; }
         public double Discount { get; set; }
         public bool Status { get; set; }
+        public bool IsAnyTableAvailable { get; set; }
         public ICollection<FeedBackResponse>? FeedBacks { get; set; }
         public ICollection<TableResponse>? Tables { get; set; }
     }
