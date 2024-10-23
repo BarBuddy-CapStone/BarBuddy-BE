@@ -160,16 +160,11 @@ namespace Application.Service
 
         public async Task<BarResponse> GetBarByIdWithFeedback(Guid barId)
         {
-<<<<<<< HEAD
-            var getBarById = (await _unitOfWork.BarRepository.GetAsync(filter: a => a.BarId == barId, 
-                    includeProperties: "Feedbacks.Account")).FirstOrDefault();
-=======
             bool isAnyTableAvailable = false;
             var response = new BarResponse();
             var currentDateTime = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now);
             var getBarById = (await _unitOfWork.BarRepository.GetAsync(filter: a => a.BarId == barId,
                     includeProperties: "Feedbacks")).FirstOrDefault();
->>>>>>> origin/tiendev
 
             if (getBarById == null)
             {
