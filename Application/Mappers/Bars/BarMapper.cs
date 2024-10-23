@@ -13,8 +13,7 @@ namespace Application.Mappers.Bars
     {
         public BarMapper() {
             CreateMap<Bar, BarResponse>();
-            CreateMap<BarRequest, Bar>()
-                .ReverseMap();
+            CreateMap<BarRequest, Bar>().ReverseMap();
         }
     }
 }

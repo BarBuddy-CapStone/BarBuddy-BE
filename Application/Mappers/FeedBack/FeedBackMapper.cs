@@ -15,7 +15,10 @@ namespace Application.Mappers.FeedBack
     {
         public FeedBackMapper()
         {
-            CreateMap<Feedback, FeedBackResponse>().ReverseMap();
+            CreateMap<Feedback, FeedBackResponse>()
+                .ForMember(x => x.ImageAccount, opt => opt.MapFrom(x => x.Account.Image))
+                .ForMember(x => x.AccountName, opt => opt.MapFrom(x => x.Account.Fullname))
+                .ReverseMap();
             CreateMap<CreateFeedBackRequest, Feedback>().ReverseMap();
             CreateMap<UpdateFeedBackRequest, Feedback>().ReverseMap();
             CreateMap<DeleteFeedBackRequest, Feedback>().ReverseMap();

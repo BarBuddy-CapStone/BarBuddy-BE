@@ -12,6 +12,8 @@ namespace Application.DTOs.Response.FeedBack
         //public Guid FeedbackId { get; set; } 
         //public Guid AccountId { get; set; }
         public Guid BookingId { get; set; }
+        public string? ImageAccount { get; set; }
+        public string? AccountName { get; set; }
         public Guid BarId { get; set; }
         public int Rating { get; set; }
         public string Comment { get; set; }

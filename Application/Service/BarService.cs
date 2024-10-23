@@ -116,7 +116,7 @@ namespace Application.Service
         public async Task<BarResponse> GetBarByIdWithFeedback(Guid barId)
         {
             var getBarById = (await _unitOfWork.BarRepository.GetAsync(filter: a => a.BarId == barId, 
-                    includeProperties: "Feedbacks")).FirstOrDefault();
+                    includeProperties: "Feedbacks.Account")).FirstOrDefault();
 
             if (getBarById == null)
             {

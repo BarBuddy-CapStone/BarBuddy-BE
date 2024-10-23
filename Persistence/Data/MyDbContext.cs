@@ -1522,6 +1522,105 @@ namespace Persistence.Data
                 }
             );
 
+            modelBuilder.Entity<Feedback>().HasData(
+                new Feedback
+                {
+                    FeedbackId = Guid.Parse("770e8400-e29b-41d4-b716-446655440000"),
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440001"), // Neymar Jr
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Booking 1
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Bar Buddy 1
+                    Rating = 5,
+                    Comment = "Excellent experience! Will definitely come back.",
+                    IsDeleted = false,
+                    CreatedTime = DateTimeOffset.Now,
+                    LastUpdatedTime = DateTimeOffset.Now
+                },
+                new Feedback
+                {
+                    FeedbackId = Guid.Parse("770e8400-e29b-41d4-b716-446655440001"),
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440002"), // Lionel Messi
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"), // Booking 2
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"), // Bar Buddy 2
+                    Rating = 4,
+                    Comment = "Great atmosphere, but the service could be faster.",
+                    IsDeleted = false,
+                    CreatedTime = DateTimeOffset.Now,
+                    LastUpdatedTime = DateTimeOffset.Now
+                },
+                new Feedback
+                {
+                    FeedbackId = Guid.Parse("770e8400-e29b-41d4-b716-446655440002"),
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440003"), // Foden
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"), // Booking 3
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Bar Buddy 3
+                    Rating = 3,
+                    Comment = "Good drinks, but the music was too loud for conversation.",
+                    IsDeleted = false,
+                    CreatedTime = DateTimeOffset.Now,
+                    LastUpdatedTime = DateTimeOffset.Now
+                },
+                new Feedback
+                {
+                    FeedbackId = Guid.Parse("770e8400-e29b-41d4-b716-446655440003"),
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440004"), // Mbappe
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"), // Bar Buddy 3
+                    Rating = 5,
+                    Comment = "Loved the VIP service. Highly recommended!",
+                    IsDeleted = false,
+                    CreatedTime = DateTimeOffset.Now,
+                    LastUpdatedTime = DateTimeOffset.Now
+                },
+                new Feedback
+                {
+                    FeedbackId = Guid.Parse("770e8400-e29b-41d4-b716-446655440004"),
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440001"), // Neymar Jr
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"), // Booking 2
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"), // Bar Buddy 2
+                    Rating = 4,
+                    Comment = "Nice vibe, will return soon!",
+                    IsDeleted = false,
+                    CreatedTime = DateTimeOffset.Now,
+                    LastUpdatedTime = DateTimeOffset.Now
+                },
+                new Feedback
+                {
+                    FeedbackId = Guid.Parse("770e8400-e29b-41d4-b716-446655440005"),
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440002"), // Lionel Messi
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Booking 1
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Bar Buddy 1
+                    Rating = 5,
+                    Comment = "Great cocktails and ambiance!",
+                    IsDeleted = false,
+                    CreatedTime = DateTimeOffset.Now,
+                    LastUpdatedTime = DateTimeOffset.Now
+                },
+                new Feedback
+                {
+                    FeedbackId = Guid.Parse("770e8400-e29b-41d4-b716-446655440006"),
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440003"), // Foden
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"), // Bar Buddy 3
+                    Rating = 2,
+                    Comment = "The experience was okay, but the place was too crowded.",
+                    IsDeleted = false,
+                    CreatedTime = DateTimeOffset.Now,
+                    LastUpdatedTime = DateTimeOffset.Now
+                },
+                new Feedback
+                {
+                    FeedbackId = Guid.Parse("770e8400-e29b-41d4-b716-446655440007"),
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440004"), // Mbappe
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Booking 1
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Bar Buddy 1
+                    Rating = 3,
+                    Comment = "Good drinks, but music selection was disappointing.",
+                    IsDeleted = false,
+                    CreatedTime = DateTimeOffset.Now,
+                    LastUpdatedTime = DateTimeOffset.Now
+                }
+            );
+
         }
     }
 }
