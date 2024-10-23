@@ -187,9 +187,10 @@ namespace Application.Service
                     isAnyTableAvailable = true;
                     break;
                 }
-                response = _mapper.Map<BarResponse>(getBarById);
-                response.IsAnyTableAvailable = isAnyTableAvailable;
             }
+
+            response = _mapper.Map<BarResponse>(getBarById);
+            response.IsAnyTableAvailable = isAnyTableAvailable;
             return response;
         }
 
