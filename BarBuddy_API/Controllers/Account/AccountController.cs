@@ -101,7 +101,7 @@ namespace BarBuddy_API.Controllers.Account
         public async Task<IActionResult> GetCustomerAccountById(Guid accountId)
         {
             var customerAccount = await _accountService.GetCustomerInfoById(accountId);
-            return CustomResult(customerAccount);
+            return Ok(customerAccount);
         }
 
         /// <summary>

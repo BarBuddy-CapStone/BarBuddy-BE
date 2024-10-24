@@ -404,13 +404,15 @@ namespace Application.Service
                     throw new CustomException.DataNotFoundException("Khách hàng không tồn tại.");
                 }
                 var role = await _unitOfWork.RoleRepository.GetByIdAsync(account.RoleId);
-                if (role.RoleName != "CUSTOMER") {
+                if (role.RoleName != "CUSTOMER")
+                {
                     throw new ForbbidenException("Bạn không thể truy cập");
                 }
                 var response = _mapper.Map<CustomerInfoResponse>(account);
                 return response;
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
