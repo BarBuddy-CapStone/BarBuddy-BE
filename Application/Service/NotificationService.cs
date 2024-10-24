@@ -11,6 +11,7 @@ using Domain.Utils;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Identity.Client;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -113,14 +114,17 @@ namespace Application.Service
                 {
                     throw new CustomException.InvalidDataException("Bạn không có quyền !");
                 }
-
+                var response = new NotificationDetailResponse();
                 var getNotiOfCusById = await _unitOfWork.NotificationRepository
                                                     .GetAsync(filter: x => x.NotificationDetails.Any(x => x.AccountId.Equals(accountId))
                                                         , includeProperties: "NotificationDetails.Account");
-                var getInfo = getNotiOfCusById?.FirstOrDefault()?.NotificationDetails?.FirstOrDefault()?.Account;
-                var response = _mapper.Map<NotificationDetailResponse>(getInfo);
-                response.NotificationResponses = _mapper.Map<List<NotificationResponse>>(getNotiOfCusById);
-
+                if(!getNotiOfCusById.IsNullOrEmpty())
+                {
+                    var getInfo = getNotiOfCusById?.FirstOrDefault()?.NotificationDetails?.FirstOrDefault()?.Account;
+                    response = _mapper.Map<NotificationDetailResponse>(getInfo);
+                    response.NotificationResponses = _mapper.Map<List<NotificationResponse>>(getNotiOfCusById);
+                }
+                response.AccountId = accountId;
                 return response;
             }
             catch (CustomException.InternalServerErrorException ex)

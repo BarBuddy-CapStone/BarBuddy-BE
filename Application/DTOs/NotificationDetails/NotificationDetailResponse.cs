@@ -11,6 +11,6 @@ namespace Application.DTOs.NotificationDetails
     {
         public Guid AccountId { get; set; }
         public string Fullname { get; set; }
-        public List<NotificationResponse> NotificationResponses { get; set; }
+        public List<NotificationResponse>? NotificationResponses { get; set; }
     }
 }
