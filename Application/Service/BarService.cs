@@ -93,7 +93,7 @@ namespace Application.Service
             return response;
         }
 
-        public async Task<IEnumerable<BarResponse>> GetAllBarWithFeedback(ObjectQuery query)
+        public async Task<IEnumerable<OnlyBarResponse>> GetAllBarWithFeedback(ObjectQuery query)
         {
 
             Expression<Func<Bar, bool>> filter = null;
@@ -110,7 +110,7 @@ namespace Application.Service
                                                         includeProperties: "Feedbacks");
 
             var currentDateTime = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now);
-            var response = new List<BarResponse>();
+            var response = new List<OnlyBarResponse>();
 
 
 
@@ -138,7 +138,7 @@ namespace Application.Service
                         break;
                     }
                 }
-                var mapper = _mapper.Map<BarResponse>(bar);
+                var mapper = _mapper.Map<OnlyBarResponse>(bar);
                 mapper.IsAnyTableAvailable = isAnyTableAvailable;
                 response.Add(mapper);
             }

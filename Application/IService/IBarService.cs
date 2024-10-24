@@ -9,7 +9,7 @@ namespace Application.IService
         Task<BarResponse> CreateBar(BarRequest request);
         Task<BarResponse> GetBarById(Guid barId);
         Task<BarResponse> UpdateBarById(Guid barId, BarRequest request);
-        Task<IEnumerable<BarResponse>> GetAllBarWithFeedback(ObjectQuery query);
+        Task<IEnumerable<OnlyBarResponse>> GetAllBarWithFeedback(ObjectQuery query);
         Task<BarResponse> GetBarByIdWithFeedback(Guid barId);
         Task<BarResponse> GetBarByIdWithTable(Guid barId);
     }
