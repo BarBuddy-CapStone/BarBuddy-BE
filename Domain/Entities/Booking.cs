@@ -17,7 +17,7 @@ namespace Domain.Entities
         public Guid AccountId { get; set; } = Guid.NewGuid();
         public Guid BarId { get; set; } = Guid.NewGuid();
         public string BookingCode { get; set; }
-        public DateTimeOffset BookingDate { get; set; }
+        public DateTime BookingDate { get; set; }
         public TimeSpan BookingTime { get; set; }
         public string? Note {  get; set; }
         public bool IsIncludeDrink {  get; set; }
@@ -34,7 +34,7 @@ namespace Domain.Entities
 
         public Booking ()
         {
-            BookingDate = CoreHelper.SystemTimeNow;
+            BookingDate = CoreHelper.SystemTimeNow.Date;
         }
     }
 }

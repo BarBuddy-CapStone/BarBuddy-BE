@@ -164,7 +164,7 @@ namespace Application.Service
             var response = new BarResponse();
             var currentDateTime = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now);
             var getBarById = (await _unitOfWork.BarRepository.GetAsync(filter: a => a.BarId == barId,
-                    includeProperties: "Feedbacks")).FirstOrDefault();
+                    includeProperties: "Feedbacks.Account")).FirstOrDefault();
 
             if (getBarById == null)
             {

@@ -14,6 +14,7 @@ using Domain.Enums;
 using Domain.IRepository;
 using Domain.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.SqlServer.Server;
 using System.Linq.Expressions;
 using static Domain.CustomException.CustomException;
 
@@ -54,7 +55,7 @@ namespace Application.Service
                     throw new CustomException.DataNotFoundException("Bạn không thể hủy đặt bàn.");
                 }
 
-                DateTime BookingDateTime = booking.BookingDate.DateTime + booking.BookingTime;
+                DateTime BookingDateTime = booking.BookingDate.ToUniversalTime() + booking.BookingTime;
                 if (BookingDateTime < DateTime.Now.AddHours(2))
                 {
                     return false;
@@ -273,7 +274,7 @@ namespace Application.Service
                 (string.IsNullOrEmpty(CustomerName) || b.Account.Fullname.Contains(CustomerName)) &&
                 (string.IsNullOrEmpty(Phone) || b.Account.Phone.Contains(Phone)) &&
                 (string.IsNullOrEmpty(Email) || b.Account.Email.Contains(Email)) &&
-                (!bookingDate.HasValue || b.BookingDate.Date == bookingDate.Value.Date) &&
+                (!bookingDate.HasValue || b.BookingDate.Date.Day == bookingDate.Value.Date.Day) &&
                 (!bookingTime.HasValue || b.BookingTime == bookingTime.Value) &&
                 (!Status.HasValue || b.Status == Status.Value);
 
@@ -375,7 +376,7 @@ namespace Application.Service
                     booking.Bar.StartTime, booking.Bar.EndTime);
 
                 booking.BookingTables = booking.BookingTables ?? new List<BookingTable>();
-                booking.BookingCode = $"{booking.BookingDate.ToString("yymmdd")}{RandomHelper.GenerateRandomNumberString()}";
+                booking.BookingCode = $"{booking.BookingDate.ToString("yyMMdd")}{RandomHelper.GenerateRandomNumberString()}";
                 booking.Status = (int)PaymentStatusEnum.Pending;
                 booking.IsIncludeDrink = false;
 
@@ -393,7 +394,7 @@ namespace Application.Service
                         {
                             BookingId = booking.BookingId,
                             TableId = tableId,
-                            ReservationDate = request.BookingDate,
+                            ReservationDate = request.BookingDate.Date,
                             ReservationTime = request.BookingTime
                         };
 
@@ -498,6 +499,7 @@ namespace Application.Service
 
                 booking.BookingTables = booking.BookingTables ?? new List<BookingTable>();
                 booking.BookingDrinks = booking.BookingDrinks ?? new List<BookingDrink>();
+                booking.BookingDate = request.BookingDate.Date;
                 booking.BookingCode = $"BOOKING-{RandomHelper.GenerateRandomNumberString()}";
                 booking.Status = (int)PaymentStatusEnum.Pending;
                 booking.IsIncludeDrink = true;

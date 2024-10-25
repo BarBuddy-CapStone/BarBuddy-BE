@@ -99,6 +99,69 @@ namespace Persistence.Data
                 }
             );
 
+            modelBuilder.Entity<DrinkEmotionalCategory>().HasData(
+                new DrinkEmotionalCategory
+                {
+                    DrinkEmotionalCategoryId = Guid.Parse("660d7300-f30c-30c3-b827-335544330100"),
+                    EmotionalDrinkCategoryId = vuiId,
+                    DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330000") // Coca Cola
+                },
+                new DrinkEmotionalCategory
+                {
+                    DrinkEmotionalCategoryId = Guid.Parse("660d7300-f30c-30c3-b827-335544330101"),
+                    EmotionalDrinkCategoryId = buonId,
+                    DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330001") // Mojito
+                },
+                new DrinkEmotionalCategory
+                {
+                    DrinkEmotionalCategoryId = Guid.Parse("660d7300-f30c-30c3-b827-335544330102"),
+                    EmotionalDrinkCategoryId = hanhPhucId,
+                    DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330002") // Trà Đào
+                },
+                new DrinkEmotionalCategory
+                {
+                    DrinkEmotionalCategoryId = Guid.Parse("660d7300-f30c-30c3-b827-335544330103"),
+                    EmotionalDrinkCategoryId = tucGianId,
+                    DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330003") // Pepsi
+                },
+                new DrinkEmotionalCategory
+                {
+                    DrinkEmotionalCategoryId = Guid.Parse("660d7300-f30c-30c3-b827-335544330104"),
+                    EmotionalDrinkCategoryId = chanNanId,
+                    DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330004") // Screwdriver
+                },
+                new DrinkEmotionalCategory
+                {
+                    DrinkEmotionalCategoryId = Guid.Parse("660d7300-f30c-30c3-b827-335544330105"),
+                    EmotionalDrinkCategoryId = dangYeuId,
+                    DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330005") // Cà phê đen
+                },
+                new DrinkEmotionalCategory
+                {
+                    DrinkEmotionalCategoryId = Guid.Parse("660d7300-f30c-30c3-b827-335544330106"),
+                    EmotionalDrinkCategoryId = vuiId,
+                    DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330001") // Mojito
+                },
+                new DrinkEmotionalCategory
+                {
+                    DrinkEmotionalCategoryId = Guid.Parse("660d7300-f30c-30c3-b827-335544330107"),
+                    EmotionalDrinkCategoryId = hanhPhucId,
+                    DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330003") // Pepsi
+                },
+                new DrinkEmotionalCategory
+                {
+                    DrinkEmotionalCategoryId = Guid.Parse("660d7300-f30c-30c3-b827-335544330108"),
+                    EmotionalDrinkCategoryId = dangYeuId,
+                    DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330000") // Coca Cola
+                },
+                new DrinkEmotionalCategory
+                {
+                    DrinkEmotionalCategoryId = Guid.Parse("660d7300-f30c-30c3-b827-335544330109"),
+                    EmotionalDrinkCategoryId = chanNanId,
+                    DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330002") // Trà Đào
+                }
+            );
+
 
             // Role Data
             modelBuilder.Entity<Role>().HasData(
