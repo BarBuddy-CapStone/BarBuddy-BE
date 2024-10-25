@@ -170,6 +170,7 @@ namespace Infrastructure.Payment.Service
                     try
                     {
                         paymentHistory.Status = (int)PaymentStatusEnum.Success;
+                        paymentHistory.Booking.Status = (int)PrefixValueEnum.Pending;
                         paymentHistory.TransactionCode = $"{DateTime.Now.ToString("yyyyMMdd")}-{response.vnp_TransactionNo}";
                         await unitOfWork.PaymentHistoryRepository.UpdateAsync(paymentHistory);
                         await unitOfWork.SaveAsync();
@@ -214,6 +215,7 @@ namespace Infrastructure.Payment.Service
                     try
                     {
                         paymentHistory.Status = (int)PaymentStatusEnum.Success;
+                        paymentHistory.Booking.Status = (int)PrefixValueEnum.Pending;
                         paymentHistory.TransactionCode = $"{DateTime.Now.ToString("yyyyMMdd")}-{request.transId}";
                         await unitOfWork.PaymentHistoryRepository.UpdateAsync(paymentHistory);
                         await unitOfWork.SaveAsync();
