@@ -93,7 +93,7 @@ namespace Application.Service
                                                     ? bt.BookingTables
                                                     .Where(x => x.ReservationDate.Date.Equals(request.Date.Date)
                                                             && x.ReservationTime == request.Time)
-                                                    .FirstOrDefault()?.Booking.Status ?? (int)PrefixValueEnum.Peding
+                                                    .FirstOrDefault()?.Booking.Status ?? (int)PrefixValueEnum.PendingBooking
                                                     : (int)PrefixValueEnum.Cancelled
                                     }).ToList()
                     }
