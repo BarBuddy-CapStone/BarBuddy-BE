@@ -3,7 +3,6 @@ using Application.IService;
 using Application.Service;
 using Azure.Core;
 using CoreApiResponse;
-using Domain.CustomException;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
