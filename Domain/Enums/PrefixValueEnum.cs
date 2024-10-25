@@ -16,8 +16,8 @@ namespace Domain.Enums
         [Description("Pending")]
         Pending = 2,
 
-        [Description("Peding")]
-        Peding = 0,
+        [Description("PendingBooking")]
+        PendingBooking = 0,
         [Description("Cancelled")]
         Cancelled = 1,
         [Description("Serving")]

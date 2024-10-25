@@ -377,7 +377,7 @@ namespace Application.Service
 
                 booking.BookingTables = booking.BookingTables ?? new List<BookingTable>();
                 booking.BookingCode = $"{booking.BookingDate.ToString("yyMMdd")}{RandomHelper.GenerateRandomNumberString()}";
-                booking.Status = (int)PrefixValueEnum.Pending;
+                booking.Status = (int)PrefixValueEnum.PendingBooking;
                 booking.IsIncludeDrink = false;
 
                 if (request.TableIds != null && request.TableIds.Count > 0)
