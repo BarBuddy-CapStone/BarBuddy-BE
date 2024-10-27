@@ -28,6 +28,7 @@ namespace Persistence.Repository
         private IGenericRepository<Event> _eventRepository;
         private IGenericRepository<TimeEvent> _timeEventRepository;
         private IGenericRepository<EventVoucher> _eventVoucherRepository;
+        private IGenericRepository<BarTime> _barTimeRepository;
 
 
         public UnitOfWork()
@@ -294,6 +295,18 @@ namespace Persistence.Repository
             }
         }
 
+        public IGenericRepository<BarTime> BarTimeRepository
+        {
+            get
+            {
+
+                if (_barTimeRepository == null)
+                {
+                    _barTimeRepository = new GenericRepository<BarTime>(_context);
+                }
+                return _barTimeRepository;
+            }
+        }
         public async Task SaveAsync()
         {
             await _context.SaveChangesAsync();

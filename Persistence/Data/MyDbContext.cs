@@ -71,32 +71,44 @@ namespace Persistence.Data
                 new EmotionalDrinkCategory
                 {
                     EmotionalDrinksCategoryId = vuiId,
-                    CategoryName = "vui"
+                    CategoryName = "vui",
+                    Description = "Vui qua di",
+                    IsDeleted = false,
                 },
                 new EmotionalDrinkCategory
                 {
                     EmotionalDrinksCategoryId = buonId,
-                    CategoryName = "buồn"
+                    CategoryName = "buồn",
+                    Description = "Vui qua di",
+                    IsDeleted = false
                 },
                 new EmotionalDrinkCategory
                 {
                     EmotionalDrinksCategoryId = hanhPhucId,
-                    CategoryName = "hạnh phúc"
+                    CategoryName = "hạnh phúc",
+                    Description = "Vui qua di",
+                    IsDeleted = false
                 },
                 new EmotionalDrinkCategory
                 {
                     EmotionalDrinksCategoryId = tucGianId,
-                    CategoryName = "tức giận"
+                    CategoryName = "tức giận",
+                    Description = "Vui qua di",
+                    IsDeleted = false
                 },
                 new EmotionalDrinkCategory
                 {
                     EmotionalDrinksCategoryId = chanNanId,
-                    CategoryName = "chán nản"
+                    CategoryName = "chán nản",
+                    Description = "Vui qua di",
+                    IsDeleted = false
                 },
                 new EmotionalDrinkCategory
                 {
                     EmotionalDrinksCategoryId = dangYeuId,
-                    CategoryName = "đang yêu"
+                    CategoryName = "đang yêu",
+                    Description = "Vui qua di",
+                    IsDeleted = false
                 }
             );
 

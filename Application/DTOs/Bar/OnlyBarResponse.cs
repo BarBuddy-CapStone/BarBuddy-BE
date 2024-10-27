@@ -1,4 +1,5 @@
-﻿using Application.DTOs.Response.FeedBack;
+﻿using Application.DTOs.BarTime;
+using Application.DTOs.Response.FeedBack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,5 +23,6 @@ namespace Application.DTOs.Bar
         public bool Status { get; set; }
         public bool IsAnyTableAvailable { get; set; }
         public ICollection<FeedBackResponse>? FeedBacks { get; set; }
+        public ICollection<BarTimeResponse>? BarTimeResponses { get; set; }
     }
 }

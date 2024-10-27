@@ -14,6 +14,7 @@ using Domain.Enums;
 using Domain.Utils;
 using Domain.Common;
 using System.Linq.Expressions;
+using Application.DTOs.BarTime;
 
 namespace Application.Service
 {
@@ -22,17 +23,18 @@ namespace Application.Service
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IFirebase _fireBase;
-
-        public BarService(IUnitOfWork unitOfWork, IMapper mapper, IFirebase fireBase)
+        private readonly IBarTimeService _barTimeService;
+        public BarService(IUnitOfWork unitOfWork, IMapper mapper, 
+                            IFirebase fireBase, IBarTimeService barTimeService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _fireBase = fireBase;
+            _barTimeService = barTimeService;
         }
 
-        public async Task<BarResponse> CreateBar(BarRequest request)
+        public async Task CreateBar(CreateBarRequest request)
         {
-            var response = new BarResponse();
             string imageUrl = null;
             List<IFormFile> fileToUpload = new List<IFormFile>();
             List<string> listImgs = new List<string>();
@@ -46,13 +48,23 @@ namespace Application.Service
                         throw new CustomException.InvalidDataException("Invalid data");
                     }
 
-                    fileToUpload = Utils.CheckValidateImageFile(request.Images);
+                    var isBarName = _unitOfWork.BarRepository.Get(filter: x => x.BarName.Contains(request.BarName)).FirstOrDefault();
+                    
+                    if (isBarName != null)
+                    {
+                        throw new CustomException.InvalidDataException("Tên quán Bar đã tồn tại, vui lòng thử lại !");    
+                    }
+
+                    var images = Utils.ConvertBase64ListToFiles(request.Images);
+
+                    fileToUpload = Utils.CheckValidateImageFile(images);
 
                     //Create với img là ""
                     var mapper = _mapper.Map<Bar>(request);
                     mapper.Images = "";
                     await _unitOfWork.BarRepository.InsertAsync(mapper);
-                    await Task.Delay(200);
+                    await _barTimeService.CreateBarTimeOfBar(mapper.BarId, request.BarTimeRequest);
+                    await Task.Delay(10);
                     await _unitOfWork.SaveAsync();
 
                     foreach (var image in fileToUpload)
@@ -69,26 +81,35 @@ namespace Application.Service
                     await _unitOfWork.SaveAsync();
 
                     transaction.Complete();
-                    response = _mapper.Map<BarResponse>(mapper);
-
                 }
-                catch (Exception)
+                catch (CustomException.InvalidDataException ex)
                 {
                     transaction.Dispose();
+                    throw new CustomException.InvalidDataException(ex.Message);
                 }
-                return response;
+                catch (CustomException.InternalServerErrorException ex)
+                {
+                    transaction.Dispose();
+                    throw new CustomException.InternalServerErrorException(ex.Message);
+                }
             }
         }
 
         public async Task<IEnumerable<BarResponse>> GetAllBar()
         {
-            var getAllBar = await _unitOfWork.BarRepository.GetAllAsync();
+            var getAllBar = await _unitOfWork.BarRepository.GetAsync(includeProperties: "BarTimes");
 
             if (getAllBar.IsNullOrEmpty() || !getAllBar.Any())
             {
                 throw new CustomException.DataNotFoundException("The list is empty !");
             }
             var response = _mapper.Map<IEnumerable<BarResponse>>(getAllBar);
+
+            foreach(var barTime in response)
+            {
+                var getOneBar = getAllBar.Where(x => x.BarId.Equals(barTime.BarId)).FirstOrDefault();
+                barTime.BarTimeResponses = _mapper.Map<List<BarTimeResponse>>(getOneBar?.BarTimes);
+            };
 
             return response;
         }
@@ -107,7 +128,7 @@ namespace Application.Service
                                     .GetAsync(filter: filter,
                                                         pageIndex: query.PageIndex, 
                                                         pageSize: query.PageSize,
-                                                        includeProperties: "Feedbacks");
+                                                        includeProperties: "Feedbacks,BarTimes");
 
             var currentDateTime = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now);
             var response = new List<OnlyBarResponse>();
@@ -140,6 +161,7 @@ namespace Application.Service
                 }
                 var mapper = _mapper.Map<OnlyBarResponse>(bar);
                 mapper.IsAnyTableAvailable = isAnyTableAvailable;
+                mapper.BarTimeResponses = _mapper.Map<List<BarTimeResponse>>(bar.BarTimes);
                 response.Add(mapper);
             }
             return response;
@@ -147,7 +169,10 @@ namespace Application.Service
 
         public async Task<BarResponse> GetBarById(Guid barId)
         {
-            var getBarById = await _unitOfWork.BarRepository.GetByIdAsync(barId);
+            var getBarById = (await _unitOfWork.BarRepository
+                                                    .GetAsync(filter: x=> x.BarId.Equals(barId), 
+                                                              includeProperties:"BarTimes"))
+                                                              .FirstOrDefault();
 
             if (getBarById == null)
             {
@@ -155,6 +180,7 @@ namespace Application.Service
             }
 
             var response = _mapper.Map<BarResponse>(getBarById);
+            response.BarTimeResponses = _mapper.Map<List<BarTimeResponse>>(getBarById.BarTimes);
             return response;
         }
 
@@ -164,7 +190,7 @@ namespace Application.Service
             var response = new BarResponse();
             var currentDateTime = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now);
             var getBarById = (await _unitOfWork.BarRepository.GetAsync(filter: a => a.BarId == barId,
-                    includeProperties: "Feedbacks.Account")).FirstOrDefault();
+                    includeProperties: "Feedbacks.Account,BarTimes")).FirstOrDefault();
 
             if (getBarById == null)
             {
@@ -191,6 +217,7 @@ namespace Application.Service
 
             response = _mapper.Map<BarResponse>(getBarById);
             response.IsAnyTableAvailable = isAnyTableAvailable;
+            response.BarTimeResponses = _mapper.Map<List<BarTimeResponse>>(getBarById.BarTimes);
             return response;
         }
 
@@ -208,9 +235,9 @@ namespace Application.Service
             return response;
         }
 
-        public async Task<BarResponse> UpdateBarById(Guid barId, BarRequest request)
+        public async Task<OnlyBarResponse> UpdateBarById(Guid barId, UpdateBarRequest request)
         {
-            var response = new BarResponse();
+            var response = new OnlyBarResponse();
             string imageUrl = null;
             string imgsUploaed = string.Empty;
             List<string> imgsList = new List<string>();
@@ -220,7 +247,10 @@ namespace Application.Service
             {
                 try
                 {
-                    var getBarById = await _unitOfWork.BarRepository.GetByIdAsync(barId);
+                    var getBarById = (await _unitOfWork.BarRepository
+                                                            .GetAsync(filter: x => x.BarId.Equals(barId),
+                                                                includeProperties: "BarTimes"))
+                                                            .FirstOrDefault();
 
                     if (getBarById == null)
                     {
@@ -229,7 +259,8 @@ namespace Application.Service
 
                     if (!request.Images.IsNullOrEmpty())
                     {
-                        imgsUpload = Utils.CheckValidateImageFile(request.Images);
+                        var images = Utils.ConvertBase64ListToFiles(request.Images);
+                        imgsUpload = Utils.CheckValidateImageFile(images);
                     }
 
                     if (request.imgsAsString.IsNullOrEmpty() && getBarById.Images.IsNullOrEmpty())
@@ -241,6 +272,7 @@ namespace Application.Service
                     //Update với img là ""
                     getBarById.Images = "";
                     await _unitOfWork.BarRepository.UpdateAsync(getBarById);
+                    await _barTimeService.UpdateBarTimeOfBar(getBarById.BarId, request.UpdateBarTimeRequests);
                     await Task.Delay(200);
                     await _unitOfWork.SaveAsync();
 
@@ -257,6 +289,7 @@ namespace Application.Service
                     imgsUploaed = string.Join(",", request.imgsAsString);
 
                     var allImg = string.IsNullOrEmpty(imgsAsString) ? imgsUploaed : $"{imgsUploaed},{imgsAsString}";
+
                     //Sau khi Upd ở trên thành công => lưu img lên firebase
                     getBarById.Images = allImg;
                     await _unitOfWork.BarRepository.UpdateAsync(getBarById);
@@ -265,7 +298,8 @@ namespace Application.Service
 
                     transaction.Complete();
 
-                    response = _mapper.Map<BarResponse>(getBarById);
+                    response = _mapper.Map<OnlyBarResponse>(getBarById);
+                    response.BarTimeResponses = _mapper.Map<List<BarTimeResponse>>(getBarById.BarTimes);
                 }
                 catch (CustomException.InternalServerErrorException e)
                 {

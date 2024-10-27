@@ -34,6 +34,7 @@ namespace Domain.IRepository
         Task<TEntity?> GetByIdAsync(object id);
         Task InsertAsync(TEntity obj);
         Task UpdateAsync(TEntity obj);
+        Task UpdateRangeAsync(TEntity obj);
         Task DeleteAsync(object id);
         Task SaveAsync();
         Task<IEnumerable<TEntity>> GetAsync(

@@ -179,7 +179,11 @@ namespace Persistence.Repository
         {
             return Task.FromResult(dbSet.Update(obj));
         }
-
+        public async Task UpdateRangeAsync(TEntity obj)
+        {
+            dbSet.UpdateRange(obj);
+            await context.SaveChangesAsync();
+        }
         public async Task DeleteAsync(object id)
         {
             TEntity entity = await dbSet.FindAsync(id) ?? throw new Exception();

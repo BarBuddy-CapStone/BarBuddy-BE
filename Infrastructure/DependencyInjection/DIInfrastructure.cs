@@ -90,6 +90,7 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<IEventBarService, EventBarService>();
             services.AddScoped<IEventService, EventService>();
             services.AddScoped<IEventTimeService, EventTimeService>();
+            services.AddScoped<IBarTimeService, BarTimeService>();
         }
 
         //public static void AddCORS(this IServiceCollection services)

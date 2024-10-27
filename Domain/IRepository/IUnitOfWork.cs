@@ -29,6 +29,7 @@ namespace Domain.IRepository
         public IGenericRepository<Event> EventRepository { get; }
         public IGenericRepository<TimeEvent> TimeEventRepository { get; }
         public IGenericRepository<EventVoucher> EventVoucherRepository { get; }
+        public IGenericRepository<BarTime> BarTimeRepository { get; }
 
         void Save();
         Task SaveAsync();

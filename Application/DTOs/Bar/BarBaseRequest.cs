@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Application.DTOs.BarTime;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Application.DTOs.Bar
 {
-    public class BarRequest
+    public class BarBaseRequest
     {
         [Required(ErrorMessage = "BarName cannot be empty")]
         [StringLength(50, MinimumLength = 7, ErrorMessage = "BarName must be between 7 and 50 characters")]
@@ -23,11 +24,7 @@ namespace Application.DTOs.Bar
         [EmailAddress]
         [Required]
         public string Email { get; set; }
-        [Required]
-        public TimeSpan StartTime { get; set; }
-        [Required]
-        public TimeSpan EndTime { get; set; }
-        public List<IFormFile>? Images { get; set; }
+        public List<string>? Images { get; set; }
         public List<string>? imgsAsString { get; set; }
         [Range(0,100)]
         [Required(ErrorMessage = "More than or equal 0 and less than or equal 100")]

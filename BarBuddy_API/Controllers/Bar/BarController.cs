@@ -143,12 +143,12 @@ namespace BarBuddy_API.Controllers.Bar
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost("admin/addBar")]
-        public async Task<IActionResult> CreateBar([FromForm] BarRequest request)
+        public async Task<IActionResult> CreateBar([FromBody] CreateBarRequest request)
         {
             try
             {
-                var response = await _barService.CreateBar(request);
-                return CustomResult("Created Successfully", response);
+                await _barService.CreateBar(request);
+                return CustomResult("Created Successfully");
             }
             catch (CustomException.InvalidDataException e)
             {
@@ -160,7 +160,7 @@ namespace BarBuddy_API.Controllers.Bar
                 return CustomResult(e.Message, HttpStatusCode.NotFound);
             }
 
-            catch (Exception e)
+            catch (CustomException.InternalServerErrorException e)
             {
                 return CustomResult(e.Message, HttpStatusCode.InternalServerError);
             }
@@ -173,7 +173,7 @@ namespace BarBuddy_API.Controllers.Bar
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPatch("admin/updateBar/{barId}")]
-        public async Task<IActionResult> UpdateBar(Guid barId, [FromForm] BarRequest request)
+        public async Task<IActionResult> UpdateBar(Guid barId, [FromBody] UpdateBarRequest request)
         {
             try
             {
