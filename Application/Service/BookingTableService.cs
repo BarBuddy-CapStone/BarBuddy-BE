@@ -15,6 +15,7 @@ using Domain.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Application.Service
@@ -54,16 +55,25 @@ namespace Application.Service
                 var requestDate = TimeHelper.ConvertToUtcPlus7(request.Date.Date);
                 var currentDate = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now.Date);
                 var currentTime = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.UtcNow);
+                var getDayOfWeek = (int)requestDate.DayOfWeek;
 
-                //Utils.ValidateOpenCloseTime(requestDate, request.Time, getOneBar.StartTime, getOneBar.EndTime);
+                var getTimeOfBar = _unitOfWork.BarTimeRepository
+                                                    .Get(filter: x => x.BarId.Equals(request.BarId)
+                                                            && x.DayOfWeek == getDayOfWeek)
+                                                    .FirstOrDefault();
+
+                if (getDayOfWeek == null)
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy khung giờ của quán Bar !");
+                }
+
+                Utils.ValidateOpenCloseTime(requestDate, request.Time, getTimeOfBar.StartTime, getTimeOfBar.EndTime);
 
                 var data = await _unitOfWork.TableRepository.GetAsync(
-                                                filter: x => /*x.BarId.Equals(request.BarId)
-                                                          &&*/ x.TableTypeId.Equals(request.TableTypeId)
+                                                filter: x => x.TableType.BarId.Equals(request.BarId)
+                                                            && x.TableTypeId.Equals(request.TableTypeId)
                                                           && x.IsDeleted == PrefixKeyConstant.FALSE,
-                                                includeProperties: "BookingTables.Booking,TableType,Bar");
-
-
+                                                includeProperties: "BookingTables.Booking,TableType.Bar.BarTimes");
 
                 if (data.IsNullOrEmpty())
                 {
@@ -81,21 +91,18 @@ namespace Application.Service
                     {
                         ReservationDate = request.Date,
                         ReservationTime = request.Time,
-                        Tables = data.Select(bt => new FilterTableResponse
-                                    {
-                                        TableId = bt.TableId,
-                                        TableName = bt.TableName,
-                                        Status = bt.BookingTables != null
-                                                    && bt.BookingTables
-                                                    .Where(x => x.ReservationDate.Date.Equals(request.Date.Date)
-                                                            && x.ReservationTime == request.Time)
-                                                    .Any()
-                                                    ? bt.BookingTables
-                                                    .Where(x => x.ReservationDate.Date.Equals(request.Date.Date)
-                                                            && x.ReservationTime == request.Time)
-                                                    .FirstOrDefault()?.Booking.Status ?? (int)PrefixValueEnum.PendingBooking
-                                                    : (int)PrefixValueEnum.Cancelled
-                                    }).ToList()
+                        Tables = data.Select(bt =>
+                        {
+                            var matchingBooking = bt.BookingTables?
+                                .FirstOrDefault(x => x.Booking.BookingDate.Date == requestDate && x.Booking.BookingTime == request.Time);
+
+                            return new FilterTableResponse
+                            {
+                                TableId = bt.TableId,
+                                TableName = bt.TableName,
+                                Status = matchingBooking?.Booking.Status ?? (int)PrefixValueEnum.Cancelled
+                            };
+                        }).ToList()
                     }
                 };
 
@@ -111,9 +118,9 @@ namespace Application.Service
         {
             var accountId = _authentication.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
             var tableIsExist = _unitOfWork.TableRepository
-                                        .Get(filter: x => /*x.BarId.Equals(request.BarId)
-                                                            &&*/ x.TableId.Equals(request.TableId),
-                                                            includeProperties: "Bar")
+                                        .Get(filter: x => x.TableType.BarId.Equals(request.BarId)
+                                                            && x.TableId.Equals(request.TableId),
+                                                            includeProperties: "TableType.Bar")
                                         .FirstOrDefault();
 
             if (tableIsExist == null)
@@ -121,9 +128,18 @@ namespace Application.Service
                 throw new CustomException.DataNotFoundException("Không tìm thấy table trong quán bar!");
             }
 
-            //Utils.ValidateOpenCloseTime(request.Date, request.Time, tableIsExist.Bar.StartTime, tableIsExist.Bar.EndTime);
+            var getTimeOfBar = _unitOfWork.BarTimeRepository
+                                            .Get(filter: x => x.BarId.Equals(tableIsExist.TableType.BarId)
+                                                        && x.DayOfWeek == (int)request.Date.DayOfWeek).FirstOrDefault();
 
-            var cacheKey = $"{request.BarId}_{request.TableId}_{request.Date.Date.Date}_{request.Time}";
+            if(getTimeOfBar == null)
+            {
+                throw new CustomException.DataNotFoundException("Không tìm thấy khung giờ trong quán bar!");
+            }
+
+            Utils.ValidateOpenCloseTime(request.Date, request.Time, getTimeOfBar.StartTime, getTimeOfBar.EndTime);
+
+            var cacheKey = $"{request.BarId}_{request.TableId}_{accountId}_{request.Date.Date.Date}_{request.Time}";
             var cacheEntry = _memoryCache.GetOrCreate(cacheKey, entry =>
             {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
@@ -188,13 +204,13 @@ namespace Application.Service
         public Task<List<TableHoldInfo>> HoldTableList(Guid barId, DateTimeRequest request)
         {
             var tableIsExist = _unitOfWork.TableRepository
-                                        .Get(filter: x => /*x.BarId.Equals(barId)
-                                                            &&*/ x.IsDeleted == PrefixKeyConstant.FALSE);
-
+                                        .Get(filter: x => x.TableType.BarId.Equals(barId)
+                                                            && x.IsDeleted == PrefixKeyConstant.FALSE);
+            var accountId = _authentication.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
             List<TableHoldInfo> tableHolds = new List<TableHoldInfo>();
             foreach (var table in tableIsExist)
             {
-                var cacheKey = $"{barId}_{table.TableId}_{request.Date.Date.Date.DayOfWeek}_{request.Time}";
+                var cacheKey = $"{barId}_{table.TableId}_{accountId}_{request.Date.Date.Date}_{request.Time}";
                 var cacheEntry = _memoryCache.GetOrCreate(cacheKey, entry =>
                 {
                     return new Dictionary<Guid, TableHoldInfo>();
@@ -217,15 +233,15 @@ namespace Application.Service
 
             var accountId = _authentication.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
             var tableIsExist = _unitOfWork.TableRepository
-                                        .Get(filter: x => /*x.BarId.Equals(request.BarId)
-                                                            &&*/ x.TableId.Equals(request.TableId))
+                                        .Get(filter: x => x.TableType.BarId.Equals(request.BarId)
+                                                            && x.TableId.Equals(request.TableId))
                                         .FirstOrDefault();
             if (tableIsExist == null)
             {
                 throw new CustomException.DataNotFoundException("Không tìm thấy table trong quán bar!");
             }
 
-            var cacheKey = $"{request.BarId}_{request.TableId}_{request.Date.Date.Date}_{request.Time}";
+            var cacheKey = $"{request.BarId}_{request.TableId}_{accountId}_{request.Date.Date.Date}_{request.Time}";
 
             var cacheEntry = _memoryCache.GetOrCreate(cacheKey, entry =>
             {
@@ -254,7 +270,7 @@ namespace Application.Service
                 {
                     throw new CustomException.InvalidDataException("Không hợp lệ");
                 }
-                var cacheKey = $"{request.BarId}_{table.TableId}_{request.Date.Date.Date}_{table.Time}";
+                var cacheKey = $"{request.BarId}_{table.TableId}_{accountId}_{request.Date.Date.Date}_{table.Time}";
                 if (_memoryCache.TryGetValue(cacheKey, out Dictionary<Guid, TableHoldInfo>? cacheTbHold))
                 {
                     if (cacheTbHold.TryGetValue(table.TableId, out var tbHold))
