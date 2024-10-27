@@ -36,7 +36,6 @@ namespace Application.Service
         private readonly IGenericRepository<Bar> _barRepository;
         private readonly IFirebase _fireBase;
         private static Random random;
-        private static readonly string key = "1234567890123456";
 
         public AccountService(IMapper mapper, IUnitOfWork unitOfWork, IFirebase fireBase)
         {
@@ -54,11 +53,11 @@ namespace Application.Service
                 .FirstOrDefault();
             if (existedAccount != null)
             {
-                throw new DataExistException("Email is existed");
+                throw new DataExistException("Email đã tồn tại");
             }
 
             var customerRole = (await _unitOfWork.RoleRepository.GetAsync(filter: r => r.RoleName == "CUSTOMER")).FirstOrDefault();
-            
+
             var newAccount = _mapper.Map<Account>(request);
             newAccount.RoleId = customerRole.RoleId;
             newAccount.Status = 1;
@@ -84,13 +83,12 @@ namespace Application.Service
             return _mapper.Map<CustomerAccountResponse>(newAccount);
         }
 
-
         public async Task<StaffAccountResponse> CreateStaffAccount(StaffAccountRequest request)
         {
             var existedAccount = (await _accountRepository.GetAsync(a => a.Email.Equals(request.Email))).FirstOrDefault();
             if (existedAccount != null)
             {
-                throw new DataExistException("Email is existed");
+                throw new DataExistException("Email đã tồn tại");
             }
             var staffRole = (await _unitOfWork.RoleRepository.GetAsync(filter: r => r.RoleName == "STAFF")).FirstOrDefault();
             var existedBar = await _barRepository.GetByIdAsync(request.BarId);
@@ -122,6 +120,45 @@ namespace Application.Service
                 _unitOfWork.Dispose();
             }
         }
+
+        public async Task<ManagerAccountResponse> CreateManagerAccount(ManagerAccountRequest request)
+        {
+            var existedAccount = (await _accountRepository.GetAsync(a => a.Email.Equals(request.Email))).FirstOrDefault();
+            if (existedAccount != null)
+            {
+                throw new DataExistException("Tài khoản không tìm thấy");
+            }
+            var managerRole = (await _unitOfWork.RoleRepository.GetAsync(filter: r => r.RoleName == "MANAGER")).FirstOrDefault();
+            var existedBar = await _barRepository.GetByIdAsync(request.BarId);
+            if (existedBar == null)
+            {
+                throw new DataNotFoundException("Dữ liệu quán Bar không có trong Database");
+            }
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                var newAccount = _mapper.Map<Account>(request);
+                newAccount.RoleId = managerRole.RoleId;
+                newAccount.Status = 1;
+                newAccount.CreatedAt = DateTime.Now;
+                newAccount.Password = await HashPassword(RandomString(10));
+                _accountRepository.Insert(newAccount);
+                var result = _mapper.Map<ManagerAccountResponse>(newAccount);
+                _unitOfWork.CommitTransaction();
+                _unitOfWork.Save();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollBack();
+                throw new InternalServerErrorException($"An Internal error occurred while creating staff: {ex.Message}");
+            }
+            finally
+            {
+                _unitOfWork.Dispose();
+            }
+        }
+
         private async Task<string> HashPassword(string password)
         {
             try
@@ -144,6 +181,7 @@ namespace Application.Service
                 throw new Exception(ex.Message);
             }
         }
+
         private static string RandomString(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -158,11 +196,14 @@ namespace Application.Service
             var existedBar = await _barRepository.GetByIdAsync(request.BarId);
             if (existedAccount == null)
             {
-                throw new DataNotFoundException("Staff's account is not found in database");
+                throw new DataNotFoundException("Tài khoản không tìm thấy");
+            } else if (existedAccount.Email != request.Email)
+            {
+                throw new DataNotFoundException("Tài khoản bị sai");
             }
             if (existedBar == null)
             {
-                throw new DataNotFoundException("Bar is not found in database");
+                throw new DataNotFoundException("Quán Bar không tìm thấy");
             }
             try
             {
@@ -186,6 +227,45 @@ namespace Application.Service
             }
         }
 
+        public async Task<ManagerAccountResponse> UpdateManagerAccount(Guid accountId, ManagerAccountRequest request)
+        {
+            var existedAccount = (await _accountRepository.GetAsync(filter: a => a.AccountId == accountId && a.Role.RoleName == "MANAGER"))
+                .FirstOrDefault();
+            var existedBar = await _barRepository.GetByIdAsync(request.BarId);
+            if (existedAccount == null)
+            {
+                throw new DataNotFoundException("Tài khoản không tìm thấy");
+            }
+            else if (existedAccount.Email != request.Email)
+            {
+                throw new DataNotFoundException("Tài khoản bị sai");
+            }
+            if (existedBar == null)
+            {
+                throw new DataNotFoundException("Quán Bar không tìm thấy");
+            }
+            try
+            {
+                _unitOfWork.BeginTransaction();
+                var updatedAccount = _mapper.Map(request, existedAccount);
+                updatedAccount.UpdatedAt = DateTime.Now;
+                _accountRepository.Update(updatedAccount);
+                var result = _mapper.Map<ManagerAccountResponse>(updatedAccount);
+                _unitOfWork.CommitTransaction();
+                _unitOfWork.Save();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollBack();
+                throw new InternalServerErrorException($"An Internal error occurred while creating staff: {ex.Message}");
+            }
+            finally
+            {
+                _unitOfWork.Dispose();
+            }
+        }
+
         public async Task<CustomerAccountResponse> UpdateCustomerAccount(Guid accountId, CustomerAccountRequest request)
         {
             var existedAccount = (await _accountRepository
@@ -193,7 +273,11 @@ namespace Application.Service
                 .FirstOrDefault();
             if (existedAccount == null)
             {
-                throw new DataNotFoundException("Customer's account is not found in database");
+                throw new DataNotFoundException("Tài khoản không tìm thấy");
+            }
+            else if (existedAccount.Email != request.Email)
+            {
+                throw new DataNotFoundException("Tài khoản bị sai");
             }
             try
             {
@@ -222,7 +306,7 @@ namespace Application.Service
             var existedAccount = _accountRepository.GetByID(accountId);
             if (existedAccount == null)
             {
-                throw new DataNotFoundException("Account is not found in database");
+                throw new DataNotFoundException("Tài khoản không tìm thấy");
             }
             try
             {
@@ -295,6 +379,51 @@ namespace Application.Service
                 _unitOfWork.Dispose();
             }
         }
+
+        public async Task<PaginationList<ManagerAccountResponse>> GetPaginationManagerAccount(int pageSize, int pageIndex)
+        {
+            try
+            {
+                //Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440201");
+                var role = (await _unitOfWork.RoleRepository.GetAsync(r => r.RoleName == "MANAGER")).FirstOrDefault();
+                if (role == null)
+                {
+                    throw new DataNotFoundException("Failed to get role info");
+                }
+                var roleIdGuid = role.RoleId;
+                var accountIEnumerable = await _accountRepository.GetAsync(
+                    filter: a => a.RoleId.Equals(roleIdGuid),
+                    includeProperties: "Bar");
+                var total = accountIEnumerable.Count();
+
+                int validPageIndex = pageIndex > 0 ? pageIndex - 1 : 0;
+                int validPageSize = pageSize > 0 ? pageSize : 10;
+                accountIEnumerable = accountIEnumerable.Skip(validPageIndex * validPageSize).Take(validPageSize);
+
+                var items = _mapper.Map<IEnumerable<ManagerAccountResponse>>(accountIEnumerable);
+                if (items == null || !items.Any())
+                {
+                    throw new DataNotFoundException("Staff's accounts is empty list");
+                }
+                var result = new PaginationList<ManagerAccountResponse>
+                {
+                    items = items,
+                    total = items.Count(),
+                    //pageIndex = pageIndex,
+                    //pageSize = pageSize
+                };
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new InternalServerErrorException($"An Internal error occurred: {ex.Message}");
+            }
+            finally
+            {
+                _unitOfWork.Dispose();
+            }
+        }
+
         public async Task<PaginationList<CustomerAccountResponse>> GetPaginationCustomerAccount(int pageSize, int pageIndex)
         {
             try
@@ -383,6 +512,37 @@ namespace Application.Service
                     throw new DataNotFoundException("Staff's account not found");
                 }
                 var result = _mapper.Map<StaffAccountResponse>(staffAccount);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new InternalServerErrorException($"An Internal error occurred: {ex.Message}");
+            }
+            finally
+            {
+                _unitOfWork.Dispose();
+            }
+        }
+
+        public async Task<ManagerAccountResponse> GetManagerAccountById(Guid accountId)
+        {
+            try
+            {
+                //Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440201");
+                var role = (await _unitOfWork.RoleRepository.GetAsync(r => r.RoleName == "MANAGER")).FirstOrDefault();
+                if (role == null)
+                {
+                    throw new DataNotFoundException("Failed to get role info");
+                }
+                var roleIdGuid = role.RoleId;
+                var managerAccount = (await _accountRepository.GetAsync(filter: a => a.AccountId == accountId && a.RoleId == roleIdGuid,
+                        includeProperties: "Bar"))
+                    .FirstOrDefault();
+                if (managerAccount == null)
+                {
+                    throw new DataNotFoundException("Tài khoản không tìm thấy");
+                }
+                var result = _mapper.Map<ManagerAccountResponse>(managerAccount);
                 return result;
             }
             catch (Exception ex)

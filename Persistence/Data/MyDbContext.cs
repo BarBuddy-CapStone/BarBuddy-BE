@@ -175,13 +175,16 @@ namespace Persistence.Data
                 }
             );
 
-
             // Role Data
             modelBuilder.Entity<Role>().HasData(
                 new Role
                 {
                     RoleId = Guid.Parse("b3b5a546-519d-411b-89d0-20c824e18d11"),
                     RoleName = "ADMIN"
+                },
+                new Role {
+                    RoleId = Guid.Parse("b3b5a546-519d-411b-89d0-20c824e18e22"),
+                    RoleName = "MANAGER"
                 },
                 new Role
                 {
@@ -319,8 +322,6 @@ namespace Persistence.Data
                 }
             );
 
-
-
             //Account
             modelBuilder.Entity<Account>().HasData(
                 new Account
@@ -328,9 +329,9 @@ namespace Persistence.Data
                     AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440001"),
                     BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     RoleId = Guid.Parse("b3b5a546-519d-411b-89d0-20c824e18d11"),
-                    Email = "admin1@barbuddy1.com",
+                    Email = "admin1@barbuddy.com",
                     Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
-                    Fullname = "Neymar Jr",
+                    Fullname = "Lionel Messi",
                     Dob = new DateTime(1980, 5, 1),
                     Phone = "0901234567",
                     CreatedAt = DateTime.Now,
@@ -340,12 +341,72 @@ namespace Persistence.Data
                 },
                 new Account
                 {
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440010"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
+                    RoleId = Guid.Parse("b3b5a546-519d-411b-89d0-20c824e18e22"),
+                    Email = "manager1@barbuddy1.com",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "Manager 1",
+                    Dob = new DateTime(1980, 1, 1),
+                    Phone = "0901234577",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "default",
+                    Status = 1
+                },
+                new Account
+                {
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440011"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+                    RoleId = Guid.Parse("b3b5a546-519d-411b-89d0-20c824e18e22"),
+                    Email = "manager2@barbuddy2.com",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "Manager 2",
+                    Dob = new DateTime(1981, 2, 2),
+                    Phone = "0901234578",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "default",
+                    Status = 1
+                },
+                new Account
+                {
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440012"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
+                    RoleId = Guid.Parse("b3b5a546-519d-411b-89d0-20c824e18e22"),
+                    Email = "manager3@barbuddy3.com",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "Manager 3",
+                    Dob = new DateTime(1982, 3, 3),
+                    Phone = "0901234579",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "default",
+                    Status = 1
+                },
+                new Account
+                {
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440013"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"),
+                    RoleId = Guid.Parse("b3b5a546-519d-411b-89d0-20c824e18e22"),
+                    Email = "manager4@barbuddy4.com",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "Manager 4",
+                    Dob = new DateTime(1983, 4, 4),
+                    Phone = "0901234580",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "default",
+                    Status = 1
+                },
+                new Account
+                {
                     AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440002"),
                     BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     RoleId = Guid.Parse("a3438270-b7ed-4222-b3d8-aee52fc58805"),
                     Email = "staff1@barbuddy2.com",
                     Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
-                    Fullname = "Lionel Messi",
+                    Fullname = "Neymar Jr",
                     Dob = new DateTime(1992, 7, 15),
                     Phone = "0901234568",
                     CreatedAt = DateTime.Now,
@@ -1060,7 +1121,6 @@ namespace Persistence.Data
 
             );
 
-
             // DrinkCategoryData
             var drinkCate1 = Guid.NewGuid();
             var drinkCate2 = Guid.NewGuid();
@@ -1140,136 +1200,136 @@ namespace Persistence.Data
 
             //Drink Data
             modelBuilder.Entity<Drink>().HasData(
-            new Drink
-            {
-                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330000"),
-                DrinkCode = "D0001",
-                DrinkCategoryId = drinkCate1,
-                DrinkName = "Coca Cola",
-                Description = "Nước ngọt có ga phổ biến.",
-                Price = 15000,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now,
-                Image = "https://www.coca-cola.com/content/dam/onexp/vn/home-image/coca-cola/Coca-Cola_OT%20320ml_VN-EX_Desktop.png",
-                Status = true
-            },
-            new Drink
-            {
-                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330001"),
-                DrinkCode = "D0002",
-                DrinkCategoryId = drinkCate2,
-                DrinkName = "Mojito",
-                Description = "Cocktail nổi tiếng pha từ rượu rum và bạc hà.",
-                Price = 70000,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now,
-                Image = "https://www.liquor.com/thmb/MJRVqf-itJGY90nwUOYGXnyG-HA=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/mojito-720x720-primary-6a57f80e200c412e9a77a1687f312ff7.jpg",
-                Status = true
-            },
-            new Drink
-            {
-                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330002"),
-                DrinkCode = "D0003",
-                DrinkCategoryId = drinkCate3,
-                DrinkName = "Trà Đào",
-                Description = "Trà xanh kết hợp với vị ngọt của đào.",
-                Price = 35000,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now,
-                Image = "https://file.hstatic.net/200000684957/article/tra-dao_e022b1a9ac564ee186007875701ac643.jpg",
-                Status = true
-            },
-            new Drink
-            {
-                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330003"),
-                DrinkCode = "D0004",
-                DrinkCategoryId = drinkCate1,
-                DrinkName = "Pepsi",
-                Description = "Nước ngọt có ga, phổ biến tương tự Coca Cola.",
-                Price = 15000,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now,
-                Image = "http://thepizzacompany.vn/images/thumbs/000/0002364_pepsi-15l-pet_500.jpeg",
-                Status = true
-            },
-            new Drink
-            {
-                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330004"),
-                DrinkCode = "D0005",
-                DrinkCategoryId = drinkCate4,
-                DrinkName = "Screwdriver",
-                Description = "Cocktail kết hợp giữa rượu vodka và nước cam.",
-                Price = 80000,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now,
-                Image = "https://www.liquor.com/thmb/RnOVWoIXp7OAJRS-NSDIF9Bglbc=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/LQR-screwdriver-original-4000x4000-edb2f56dd69146bba9f7fafbf69e00a0.jpg",
-                Status = true
-            },
-            new Drink
-            {
-                DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330005"),
-                DrinkCode = "D0006",
-                DrinkCategoryId = drinkCate8,
-                DrinkName = "Cà phê đen",
-                Description = "Cà phê đen pha đậm, không đường, không sữa.",
-                Price = 15000,
-                CreatedDate = DateTime.Now,
-                UpdatedDate = DateTime.Now,
-                Image = "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/8/14/2121767707dcce179f6866d132a2d6a384312f9-1723600454996-1723600455541950721311.jpg",
-                Status = true
-            }
+                new Drink
+                {
+                    DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330000"),
+                    DrinkCode = "D0001",
+                    DrinkCategoryId = drinkCate1,
+                    DrinkName = "Coca Cola",
+                    Description = "Nước ngọt có ga phổ biến.",
+                    Price = 15000,
+                    CreatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.Now,
+                    Image = "https://www.coca-cola.com/content/dam/onexp/vn/home-image/coca-cola/Coca-Cola_OT%20320ml_VN-EX_Desktop.png",
+                    Status = true
+                },
+                new Drink
+                {
+                    DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330001"),
+                    DrinkCode = "D0002",
+                    DrinkCategoryId = drinkCate2,
+                    DrinkName = "Mojito",
+                    Description = "Cocktail nổi tiếng pha từ rượu rum và bạc hà.",
+                    Price = 70000,
+                    CreatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.Now,
+                    Image = "https://www.liquor.com/thmb/MJRVqf-itJGY90nwUOYGXnyG-HA=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/mojito-720x720-primary-6a57f80e200c412e9a77a1687f312ff7.jpg",
+                    Status = true
+                },
+                new Drink
+                {
+                    DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330002"),
+                    DrinkCode = "D0003",
+                    DrinkCategoryId = drinkCate3,
+                    DrinkName = "Trà Đào",
+                    Description = "Trà xanh kết hợp với vị ngọt của đào.",
+                    Price = 35000,
+                    CreatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.Now,
+                    Image = "https://file.hstatic.net/200000684957/article/tra-dao_e022b1a9ac564ee186007875701ac643.jpg",
+                    Status = true
+                },
+                new Drink
+                {
+                    DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330003"),
+                    DrinkCode = "D0004",
+                    DrinkCategoryId = drinkCate1,
+                    DrinkName = "Pepsi",
+                    Description = "Nước ngọt có ga, phổ biến tương tự Coca Cola.",
+                    Price = 15000,
+                    CreatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.Now,
+                    Image = "http://thepizzacompany.vn/images/thumbs/000/0002364_pepsi-15l-pet_500.jpeg",
+                    Status = true
+                },
+                new Drink
+                {
+                    DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330004"),
+                    DrinkCode = "D0005",
+                    DrinkCategoryId = drinkCate4,
+                    DrinkName = "Screwdriver",
+                    Description = "Cocktail kết hợp giữa rượu vodka và nước cam.",
+                    Price = 80000,
+                    CreatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.Now,
+                    Image = "https://www.liquor.com/thmb/RnOVWoIXp7OAJRS-NSDIF9Bglbc=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/LQR-screwdriver-original-4000x4000-edb2f56dd69146bba9f7fafbf69e00a0.jpg",
+                    Status = true
+                },
+                new Drink
+                {
+                    DrinkId = Guid.Parse("550d7300-f30c-30c3-b827-335544330005"),
+                    DrinkCode = "D0006",
+                    DrinkCategoryId = drinkCate8,
+                    DrinkName = "Cà phê đen",
+                    Description = "Cà phê đen pha đậm, không đường, không sữa.",
+                    Price = 15000,
+                    CreatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.Now,
+                    Image = "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/8/14/2121767707dcce179f6866d132a2d6a384312f9-1723600454996-1723600455541950721311.jpg",
+                    Status = true
+                }
             );
+
             modelBuilder.Entity<Booking>().HasData(
-    new Booking
-    {
-        BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
-        BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Bar Buddy 1
-        AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440001"), // Admin Bar Buddy 1
-        BookingCode = "BB0001", // Custom booking code
-        BookingDate = DateTime.Now.AddDays(-5),
-        BookingTime = new TimeSpan(19, 0, 0), // Thêm thời gian đặt chỗ
-        Status = 1, // Confirmed
-        NumOfTable = 1, // Số lượng bàn
-        CreateAt = DateTime.Now // Ngày tạo
-    },
-    new Booking
-    {
-        BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
-        BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"), // Bar Buddy 2
-        AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440002"), // Staff Bar Buddy 2
-        BookingCode = "BB0002", // Custom booking code
-        BookingDate = DateTime.Now.AddDays(-7),
-        BookingTime = new TimeSpan(20, 0, 0), // Thêm thời gian đặt chỗ
-        Status = 2, // Completed
-        NumOfTable = 2, // Số lượng bàn
-        CreateAt = DateTime.Now // Ngày tạo
-    },
-    new Booking
-    {
-        BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
-        BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Bar Buddy 3
-        AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440003"), // Customer Bar Buddy 3
-        BookingCode = "BB0003", // Custom booking code
-        BookingDate = DateTime.Now.AddDays(-3),
-        BookingTime = new TimeSpan(18, 0, 0), // Thêm thời gian đặt chỗ
-        Status = 1, // Confirmed
-        NumOfTable = 1, // Số lượng bàn
-        CreateAt = DateTime.Now // Ngày tạo
-    },
-    new Booking
-    {
-        BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"),
-        BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"), // Bar Buddy 3
-        AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440004"), // Customer Bar Buddy 3
-        BookingCode = "BB0004", // Custom booking code
-        BookingDate = DateTime.Now.AddDays(-2),
-        BookingTime = new TimeSpan(21, 0, 0), // Thêm thời gian đặt chỗ
-        Status = 1, // Confirmed
-        NumOfTable = 1, // Số lượng bàn
-        CreateAt = DateTime.Now // Ngày tạo
-    }
-);
-            // BookingTable Data
+                new Booking
+                {
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Bar Buddy 1
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440001"), // Admin Bar Buddy 1
+                    BookingCode = "BB0001", // Custom booking code
+                    BookingDate = DateTime.Now.AddDays(-5),
+                    BookingTime = new TimeSpan(19, 0, 0), // Thêm thời gian đặt chỗ
+                    Status = 1, // Confirmed
+                    NumOfTable = 1, // Số lượng bàn
+                    CreateAt = DateTime.Now // Ngày tạo
+                },
+                new Booking
+                {
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"), // Bar Buddy 2
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440002"), // Staff Bar Buddy 2
+                    BookingCode = "BB0002", // Custom booking code
+                    BookingDate = DateTime.Now.AddDays(-7),
+                    BookingTime = new TimeSpan(20, 0, 0), // Thêm thời gian đặt chỗ
+                    Status = 2, // Completed
+                    NumOfTable = 2, // Số lượng bàn
+                    CreateAt = DateTime.Now // Ngày tạo
+                },
+                new Booking
+                {
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Bar Buddy 3
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440003"), // Customer Bar Buddy 3
+                    BookingCode = "BB0003", // Custom booking code
+                    BookingDate = DateTime.Now.AddDays(-3),
+                    BookingTime = new TimeSpan(18, 0, 0), // Thêm thời gian đặt chỗ
+                    Status = 1, // Confirmed
+                    NumOfTable = 1, // Số lượng bàn
+                    CreateAt = DateTime.Now // Ngày tạo
+                },
+                new Booking
+                {
+                    BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"), // Bar Buddy 3
+                    AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440004"), // Customer Bar Buddy 3
+                    BookingCode = "BB0004", // Custom booking code
+                    BookingDate = DateTime.Now.AddDays(-2),
+                    BookingTime = new TimeSpan(21, 0, 0), // Thêm thời gian đặt chỗ
+                    Status = 1, // Confirmed
+                    NumOfTable = 1, // Số lượng bàn
+                    CreateAt = DateTime.Now // Ngày tạo
+                }
+            );
             // BookingTable Data
             modelBuilder.Entity<BookingTable>().HasData(
                 new BookingTable
@@ -1664,6 +1724,129 @@ namespace Persistence.Data
                     IsDeleted = false,
                     CreatedTime = DateTimeOffset.Now,
                     LastUpdatedTime = DateTimeOffset.Now
+                }
+            );
+
+            // Thêm dữ liệu mẫu cho các quán bar chưa có dữ liệu mẫu
+            modelBuilder.Entity<Table>().HasData(
+                // Bar Buddy 4
+                new Table
+                {
+                    TableId = Guid.NewGuid(),
+                    TableTypeId = svip,
+                    TableName = "SVIPA-4-1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                new Table
+                {
+                    TableId = Guid.NewGuid(),
+                    TableTypeId = vip,
+                    TableName = "VIPA-4-1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                // Bar Buddy 5
+                new Table
+                {
+                    TableId = Guid.NewGuid(),
+                    TableTypeId = tc1,
+                    TableName = "Table TC1-5-1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                new Table
+                {
+                    TableId = Guid.NewGuid(),
+                    TableTypeId = tc2,
+                    TableName = "Table TC2-5-1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                // Bar Buddy 6
+                new Table
+                {
+                    TableId = Guid.NewGuid(),
+                    TableTypeId = qb,
+                    TableName = "QA-6-1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                new Table
+                {
+                    TableId = Guid.NewGuid(),
+                    TableTypeId = qb,
+                    TableName = "QB-6-1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                // Bar Buddy 7
+                new Table
+                {
+                    TableId = Guid.NewGuid(),
+                    TableTypeId = svip,
+                    TableName = "SVIPA-7-1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                new Table
+                {
+                    TableId = Guid.NewGuid(),
+                    TableTypeId = vip,
+                    TableName = "VIPA-7-1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                // Bar Buddy 8
+                new Table
+                {
+                    TableId = Guid.NewGuid(),
+                    TableTypeId = tc1,
+                    TableName = "Table TC1-8-1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                new Table
+                {
+                    TableId = Guid.NewGuid(),
+                    TableTypeId = tc2,
+                    TableName = "Table TC2-8-1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                // Bar Buddy 9
+                new Table
+                {
+                    TableId = Guid.NewGuid(),
+                    TableTypeId = qb,
+                    TableName = "QA-9-1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                new Table
+                {
+                    TableId = Guid.NewGuid(),
+                    TableTypeId = qb,
+                    TableName = "QB-9-1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                // Bar Buddy 10
+                new Table
+                {
+                    TableId = Guid.NewGuid(),
+                    TableTypeId = svip,
+                    TableName = "SVIPA-10-1",
+                    Status = 0,
+                    IsDeleted = false
+                },
+                new Table
+                {
+                    TableId = Guid.NewGuid(),
+                    TableTypeId = vip,
+                    TableName = "VIPA-10-1",
+                    Status = 0,
+                    IsDeleted = false
                 }
             );
 

@@ -25,6 +25,7 @@ namespace Domain.Entities
         public Guid? CheckOutStaffId { get; set; }
         public int NumOfTable { get; set; }
         public string? QRTicket { get; set; }
+        public DateTime ExpireAt { get; set; }
         public DateTime CreateAt { get; set; } = DateTime.Now;
         public int Status { get; set; }
 

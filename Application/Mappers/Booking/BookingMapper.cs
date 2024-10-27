@@ -25,7 +25,7 @@ namespace Application.Mappers.Booking
             CreateMap<BookingTable, BookingTableResponse>();
 
             CreateMap<BookingTableRequest, Domain.Entities.Booking>()
-                .ForMember(dest => dest.BookingDate, opt => opt.MapFrom(src => src.BookingDate.DateTime));
+                .ForMember(dest => dest.BookingDate, opt => opt.MapFrom(src => src.BookingDate));
 
             CreateMap<BookingDrink, BookingDrinkDetailResponse>()
                 .ForMember(x => x.DrinkName, opt => opt.MapFrom(y => y.Drink.DrinkName));

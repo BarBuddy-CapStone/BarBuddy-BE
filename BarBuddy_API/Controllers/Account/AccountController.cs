@@ -1,6 +1,5 @@
 ﻿using Application.DTOs.Account;
 using Application.IService;
-using Application.Service;
 using Azure.Core;
 using CoreApiResponse;
 using MediatR;
@@ -66,6 +65,27 @@ namespace BarBuddy_API.Controllers.Account
         }
 
         /// <summary>
+        /// Get List Manager Accounts
+        /// </summary>
+        /// <param name="pageSize"></param>
+        /// <param name="pageIndex"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet("/api/v1/manager-accounts")]
+        public async Task<IActionResult> GetManagerAccounts([FromQuery] int pageSize, [FromQuery] int pageIndex)
+        {
+            var accountList = await _accountService.GetPaginationManagerAccount(pageSize, pageIndex);
+            var result = new
+            {
+                items = accountList.items,
+                total = accountList.total,
+                pageIndex = pageIndex,
+                pageSize = pageSize
+            };
+            return CustomResult(result);
+        }
+
+        /// <summary>
         ///  Get Staff Account By Id
         /// </summary>
         /// <param name="accountId"></param>
@@ -75,6 +95,19 @@ namespace BarBuddy_API.Controllers.Account
         public async Task<IActionResult> GetStaffAccountById([FromQuery] Guid accountId)
         {
             var staffAccount = await _accountService.GetStaffAccountById(accountId);
+            return CustomResult(staffAccount);
+        }
+
+        /// <summary>
+        ///  Get Manager Account By Id
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet("/api/v1/manager-account/detail")]
+        public async Task<IActionResult> GetManagerAccountById([FromQuery] Guid accountId)
+        {
+            var staffAccount = await _accountService.GetManagerAccountById(accountId);
             return CustomResult(staffAccount);
         }
 
@@ -121,6 +154,23 @@ namespace BarBuddy_API.Controllers.Account
         }
 
         /// <summary>
+        /// Create Manager Account
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpPost("/api/v1/manager-account")]
+        public async Task<IActionResult> CreateManagerAccount([FromBody] ManagerAccountRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _accountService.CreateManagerAccount(request);
+            return CustomResult("Tạo tài khoản thành công!", result);
+        }
+
+        /// <summary>
         /// Create Customer Account
         /// </summary>
         /// <param name="request"></param>
@@ -152,6 +202,24 @@ namespace BarBuddy_API.Controllers.Account
                 return BadRequest(ModelState);
             }
             var result = await _accountService.UpdateStaffAccount(accountId, request);
+            return CustomResult("Thông tin đã được cập nhật thành công!", result);
+        }
+
+        /// <summary>
+        /// Update Manager Account
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpPatch("/api/v1/manager-account")]
+        public async Task<IActionResult> UpdateManagerAccount([FromQuery] Guid accountId, [FromBody] ManagerAccountRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _accountService.UpdateManagerAccount(accountId, request);
             return CustomResult("Thông tin đã được cập nhật thành công!", result);
         }
 

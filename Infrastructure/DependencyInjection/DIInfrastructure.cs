@@ -18,6 +18,7 @@ using Infrastructure.Zalopay.Config;
 using Infrastructure.Momo.Config;
 
 using Quartz;
+using Infrastructure.QRService;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -71,6 +72,7 @@ namespace Infrastructure.DependencyInjection
             services.AddTransient<IOtpSender, OtpSender>();
             services.AddTransient<IBookingHubService, BookingHubService>();
             services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+            services.AddScoped<IQRCodeService, QRCodeService>();
 
             services.AddScoped<IEmotionalDrinkCategoryService, EmotionalDrinkCategoryService>();
             services.AddScoped<IFeedBackService, FeedBackService>();

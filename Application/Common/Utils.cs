@@ -1,5 +1,6 @@
 ﻿using Azure.Core;
 using Domain.CustomException;
+using Domain.Entities;
 using Domain.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
@@ -55,7 +56,7 @@ namespace Application.Common
             return age >= 18 ? ValidationResult.Success : new ValidationResult("Bạn phải đủ 18 tuổi.");
         }
 
-        public static void ValidateOpenCloseTime(DateTimeOffset requestDate, TimeSpan requestTime, TimeSpan openTime, TimeSpan closeTime)
+        public static void ValidateOpenCloseTime(DateTimeOffset requestDate, TimeSpan requestTime, List<BarTime> barTimes)
         {
             var currentDate = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now.Date);
             if (requestDate < currentDate)
@@ -66,25 +67,16 @@ namespace Application.Common
             {
                 if (requestTime < TimeHelper.ConvertToUtcPlus7(DateTimeOffset.UtcNow).TimeOfDay)
                 {
-                    throw new CustomException.InvalidDataException("Thời gian phải nằm trong giờ mở cửa và giờ đóng cửa của quán Bar !");
-                }
-                if (requestTime < openTime || requestTime > TimeSpan.FromHours(23.9999))
-                {
-                    if (requestTime > closeTime)
-                    {
-                        throw new CustomException.InvalidDataException("Thời gian phải nằm trong giờ mở cửa và giờ đóng cửa của quán Bar !");
-                    }
+                    throw new CustomException.InvalidDataException("Thời gian phải nằm trong giờ mở cửa và giờ đóng cửa của quán Bar!");
                 }
             }
-            else if (requestDate > currentDate)
+
+            bool isValidTime = barTimes.Any(barTime => 
+                (requestTime >= barTime.StartTime && requestTime <= barTime.EndTime));
+
+            if (!isValidTime)
             {
-                if (requestTime > closeTime && requestTime < TimeSpan.FromHours(24))
-                {
-                    if (requestTime < openTime)
-                    {
-                        throw new CustomException.InvalidDataException("Thời gian phải nằm trong giờ mở cửa và giờ đóng cửa của quán Bar !");
-                    }
-                }
+                throw new CustomException.InvalidDataException("Thời gian phải nằm trong giờ mở cửa và giờ đóng cửa của quán Bar!");
             }
         }
 
@@ -93,8 +85,8 @@ namespace Application.Common
             if (requestDate != null)
             {
                 ValidateDateNotInPast(requestDate.Value);
-                ValidateOpenCloseTime(requestDate.Value, startTime, openTime, closeTime);
-                ValidateOpenCloseTime(requestDate.Value, endTime, openTime, closeTime);
+                //ValidateOpenCloseTime(requestDate.Value, startTime, openTime, closeTime);
+                //ValidateOpenCloseTime(requestDate.Value, endTime, openTime, closeTime);
             }
             else
             {

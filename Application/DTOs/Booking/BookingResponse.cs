@@ -18,6 +18,8 @@ namespace Application.DTOs.Booking
         public string CustomerName { get; set; }
         public string CustomerPhone { get; set; }
         public string CustomerEmail { get; set; }
+        public string QRTicket { get; set; }
+        public DateTime ExpireAt { get; set; }
         public string? Note { get; set; }
         public DateTimeOffset BookingDate { get; set; }
         public TimeSpan BookingTime { get; set; }

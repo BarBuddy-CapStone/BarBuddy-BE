@@ -28,8 +28,12 @@ namespace Application.Service
         private readonly IPaymentService _paymentService;
         private readonly IEmailSender _emailSender;
         private readonly INotificationService _notificationService;
+        private readonly IQRCodeService _qrCodeService;
+        private readonly IFirebase _firebase;
+
         public BookingService(IUnitOfWork unitOfWork, IMapper mapper, IAuthentication authentication,
-            IPaymentService paymentService, IEmailSender emailSender, INotificationService notificationService)
+            IPaymentService paymentService, IEmailSender emailSender, 
+            INotificationService notificationService, IQRCodeService qrCodeService, IFirebase firebase)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -37,6 +41,8 @@ namespace Application.Service
             _paymentService = paymentService;
             _emailSender = emailSender;
             _notificationService = notificationService;
+            _qrCodeService = qrCodeService;
+            _firebase = firebase;
         }
 
         public async Task<bool> CancelBooking(Guid BookingId)
@@ -325,7 +331,10 @@ namespace Application.Service
             {
                 var responses = new List<TopBookingResponse>();
 
-                var bookings = await _unitOfWork.BookingRepository.GetAsync(b => b.AccountId == CustomerId, pageIndex: 1, pageSize: NumOfBookings, orderBy: o => o.OrderByDescending(b => b.CreateAt).ThenByDescending(b => b.BookingDate), includeProperties: "Bar");
+                var bookings = await _unitOfWork.BookingRepository.GetAsync(b => b.AccountId == CustomerId, 
+                    pageIndex: 1, pageSize: NumOfBookings, 
+                    orderBy: o => o.OrderByDescending(b => b.CreateAt).ThenByDescending(b => b.BookingDate), 
+                    includeProperties: "Bar");
                 foreach (var booking in bookings)
                 {
                     var feedback = await _unitOfWork.FeedbackRepository.GetAsync(f => f.BookingId == booking.BookingId);
@@ -367,17 +376,26 @@ namespace Application.Service
         {
             try
             {
-
                 var booking = _mapper.Map<Booking>(request);
                 booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext)) ?? throw new DataNotFoundException("account not found");
                 booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId) ?? throw new DataNotFoundException("Bar not found");
 
-                //Utils.ValidateOpenCloseTime(request.BookingDate.Date, request.BookingTime,
-                //    booking.Bar.StartTime, booking.Bar.EndTime);
+                var barTimes = await _unitOfWork.BarTimeRepository.GetAsync(x => x.BarId == request.BarId);
+                if (barTimes == null || !barTimes.Any())
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy thông tin thời gian của Bar.");
+                }
+
+                Utils.ValidateOpenCloseTime(request.BookingDate, request.BookingTime, barTimes.ToList());
 
                 booking.BookingTables = booking.BookingTables ?? new List<BookingTable>();
                 booking.BookingCode = $"{booking.BookingDate.ToString("yyMMdd")}{RandomHelper.GenerateRandomNumberString()}";
-                booking.Status = (int)PrefixValueEnum.PendingBooking;
+                booking.Status = (int)BookingStatusEnum.Pending;
+
+                var qrCode = _qrCodeService.GenerateQRCode(booking.BookingId);
+                booking.QRTicket = await _firebase.UploadImageAsync(Utils.ConvertBase64ToFile(qrCode));
+
+                booking.ExpireAt = (request.BookingDate + request.BookingTime).AddHours(2);
                 booking.TotalPrice = null;
 
                 if (request.TableIds != null && request.TableIds.Count > 0)
@@ -494,15 +512,24 @@ namespace Application.Service
                 booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext)) ?? throw new DataNotFoundException("account not found");
                 booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId) ?? throw new DataNotFoundException("Bar not found");
 
-                //Utils.ValidateOpenCloseTime(request.BookingDate, request.BookingTime,
-                //    booking.Bar.StartTime, booking.Bar.EndTime);
+                var barTimes = await _unitOfWork.BarTimeRepository.GetAsync(x => x.BarId == request.BarId);
+                if (barTimes == null || !barTimes.Any())
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy thông tin thời gian của Bar.");
+                }
+
+                Utils.ValidateOpenCloseTime(request.BookingDate, request.BookingTime, barTimes.ToList());
 
                 booking.BookingTables = booking.BookingTables ?? new List<BookingTable>();
                 booking.BookingDrinks = booking.BookingDrinks ?? new List<BookingDrink>();
                 booking.BookingDate = request.BookingDate.Date;
                 booking.BookingCode = $"BOOKING-{RandomHelper.GenerateRandomNumberString()}";
-                booking.Status = (int)PaymentStatusEnum.Pending;
-                booking.TotalPrice = 0;
+                booking.Status = (int)BookingStatusEnum.Pending;
+
+                var qrCode = _qrCodeService.GenerateQRCode(booking.BookingId);
+                booking.QRTicket = await _firebase.UploadImageAsync(Utils.ConvertBase64ToFile(qrCode));
+
+                booking.ExpireAt = (request.BookingDate + request.BookingTime).AddHours(2);
 
                 double totalPrice = 0;
 
@@ -550,6 +577,7 @@ namespace Application.Service
                             Quantity = drink.Quantity
                         };
                         totalPrice += bookingDrink.ActualPrice * bookingDrink.Quantity;
+                        booking.TotalPrice = totalPrice;
                         booking.BookingDrinks?.Add(bookingDrink);
                     }
                     totalPrice = totalPrice - totalPrice * booking.Bar.Discount / 100;
@@ -563,6 +591,7 @@ namespace Application.Service
 
                 try
                 {
+                    booking.TotalPrice = totalPrice;
                     _unitOfWork.BeginTransaction();
                     _unitOfWork.BookingRepository.Insert(booking);
                     await _notificationService.CreateNotification(creNoti);
