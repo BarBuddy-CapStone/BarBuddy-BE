@@ -10,6 +10,8 @@ namespace Application.DTOs.TableType
     public class TableTypeRequest
     {
         [Required]
+        public Guid BarId { get; set; }
+        [Required]
         public string? TypeName { get; set; }
         public string? Description { get; set; }
         [Required]
