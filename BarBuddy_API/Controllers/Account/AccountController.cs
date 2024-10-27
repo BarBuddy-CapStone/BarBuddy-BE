@@ -89,7 +89,7 @@ namespace BarBuddy_API.Controllers.Account
         public async Task<IActionResult> GetCustomerAccountByEmail([FromQuery] Guid accountId)
         {
             var customerAccount = await _accountService.GetCustomerAccountById(accountId);
-            return CustomResult(customerAccount);
+            return CustomResult("Data loaded", customerAccount);
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace BarBuddy_API.Controllers.Account
         public async Task<IActionResult> GetCustomerAccountById(Guid accountId)
         {
             var customerAccount = await _accountService.GetCustomerInfoById(accountId);
-            return Ok(customerAccount);
+            return CustomResult(customerAccount);
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace BarBuddy_API.Controllers.Account
                 return BadRequest(ModelState);
             }
             var result = await _accountService.CreateStaffAccount(request);
-            return CustomResult(result);
+            return CustomResult("Tạo tài khoản thành công!", result);
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace BarBuddy_API.Controllers.Account
                 return BadRequest(ModelState);
             }
             var result = await _accountService.CreateCustomerAccount(request);
-            return CustomResult(result);
+            return CustomResult("Tạo tài khoản thành công!", result);
         }
 
         /// <summary>
@@ -153,7 +153,7 @@ namespace BarBuddy_API.Controllers.Account
                 return BadRequest(ModelState);
             }
             var result = await _accountService.UpdateStaffAccount(accountId, request);
-            return CustomResult(result);
+            return CustomResult("Thông tin đã được cập nhật thành công!", result);
         }
 
         /// <summary>
@@ -171,7 +171,7 @@ namespace BarBuddy_API.Controllers.Account
                 return BadRequest(ModelState);
             }
             var result = await _accountService.UpdateCustomerAccount(accountId, request);
-            return CustomResult(result);
+            return CustomResult("Thông tin đã được cập nhật thành công!", result);
         }
 
         /// <summary>

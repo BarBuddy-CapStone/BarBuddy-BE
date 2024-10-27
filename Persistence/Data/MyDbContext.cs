@@ -36,6 +36,7 @@ namespace Persistence.Data
         public DbSet<Event> Events { get; set; }
         public DbSet<TimeEvent> TimeEvents { get; set; }
         public DbSet<EventVoucher> EventVouchers { get; set; }
+        public DbSet<BarTime> BarTimes { get; set; }
 
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -189,11 +190,9 @@ namespace Persistence.Data
                     BarId = new Guid("550e8400-e29b-41d4-a716-446655440000"),
                     Address = "87A Hàm Nghi, Phường Nguyễn Thái Bình, Quận 1",
                     BarName = "Bar Buddy 1",
-                    Description = "Tọa lạc trên tầng 14, tại 87A Hàm Nghi, quận 1, nằm ở khu vực trung tâm thành phố. Đến với Bar Buddy 1 để trải nghiệm sky bar “HOT” nhất Sài Gòn hiện nay. Bar Buddy 1 được mệnh danh là địa điểm ăn chơi Sài Gòn xa hoa bậc nhất. Âm nhạc cuốn hút và vị ngon mê đắm của những đồ uống hảo hạng sẽ giúp bạn tận hưởng những phút giây thăng hoa. Những màn trình diễn đẳng cấp của các ca sĩ hàng đầu Việt Nam sẽ thổi bùng không khí khiến bạn không thể ngồi yên.",
+                    Description = "Tọa lạc trên tầng 14, tại 87A Hàm Nghi, quận 1, nằm ở khu vực trung tâm thành phố. Đến với Bar Buddy 1 để trải nghiệm sky bar \"HOT\" nhất Sài Gòn hiện nay. Bar Buddy 1 được mệnh danh là địa điểm ăn chơi Sài Gòn xa hoa bậc nhất. Âm nhạc cuốn hút và vị ngon mê đắm của những đồ uống hảo hạng sẽ giúp bạn tận hưởng những phút giây thăng hoa. Những màn trình diễn đẳng cấp của các ca sĩ hàng đầu Việt Nam sẽ thổi bùng không khí khiến bạn không thể ngồi yên.",
                     Discount = 10,
                     Email = "contact@barbuddy1.com",
-                    EndTime = new TimeSpan(2, 0, 0),
-                    StartTime = new TimeSpan(18, 0, 0),
                     Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/a0d4292c13b0cc51b2487f4c276cd7c0d96510872c4a855db190ff2db8e692d2?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
                     PhoneNumber = "0901234567",
                     Status = true
@@ -206,8 +205,6 @@ namespace Persistence.Data
                     Description = "Tọa lạc ngay giữa trung tâm thành phố Hồ Chí Minh, Bar Buddy 2 với thiết kế độc đáo, lạ mắt, mang nét thu hút riêng như lạc vào thế giới của bộ phim hành động kinh dị: Mad Max. Một không gian nổi loạn và cực ngầu mang lại cảm giác quái lạ đầy bí ẩn. Bar Buddy 2 với sự đầu tư hoành tráng bằng những thiết bị, âm thanh, ánh sáng hiện đại nhất bạn sẽ được các DJ hàng đầu chiêu đãi cùng dàn khách mời đặc biệt: Hồ Ngọc Hà, Sơn Tùng M-TP, Erik.... chắc chắn khách hàng của Atmos sẽ luôn được tiếp đón và phục vụ tận tình",
                     Discount = 15,
                     Email = "contact@barbuddy2.com",
-                    EndTime = new TimeSpan(3, 0, 0),
-                    StartTime = new TimeSpan(17, 0, 0),
                     Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/7cbd7d84e2ff7b5156aa5241bd27de56fe00bcb6e309e2c77ff2c39bf3b0b236?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
                     PhoneNumber = "0901234568",
                     Status = true
@@ -217,11 +214,9 @@ namespace Persistence.Data
                     BarId = new Guid("550e8400-e29b-41d4-a716-446655440002"),
                     Address = "264 Đ. Nam Kỳ Khởi Nghĩa, Phường 8, Quận 3",
                     BarName = "Bar Buddy 3",
-                    Description = "Nằm tại trung tâm quận 3, Bar Buddy 3 là một trong những bar lâu năm nổi tiếng hàng đầu Sài Gòn. Không gian sang trọng nhiều vị trí đẹp và có sân khấu lớn ngay trung tâm. Sử dụng chất nhạc Vinahouse cực kỳ mạnh mẽ “on trend” là điều luôn hấp dẫn các vị khách tới Bar Buddy 3. Hơn thế nữa các sự kiện luôn diễn ra vào cuối tuần với dàn khách mời ca sĩ hàng đầu Việt Nam: Ưng Hoàng Phúc, Duy Mạnh, Trịnh Tuấn Vỹ… Với slogan “Nơi thể hiện đẳng cấp của bạn” hãy sẵn sàng thể hiện bản thân tại Bar Buddy 3 bar.",
+                    Description = "Nằm tại trung tâm quận 3, Bar Buddy 3 là một trong những bar lâu năm nổi tiếng hàng đầu Sài Gòn. Không gian sang trọng nhiều vị trí đẹp và có sân khấu lớn ngay trung tâm. Sử dụng chất nhạc Vinahouse cực kỳ mạnh mẽ \"on trend\" là điều luôn hấp dẫn các vị khách tới Bar Buddy 3. Hơn thế nữa các sự kiện luôn diễn ra vào cuối tuần với dàn khách mời ca sĩ hàng đầu Việt Nam: Ưng Hoàng Phúc, Duy Mạnh, Trịnh Tuấn Vỹ… Với slogan \"Nơi thể hiện đẳng cấp của bạn\" hãy sẵn sàng thể hiện bản thân tại Bar Buddy 3 bar.",
                     Discount = 20,
                     Email = "contact@barbuddy3.com",
-                    EndTime = new TimeSpan(1, 0, 0),
-                    StartTime = new TimeSpan(19, 0, 0),
                     Images = "https://vietnamnightlife.com/uploads/images/2020/02/1580805657-multi_product20-bambamoverview1.jpg.webp",
                     PhoneNumber = "0901234569",
                     Status = true
@@ -234,8 +229,6 @@ namespace Persistence.Data
                     Description = "Bar Buddy 4 sở hữu vị trí đắc địa trên tầng 2, khách sạn 5 sao Le Meridien trên đường Tôn Đức Thắng. Bar Buddy 4 sở hữu không gian \"dark bar\" không lẫn vào đâu được cùng phong cách Commas, với công nghệ laser light độc nhất vô nhị tại Hồ Chí Minh. Khách hàng sẽ có những giây phút bung xõa cùng những giai điệu Hip Hop tại Bar Buddy 4, tân binh mới nhất tại Nightlife Hồ Chí Minh. ",
                     Discount = 25,
                     Email = "contact@barbuddy4.com",
-                    EndTime = new TimeSpan(4, 0, 0),
-                    StartTime = new TimeSpan(20, 0, 0),
                     Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/4f4bc5cae670ae75847bb24a78027e45ce8487386c0a1043f999381ae9fa4831?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
                     PhoneNumber = "0901234570",
                     Status = true
@@ -248,8 +241,6 @@ namespace Persistence.Data
                     Description = "Quán bar kết hợp giữa nhạc sống và DJ.",
                     Discount = 5,
                     Email = "contact@barbuddy5.com",
-                    EndTime = new TimeSpan(2, 30, 0),
-                    StartTime = new TimeSpan(18, 30, 0),
                     Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/fc1f4652930fe4a25d46a46d1933e950912b6ceace8e777840ceccd123995783?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
                     PhoneNumber = "0901234571",
                     Status = true
@@ -262,8 +253,6 @@ namespace Persistence.Data
                     Description = "Không gian thoải mái với nhiều trò chơi giải trí.",
                     Discount = 10,
                     Email = "contact@barbuddy6.com",
-                    EndTime = new TimeSpan(3, 30, 0),
-                    StartTime = new TimeSpan(17, 30, 0),
                     Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/677e2c38ccd2ea07e8a72aa6262c873572a4cfd3da719a1e25c2152169bb47c6?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
                     PhoneNumber = "0901234572",
                     Status = true
@@ -276,8 +265,6 @@ namespace Persistence.Data
                     Description = "Nơi hội tụ của những tâm hồn yêu thích âm nhạc.",
                     Discount = 30,
                     Email = "contact@barbuddy7.com",
-                    EndTime = new TimeSpan(1, 0, 0),
-                    StartTime = new TimeSpan(19, 0, 0),
                     Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/2f3601dbe8c6d0a812bccaf7ecf02686ec5b99038e314c058a00a37c16840608?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
                     PhoneNumber = "0901234573",
                     Status = true
@@ -287,11 +274,9 @@ namespace Persistence.Data
                     BarId = new Guid("550e8400-e29b-41d4-a716-446655440007"),
                     Address = "120 Đ. Nguyễn Huệ, Bến Nghé, Quận 1",
                     BarName = "Bar Buddy 8",
-                    Description = "Quán bar rooftop với tầm nhìn đẹp.",
+                    Description = "Quán bar rooftop với tầm nhìn đp.",
                     Discount = 20,
                     Email = "contact@barbuddy8.com",
-                    EndTime = new TimeSpan(2, 0, 0),
-                    StartTime = new TimeSpan(17, 0, 0),
                     Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/7cbd7d84e2ff7b5156aa5241bd27de56fe00bcb6e309e2c77ff2c39bf3b0b236?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
                     PhoneNumber = "0901234574",
                     Status = true
@@ -304,8 +289,6 @@ namespace Persistence.Data
                     Description = "Quán bar dành cho các tín đồ yêu thích craft beer.",
                     Discount = 15,
                     Email = "contact@barbuddy9.com",
-                    EndTime = new TimeSpan(3, 0, 0),
-                    StartTime = new TimeSpan(18, 0, 0),
                     Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/7cbd7d84e2ff7b5156aa5241bd27de56fe00bcb6e309e2c77ff2c39bf3b0b236?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
                     PhoneNumber = "0901234575",
                     Status = true
@@ -318,8 +301,6 @@ namespace Persistence.Data
                     Description = "Không gian ấm cúng với các loại cocktail độc đáo.",
                     Discount = 10,
                     Email = "contact@barbuddy10.com",
-                    EndTime = new TimeSpan(2, 0, 0),
-                    StartTime = new TimeSpan(19, 0, 0),
                     Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/a0d4292c13b0cc51b2487f4c276cd7c0d96510872c4a855db190ff2db8e692d2?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
                     PhoneNumber = "0901234576",
                     Status = true
@@ -418,6 +399,7 @@ namespace Persistence.Data
                 new TableType
                 {
                     TableTypeId = svip,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Thêm BarId vào TableType
                     TypeName = "Bàn SVIP",
                     Description = "Bàn SVIP phù hợp cho khách hàng muốn trải nghiệm dịch vụ chất lượng cao nhất tại quán, phù hợp cho nhóm khách hàng từ 1-15 người, mức giá tối thiểu chỉ từ 10.000.000 VND.",
                     MaximumGuest = 15,
@@ -428,6 +410,7 @@ namespace Persistence.Data
                 new TableType
                 {
                     TableTypeId = vip,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"), // Thêm BarId vào TableType
                     TypeName = "Bàn VIP",
                     Description = "Bàn VIP phù hợp cho khách hàng muốn trải nghiệm dịch vụ chất lượng cao tại quán, phù hợp cho nhóm khách hàng từ 1-10 người, mức giá tối thiểu chỉ từ 5.000.000 VND.",
                     MaximumGuest = 10,
@@ -438,6 +421,7 @@ namespace Persistence.Data
                 new TableType
                 {
                     TableTypeId = tc1,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"), // Thêm BarId vào TableType
                     TypeName = "Bàn Tiêu chuẩn 1",
                     Description = "Bàn Tiêu chuẩn 1 phù hợp cho khách hàng muốn trải nghiệm dịch vụ tiêu chuẩn tại quán, phù hợp cho nhóm khách hàng từ 1-4 người, mức giá tối thiểu chỉ từ 200.000 VND.",
                     MaximumGuest = 4,
@@ -448,6 +432,7 @@ namespace Persistence.Data
                 new TableType
                 {
                     TableTypeId = tc2,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Thêm BarId vào TableType
                     TypeName = "Bàn Tiêu chuẩn 2",
                     Description = "Bàn Tiêu chuẩn 2 phù hợp cho khách hàng muốn trải nghiệm dịch vụ tiêu chuẩn tại quán, phù hợp cho nhóm khách hàng từ 4-6 người, mức giá tối thiểu chỉ từ 500.000 VND.",
                     MaximumGuest = 6,
@@ -458,6 +443,7 @@ namespace Persistence.Data
                 new TableType
                 {
                     TableTypeId = qb,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440004"), // Thêm BarId vào TableType
                     TypeName = "Bàn Quầy Bar",
                     Description = "Bàn Quầy Bar phù hợp cho khách hàng muốn trải nghiệm dịch vụ tiêu chuẩn tại quán và được phụ vụ trực tiếp bởi các Bartender, mức giá tối thiểu chỉ từ 200.000 VND.",
                     MaximumGuest = 1,
@@ -467,12 +453,40 @@ namespace Persistence.Data
                 }
             );
 
+            // BarTime Data
+            modelBuilder.Entity<BarTime>().HasData(
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Bar Buddy 1
+                    DayOfWeek = 5, // Thứ Sáu
+                    StartTime = new TimeSpan(18, 0, 0), // 6:00 PM
+                    EndTime = new TimeSpan(2, 0, 0) // 2:00 AM
+                },
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"), // Bar Buddy 2
+                    DayOfWeek = 6, // Thứ Bảy
+                    StartTime = new TimeSpan(19, 0, 0), // 7:00 PM
+                    EndTime = new TimeSpan(3, 0, 0) // 3:00 AM
+                },
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"), // Bar Buddy 3
+                    DayOfWeek = 0, // Chủ Nhật
+                    StartTime = new TimeSpan(17, 0, 0), // 5:00 PM
+                    EndTime = new TimeSpan(1, 0, 0) // 1:00 AM
+                }
+                // ... thêm dữ liệu mẫu cho các quán bar khác nếu cần ...
+            );
+
             //Table
             modelBuilder.Entity<Table>().HasData(
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330444"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = svip,
                     TableName = "Table SVIP1-A1",
                     Status = 0,
@@ -481,7 +495,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330443"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = svip,
                     TableName = "Table SVIP1-B1",
                     Status = 0,
@@ -490,7 +503,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330442"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = vip,
                     TableName = "Table VIP1-A1",
                     Status = 0,
@@ -499,7 +511,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330441"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = vip,
                     TableName = "Table VIP1-B1",
                     Status = 0,
@@ -508,7 +519,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330440"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = vip,
                     TableName = "Table VIP1-C1",
                     Status = 0,
@@ -517,7 +527,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330000"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = tc1,
                     TableName = "Table TC1-A1",
                     Status = 0,
@@ -526,7 +535,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330331"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = tc1,
                     TableName = "Table TC1-B1",
                     Status = 0,
@@ -535,7 +543,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330231"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = tc1,
                     TableName = "Table TC1-C1",
                     Status = 0,
@@ -544,7 +551,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330232"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = tc1,
                     TableName = "Table TC1-D1",
                     Status = 0,
@@ -553,7 +559,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330233"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = tc1,
                     TableName = "Table TC1-E1",
                     Status = 0,
@@ -562,7 +567,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330234"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = tc1,
                     TableName = "Table TC1-F1",
                     Status = 0,
@@ -571,7 +575,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330235"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = tc2,
                     TableName = "Table TC2-A1",
                     Status = 0,
@@ -580,7 +583,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330236"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = tc2,
                     TableName = "Table TC2-B1",
                     Status = 0,
@@ -589,7 +591,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330237"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = tc2,
                     TableName = "Table TC2-C1",
                     Status = 0,
@@ -598,7 +599,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330238"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = tc2,
                     TableName = "Table TC2-D1",
                     Status = 0,
@@ -607,7 +607,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330001"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = qb,
                     TableName = "Table QA-1",
                     Status = 0,
@@ -616,7 +615,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330021"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = qb,
                     TableName = "Table QB-1",
                     Status = 0,
@@ -625,7 +623,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330013"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = qb,
                     TableName = "Table QC-1",
                     Status = 0,
@@ -634,7 +631,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330014"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = qb,
                     TableName = "Table QD-1",
                     Status = 0,
@@ -643,7 +639,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330015"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = qb,
                     TableName = "Table QE-1",
                     Status = 0,
@@ -652,7 +647,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330016"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"),
                     TableTypeId = qb,
                     TableName = "Table QF-1",
                     Status = 0,
@@ -662,7 +656,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330111"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     TableTypeId = svip,
                     TableName = "SVIPA-2",
                     Status = 0,
@@ -671,7 +664,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330112"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     TableTypeId = svip,
                     TableName = "SVIPB-2",
                     Status = 0,
@@ -680,7 +672,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330113"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     TableTypeId = vip,
                     TableName = "VIPA-2",
                     Status = 0,
@@ -689,7 +680,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330114"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     TableTypeId = vip,
                     TableName = "VIPB-2",
                     Status = 0,
@@ -698,7 +688,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330115"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     TableTypeId = vip,
                     TableName = "VIPC-2",
                     Status = 0,
@@ -707,7 +696,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330116"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     TableTypeId = tc1,
                     TableName = "Table TC1-A2",
                     Status = 0,
@@ -716,7 +704,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330117"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     TableTypeId = tc1,
                     TableName = "Table TC1-B2",
                     Status = 0,
@@ -725,7 +712,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330118"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     TableTypeId = tc1,
                     TableName = "Table TC1-C2",
                     Status = 0,
@@ -734,7 +720,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330119"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     TableTypeId = tc1,
                     TableName = "Table TC1-D2",
                     Status = 0,
@@ -743,7 +728,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330120"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     TableTypeId = tc1,
                     TableName = "Table TC1-E2",
                     Status = 0,
@@ -752,7 +736,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330121"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     TableTypeId = tc2,
                     TableName = "Table TC2-A2",
                     Status = 0,
@@ -761,7 +744,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330122"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     TableTypeId = tc2,
                     TableName = "Table TC2-B2",
                     Status = 0,
@@ -770,7 +752,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330123"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     TableTypeId = tc2,
                     TableName = "Table TC2-C2",
                     Status = 0,
@@ -779,7 +760,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330124"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     TableTypeId = tc2,
                     TableName = "Table TC2-D2",
                     Status = 0,
@@ -788,7 +768,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330125"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     TableTypeId = qb,
                     TableName = "QA-2",
                     Status = 0,
@@ -797,7 +776,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330126"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     TableTypeId = qb,
                     TableName = "QB-2",
                     Status = 0,
@@ -806,7 +784,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330127"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     TableTypeId = qb,
                     TableName = "QC-2",
                     Status = 0,
@@ -815,7 +792,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330128"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     TableTypeId = qb,
                     TableName = "QD-2",
                     Status = 0,
@@ -824,7 +800,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330129"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     TableTypeId = qb,
                     TableName = "QE-2",
                     Status = 0,
@@ -833,7 +808,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330130"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"),
                     TableTypeId = qb,
                     TableName = "QF-2",
                     Status = 0,
@@ -842,7 +816,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330131"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
                     TableTypeId = svip,
                     TableName = "SVIPA-3",
                     Status = 0,
@@ -851,7 +824,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330132"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
                     TableTypeId = svip,
                     TableName = "SVIPB-3",
                     Status = 0,
@@ -860,7 +832,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330133"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
                     TableTypeId = vip,
                     TableName = "VIPA-3",
                     Status = 0,
@@ -869,7 +840,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330134"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
                     TableTypeId = vip,
                     TableName = "VIPB-3",
                     Status = 0,
@@ -878,7 +848,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330135"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
                     TableTypeId = vip,
                     TableName = "VIPC-3",
                     Status = 0,
@@ -887,7 +856,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330136"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
                     TableTypeId = tc1,
                     TableName = "Table TC1-A3",
                     Status = 0,
@@ -896,7 +864,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330137"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
                     TableTypeId = tc1,
                     TableName = "Table TC1-B3",
                     Status = 0,
@@ -905,7 +872,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330138"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
                     TableTypeId = tc1,
                     TableName = "Table TC1-C3",
                     Status = 0,
@@ -914,7 +880,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330139"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
                     TableTypeId = tc1,
                     TableName = "Table TC1-D3",
                     Status = 0,
@@ -923,7 +888,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330140"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
                     TableTypeId = tc1,
                     TableName = "Table TC1-E3",
                     Status = 0,
@@ -932,7 +896,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330141"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
                     TableTypeId = tc2,
                     TableName = "Table TC2-A3",
                     Status = 0,
@@ -941,7 +904,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330142"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
                     TableTypeId = tc2,
                     TableName = "Table TC2-B3",
                     Status = 0,
@@ -950,7 +912,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330143"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
                     TableTypeId = tc2,
                     TableName = "Table TC2-C3",
                     Status = 0,
@@ -959,7 +920,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330144"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
                     TableTypeId = tc2,
                     TableName = "Table TC2-D3",
                     Status = 0,
@@ -968,7 +928,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330145"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
                     TableTypeId = qb,
                     TableName = "QA-3",
                     Status = 0,
@@ -977,7 +936,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330146"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
                     TableTypeId = qb,
                     TableName = "QB-3",
                     Status = 0,
@@ -986,7 +944,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330147"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
                     TableTypeId = qb,
                     TableName = "QC-3",
                     Status = 0,
@@ -995,7 +952,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330148"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
                     TableTypeId = qb,
                     TableName = "QD-3",
                     Status = 0,
@@ -1004,7 +960,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330149"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
                     TableTypeId = qb,
                     TableName = "QE-3",
                     Status = 0,
@@ -1013,7 +968,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330150"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"),
                     TableTypeId = qb,
                     TableName = "QF-3",
                     Status = 0,
@@ -1022,7 +976,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330151"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"),
                     TableTypeId = svip,
                     TableName = "SVIPA-4",
                     Status = 0,
@@ -1031,7 +984,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330152"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"),
                     TableTypeId = vip,
                     TableName = "VIPA-4",
                     Status = 0,
@@ -1040,7 +992,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330153"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"),
                     TableTypeId = vip,
                     TableName = "VIPB-4",
                     Status = 0,
@@ -1049,7 +1000,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330154"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"),
                     TableTypeId = tc1,
                     TableName = "Table TC1-A4",
                     Status = 0,
@@ -1058,7 +1008,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330155"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"),
                     TableTypeId = tc1,
                     TableName = "Table TC1-B4",
                     Status = 0,
@@ -1067,7 +1016,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330156"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"),
                     TableTypeId = tc2,
                     TableName = "Table TC2-A4",
                     Status = 0,
@@ -1076,7 +1024,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330157"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"),
                     TableTypeId = tc2,
                     TableName = "Table TC2-B4",
                     Status = 0,
@@ -1085,7 +1032,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330158"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"),
                     TableTypeId = qb,
                     TableName = "QA-4",
                     Status = 0,
@@ -1094,7 +1040,6 @@ namespace Persistence.Data
                 new Table
                 {
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330159"),
-                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"),
                     TableTypeId = qb,
                     TableName = "QB-4",
                     Status = 0,
@@ -1270,7 +1215,10 @@ namespace Persistence.Data
         AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440001"), // Admin Bar Buddy 1
         BookingCode = "BB0001", // Custom booking code
         BookingDate = DateTime.Now.AddDays(-5),
+        BookingTime = new TimeSpan(19, 0, 0), // Thêm thời gian đặt chỗ
         Status = 1, // Confirmed
+        NumOfTable = 1, // Số lượng bàn
+        CreateAt = DateTime.Now // Ngày tạo
     },
     new Booking
     {
@@ -1279,7 +1227,10 @@ namespace Persistence.Data
         AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440002"), // Staff Bar Buddy 2
         BookingCode = "BB0002", // Custom booking code
         BookingDate = DateTime.Now.AddDays(-7),
+        BookingTime = new TimeSpan(20, 0, 0), // Thêm thời gian đặt chỗ
         Status = 2, // Completed
+        NumOfTable = 2, // Số lượng bàn
+        CreateAt = DateTime.Now // Ngày tạo
     },
     new Booking
     {
@@ -1288,7 +1239,10 @@ namespace Persistence.Data
         AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440003"), // Customer Bar Buddy 3
         BookingCode = "BB0003", // Custom booking code
         BookingDate = DateTime.Now.AddDays(-3),
+        BookingTime = new TimeSpan(18, 0, 0), // Thêm thời gian đặt chỗ
         Status = 1, // Confirmed
+        NumOfTable = 1, // Số lượng bàn
+        CreateAt = DateTime.Now // Ngày tạo
     },
     new Booking
     {
@@ -1297,7 +1251,10 @@ namespace Persistence.Data
         AccountId = Guid.Parse("550e8400-e29b-41d4-b777-446655440004"), // Customer Bar Buddy 3
         BookingCode = "BB0004", // Custom booking code
         BookingDate = DateTime.Now.AddDays(-2),
+        BookingTime = new TimeSpan(21, 0, 0), // Thêm thời gian đặt chỗ
         Status = 1, // Confirmed
+        NumOfTable = 1, // Số lượng bàn
+        CreateAt = DateTime.Now // Ngày tạo
     }
 );
             // BookingTable Data
@@ -1308,41 +1265,55 @@ namespace Persistence.Data
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Booking 1 (Bar Buddy 1)
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330000"), // Table A1 - Bar Buddy 1
+                    ReservationDate = DateTimeOffset.Now, // Ngày đặt bàn
+                    ReservationTime = new TimeSpan(19, 0, 0) // Thời gian đặt bàn
                 },
                 new BookingTable
                 {
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"), // Booking 2 (Bar Buddy 2)
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330117"), // Table B1 - Bar Buddy 2
+                    ReservationDate = DateTimeOffset.Now, // Ngày đặt bàn
+                    ReservationTime = new TimeSpan(20, 0, 0) // Thời gian đặt bàn
                 },
                 new BookingTable
                 {
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"), // Booking 3 (Bar Buddy 4)
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330159"), // Table C1 - Bar Buddy 4
+                    ReservationDate = DateTimeOffset.Now, // Ngày đặt bàn
+                    ReservationTime = new TimeSpan(18, 0, 0) // Thời gian đặt bàn
                 },
                 new BookingTable
                 {
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 3)
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330141"), // Table D1 - Bar Buddy 3
+                    ReservationDate = DateTimeOffset.Now, // Ngày đặt bàn
+                    ReservationTime = new TimeSpan(21, 0, 0) // Thời gian đặt bàn
                 },
                 new BookingTable
                 {
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 3)
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330142"), // Table D1 - Bar Buddy 3
+                    ReservationDate = DateTimeOffset.Now, // Ngày đặt bàn
+                    ReservationTime = new TimeSpan(21, 0, 0) // Thời gian đặt bàn
                 }, new BookingTable
                 {
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 3)
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330143"), // Table D1 - Bar Buddy 3
+                    ReservationDate = DateTimeOffset.Now, // Ngày đặt bàn
+                    ReservationTime = new TimeSpan(21, 0, 0) // Thời gian đặt bàn
                 },
                 new BookingTable
                 {
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 3)
                     TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330144"), // Table D1 - Bar Buddy 3
+                    ReservationDate = DateTimeOffset.Now, // Ngày đặt bàn
+                    ReservationTime = new TimeSpan(21, 0, 0) // Thời gian đặt bàn
                 }
             );
 

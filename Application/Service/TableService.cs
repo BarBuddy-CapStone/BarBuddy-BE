@@ -27,7 +27,7 @@ namespace Application.Service
             {
                 var Table = new Table
                 {
-                    BarId = request.BarId,
+                    //BarId = request.BarId,
                     TableTypeId = request.TableTypeId,
                     TableName = request.TableName,
                     Status = request.Status,
@@ -86,7 +86,7 @@ namespace Application.Service
                 // filter expression
                 Expression<Func<Table, bool>> filter = t =>
                 (Status == null || t.Status == Status) &&
-                (BarId == null || t.BarId == BarId) &&
+                //(BarId == null || t.BarId == BarId) &&
                 t.TableTypeId == TableTypeId &&
                 t.IsDeleted == false;
                 
@@ -112,7 +112,7 @@ namespace Application.Service
                     {
                         var tableResponse = new TableResponse
                         {
-                            BarId = table.BarId,
+                            //BarId = table.BarId,
                             TableTypeId = table.TableTypeId,
                             MinimumGuest = table.TableType.MinimumGuest,
                             MaximumGuest = table.TableType.MaximumGuest,

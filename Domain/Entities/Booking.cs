@@ -20,7 +20,11 @@ namespace Domain.Entities
         public DateTime BookingDate { get; set; }
         public TimeSpan BookingTime { get; set; }
         public string? Note {  get; set; }
-        public bool IsIncludeDrink {  get; set; }
+        public double? TotalPrice { get; set; }
+        public Guid? CheckInStaffId { get; set; }
+        public Guid? CheckOutStaffId { get; set; }
+        public int NumOfTable { get; set; }
+        public string? QRTicket { get; set; }
         public DateTime CreateAt { get; set; } = DateTime.Now;
         public int Status { get; set; }
 

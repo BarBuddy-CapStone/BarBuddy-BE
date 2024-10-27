@@ -55,11 +55,11 @@ namespace Application.Service
                 var currentDate = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now.Date);
                 var currentTime = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.UtcNow);
 
-                Utils.ValidateOpenCloseTime(requestDate, request.Time, getOneBar.StartTime, getOneBar.EndTime);
+                //Utils.ValidateOpenCloseTime(requestDate, request.Time, getOneBar.StartTime, getOneBar.EndTime);
 
                 var data = await _unitOfWork.TableRepository.GetAsync(
-                                                filter: x => x.BarId.Equals(request.BarId)
-                                                          && x.TableTypeId.Equals(request.TableTypeId)
+                                                filter: x => /*x.BarId.Equals(request.BarId)
+                                                          &&*/ x.TableTypeId.Equals(request.TableTypeId)
                                                           && x.IsDeleted == PrefixKeyConstant.FALSE,
                                                 includeProperties: "BookingTables.Booking,TableType,Bar");
 
@@ -111,8 +111,8 @@ namespace Application.Service
         {
             var accountId = _authentication.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
             var tableIsExist = _unitOfWork.TableRepository
-                                        .Get(filter: x => x.BarId.Equals(request.BarId)
-                                                            && x.TableId.Equals(request.TableId),
+                                        .Get(filter: x => /*x.BarId.Equals(request.BarId)
+                                                            &&*/ x.TableId.Equals(request.TableId),
                                                             includeProperties: "Bar")
                                         .FirstOrDefault();
 
@@ -121,7 +121,7 @@ namespace Application.Service
                 throw new CustomException.DataNotFoundException("Không tìm thấy table trong quán bar!");
             }
 
-            Utils.ValidateOpenCloseTime(request.Date, request.Time, tableIsExist.Bar.StartTime, tableIsExist.Bar.EndTime);
+            //Utils.ValidateOpenCloseTime(request.Date, request.Time, tableIsExist.Bar.StartTime, tableIsExist.Bar.EndTime);
 
             var cacheKey = $"{request.BarId}_{request.TableId}_{request.Date.Date.Date}_{request.Time}";
             var cacheEntry = _memoryCache.GetOrCreate(cacheKey, entry =>
@@ -188,8 +188,8 @@ namespace Application.Service
         public Task<List<TableHoldInfo>> HoldTableList(Guid barId, DateTimeRequest request)
         {
             var tableIsExist = _unitOfWork.TableRepository
-                                        .Get(filter: x => x.BarId.Equals(barId)
-                                                            && x.IsDeleted == PrefixKeyConstant.FALSE);
+                                        .Get(filter: x => /*x.BarId.Equals(barId)
+                                                            &&*/ x.IsDeleted == PrefixKeyConstant.FALSE);
 
             List<TableHoldInfo> tableHolds = new List<TableHoldInfo>();
             foreach (var table in tableIsExist)
@@ -217,8 +217,8 @@ namespace Application.Service
 
             var accountId = _authentication.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
             var tableIsExist = _unitOfWork.TableRepository
-                                        .Get(filter: x => x.BarId.Equals(request.BarId)
-                                                            && x.TableId.Equals(request.TableId))
+                                        .Get(filter: x => /*x.BarId.Equals(request.BarId)
+                                                            &&*/ x.TableId.Equals(request.TableId))
                                         .FirstOrDefault();
             if (tableIsExist == null)
             {

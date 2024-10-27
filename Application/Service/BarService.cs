@@ -122,7 +122,7 @@ namespace Application.Service
             foreach (var bar in bars)
             {
                 var tables = await _unitOfWork.TableRepository
-                                                .GetAsync(t => t.BarId == bar.BarId && t.IsDeleted == false);
+                                                .GetAsync(t =>t.IsDeleted == false);
                 bool isAnyTableAvailable = false;
                 foreach (var table in tables)
                 {
@@ -172,7 +172,7 @@ namespace Application.Service
             }
 
             var tables = await _unitOfWork.TableRepository
-                                                .GetAsync(t => t.BarId == getBarById.BarId && t.IsDeleted == false);
+                                                .GetAsync(t => t.IsDeleted == false);
 
             foreach (var table in tables)
             {

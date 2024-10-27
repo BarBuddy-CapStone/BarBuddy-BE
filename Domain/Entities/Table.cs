@@ -13,7 +13,6 @@ namespace Domain.Entities
     {
         [Key]
         public Guid TableId { get; set; } = Guid.NewGuid();
-        public Guid BarId { get; set; }
         public Guid TableTypeId { get; set; }
         public string TableName { get; set; }
         public int Status { get; set; }
@@ -23,8 +22,5 @@ namespace Domain.Entities
 
         [ForeignKey("TableTypeId")]
         public virtual TableType TableType { get; set; }
-
-        [ForeignKey("BarId")]
-        public virtual Bar Bar { get; set; }
     }
 }

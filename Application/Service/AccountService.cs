@@ -188,7 +188,8 @@ namespace Application.Service
 
         public async Task<CustomerAccountResponse> UpdateCustomerAccount(Guid accountId, CustomerAccountRequest request)
         {
-            var existedAccount = (await _accountRepository.GetAsync(filter: a => a.AccountId == accountId && a.Role.RoleName == "CUSTOMER"))
+            var existedAccount = (await _accountRepository
+                    .GetAsync(filter: a => a.AccountId == accountId && a.Role.RoleName == "CUSTOMER"))
                 .FirstOrDefault();
             if (existedAccount == null)
             {

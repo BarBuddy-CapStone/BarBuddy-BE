@@ -17,6 +17,7 @@ namespace Application.DTOs.Account
         //public DateTimeOffset UpdatedAt { get; set; }
         [DataType(DataType.Date)]
         public DateTimeOffset Dob { get; set; }
+        public string? Image {  get; set; }
         public int Status { get; set; }
     }
 }

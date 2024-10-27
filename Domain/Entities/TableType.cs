@@ -13,6 +13,7 @@ namespace Domain.Entities
     {
         [Key]
         public Guid TableTypeId { get; set; } = Guid.NewGuid();
+        public Guid BarId { get; set; }
         public string TypeName { get; set; }
         public string Description { get; set; }
         public int MinimumGuest {  get; set; }
@@ -21,5 +22,8 @@ namespace Domain.Entities
         public bool IsDeleted { get; set; }
 
         public virtual ICollection<Table> Tables { get; set;}
+
+        [ForeignKey("BarId")]
+        public virtual Bar Bar { get; set; }
     }
 }

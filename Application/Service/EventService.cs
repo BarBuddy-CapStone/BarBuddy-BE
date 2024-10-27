@@ -101,7 +101,7 @@ namespace Application.Service
                         var getbar = _unitOfWork.BarRepository.GetByID(barId);
 
 
-                        Utils.ValidateEventTime(eventTime.Date, eventTime.StartTime, eventTime.EndTime, getbar.StartTime, getbar.EndTime);
+                        //Utils.ValidateEventTime(eventTime.Date, eventTime.StartTime, eventTime.EndTime, getbar.StartTime, getbar.EndTime);
                         var eventBar = new BarEventRequest
                         {
                             BarId = barId,

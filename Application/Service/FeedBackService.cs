@@ -154,8 +154,8 @@ namespace Application.Service
                     FeedbackId = feedback.FeedbackId,
                     LastUpdatedTime = feedback.LastUpdatedTime,
                     Rating = feedback.Rating,
-                    EndTime = feedback.Bar.EndTime,
-                    StartTime = feedback.Bar.StartTime
+                    //EndTime = feedback.Bar.EndTime,
+                    //StartTime = feedback.Bar.StartTime
                 };
                 return response;
             }

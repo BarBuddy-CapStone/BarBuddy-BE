@@ -161,7 +161,7 @@ namespace Application.Service
                 response.Note = booking.Note;
                 response.Images = booking.Bar.Images.Split(',').ToList();
 
-                if (booking.IsIncludeDrink)
+                if (booking.TotalPrice == 0)
                 {
                     var bookingDrinks = await _unitOfWork.BookingDrinkRepository.GetAsync(bd => bd.BookingId == booking.BookingId, includeProperties: "Drink");
                     foreach (var drink in bookingDrinks)
@@ -218,7 +218,7 @@ namespace Application.Service
                 response.BookingCode = booking.BookingCode;
                 response.Note = booking.Note;
 
-                if (booking.IsIncludeDrink)
+                if (booking.TotalPrice == 0)
                 {
                     var bookingDrinks = await _unitOfWork.BookingDrinkRepository.GetAsync(bd => bd.BookingId == booking.BookingId, includeProperties: "Drink");
                     foreach (var drink in bookingDrinks)
@@ -266,8 +266,8 @@ namespace Application.Service
                 {
                     throw new CustomException.DataNotFoundException("Không có thông tin của Bar");
                 }
-                TimeSpan startTime = Bar.StartTime;
-                TimeSpan endTime = Bar.EndTime;
+                //TimeSpan startTime = Bar.StartTime;
+                //TimeSpan endTime = Bar.EndTime;
 
                 Expression<Func<Booking, bool>> filter = b =>
                 b.BarId == BarId &&
@@ -311,7 +311,7 @@ namespace Application.Service
                     responses.Add(response);
                 }
 
-                return (responses, totalPage, startTime, endTime);
+                return (responses, totalPage, TimeSpan.MaxValue, TimeSpan.MinValue);
             }
             catch (Exception ex)
             {
@@ -372,17 +372,17 @@ namespace Application.Service
                 booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext)) ?? throw new DataNotFoundException("account not found");
                 booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId) ?? throw new DataNotFoundException("Bar not found");
 
-                Utils.ValidateOpenCloseTime(request.BookingDate.Date, request.BookingTime,
-                    booking.Bar.StartTime, booking.Bar.EndTime);
+                //Utils.ValidateOpenCloseTime(request.BookingDate.Date, request.BookingTime,
+                //    booking.Bar.StartTime, booking.Bar.EndTime);
 
                 booking.BookingTables = booking.BookingTables ?? new List<BookingTable>();
                 booking.BookingCode = $"{booking.BookingDate.ToString("yyMMdd")}{RandomHelper.GenerateRandomNumberString()}";
                 booking.Status = (int)PrefixValueEnum.PendingBooking;
-                booking.IsIncludeDrink = false;
+                booking.TotalPrice = null;
 
                 if (request.TableIds != null && request.TableIds.Count > 0)
                 {
-                    var existingTables = _unitOfWork.TableRepository.Get(t => request.TableIds.Contains(t.TableId) && t.BarId == request.BarId,
+                    var existingTables = _unitOfWork.TableRepository.Get(t => request.TableIds.Contains(t.TableId) /*&& t.BarId == request.BarId*/,
                         includeProperties: "TableType");
                     if (existingTables.Count() != request.TableIds.Count)
                     {
@@ -494,23 +494,21 @@ namespace Application.Service
                 booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext)) ?? throw new DataNotFoundException("account not found");
                 booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId) ?? throw new DataNotFoundException("Bar not found");
 
-                Utils.ValidateOpenCloseTime(request.BookingDate, request.BookingTime,
-                    booking.Bar.StartTime, booking.Bar.EndTime);
+                //Utils.ValidateOpenCloseTime(request.BookingDate, request.BookingTime,
+                //    booking.Bar.StartTime, booking.Bar.EndTime);
 
                 booking.BookingTables = booking.BookingTables ?? new List<BookingTable>();
                 booking.BookingDrinks = booking.BookingDrinks ?? new List<BookingDrink>();
                 booking.BookingDate = request.BookingDate.Date;
                 booking.BookingCode = $"BOOKING-{RandomHelper.GenerateRandomNumberString()}";
                 booking.Status = (int)PaymentStatusEnum.Pending;
-                booking.IsIncludeDrink = true;
-
-
+                booking.TotalPrice = 0;
 
                 double totalPrice = 0;
 
                 if (request.TableIds != null && request.TableIds.Count > 0)
                 {
-                    var existingTables = _unitOfWork.TableRepository.Get(t => request.TableIds.Contains(t.TableId) && t.BarId == request.BarId,
+                    var existingTables = _unitOfWork.TableRepository.Get(t => request.TableIds.Contains(t.TableId),
                         includeProperties: "TableType");
                     if (existingTables.Count() != request.TableIds.Count)
                     {

@@ -41,7 +41,7 @@ namespace Application.DTOs.Account
             return age >= 18 ? ValidationResult.Success : new ValidationResult("Bạn phải đủ 18 tuổi.");
         }
 
-        public string Image { get => "default"; }
+        public string? Image { get; set; }
         public int Status { get; set; }
     }
 }
