@@ -12,8 +12,8 @@ namespace Domain.Enums
         [Description("Pending")]
         Pending = 0,
         [Description("Success")]
-        Success = 2,
+        Success = 1,
         [Description("Failed")]
-        Failed = 1,
+        Failed = 2,
     }
 }
