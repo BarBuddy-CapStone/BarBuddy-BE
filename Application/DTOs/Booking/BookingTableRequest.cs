@@ -13,9 +13,9 @@ namespace Application.DTOs.Booking
         [Required]
         public List<Guid>? TableIds { get; set; }
 
-        public static ValidationResult? ValidateBookingDate(DateTimeOffset bookingDate, ValidationContext context)
+        public static ValidationResult? ValidateBookingDate(DateTime bookingDate, ValidationContext context)
         {
-            return bookingDate < DateTimeOffset.Now.Date ? new ValidationResult("Ngày đặt sai") : ValidationResult.Success;
+            return bookingDate < DateTime.Now.Date ? new ValidationResult("Ngày đặt sai") : ValidationResult.Success;
         }
     }
 }

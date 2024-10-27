@@ -63,16 +63,18 @@ namespace Application.Common
             {
                 throw new CustomException.InvalidDataException("Không hợp lệ");
             }
-            else if (requestDate == currentDate)
-            {
-                if (requestTime < TimeHelper.ConvertToUtcPlus7(DateTimeOffset.UtcNow).TimeOfDay)
-                {
-                    throw new CustomException.InvalidDataException("Thời gian phải nằm trong giờ mở cửa và giờ đóng cửa của quán Bar!");
-                }
-            }
 
             bool isValidTime = barTimes.Any(barTime => 
-                (requestTime >= barTime.StartTime && requestTime <= barTime.EndTime));
+            {
+                if (barTime.StartTime < barTime.EndTime)
+                {
+                    return requestTime >= barTime.StartTime && requestTime <= barTime.EndTime;
+                }
+                else
+                {
+                    return requestTime >= barTime.StartTime || requestTime <= barTime.EndTime;
+                }
+            });
 
             if (!isValidTime)
             {
