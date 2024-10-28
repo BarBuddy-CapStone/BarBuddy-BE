@@ -2,6 +2,7 @@
 using Application.IService;
 using Azure.Core;
 using CoreApiResponse;
+using Domain.CustomException;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -52,18 +53,30 @@ namespace BarBuddy_API.Controllers.Account
         /// <returns></returns>
         [AllowAnonymous]
         [HttpGet("/api/v1/staff-accounts/{barId}")]
-        public async Task<IActionResult> GetStaffAccounts(Guid? barId, 
+        public async Task<IActionResult> GetStaffAccounts(Guid? barId,
             [FromQuery] int pageSize, [FromQuery] int pageIndex)
         {
-            var accountList = await _accountService.GetPaginationStaffAccount(pageSize, pageIndex, barId);
-            var result = new
+            try
             {
-                items = accountList.items,
-                total = accountList.total,
-                pageIndex = pageIndex,
-                pageSize = pageSize
-            };
-            return CustomResult(result);
+
+                var accountList = await _accountService.GetPaginationStaffAccount(pageSize, pageIndex, barId);
+                var result = new
+                {
+                    items = accountList.items,
+                    total = accountList.total,
+                    pageIndex = pageIndex,
+                    pageSize = pageSize
+                };
+                return CustomResult(result);
+
+            }
+            catch (CustomException.DataNotFoundException ex) {
+                return CustomResult(ex.Message, HttpStatusCode.NotFound);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -168,7 +181,7 @@ namespace BarBuddy_API.Controllers.Account
         [HttpPost("/api/v1/staff-account")]
         public async Task<IActionResult> CreateStaffAccount([FromBody] StaffAccountRequest request)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -256,7 +269,7 @@ namespace BarBuddy_API.Controllers.Account
         [HttpPatch("/api/v1/customer-account")]
         public async Task<IActionResult> UpdateCustomerAccount([FromQuery] Guid accountId, [FromBody] CustomerAccountRequest request)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -293,7 +306,7 @@ namespace BarBuddy_API.Controllers.Account
         public async Task<IActionResult> UpdateCustomerAvatar(Guid accountId, [FromForm] IFormFile Image)
         {
             var res = await _accountService.UpdateCustomerAvatar(accountId, Image);
-            return CustomResult(new {url = res});
+            return CustomResult(new { url = res });
         }
     }
 }

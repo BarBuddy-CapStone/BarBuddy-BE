@@ -370,7 +370,7 @@ namespace Application.Service
                 var items = _mapper.Map<IEnumerable<StaffAccountResponse>>(accountIEnumerable);
                 if (items == null || !items.Any())
                 {
-                    throw new DataNotFoundException("Staff's accounts is empty list");
+                    throw new DataNotFoundException("Danh sách staff đang trống !");
                 }
                 var result = new PaginationList<StaffAccountResponse>
                 {
@@ -383,7 +383,7 @@ namespace Application.Service
             }
             catch (Exception ex)
             {
-                throw new InternalServerErrorException($"An Internal error occurred: {ex.Message}");
+                throw new DataNotFoundException(ex.Message);
             }
             finally
             {
