@@ -18,6 +18,8 @@ namespace Application.DTOs.Booking
         public string CustomerPhone { get; set; }
         public string CustomerEmail { get; set; }
         public string? Note { get; set; }
+        public double? TotalPrice { get; set; }
+        public double? AdditionalFee { get; set; }
         public int Status { get; set; }
         public DateTimeOffset BookingDate { get; set; }
         public TimeSpan BookingTime { get; set; }

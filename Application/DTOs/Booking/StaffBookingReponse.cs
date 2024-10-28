@@ -15,6 +15,8 @@ namespace Application.DTOs.Booking
         public string BookingCode { get; set; }
         public DateTimeOffset BookingDate { get; set; }
         public TimeSpan BookingTime { get; set; }
+        public double? TotalPrice { get; set; }
+        public double? AdditionalFee { get; set; }
         public int Status { get; set; }
     }
 }

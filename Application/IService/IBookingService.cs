@@ -18,7 +18,7 @@ namespace Application.IService
         Task<BookingByIdResponse> GetBookingById(Guid BookingId);
         Task<BookingDetailByStaff> GetBookingDetailByStaff(Guid BookingId);
         Task<(List<StaffBookingReponse> responses, int TotalPage, TimeSpan startTime, TimeSpan endTime)> GetListBookingByStaff(Guid BarId, string? CustomerName, string? Phone, string? Email, DateTimeOffset? bookingDate, TimeSpan? bookingTime, int? Status, int PageIndex, int PageSize);
-        Task UpdateBookingStatus(Guid BookingId, int Status);
+        Task UpdateBookingStatus(Guid BookingId, int Status, double? AdditionalFee);
         Task<bool> CancelBooking(Guid BookingId);
         Task<BookingResponse> CreateBookingTableOnly(BookingTableRequest request, HttpContext httpContext);
         Task<PaymentLink> CreateBookingTableWithDrinks(BookingDrinkRequest request, HttpContext httpContext);

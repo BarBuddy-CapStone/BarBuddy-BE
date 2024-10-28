@@ -164,6 +164,8 @@ namespace Application.Service
                 response.CustomerName = booking.Account.Fullname;
                 response.CustomerEmail = booking.Account.Email;
                 response.BookingCode = booking.BookingCode;
+                response.AdditionalFee = booking.AdditionalFee;
+                response.TotalPrice = booking.TotalPrice;
                 response.Note = booking.Note;
                 response.Images = booking.Bar.Images.Split(',').ToList();
 
@@ -222,6 +224,8 @@ namespace Application.Service
                 response.CustomerName = booking.Account.Fullname;
                 response.CustomerEmail = booking.Account.Email;
                 response.BookingCode = booking.BookingCode;
+                response.AdditionalFee = booking.AdditionalFee;
+                response.TotalPrice = booking.TotalPrice;
                 response.Note = booking.Note;
 
                 if (booking.TotalPrice == 0)
@@ -313,6 +317,8 @@ namespace Application.Service
                         Phone = booking.Account.Phone,
                         Status = booking.Status,
                         BookingCode = booking.BookingCode,
+                        AdditionalFee = booking.AdditionalFee,
+                        TotalPrice = booking.TotalPrice
                     };
                     responses.Add(response);
                 }
@@ -457,27 +463,39 @@ namespace Application.Service
             }
         }
 
-        public async Task UpdateBookingStatus(Guid BookingId, int Status)
+        public async Task UpdateBookingStatus(Guid BookingId, int Status, double? AdditionalFee)
         {
             try
             {
-                var booking = (await _unitOfWork.BookingRepository.GetAsync(b => b.BookingId == BookingId)).FirstOrDefault();
+                var booking = _unitOfWork.BookingRepository.Get(b => b.BookingId == BookingId).FirstOrDefault();
+                _unitOfWork.BeginTransaction();
 
                 if (booking == null)
                 {
                     throw new CustomException.DataNotFoundException("Không tìm thấy Id Đặt bàn.");
                 }
-
+                if(booking.Status == 1 && (Status == 2 || Status == 3))
+                {
+                    throw new CustomException.InvalidDataException("Không thể thực hiện check-in: Lịch đặt chỗ đã bị hủy");
+                }
+                if(booking.Status == 0 && booking.BookingDate.Date != DateTime.Now.Date && (Status == 2 || Status == 3))
+                {
+                    throw new CustomException.InvalidDataException("Không thể thực hiện check-in: vẫn chưa đến ngày đặt bàn");
+                }
+                if(Status == 3)
+                {
+                    booking.AdditionalFee = AdditionalFee == null ? 0 : (AdditionalFee < 0 ?  throw new CustomException.InvalidDataException("Dịch vụ cộng thêm không thể nhỏ hơn 0") : AdditionalFee);
+                }
                 booking.Status = Status;
-                await _unitOfWork.BookingRepository.UpdateAsync(booking);
-                await _unitOfWork.SaveAsync();
+                _unitOfWork.BookingRepository.Update(booking);
+                _unitOfWork.Save();
 
                 if (Status == 2 || Status == 3)
                 {
-                    var bookingTables = await _unitOfWork.BookingTableRepository.GetAsync(t => t.BookingId == booking.BookingId);
+                    var bookingTables = _unitOfWork.BookingTableRepository.Get(t => t.BookingId == booking.BookingId);
                     foreach (var bookingTable in bookingTables)
                     {
-                        var table = await _unitOfWork.TableRepository.GetByIdAsync(bookingTable.TableId);
+                        var table = _unitOfWork.TableRepository.GetByID(bookingTable.TableId);
                         if (table == null)
                         {
                             throw new CustomException.DataNotFoundException("Không tìm thấy bàn");
@@ -490,14 +508,15 @@ namespace Application.Service
                         {
                             table.Status = 0;
                         }
-                        await _unitOfWork.TableRepository.UpdateAsync(table);
-                        await _unitOfWork.SaveAsync();
+                        _unitOfWork.TableRepository.Update(table);
+                        _unitOfWork.Save();
                     }
                 }
-
+                _unitOfWork.CommitTransaction();
             }
             catch (Exception ex)
             {
+                _unitOfWork.RollBack();
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }

@@ -87,15 +87,16 @@ namespace BarBuddy_API.Controllers.Booking
         }
 
         /// <summary>
-        /// Cancel Booking based Status and BookingId
+        /// Update booking by staff based Status and BookingId and AdditionalFee (if it has)
         /// </summary>
         /// <param name="BookingId"></param>
         /// <param name="Status"></param>
+        /// <param name="AdditionalFee"></param>
         /// <returns></returns>
         [HttpPatch("status")]
-        public async Task<IActionResult> CancelBooking([FromQuery][Required] Guid BookingId, [FromQuery][Required] int Status)
+        public async Task<IActionResult> UpdateBookingByStaff([FromQuery][Required] Guid BookingId, [FromQuery][Required] int Status, [FromQuery] double? AdditionalFee)
         {
-            await _bookingService.UpdateBookingStatus(BookingId, Status);
+            await _bookingService.UpdateBookingStatus(BookingId, Status, AdditionalFee);
             return Ok("Cập nhật trạng thái thành công");
         }
 
