@@ -9,7 +9,6 @@ namespace Application.DTOs.Table
 {
     public class CreateTableRequest
     {
-        public Guid BarId { get; set; }
         public Guid TableTypeId { get; set; }
         [Required(ErrorMessage = "TableName cannot be empty")]
         [StringLength(20, MinimumLength = 6, ErrorMessage = "TableName must be between 6 and 20 characters")]

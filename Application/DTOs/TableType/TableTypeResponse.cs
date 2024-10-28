@@ -9,6 +9,7 @@ namespace Application.DTOs.TableType
     public class TableTypeResponse
     {
         public Guid? TableTypeId { get; set; }
+        public Guid? BarId { get; set; }
         public string? TypeName { get; set; }
         public string? Description { get; set; }
         public int MinimumGuest { get; set; }

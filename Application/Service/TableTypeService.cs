@@ -35,6 +35,7 @@ namespace Application.Service
                 var tableType = new TableType
                 {
                     TableTypeId = Guid.NewGuid(),
+                    BarId = request.BarId,
                     Description = request.Description,
                     MaximumGuest = request.MaximumGuest,
                     MinimumGuest = request.MinimumGuest,
