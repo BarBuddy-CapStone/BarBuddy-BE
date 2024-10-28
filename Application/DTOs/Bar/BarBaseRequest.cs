@@ -31,5 +31,8 @@ namespace Application.DTOs.Bar
         public double Discount { get; set; }
         [Required]
         public bool Status { get; set; }
+        [Required]
+        [Range(0,24,ErrorMessage ="Thời gian của một slot chỉ từ 0 đến 24 giờ")]
+        public double TimeSlot { get; set; }
     }
 }

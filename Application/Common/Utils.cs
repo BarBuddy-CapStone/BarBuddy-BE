@@ -64,7 +64,7 @@ namespace Application.Common
                 throw new CustomException.InvalidDataException("Không hợp lệ");
             }
 
-            bool isValidTime = barTimes.Any(barTime => 
+            bool isValidTime = barTimes.Any(barTime =>
             {
                 if (barTime.StartTime < barTime.EndTime)
                 {
@@ -164,6 +164,14 @@ namespace Application.Common
             }
 
             return files;
+        }
+
+        public static bool IValidSlot(double requiredHours, TimeSpan StartTime, TimeSpan EndTime)
+        {
+            double duration = (EndTime < StartTime)
+                                ? (EndTime + TimeSpan.FromDays(1) - StartTime).TotalHours
+                                : (EndTime - StartTime).TotalHours;
+            return duration >= requiredHours;
         }
     }
 }

@@ -63,6 +63,22 @@ namespace Application.Service
                     var mapper = _mapper.Map<Bar>(request);
                     mapper.Images = "";
                     await _unitOfWork.BarRepository.InsertAsync(mapper);
+                    foreach(var isValidTimeSlot in request.BarTimeRequest)
+                    {
+                        var isValid = Utils.IValidSlot(request.TimeSlot, isValidTimeSlot.StartTime, isValidTimeSlot.EndTime);
+                        if(!isValid)
+                        {
+                            throw new CustomException.InvalidDataException($" Thời gian đóng mở cửa không đủ cho một slot -> {isValidTimeSlot.DayOfWeek} !");
+                        }
+                    }
+                    foreach (var isValidTimeSlot in request.BarTimeRequest)
+                    {
+                        var isValid = Utils.IValidSlot(request.TimeSlot, isValidTimeSlot.StartTime, isValidTimeSlot.EndTime);
+                        if (!isValid)
+                        {
+                            throw new CustomException.InvalidDataException($" Thời gian đóng mở cửa không đủ cho một slot -> {isValidTimeSlot.DayOfWeek} !");
+                        }
+                    }
                     await _barTimeService.CreateBarTimeOfBar(mapper.BarId, request.BarTimeRequest);
                     await Task.Delay(10);
                     await _unitOfWork.SaveAsync();

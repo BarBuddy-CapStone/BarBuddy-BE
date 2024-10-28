@@ -20,6 +20,7 @@ namespace Domain.Entities
         public string Email { get; set; }
         public string Images {  get; set; }
         public double Discount { get; set; }
+        public double TimeSlot { get; set; }
         public bool Status { get; set; }
 
         public virtual ICollection<Account> Accounts { get; set; }

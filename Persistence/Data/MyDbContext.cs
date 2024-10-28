@@ -216,7 +216,8 @@ namespace Persistence.Data
                     Email = "contact@barbuddy1.com",
                     Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/a0d4292c13b0cc51b2487f4c276cd7c0d96510872c4a855db190ff2db8e692d2?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
                     PhoneNumber = "0901234567",
-                    Status = true
+                    Status = true,
+                    TimeSlot = 1
                 },
                 new Bar
                 {
@@ -228,7 +229,8 @@ namespace Persistence.Data
                     Email = "contact@barbuddy2.com",
                     Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/7cbd7d84e2ff7b5156aa5241bd27de56fe00bcb6e309e2c77ff2c39bf3b0b236?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
                     PhoneNumber = "0901234568",
-                    Status = true
+                    Status = true,
+                    TimeSlot = 1
                 },
                 new Bar
                 {
@@ -240,7 +242,8 @@ namespace Persistence.Data
                     Email = "contact@barbuddy3.com",
                     Images = "https://vietnamnightlife.com/uploads/images/2020/02/1580805657-multi_product20-bambamoverview1.jpg.webp",
                     PhoneNumber = "0901234569",
-                    Status = true
+                    Status = true,
+                    TimeSlot = 1
                 },
                 new Bar
                 {
@@ -252,7 +255,8 @@ namespace Persistence.Data
                     Email = "contact@barbuddy4.com",
                     Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/4f4bc5cae670ae75847bb24a78027e45ce8487386c0a1043f999381ae9fa4831?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
                     PhoneNumber = "0901234570",
-                    Status = true
+                    Status = true,
+                    TimeSlot = 1
                 },
                 new Bar
                 {
@@ -264,7 +268,8 @@ namespace Persistence.Data
                     Email = "contact@barbuddy5.com",
                     Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/fc1f4652930fe4a25d46a46d1933e950912b6ceace8e777840ceccd123995783?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
                     PhoneNumber = "0901234571",
-                    Status = true
+                    Status = true,
+                    TimeSlot = 1
                 },
                 new Bar
                 {
@@ -276,7 +281,8 @@ namespace Persistence.Data
                     Email = "contact@barbuddy6.com",
                     Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/677e2c38ccd2ea07e8a72aa6262c873572a4cfd3da719a1e25c2152169bb47c6?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
                     PhoneNumber = "0901234572",
-                    Status = true
+                    Status = true,
+                    TimeSlot = 1
                 },
                 new Bar
                 {
@@ -288,7 +294,8 @@ namespace Persistence.Data
                     Email = "contact@barbuddy7.com",
                     Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/2f3601dbe8c6d0a812bccaf7ecf02686ec5b99038e314c058a00a37c16840608?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
                     PhoneNumber = "0901234573",
-                    Status = true
+                    Status = true,
+                    TimeSlot = 1
                 },
                 new Bar
                 {
@@ -300,7 +307,8 @@ namespace Persistence.Data
                     Email = "contact@barbuddy8.com",
                     Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/7cbd7d84e2ff7b5156aa5241bd27de56fe00bcb6e309e2c77ff2c39bf3b0b236?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
                     PhoneNumber = "0901234574",
-                    Status = true
+                    Status = true,
+                    TimeSlot = 1
                 },
                 new Bar
                 {
@@ -312,7 +320,8 @@ namespace Persistence.Data
                     Email = "contact@barbuddy9.com",
                     Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/7cbd7d84e2ff7b5156aa5241bd27de56fe00bcb6e309e2c77ff2c39bf3b0b236?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
                     PhoneNumber = "0901234575",
-                    Status = true
+                    Status = true,
+                    TimeSlot = 1
                 },
                 new Bar
                 {
@@ -324,7 +333,8 @@ namespace Persistence.Data
                     Email = "contact@barbuddy10.com",
                     Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/a0d4292c13b0cc51b2487f4c276cd7c0d96510872c4a855db190ff2db8e692d2?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
                     PhoneNumber = "0901234576",
-                    Status = true
+                    Status = true,
+                    TimeSlot = 1,
                 }
             );
 
