@@ -43,7 +43,7 @@ namespace Application.Service
 
         public async Task<FeedBackResponse> GetFeedBackByID(Guid id)
         {
-            var feedbackId = _unitOfWork.FeedbackRepository.Get(fb => fb.FeedbackId == id).FirstOrDefault();
+            var feedbackId = _unitOfWork.FeedbackRepository.Get(fb => fb.FeedbackId == id, includeProperties: "Account,Bar").FirstOrDefault();
             if (feedbackId == null)
             {
                 throw new CustomException.DataNotFoundException("Không tìm thấy Feedback.");
