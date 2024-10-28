@@ -2,6 +2,7 @@
 using Application.IService;
 using CoreApiResponse;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace BarBuddy_API.Controllers.FeedBack
 {
@@ -41,6 +42,20 @@ namespace BarBuddy_API.Controllers.FeedBack
         {
             var responses = await _feedBackService.GetFeedBackAdmin(BarId, Status, PageIndex, PageSize);
             return Ok(new { totalPage = responses.TotalPage, response = responses.responses});
+        }
+
+        /// <summary>
+        /// Get FeedBack Of Bar by Manager
+        /// </summary>
+        /// <param name="BarId"></param>
+        /// <param name="PageIndex"></param>
+        /// <param name="PageSize"></param>
+        /// <returns></returns>
+        [HttpGet("manager")]
+        public async Task<IActionResult> GetFeedBackManager([FromQuery][Required] Guid BarId, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
+        {
+            var responses = await _feedBackService.GetFeedBackManager(BarId, PageIndex, PageSize);
+            return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.responses });
         }
 
         /// <summary>

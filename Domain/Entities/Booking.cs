@@ -21,6 +21,7 @@ namespace Domain.Entities
         public TimeSpan BookingTime { get; set; }
         public string? Note {  get; set; }
         public double? TotalPrice { get; set; }
+        public double? AdditionalFee { get; set; }
         public Guid? CheckInStaffId { get; set; }
         public Guid? CheckOutStaffId { get; set; }
         public int NumOfTable { get; set; }
