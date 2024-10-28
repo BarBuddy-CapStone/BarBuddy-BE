@@ -336,7 +336,7 @@ namespace Persistence.Data
                     Phone = "0901234567",
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
-                    Image = "https://dailytrust.com/wp-content/uploads/2022/12/Neymar.jpg",
+                    Image = "https://cdn.santino.com.vn/storage/upload/news/2023/07/Lionel-Messi-13.webp",
                     Status = 1
                 },
                 new Account

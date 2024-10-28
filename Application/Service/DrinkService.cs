@@ -123,6 +123,10 @@ namespace Application.Service
             {
                 throw new CustomException.InternalServerErrorException(e.Message);
             }
+            catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
         }
         public async Task<IEnumerable<DrinkResponse>> GetAllDrinkCustomer()
         {

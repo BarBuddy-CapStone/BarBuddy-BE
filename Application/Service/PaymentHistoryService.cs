@@ -139,5 +139,41 @@ namespace Application.Service
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
+
+        public async Task<(List<PaymentHistoryResponse> response, int totalPage)> GetByBarId(Guid barId, int pageIndex, int pageSize)
+        {
+            try
+            {
+                var payments = await _unitOfWork.PaymentHistoryRepository
+                    .GetAsync(filter: p => p.Booking.BarId.Equals(barId), 
+                    includeProperties: "Booking.Bar,Account");
+
+                if (payments == null || !payments.Any())
+                {
+                    return (new List<PaymentHistoryResponse>(), 0);
+                }
+
+                int totalPage = 1;
+                int validPageIndex = pageIndex > 0 ? pageIndex - 1 : 0;
+                int validPageSize = pageSize > 0 ? pageSize : 10;
+                if (payments.Count() > pageSize)
+                {
+                    if (pageSize == 1)
+                    {
+                        totalPage = (payments.Count() / pageSize);
+                    }
+                    else
+                    {
+                        totalPage = (payments.Count() / pageSize) + 1;
+                    }
+                }
+                var paginationPayments = payments.Skip(validPageIndex * validPageSize).Take(validPageSize);
+                return (_mapper.Map<List<PaymentHistoryResponse>>(paginationPayments), totalPage);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
     }
 }
