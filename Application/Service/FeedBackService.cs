@@ -29,7 +29,7 @@ namespace Application.Service
 
         public async Task<IEnumerable<FeedBackResponse>> GetFeedBack()
         {
-            var feedback = _unitOfWork.FeedbackRepository.Get();
+            var feedback = _unitOfWork.FeedbackRepository.Get(includeProperties: "Account,Bar");
 
             if (!feedback.Any())
             {

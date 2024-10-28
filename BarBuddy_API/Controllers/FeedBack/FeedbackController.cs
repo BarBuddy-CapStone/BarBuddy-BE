@@ -25,7 +25,7 @@ namespace BarBuddy_API.Controllers.FeedBack
         [HttpGet("get")]
         public async Task<IActionResult> GetFeedBack()
         {
-            var feedback = _feedBackService.GetFeedBack();
+            var feedback = await _feedBackService.GetFeedBack();
             return CustomResult("Tải dữ liệu thành công", feedback);
         }
 
@@ -66,7 +66,7 @@ namespace BarBuddy_API.Controllers.FeedBack
         [HttpGet("{id}")]
         public async Task<IActionResult> GetFeedBackByID(Guid id)
         {
-            var feedback = _feedBackService.GetFeedBackByID(id);
+            var feedback = await _feedBackService.GetFeedBackByID(id);
             return CustomResult("Tải dữ liệu thành công", feedback);
         }
 
