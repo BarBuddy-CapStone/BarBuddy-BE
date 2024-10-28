@@ -109,7 +109,7 @@ namespace Application.Service
             }
             catch (Exception ex)
             {
-                throw new CustomException.InternalServerErrorException($"Internal error: {ex.Message}");
+                throw new CustomException.InternalServerErrorException($"Lỗi hệ thống: {ex.Message}");
             }
         }
 
@@ -162,7 +162,7 @@ namespace Application.Service
             } catch(Exception ex)
             {
                 _unitOfWork.RollBack();
-                throw new Exception($"Internal error: {ex.Message}");
+                throw new Exception($"Lỗi hệ thống: {ex.Message}");
             }
             finally
             {
@@ -179,10 +179,10 @@ namespace Application.Service
                 .Get(filter: x => x.Email.Equals(request.Email)).FirstOrDefault();
             if (existAccount == null)
             {
-                throw new DataNotFoundException("Account không tồn tại");
+                throw new DataNotFoundException("Tài khoản không tồn tại");
             } else if (existAccount.Status == (int)PrefixValueEnum.Active)
             {
-                throw new ForbbidenException("Account đã được kích hoạt");
+                throw new ForbbidenException("Tài khoản đã được kích hoạt");
             }
 
             var validOtp = _cache.Get(request.Email)?.ToString();
@@ -235,7 +235,7 @@ namespace Application.Service
                         Phone = "",
                         Dob = DateTimeOffset.Now,
                         Password = "HowWouldTheyKnow",
-                        RoleId = Role == null ? throw new CustomException.DataNotFoundException("Cannot get role data") : Role.RoleId,
+                        RoleId = Role == null ? throw new CustomException.DataNotFoundException("Không tìm thấy vai trò") : Role.RoleId,
                         Status = (int)PrefixValueEnum.Active,
                         UpdatedAt = DateTimeOffset.Now,
                     };

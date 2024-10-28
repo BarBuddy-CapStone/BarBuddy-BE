@@ -73,7 +73,7 @@ namespace Application.Service
             catch (Exception ex)
             {
                 _unitOfWork.RollBack();
-                throw new InternalServerErrorException($"An Internal error occurred while creating customer: {ex.Message}");
+                throw new InternalServerErrorException($"Lỗi hệ thống: {ex.Message}");
             }
             finally
             {
@@ -94,7 +94,7 @@ namespace Application.Service
             var existedBar = await _barRepository.GetByIdAsync(request.BarId);
             if (existedBar == null)
             {
-                throw new DataNotFoundException("Bar is not found in database");
+                throw new DataNotFoundException("Không tìm thấy quán bar !");
             }
             try
             {
@@ -113,7 +113,7 @@ namespace Application.Service
             catch (Exception ex)
             {
                 _unitOfWork.RollBack();
-                throw new InternalServerErrorException($"An Internal error occurred while creating staff: {ex.Message}");
+                throw new InternalServerErrorException($"Lỗi hệ thống: {ex.Message}");
             }
             finally
             {
@@ -151,7 +151,7 @@ namespace Application.Service
             catch (Exception ex)
             {
                 _unitOfWork.RollBack();
-                throw new InternalServerErrorException($"An Internal error occurred while creating staff: {ex.Message}");
+                throw new InternalServerErrorException($"Lỗi hệ thống: {ex.Message}");
             }
             finally
             {
@@ -219,7 +219,7 @@ namespace Application.Service
             catch (Exception ex)
             {
                 _unitOfWork.RollBack();
-                throw new InternalServerErrorException($"An Internal error occurred while creating staff: {ex.Message}");
+                throw new InternalServerErrorException($"Lỗi hệ thống: {ex.Message}");
             }
             finally
             {
@@ -258,7 +258,7 @@ namespace Application.Service
             catch (Exception ex)
             {
                 _unitOfWork.RollBack();
-                throw new InternalServerErrorException($"An Internal error occurred while creating staff: {ex.Message}");
+                throw new InternalServerErrorException($"Lỗi hệ thống: {ex.Message}");
             }
             finally
             {
@@ -293,7 +293,7 @@ namespace Application.Service
             catch (Exception ex)
             {
                 _unitOfWork.RollBack();
-                throw new InternalServerErrorException($"An Internal error occurred while creating staff: {ex.Message}");
+                throw new InternalServerErrorException($"Lỗi hệ thống: {ex.Message}");
             }
             finally
             {
@@ -328,7 +328,7 @@ namespace Application.Service
             catch (Exception ex)
             {
                 _unitOfWork.RollBack();
-                throw new InternalServerErrorException($"An Internal error occurred while creating staff: {ex.Message}");
+                throw new InternalServerErrorException($"Lỗi hệ thống: {ex.Message}");
             }
             finally
             {
@@ -370,7 +370,7 @@ namespace Application.Service
                 var items = _mapper.Map<IEnumerable<StaffAccountResponse>>(accountIEnumerable);
                 if (items == null || !items.Any())
                 {
-                    throw new DataNotFoundException("Danh sách staff đang trống !");
+                    throw new DataNotFoundException("Danh sách nhân viên đang trống !");
                 }
                 var result = new PaginationList<StaffAccountResponse>
                 {
@@ -399,7 +399,7 @@ namespace Application.Service
                 var role = (await _unitOfWork.RoleRepository.GetAsync(r => r.RoleName == "MANAGER")).FirstOrDefault();
                 if (role == null)
                 {
-                    throw new DataNotFoundException("Failed to get role info");
+                    throw new DataNotFoundException("Thất bại khi phân quyền !");
                 }
                 var roleIdGuid = role.RoleId;
                 var accountIEnumerable = await _accountRepository.GetAsync(
@@ -414,7 +414,7 @@ namespace Application.Service
                 var items = _mapper.Map<IEnumerable<ManagerAccountResponse>>(accountIEnumerable);
                 if (items == null || !items.Any())
                 {
-                    throw new DataNotFoundException("Staff's accounts is empty list");
+                    throw new DataNotFoundException("Danh sách nhân viên đang trống");
                 }
                 var result = new PaginationList<ManagerAccountResponse>
                 {
@@ -427,7 +427,7 @@ namespace Application.Service
             }
             catch (Exception ex)
             {
-                throw new InternalServerErrorException($"An Internal error occurred: {ex.Message}");
+                throw new InternalServerErrorException($"Lỗi hệ thống: {ex.Message}");
             }
             finally
             {
@@ -443,7 +443,7 @@ namespace Application.Service
                 var role = (await _unitOfWork.RoleRepository.GetAsync(r => r.RoleName == "CUSTOMER")).FirstOrDefault();
                 if (role == null)
                 {
-                    throw new DataNotFoundException("Failed to get role info");
+                    throw new DataNotFoundException("Thất bại khi phân quyền !");
                 }
                 var roleIdGuid = role.RoleId;
                 var accountIEnumerable = await _accountRepository.GetAsync(
@@ -466,7 +466,7 @@ namespace Application.Service
             }
             catch (Exception ex)
             {
-                throw new InternalServerErrorException($"An Internal error occurred: {ex.Message}");
+                throw new InternalServerErrorException($"Lỗi hệ thống: {ex.Message}");
             }
             finally
             {
@@ -482,21 +482,21 @@ namespace Application.Service
                 var role = (await _unitOfWork.RoleRepository.GetAsync(r => r.RoleName == "CUSTOMER")).FirstOrDefault();
                 if (role == null)
                 {
-                    throw new DataNotFoundException("Failed to get role info");
+                    throw new DataNotFoundException("Thất bại khi phân quyền !");
                 }
                 var roleIdGuid = role.RoleId;
                 var customerAccount = (await _accountRepository.GetAsync(filter: a => a.AccountId == accountId
                         && a.RoleId == roleIdGuid)).FirstOrDefault();
                 if (customerAccount == null)
                 {
-                    throw new DataNotFoundException("Customer's account not found");
+                    throw new DataNotFoundException("Không tìm thấy khách hàng !");
                 }
                 var result = _mapper.Map<CustomerAccountResponse>(customerAccount);
                 return result;
             }
             catch (Exception ex)
             {
-                throw new InternalServerErrorException($"An Internal error occurred: {ex.Message}");
+                throw new InternalServerErrorException($"Thất bại khi phân quyền !: {ex.Message}");
             }
             finally
             {
@@ -512,7 +512,7 @@ namespace Application.Service
                 var role = (await _unitOfWork.RoleRepository.GetAsync(r => r.RoleName == "STAFF")).FirstOrDefault();
                 if (role == null)
                 {
-                    throw new DataNotFoundException("Failed to get role info");
+                    throw new DataNotFoundException("Thất bại khi phân quyền !");
                 }
                 var roleIdGuid = role.RoleId;
                 var staffAccount = (await _accountRepository.GetAsync(filter: a => a.AccountId == accountId && a.RoleId == roleIdGuid,
@@ -520,14 +520,14 @@ namespace Application.Service
                     .FirstOrDefault();
                 if (staffAccount == null)
                 {
-                    throw new DataNotFoundException("Staff's account not found");
+                    throw new DataNotFoundException("Không tìm thấy nhân viên bạn đang tìm !");
                 }
                 var result = _mapper.Map<StaffAccountResponse>(staffAccount);
                 return result;
             }
             catch (Exception ex)
             {
-                throw new InternalServerErrorException($"An Internal error occurred: {ex.Message}");
+                throw new InternalServerErrorException($"Lỗi hệ thống: {ex.Message}");
             }
             finally
             {
@@ -543,7 +543,7 @@ namespace Application.Service
                 var role = (await _unitOfWork.RoleRepository.GetAsync(r => r.RoleName == "MANAGER")).FirstOrDefault();
                 if (role == null)
                 {
-                    throw new DataNotFoundException("Failed to get role info");
+                    throw new DataNotFoundException("Thất bại khi phân quyền !");
                 }
                 var roleIdGuid = role.RoleId;
                 var managerAccount = (await _accountRepository.GetAsync(filter: a => a.AccountId == accountId && a.RoleId == roleIdGuid,
@@ -558,7 +558,7 @@ namespace Application.Service
             }
             catch (Exception ex)
             {
-                throw new InternalServerErrorException($"An Internal error occurred: {ex.Message}");
+                throw new InternalServerErrorException($"Lỗi hệ thống: {ex.Message}");
             }
             finally
             {

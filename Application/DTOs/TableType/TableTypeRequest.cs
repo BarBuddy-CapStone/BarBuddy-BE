@@ -11,8 +11,11 @@ namespace Application.DTOs.TableType
     {
         [Required]
         public Guid BarId { get; set; }
-        [Required]
+        [Required(ErrorMessage ="Thể loại bàn không thể trống !")]
+        [StringLength(100, MinimumLength = 7, ErrorMessage = "Thể loại bàn phải từ 7 đến 100 kí tự !")]
         public string? TypeName { get; set; }
+        [Required(ErrorMessage = "Mô tả không thể trống !")]
+        [StringLength(100, MinimumLength = 7, ErrorMessage = "Mô tả phải từ 7 đến 100 kí tự !")]
         public string? Description { get; set; }
         [Required]
         [Range(1, 99, ErrorMessage = "Chỉ trong khoảng từ 1 - 99")]
@@ -21,7 +24,7 @@ namespace Application.DTOs.TableType
         [Range(1, 99, ErrorMessage = "Chỉ trong khoảng từ 1 - 99")]
         public int MaximumGuest { get; set; }
         [Required]
-        [Range(0, 100000000, ErrorMessage = "Lớn hơn 0")]
+        [Range(0, 100000000, ErrorMessage = "Lớn hơn 0 và bé hơn 100000000")]
         public double MinimumPrice { get; set; }
     }
 }

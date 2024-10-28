@@ -12,12 +12,14 @@ namespace Application.DTOs.Drink
     {
         [Required]
         public Guid DrinkCategoryId { get; set; }
-        [Required(ErrorMessage = "DrinkName cannot be empty")]
-        [StringLength(50, MinimumLength = 7, ErrorMessage = "DrinkName must be between 7 and 50 characters")]
+        [Required(ErrorMessage = "Tên đồ uống không thể trống !")]
+        [StringLength(50, MinimumLength = 7, ErrorMessage = "Tên đồ uống phải từ 7 đến 50 kí tự !")]
         public string DrinkName { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Mô tả không thể trống !")]
+        [StringLength(100, MinimumLength = 7, ErrorMessage = "Mô tả phải từ 7 đến 100 kí tự !")]
         public string Description { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Giá thể trống !")]
+        [Range(0,100000000, ErrorMessage = "Giá đồ uống phải từ 0 đến 100000000 !")]
         public double Price { get; set; }
         [Required]
         public List<Guid> DrinkBaseEmo {  get; set; }

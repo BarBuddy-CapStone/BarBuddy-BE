@@ -9,10 +9,12 @@ namespace Application.DTOs.Table
 {
     public class CreateTableRequest
     {
+        [Required(ErrorMessage = "Không thể thiếu loại bàn !")]
         public Guid TableTypeId { get; set; }
-        [Required(ErrorMessage = "TableName cannot be empty")]
-        [StringLength(20, MinimumLength = 6, ErrorMessage = "TableName must be between 6 and 20 characters")]
+        [Required(ErrorMessage = "Tên bàn không thể trống !")]
+        [StringLength(20, MinimumLength = 6, ErrorMessage = "Tên bàn phải từ 6 đến 20 kí tự!")]
         public string TableName { get; set; }
+        [Required(ErrorMessage ="Trạng thái bàn không thể trống !")]
         public int Status { get; set; }
     }
 }

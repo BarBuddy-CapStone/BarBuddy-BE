@@ -11,23 +11,28 @@ namespace Application.DTOs.Bar
 {
     public class BarBaseRequest
     {
-        [Required(ErrorMessage = "BarName cannot be empty")]
-        [StringLength(50, MinimumLength = 7, ErrorMessage = "BarName must be between 7 and 50 characters")]
+        [Required(ErrorMessage = "Tên quán Bar không thể trống !")]
+        [StringLength(50, MinimumLength = 7, ErrorMessage = "Tên quán Bar phải từ 7 đến 50 kí tự !")]
         public string BarName { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "Địa chỉ Bar không thể trống !")]
+        [StringLength(100, MinimumLength = 7, ErrorMessage = "Địa chỉ Bar phải từ 7 đến 100 kí tự !")]
         public string Address { get; set; }
-        [Required]
+
+        [Required(ErrorMessage = "Mô tả Bar không thể trống !")]
+        [StringLength(500, MinimumLength = 7, ErrorMessage = "Địa chỉ Bar phải từ 7 đến 500 kí tự !")]
         public string Description { get; set; }
         [Required]
-        [RegularExpression(@"^\d+$", ErrorMessage = "Phone number must contain only digits.")]
+        [RegularExpression(@"^\d+$", ErrorMessage = "Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại Việt Nam hợp lệ !")]
         public string PhoneNumber { get; set; }
+        [Required(ErrorMessage = "Email không thể để trống!")]
         [EmailAddress]
-        [Required]
+        [StringLength(100, ErrorMessage = "Email tối đa 100 kí tự!")]
         public string Email { get; set; }
         public List<string>? Images { get; set; }
         public List<string>? imgsAsString { get; set; }
         [Range(0,100)]
-        [Required(ErrorMessage = "More than or equal 0 and less than or equal 100")]
+        [Required(ErrorMessage = "Giảm giá chỉ từ 0 đến 100% !")]
         public double Discount { get; set; }
         [Required]
         public bool Status { get; set; }

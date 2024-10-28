@@ -9,6 +9,8 @@ namespace Application.DTOs.Account
 {
     public class StaffAccountRequest
     {
+        [Required(ErrorMessage = "Email không thể để trống!")]
+        [StringLength(100, ErrorMessage = "Email tối đa 100 kí tự!")]
         [EmailAddress]
         public string Email { get; set; }
 
@@ -19,7 +21,7 @@ namespace Application.DTOs.Account
         [RegularExpression(@"^0[3-9]\d{8,9}$", ErrorMessage = "Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại Việt Nam hợp lệ.")]
         public string Phone { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Dob không thể để trống!")]
         [CustomValidation(typeof(CustomerAccountRequest), "ValidateAge", ErrorMessage = "Bạn phải đủ 18 tuổi.")]
         public DateTimeOffset Dob { get; set; }
 

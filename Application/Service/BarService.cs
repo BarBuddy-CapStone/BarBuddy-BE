@@ -45,7 +45,7 @@ namespace Application.Service
                 {
                     if (request.Images.IsNullOrEmpty())
                     {
-                        throw new CustomException.InvalidDataException("Invalid data");
+                        throw new CustomException.InvalidDataException("Dữ liệu không hợp lí");
                     }
 
                     var isBarName = _unitOfWork.BarRepository.Get(filter: x => x.BarName.Contains(request.BarName)).FirstOrDefault();
@@ -117,7 +117,7 @@ namespace Application.Service
 
             if (getAllBar.IsNullOrEmpty() || !getAllBar.Any())
             {
-                throw new CustomException.DataNotFoundException("The list is empty !");
+                throw new CustomException.DataNotFoundException("Danh sách đang trống !");
             }
             var response = _mapper.Map<IEnumerable<BarResponse>>(getAllBar);
 
@@ -153,7 +153,7 @@ namespace Application.Service
 
             if (bars.IsNullOrEmpty() || !bars.Any())
             {
-                throw new CustomException.DataNotFoundException("The list is empty !");
+                throw new CustomException.DataNotFoundException("Danh sách đang trống !");
             }
 
             foreach (var bar in bars)
@@ -192,7 +192,7 @@ namespace Application.Service
 
             if (getBarById == null)
             {
-                throw new CustomException.DataNotFoundException("Data not Found !");
+                throw new CustomException.DataNotFoundException("Không tìm thấy quán bar !");
             }
 
             var response = _mapper.Map<BarResponse>(getBarById);
@@ -210,7 +210,7 @@ namespace Application.Service
 
             if (getBarById == null)
             {
-                throw new CustomException.DataNotFoundException("Data not Found !");
+                throw new CustomException.DataNotFoundException("Không tìm thấy quán bar !");
             }
 
             var tables = await _unitOfWork.TableRepository
@@ -244,7 +244,7 @@ namespace Application.Service
 
             if (getBarById == null)
             {
-                throw new CustomException.DataNotFoundException("Data not Found !");
+                throw new CustomException.DataNotFoundException("Không tìm thấy quán bar !");
             }
 
             var response = _mapper.Map<BarResponse>(getBarById);
