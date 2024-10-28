@@ -224,7 +224,7 @@ namespace Application.Service
         public async Task<BarResponse> GetBarByIdWithTable(Guid barId)
         {
             var getBarById = (await _unitOfWork.BarRepository.GetAsync(filter: a => a.BarId == barId,
-                    includeProperties: "Tables,Tables.TableType")).FirstOrDefault();
+                    includeProperties: "TableTypes.Tables,BarTimes")).FirstOrDefault();
 
             if (getBarById == null)
             {

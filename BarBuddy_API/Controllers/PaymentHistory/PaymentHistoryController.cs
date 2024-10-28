@@ -1,4 +1,6 @@
 ﻿using Application.IService;
+using Azure;
+using CoreApiResponse;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -7,7 +9,7 @@ namespace BarBuddy_API.Controllers.PaymentHistory
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PaymentHistoryController : ControllerBase
+    public class PaymentHistoryController : BaseController
     {
         private readonly IPaymentHistoryService _service;
 
@@ -47,6 +49,18 @@ namespace BarBuddy_API.Controllers.PaymentHistory
         {
             var response = await _service.GetByCustomerId(CustomerId, Status, PageIndex, PageSize);
             return Ok(new { totalPage = response.totalPage, response = response.response });
+        }
+
+        /// <summary>
+        /// Get Payment History By BarId
+        /// </summary>
+        /// <param name="barId"></param>
+        /// <returns></returns>
+        [HttpGet("/manager/{barId}")]
+        public async Task<IActionResult> GetAllHistoryPaymentByBarId(Guid barId, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
+        {
+            var response = await _service.GetByBarId(barId, PageIndex, PageSize);
+            return CustomResult("Data Loaded", new { response = response.response, totalPage = response.totalPage});
         }
     }
 }

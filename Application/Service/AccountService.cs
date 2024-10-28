@@ -103,7 +103,7 @@ namespace Application.Service
                 newAccount.RoleId = staffRole.RoleId;
                 newAccount.Status = 1;
                 newAccount.CreatedAt = DateTime.Now;
-                newAccount.Password = await HashPassword(RandomString(10));
+                newAccount.Password = await HashPassword("string");
                 _accountRepository.Insert(newAccount);
                 _unitOfWork.CommitTransaction();
                 _unitOfWork.Save();
@@ -336,7 +336,7 @@ namespace Application.Service
             }
         }
 
-        public async Task<PaginationList<StaffAccountResponse>> GetPaginationStaffAccount(int pageSize, int pageIndex)
+        public async Task<PaginationList<StaffAccountResponse>> GetPaginationStaffAccount(int pageSize, int pageIndex, Guid? barId = null)
         {
             try
             {
@@ -347,9 +347,20 @@ namespace Application.Service
                     throw new DataNotFoundException("Failed to get role info");
                 }
                 var roleIdGuid = role.RoleId;
-                var accountIEnumerable = await _accountRepository.GetAsync(
+                IEnumerable<Account> accountIEnumerable;
+                if (barId is not null)
+                {
+                    accountIEnumerable = await _accountRepository.GetAsync(
+                    filter: a => a.RoleId.Equals(roleIdGuid) && a.BarId.Equals(barId),
+                    includeProperties: "Bar");
+                } 
+                else
+                {
+                    accountIEnumerable = await _accountRepository.GetAsync(
                     filter: a => a.RoleId.Equals(roleIdGuid),
                     includeProperties: "Bar");
+                }
+                
                 var total = accountIEnumerable.Count();
 
                 int validPageIndex = pageIndex > 0 ? pageIndex - 1 : 0;

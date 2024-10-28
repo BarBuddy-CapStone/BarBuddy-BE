@@ -15,6 +15,7 @@ namespace Application.DTOs.Account
         public string Email { get; set; }
         public string Fullname { get; set; }
         public string Phone { get; set; }
+        public string Image {  get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         //public DateTimeOffset UpdatedAt { get; set; }
         [DataType(DataType.Date)]

@@ -44,6 +44,29 @@ namespace BarBuddy_API.Controllers.Account
         }
 
         /// <summary>
+        /// Get List Staff Accounts For Manager Of Bar
+        /// </summary>
+        /// <param name="barId"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageIndex"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet("/api/v1/staff-accounts/{barId}")]
+        public async Task<IActionResult> GetStaffAccounts(Guid? barId, 
+            [FromQuery] int pageSize, [FromQuery] int pageIndex)
+        {
+            var accountList = await _accountService.GetPaginationStaffAccount(pageSize, pageIndex, barId);
+            var result = new
+            {
+                items = accountList.items,
+                total = accountList.total,
+                pageIndex = pageIndex,
+                pageSize = pageSize
+            };
+            return CustomResult(result);
+        }
+
+        /// <summary>
         /// Get List Staff Accounts
         /// </summary>
         /// <param name="pageSize"></param>
@@ -53,7 +76,7 @@ namespace BarBuddy_API.Controllers.Account
         [HttpGet("/api/v1/staff-accounts")]
         public async Task<IActionResult> GetStaffAccounts([FromQuery] int pageSize, [FromQuery] int pageIndex)
         {
-            var accountList = await _accountService.GetPaginationStaffAccount(pageSize, pageIndex);
+            var accountList = await _accountService.GetPaginationStaffAccount(pageSize, pageIndex, null);
             var result = new
             {
                 items = accountList.items,
