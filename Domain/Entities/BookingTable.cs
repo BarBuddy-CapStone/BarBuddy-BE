@@ -16,9 +16,6 @@ namespace Domain.Entities
         public Guid BookingTableId { get; set; } = Guid.NewGuid();
         public Guid BookingId { get; set; }
         public Guid TableId { get; set;}
-        public DateTimeOffset ReservationDate { get; set; }
-        public TimeSpan ReservationTime { get; set; }
-
         [ForeignKey("BookingId")]
         public virtual Booking Booking { get; set; }
         [ForeignKey("TableId")]

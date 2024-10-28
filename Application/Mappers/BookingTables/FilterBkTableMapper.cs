@@ -11,9 +11,7 @@ namespace Application.Mappers.BookingTables
         public FilterBkTableMapper()
         {
             CreateMap<Domain.Entities.Table, FilterTableResponse>();
-            CreateMap<BookingTable, FilterBkTableResponse>()
-                .ForMember(dst => dst.ReservationDate, src => src.MapFrom(x => x.ReservationDate))
-                .ForMember(dst => dst.ReservationTime, src => src.MapFrom(x => x.ReservationTime));
+            CreateMap<BookingTable, FilterBkTableResponse>();
             CreateMap<Domain.Entities.TableType, FilterTableTypeReponse>();
 
             CreateMap<TableHoldInfo, BookingHubResponse>().ReverseMap();

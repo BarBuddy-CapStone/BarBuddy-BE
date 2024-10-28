@@ -126,9 +126,9 @@ namespace Application.Service
 
             var bars = await _unitOfWork.BarRepository
                                     .GetAsync(filter: filter,
-                                                        pageIndex: query.PageIndex, 
-                                                        pageSize: query.PageSize,
-                                                        includeProperties: "Feedbacks,BarTimes");
+                                              pageIndex: query.PageIndex, 
+                                              pageSize: query.PageSize,
+                                              includeProperties: "Feedbacks,BarTimes");
 
             var currentDateTime = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now);
             var response = new List<OnlyBarResponse>();
@@ -148,10 +148,10 @@ namespace Application.Service
                 foreach (var table in tables)
                 {
                     var reservations = await _unitOfWork.BookingTableRepository
-                                                        .GetAsync(bt => bt.TableId == table.TableId &&
-                                                                         (bt.ReservationDate + bt.ReservationTime) >= currentDateTime &&
-                                                                         (bt.Booking.Status == (int)PrefixValueEnum.Pending ||
-                                                                            bt.Booking.Status == (int)PrefixValueEnum.Serving));
+                        .GetAsync(filter: bt => bt.TableId == table.TableId &&
+                        (bt.Booking.BookingDate + bt.Booking.BookingTime) >= currentDateTime &&
+                        (bt.Booking.Status == (int)PrefixValueEnum.Pending || bt.Booking.Status == (int)PrefixValueEnum.Serving),
+                        includeProperties: "Booking");
 
                     if (!reservations.Any())
                     {
@@ -203,10 +203,10 @@ namespace Application.Service
             foreach (var table in tables)
             {
                 var reservations = await _unitOfWork.BookingTableRepository
-                                                    .GetAsync(bt => bt.TableId == table.TableId &&
-                                                                     (bt.ReservationDate + bt.ReservationTime) >= currentDateTime &&
-                                                                     (bt.Booking.Status == (int)PrefixValueEnum.Pending ||
-                                                                        bt.Booking.Status == (int)PrefixValueEnum.Serving));
+                    .GetAsync(filter: bt => bt.TableId == table.TableId &&
+                        (bt.Booking.BookingDate + bt.Booking.BookingTime) >= currentDateTime &&
+                        (bt.Booking.Status == (int)PrefixValueEnum.Pending || bt.Booking.Status == (int)PrefixValueEnum.Serving),
+                        includeProperties: "Booking");
 
                 if (!reservations.Any())
                 {

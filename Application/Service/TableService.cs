@@ -51,7 +51,10 @@ namespace Application.Service
                     throw new CustomException.DataNotFoundException("Table Id không tồn tại");
                 }
                 // Check future booking
-                var bookingTable = await _unitOfWork.BookingTableRepository.GetAsync(filter: bt => bt.TableId == TableId && bt.ReservationDate >= DateTimeOffset.Now);
+                var bookingTable = await _unitOfWork.BookingTableRepository.GetAsync(
+                    filter: bt => bt.TableId == TableId && bt.Booking.BookingDate >= DateTimeOffset.Now,
+                    includeProperties: "Booking");
+
                 if (bookingTable.Any())
                 {
                     return false;

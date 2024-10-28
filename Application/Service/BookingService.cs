@@ -412,8 +412,6 @@ namespace Application.Service
                         {
                             BookingId = booking.BookingId,
                             TableId = tableId,
-                            ReservationDate = request.BookingDate.Date,
-                            ReservationTime = request.BookingTime
                         };
 
                         booking.BookingTables?.Add(bookingTable);
@@ -547,8 +545,6 @@ namespace Application.Service
                         {
                             BookingId = booking.BookingId,
                             TableId = tableId,
-                            ReservationDate = request.BookingDate,
-                            ReservationTime = request.BookingTime
                         };
 
                         booking.BookingTables?.Add(bookingTable);

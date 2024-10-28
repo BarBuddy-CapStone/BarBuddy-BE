@@ -1336,56 +1336,42 @@ namespace Persistence.Data
                 {
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Booking 1 (Bar Buddy 1)
-                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330000"), // Table A1 - Bar Buddy 1
-                    ReservationDate = DateTimeOffset.Now, // Ngày đặt bàn
-                    ReservationTime = new TimeSpan(19, 0, 0) // Thời gian đặt bàn
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330000"),
                 },
                 new BookingTable
                 {
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"), // Booking 2 (Bar Buddy 2)
-                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330117"), // Table B1 - Bar Buddy 2
-                    ReservationDate = DateTimeOffset.Now, // Ngày đặt bàn
-                    ReservationTime = new TimeSpan(20, 0, 0) // Thời gian đặt bàn
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330117"),
                 },
                 new BookingTable
                 {
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"), // Booking 3 (Bar Buddy 4)
-                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330159"), // Table C1 - Bar Buddy 4
-                    ReservationDate = DateTimeOffset.Now, // Ngày đặt bàn
-                    ReservationTime = new TimeSpan(18, 0, 0) // Thời gian đặt bàn
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330159"),
                 },
                 new BookingTable
                 {
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 3)
-                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330141"), // Table D1 - Bar Buddy 3
-                    ReservationDate = DateTimeOffset.Now, // Ngày đặt bàn
-                    ReservationTime = new TimeSpan(21, 0, 0) // Thời gian đặt bàn
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330141"),
                 },
                 new BookingTable
                 {
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 3)
-                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330142"), // Table D1 - Bar Buddy 3
-                    ReservationDate = DateTimeOffset.Now, // Ngày đặt bàn
-                    ReservationTime = new TimeSpan(21, 0, 0) // Thời gian đặt bàn
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330142"),
                 }, new BookingTable
                 {
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 3)
-                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330143"), // Table D1 - Bar Buddy 3
-                    ReservationDate = DateTimeOffset.Now, // Ngày đặt bàn
-                    ReservationTime = new TimeSpan(21, 0, 0) // Thời gian đặt bàn
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330143"),
                 },
                 new BookingTable
                 {
                     BookingTableId = Guid.NewGuid(),
                     BookingId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Booking 4 (Bar Buddy 3)
-                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330144"), // Table D1 - Bar Buddy 3
-                    ReservationDate = DateTimeOffset.Now, // Ngày đặt bàn
-                    ReservationTime = new TimeSpan(21, 0, 0) // Thời gian đặt bàn
+                    TableId = Guid.Parse("660d7300-f30c-30c3-b827-335544330144"),
                 }
             );
 
