@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.Table;
 using Application.IService;
+using CoreApiResponse;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -8,7 +9,7 @@ namespace BarBuddy_API.Controllers.Table
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TableController : ControllerBase
+    public class TableController : BaseController
     {
         private readonly ITableService _tableService;
 
@@ -56,6 +57,19 @@ namespace BarBuddy_API.Controllers.Table
         {
             await _tableService.UpdateTable(TableId, request);
             return Ok("Cập nhật bàn thành công");
+        }
+
+        /// <summary>
+        /// Update Table status based TableId
+        /// </summary>
+        /// <param name="TableId"></param>
+        /// <param name="Status"></param>
+        /// <returns></returns>
+        [HttpPatch("status")]
+        public async Task<IActionResult> UpdateStatus([FromQuery][Required] Guid TableId ,[FromQuery][Required] int Status)
+        {
+            await _tableService.UpdateTableStatus(TableId, Status);
+            return CustomResult("Cập nhật bàn thành công");
         }
 
         /// <summary>

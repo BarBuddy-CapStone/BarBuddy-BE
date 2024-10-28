@@ -25,6 +25,9 @@ namespace Application.Mappers.FeedBack
             CreateMap<Feedback, AdminFeedbackResponse>()
                 .ForMember(x => x.CustomerName, opt => opt.MapFrom(x => x.Account.Fullname))
                 .ForMember(x => x.BarName, opt => opt.MapFrom(x => x.Bar.BarName));
+            CreateMap<Feedback, ManagerFeedbackResponse>()
+                .ForMember(x => x.CustomerName, opt => opt.MapFrom(x => x.Account.Fullname))
+                .ForMember(x => x.BarName, opt => opt.MapFrom(x => x.Bar.BarName));
         }
     }
 }

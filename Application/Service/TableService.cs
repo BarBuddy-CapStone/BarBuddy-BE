@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.Table;
 using Application.IService;
+using Azure.Core;
 using Domain.CustomException;
 using Domain.Entities;
 using Domain.IRepository;
@@ -145,9 +146,35 @@ namespace Application.Service
                 {
                     throw new CustomException.DataNotFoundException("Table Id không tồn tại");
                 }
-
+                if (existedTable.IsDeleted)
+                {
+                    throw new CustomException.DataNotFoundException("Table Id không tồn tại");
+                }
                 existedTable.TableName = request.TableName;
                 existedTable.Status = request.Status;
+                await _unitOfWork.TableRepository.UpdateAsync(existedTable);
+                await _unitOfWork.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
+
+        public async Task UpdateTableStatus(Guid TableId, int status)
+        {
+            try
+            {
+                var existedTable = await _unitOfWork.TableRepository.GetByIdAsync(TableId);
+                if (existedTable == null)
+                {
+                    throw new CustomException.DataNotFoundException("Table Id không tồn tại");
+                }
+                if (existedTable.IsDeleted)
+                {
+                    throw new CustomException.DataNotFoundException("Table Id không tồn tại");
+                }
+                existedTable.Status = status;
                 await _unitOfWork.TableRepository.UpdateAsync(existedTable);
                 await _unitOfWork.SaveAsync();
             }

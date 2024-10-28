@@ -225,5 +225,49 @@ namespace Application.Service
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
+
+        public async Task<(List<ManagerFeedbackResponse> responses, int TotalPage)> GetFeedBackManager(Guid BarId, int PageIndex, int PageSize)
+        {
+            try
+            {
+                var responses = new List<ManagerFeedbackResponse>();
+
+                var feedbacks = await _unitOfWork.FeedbackRepository.GetAsync(f => f.BarId == BarId && f.IsDeleted == false);
+
+                int totalPage = 1;
+                if (feedbacks.Count() > PageSize)
+                {
+                    if (PageSize == 1)
+                    {
+                        totalPage = (feedbacks.Count() / PageSize);
+                    }
+                    else
+                    {
+                        if (feedbacks.Count() % PageSize != 0)
+                        {
+                            totalPage = (feedbacks.Count() / PageSize) + 1;
+                        }
+                        else
+                        {
+                            totalPage = (feedbacks.Count() / PageSize);
+                        }
+                    }
+                }
+
+                var feedbacksWithPagination = await _unitOfWork.FeedbackRepository.GetAsync(f => f.BarId == BarId && f.IsDeleted == false, pageIndex: PageIndex, pageSize: PageSize, includeProperties: "Account,Bar", orderBy: o => o.OrderByDescending(f => f.CreatedTime).ThenByDescending(f => f.LastUpdatedTime));
+
+                foreach (var feedback in feedbacksWithPagination)
+                {
+                    var response = _mapper.Map<ManagerFeedbackResponse>(feedback);
+                    responses.Add(response);
+                }
+
+                return (responses, totalPage);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
     }
 }
