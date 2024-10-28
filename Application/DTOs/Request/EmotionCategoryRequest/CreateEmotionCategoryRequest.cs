@@ -9,9 +9,12 @@ namespace Application.DTOs.Request.EmotionCategoryRequest
 {
     public class CreateEmotionCategoryRequest
     {
-        [Required(ErrorMessage = "Category name cannot be empty")]
-        [StringLength(20, MinimumLength = 3, ErrorMessage = "Category name must be between 3 and 20 characters")]
+        [Required]
+        public Guid BarId { get; set; }
+        [Required(ErrorMessage = "Tên thể loại danh mục cảm xúc không thể thiếu")]
+        [StringLength(20, MinimumLength = 3, ErrorMessage = "Category name phải có độ dài từ 3 đến 20 kí tự !")]
         public string CategoryName { get; set; }
-
+        [Required]
+        public string Description { get; set; }
     }
 }

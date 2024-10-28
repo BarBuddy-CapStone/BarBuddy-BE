@@ -74,41 +74,47 @@ namespace Persistence.Data
                     CategoryName = "vui",
                     Description = "Vui qua di",
                     IsDeleted = false,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001")
                 },
                 new EmotionalDrinkCategory
                 {
                     EmotionalDrinksCategoryId = buonId,
                     CategoryName = "buồn",
                     Description = "Vui qua di",
-                    IsDeleted = false
+                    IsDeleted = false,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001")
                 },
                 new EmotionalDrinkCategory
                 {
                     EmotionalDrinksCategoryId = hanhPhucId,
                     CategoryName = "hạnh phúc",
                     Description = "Vui qua di",
-                    IsDeleted = false
+                    IsDeleted = false,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001")
                 },
                 new EmotionalDrinkCategory
                 {
                     EmotionalDrinksCategoryId = tucGianId,
                     CategoryName = "tức giận",
                     Description = "Vui qua di",
-                    IsDeleted = false
+                    IsDeleted = false,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001")
                 },
                 new EmotionalDrinkCategory
                 {
                     EmotionalDrinksCategoryId = chanNanId,
                     CategoryName = "chán nản",
                     Description = "Vui qua di",
-                    IsDeleted = false
+                    IsDeleted = false,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001")
                 },
                 new EmotionalDrinkCategory
                 {
                     EmotionalDrinksCategoryId = dangYeuId,
                     CategoryName = "đang yêu",
                     Description = "Vui qua di",
-                    IsDeleted = false
+                    IsDeleted = false,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001")
                 }
             );
 

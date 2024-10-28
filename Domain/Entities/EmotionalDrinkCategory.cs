@@ -13,8 +13,11 @@ namespace Domain.Entities
     {
         [Key]
         public Guid EmotionalDrinksCategoryId { get; set; } = Guid.NewGuid();
+        public Guid BarId { get; set; }
         public string CategoryName { get; set; }
         public string Description { get; set; }
         public bool IsDeleted { get; set; }
+        [ForeignKey("BarId")]
+        public virtual Bar Bar { get; set; }
     }
 }

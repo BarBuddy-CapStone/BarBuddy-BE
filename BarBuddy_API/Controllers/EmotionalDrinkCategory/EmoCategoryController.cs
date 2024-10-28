@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.Request.EmotionCategoryRequest;
 using Application.IService;
 using CoreApiResponse;
+using Domain.CustomException;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BarBuddy_API.Controllers.EmotionalDrinkCategory
@@ -73,8 +74,32 @@ namespace BarBuddy_API.Controllers.EmotionalDrinkCategory
         [HttpDelete("deleteEmotionCategory/{id}")]
         public async Task<IActionResult> DeleteEmotionCategory(Guid id)
         {
-            var emotional = await _emotionalDrinkCategory.DeleteEmotionCategory(id);
-            return CustomResult("Xóa EmotionCategory thành công.", emotional);
+            await _emotionalDrinkCategory.DeleteEmotionCategory(id);
+            return CustomResult("Xóa EmotionCategory thành công.");
+        }
+        /// <summary>
+        /// Get Emotion Category Of Bar
+        /// </summary>
+        /// <param name="barId"></param>
+        /// <returns></returns>
+        /// <exception cref="CustomException.DataNotFoundException"></exception>
+        /// <exception cref="CustomException.InternalServerErrorException"></exception>
+        [HttpGet("getEmoCateOfBar")]
+        public async Task<IActionResult> GetEmotionCategoryOfBar(Guid barId)
+        {
+            try
+            {
+                var emotional = await _emotionalDrinkCategory.GetEmotionCategoryOfBar(barId);
+                return CustomResult("Tải dữ liệu thành công", emotional);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
         }
     }
 }

@@ -16,6 +16,7 @@ namespace Application.IService
         Task<EmotionCategoryResponse> GetEmotionCategoryByID(Guid id);
         Task<EmotionCategoryResponse> CreateEmotionCategory(CreateEmotionCategoryRequest request);
         Task<EmotionCategoryResponse> UpdateEmotionCategory(Guid id , UpdateEmotionCategoryRequest request);
-        Task<EmotionalDrinkCategory> DeleteEmotionCategory(Guid id);
+        Task DeleteEmotionCategory(Guid id);
+        Task<List<EmotionCategoryResponse>> GetEmotionCategoryOfBar(Guid barId);
     }
 }

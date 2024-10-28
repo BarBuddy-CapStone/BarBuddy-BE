@@ -3,6 +3,8 @@ using Application.DTOs.Request.EmotionCategoryRequest;
 using Application.DTOs.Response.EmotionCategory;
 using Application.IService;
 using AutoMapper;
+using Azure.Core;
+using Domain.Constants;
 using Domain.CustomException;
 using Domain.Entities;
 using Domain.IRepository;
@@ -27,11 +29,12 @@ namespace Application.Service
 
         public async Task<IEnumerable<EmotionCategoryResponse>> GetEmotionCategory()
         {
-            var emotionCategory = _unitOfWork.EmotionalDrinkCategoryRepository.Get();
+            var emotionCategory = _unitOfWork.EmotionalDrinkCategoryRepository
+                                                .Get(filter: e => e.IsDeleted == PrefixKeyConstant.FALSE);
 
             if (!emotionCategory.Any())
             {
-                throw new CustomException.DataNotFoundException("No EmotionCategoryDrink in Database");
+                throw new CustomException.DataNotFoundException("Không tìm thấy danh mục cảm xúc !");
             }
 
             var myemotionCategory = _mapper.Map<IEnumerable<EmotionCategoryResponse>>(emotionCategory);
@@ -41,18 +44,56 @@ namespace Application.Service
 
         public async Task<EmotionCategoryResponse> GetEmotionCategoryByID(Guid id)
         {
-            var emotionid = _unitOfWork.EmotionalDrinkCategoryRepository.Get(e => e.EmotionalDrinksCategoryId == id).FirstOrDefault();
+            var emotionid = _unitOfWork.EmotionalDrinkCategoryRepository
+                                        .Get(e => e.EmotionalDrinksCategoryId.Equals(id) 
+                                            && e.IsDeleted == PrefixKeyConstant.FALSE)
+                                        .FirstOrDefault();
             if (emotionid == null)
             {
-                throw new CustomException.DataNotFoundException("Không tìm thấy Trạng Thái.");
+                throw new CustomException.DataNotFoundException("Không tìm thấy thể loại cảm xúc, vui lòng thử lại !");
             }
             var emotionResponse = _mapper.Map<EmotionCategoryResponse>(emotionid);
             return emotionResponse;
         }
 
+        public async Task<List<EmotionCategoryResponse>> GetEmotionCategoryOfBar(Guid barId)
+        {
+            var emotionid = await _unitOfWork.EmotionalDrinkCategoryRepository
+                                        .GetAsync(e => e.BarId.Equals(barId)
+                                            && e.IsDeleted == PrefixKeyConstant.FALSE);
+            if (emotionid == null)
+            {
+                throw new CustomException.DataNotFoundException("Không tìm thấy thể loại cảm xúc, vui lòng thử lại !");
+            }
+
+            var isExistBar = _unitOfWork.BarRepository.Exists(filter: x => x.BarId.Equals(barId));
+
+            if (!isExistBar)
+            {
+                throw new CustomException.DataNotFoundException("Không tìm thấy quán bar, vui lòng thử lại!");
+            }
+
+            var emotionResponse = _mapper.Map<List<EmotionCategoryResponse>>(emotionid);
+            return emotionResponse;
+        }
+
         public async Task<EmotionCategoryResponse> CreateEmotionCategory(CreateEmotionCategoryRequest request)
         {
+            var isExistName = _unitOfWork.EmotionalDrinkCategoryRepository
+                                            .Exists(filter: x => x.CategoryName.Contains(request.CategoryName));
+            
+            if (isExistName) {
+                throw new CustomException.InvalidDataException("Tên thể loại cảm xúc đã tồn tại, vui lòng thử lại!");
+            }
+
+            var isExistBar = _unitOfWork.BarRepository.Exists(filter: x => x.BarId.Equals(request.BarId));
+
+            if (!isExistBar)
+            {
+                throw new CustomException.DataNotFoundException("Không tìm thấy quán bar, vui lòng thử lại!");
+            }
             var emotionRequest = _mapper.Map<EmotionalDrinkCategory>(request);
+            emotionRequest.IsDeleted = PrefixKeyConstant.FALSE;
             _unitOfWork.EmotionalDrinkCategoryRepository.Insert(emotionRequest);
             await _unitOfWork.SaveAsync();
 
@@ -62,14 +103,29 @@ namespace Application.Service
 
         public async Task<EmotionCategoryResponse> UpdateEmotionCategory(Guid id, UpdateEmotionCategoryRequest request)
         {
-            var emotionCategoryID = _unitOfWork.EmotionalDrinkCategoryRepository.Get(e => e.EmotionalDrinksCategoryId == id).FirstOrDefault();
-
+            var emotionCategoryID = _unitOfWork.EmotionalDrinkCategoryRepository
+                                                .Get(e => e.EmotionalDrinksCategoryId.Equals(id) 
+                                                        && e.IsDeleted == PrefixKeyConstant.FALSE)
+                                                .FirstOrDefault();
             if (emotionCategoryID == null)
             {
-                throw new CustomException.DataNotFoundException("Không tìm thấy Trạng Thái.");
+                throw new CustomException.DataNotFoundException("Không tìm thấy thể loại cảm xúc, vui lòng thử lại !");
+            }
+
+            var isExistName = _unitOfWork.EmotionalDrinkCategoryRepository.Exists(filter: x => x.CategoryName.Contains(request.CategoryName));
+            if (isExistName)
+            {
+                throw new CustomException.InvalidDataException("Tên thể loại cảm xúc đã tồn tại, vui lòng thử lại!");
+            }
+
+            var isExistBar = _unitOfWork.BarRepository.Exists(filter: x => x.BarId.Equals(request.BarId));
+            if (!isExistBar)
+            {
+                throw new CustomException.DataNotFoundException("Không tìm thấy quán bar, vui lòng thử lại!");
             }
 
             var emotionCategory = _mapper.Map(request, emotionCategoryID);
+            emotionCategory.IsDeleted = PrefixKeyConstant.FALSE;
 
             _unitOfWork.EmotionalDrinkCategoryRepository.Update(emotionCategory);
             await _unitOfWork.SaveAsync();
@@ -78,18 +134,21 @@ namespace Application.Service
             return emotionCategoryResponse;
         }
 
-        public async Task<EmotionalDrinkCategory> DeleteEmotionCategory(Guid id)
+        public async Task DeleteEmotionCategory(Guid id)
         {
-            var emotionid = _unitOfWork.EmotionalDrinkCategoryRepository.Get(e => e.EmotionalDrinksCategoryId == id).FirstOrDefault();
+            var emotionid = _unitOfWork.EmotionalDrinkCategoryRepository
+                                        .Get(e => e.EmotionalDrinksCategoryId.Equals(id) 
+                                                && e.IsDeleted == PrefixKeyConstant.FALSE)
+                                        .FirstOrDefault();
             if (emotionid == null)
             {
-                throw new CustomException.DataNotFoundException("Không tìm thấy Trạng Thái.");
+                throw new CustomException.DataNotFoundException("Không tìm thấy thể loại cảm xúc, vui lòng thử lại !");
             }
 
-            _unitOfWork.EmotionalDrinkCategoryRepository.Delete(emotionid);
+            emotionid.IsDeleted = PrefixKeyConstant.TRUE;
+            await _unitOfWork.EmotionalDrinkCategoryRepository.UpdateRangeAsync(emotionid);
+            await Task.Delay(10);
             await _unitOfWork.SaveAsync();
-
-            return emotionid;
         }
     }
 }

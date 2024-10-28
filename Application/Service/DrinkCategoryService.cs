@@ -42,7 +42,7 @@ namespace Application.Service
 
                 if (!isExistBar)
                 {
-                    throw new CustomException.InvalidDataException("Không tìm thấy quán bar, vui lòng thử lại");
+                    throw new CustomException.DataNotFoundException("Không tìm thấy quán bar, vui lòng thử lại");
                 }
                 var mapper = _mapper.Map<DrinkCategory>(request);
                 mapper.IsDrinkCategory = PrefixKeyConstant.TRUE;
@@ -60,6 +60,10 @@ namespace Application.Service
             {
                 throw new CustomException.InternalServerErrorException(e.Message);
             }
+            catch (CustomException.DataNotFoundException e)
+            {
+                throw new CustomException.DataNotFoundException(e.Message);
+            }
         }
 
         public async Task<bool> DeleteDrinkCategory(Guid drinkCateId)
@@ -73,7 +77,7 @@ namespace Application.Service
 
                 if (getOne == null)
                 {
-                    throw new CustomException.DataNotFoundException("Category Drink not found !");
+                    throw new CustomException.DataNotFoundException("Không tìm thấy thể loại đồ uống!");
                 }
 
                 getOne.IsDrinkCategory = PrefixKeyConstant.FALSE;
@@ -87,6 +91,10 @@ namespace Application.Service
             {
                 throw new CustomException.InternalServerErrorException(e.Message);
             }
+            catch (CustomException.DataNotFoundException e)
+            {
+                throw new CustomException.DataNotFoundException(e.Message);
+            }
         }
 
         public async Task<IEnumerable<DrinkCategoryResponse>> GetAllDrinkCategory()
@@ -97,7 +105,7 @@ namespace Application.Service
 
                 if (getAllDrinkCate.IsNullOrEmpty())
                 {
-                    throw new CustomException.DataNotFoundException("The list category drink is empty !");
+                    throw new CustomException.DataNotFoundException("Không tìm thấy thể loại đồ uống nào !");
                 }
 
                 var response = _mapper.Map<IEnumerable<DrinkCategoryResponse>>(getAllDrinkCate);
@@ -106,6 +114,10 @@ namespace Application.Service
             catch (CustomException.InternalServerErrorException e)
             {
                 throw new CustomException.InternalServerErrorException(e.Message);
+            }
+            catch (CustomException.DataNotFoundException e)
+            {
+                throw new CustomException.DataNotFoundException(e.Message);
             }
         }
 
@@ -119,7 +131,7 @@ namespace Application.Service
 
                 if (getAllDrinkCateOfBar.IsNullOrEmpty())
                 {
-                    throw new CustomException.DataNotFoundException("The list category drink is empty !");
+                    throw new CustomException.DataNotFoundException("Không tìm thấy danh sách thể loại đồ uống nào của quán bar !");
                 }
 
                 var response = _mapper.Map<IEnumerable<DrinkCategoryResponse>>(getAllDrinkCateOfBar);
@@ -128,6 +140,10 @@ namespace Application.Service
             catch (CustomException.InternalServerErrorException e)
             {
                 throw new CustomException.InternalServerErrorException(e.Message);
+            }
+            catch (CustomException.DataNotFoundException e)
+            {
+                throw new CustomException.DataNotFoundException(e.Message);
             }
         }
 
@@ -183,7 +199,7 @@ namespace Application.Service
 
                 if (!isExistBar)
                 {
-                    throw new CustomException.InvalidDataException("Không tìm thấy quán bar, vui lòng thử lại");
+                    throw new CustomException.DataNotFoundException("Không tìm thấy quán bar, vui lòng thử lại");
                 }
                 var mapper = _mapper.Map(request, getOne);
                 await _unitOfWork.DrinkCategoryRepository.UpdateAsync(mapper);
@@ -196,6 +212,10 @@ namespace Application.Service
             catch (CustomException.InternalServerErrorException e)
             {
                 throw new CustomException.InternalServerErrorException(e.Message);
+            }
+            catch (CustomException.DataNotFoundException e)
+            {
+                throw new CustomException.DataNotFoundException(e.Message);
             }
         }
     }
