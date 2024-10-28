@@ -8,6 +8,7 @@ namespace Application.DTOs.DrinkCategory
 {
     public class DrinkCategoryResponse
     {
+        public Guid BarId { get; set; }
         public string DrinksCategoryId { get; set; }
         public string DrinksCategoryName { get; set; }
         public string Description { get; set; }

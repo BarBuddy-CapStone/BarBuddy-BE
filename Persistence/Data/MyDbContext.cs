@@ -1138,63 +1138,72 @@ namespace Persistence.Data
                     DrinksCategoryId = drinkCate1,
                     DrinksCategoryName = "Nước ngọt",
                     Description = "Đồ uống không cồn như soda, nước ngọt có ga, và nước ngọt có hương vị.",
-                    IsDrinkCategory = true
+                    IsDrinkCategory = true,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001")
                 },
                 new DrinkCategory
                 {
                     DrinksCategoryId = drinkCate2,
                     DrinksCategoryName = "Cocktail",
                     Description = "Đồ uống pha trộn thường chứa cồn, kết hợp với nước trái cây, soda hoặc các nguyên liệu khác.",
-                    IsDrinkCategory = true
+                    IsDrinkCategory = true,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001")
                 },
                 new DrinkCategory
                 {
                     DrinksCategoryId = drinkCate3,
                     DrinksCategoryName = "Mocktail",
                     Description = "Phiên bản không cồn của các loại cocktail, phù hợp cho những người không uống rượu.",
-                    IsDrinkCategory = true
+                    IsDrinkCategory = true,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001")
                 },
                 new DrinkCategory
                 {
                     DrinksCategoryId = drinkCate4,
                     DrinksCategoryName = "Rượu mạnh",
                     Description = "Đồ uống có cồn mạnh như vodka, whisky, gin, rum, v.v.",
-                    IsDrinkCategory = true
+                    IsDrinkCategory = true,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001")
                 },
                 new DrinkCategory
                 {
                     DrinksCategoryId = drinkCate5,
                     DrinksCategoryName = "Bia",
                     Description = "Đồ uống có cồn được ủ từ lúa mạch, hoa bia và nước. Có nhiều loại khác nhau như lager, ale, stout.",
-                    IsDrinkCategory = true
+                    IsDrinkCategory = true,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001")
                 },
                 new DrinkCategory
                 {
                     DrinksCategoryId = drinkCate6,
                     DrinksCategoryName = "Rượu vang",
                     Description = "Đồ uống có cồn được làm từ nho lên men, có nhiều loại như vang đỏ, vang trắng và vang hồng.",
-                    IsDrinkCategory = true
+                    IsDrinkCategory = true,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001")
                 },
                 new DrinkCategory
                 {
                     DrinksCategoryId = drinkCate7,
                     DrinksCategoryName = "Trà",
                     Description = "Đồ uống nóng hoặc lạnh được pha từ lá trà, có nhiều loại như trà đen, trà xanh và trà thảo mộc.",
-                    IsDrinkCategory = true
+                    IsDrinkCategory = true,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001")
                 },
                 new DrinkCategory
                 {
                     DrinksCategoryId = drinkCate8,
                     DrinksCategoryName = "Cà phê",
                     Description = "Đồ uống nóng hoặc lạnh được pha từ hạt cà phê rang, bao gồm espresso, cappuccino, latte và nhiều loại khác.",
-                    IsDrinkCategory = true
+                    IsDrinkCategory = true,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001")
                 },
                 new DrinkCategory
                 {
                     DrinksCategoryId = drinkCate9,
                     DrinksCategoryName = "Nước ép",
                     Description = "Đồ uống tự nhiên được làm từ nước ép trái cây hoặc rau củ. Các loại phổ biến gồm nước cam, nước táo, và nước ép cà rốt.",
-                    IsDrinkCategory = true
+                    IsDrinkCategory = true,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001")
                 }
             );
 

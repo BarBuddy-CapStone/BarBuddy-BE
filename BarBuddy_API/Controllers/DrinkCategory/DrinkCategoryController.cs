@@ -40,6 +40,25 @@ namespace BarBuddy_API.Controllers.DrinkCategory
             }
         }
 
+        [HttpGet("/getcateDrinkOfBar")]
+        public async Task<IActionResult> GetAllDrinkCateOfBar(Guid barId)
+        {
+            try
+            {
+                var response = await _drinkCategoryService.GetAllDrinkCateOfBar(barId);
+                return CustomResult("Data loaded", response);
+            }
+            catch (CustomException.DataNotFoundException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.NotFound);
+            }
+
+            catch (CustomException.InternalServerErrorException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
+        }
+
         /// <summary>
         /// GetAllDrinkCate By cateDrinkId
         /// </summary>

@@ -254,7 +254,14 @@ namespace Application.Service
 
                     if (getBarById == null)
                     {
-                        throw new CustomException.DataNotFoundException("Data not Found !");
+                        throw new CustomException.DataNotFoundException("Không tìm thấy quán bar muốn thay đổi !");
+                    }
+
+                    var isBarName = _unitOfWork.BarRepository.Get(filter: x => x.BarName.Contains(request.BarName)).FirstOrDefault();
+
+                    if (isBarName != null)
+                    {
+                        throw new CustomException.InvalidDataException("Tên quán Bar đã tồn tại, vui lòng thử lại !");
                     }
 
                     if (!request.Images.IsNullOrEmpty())
@@ -265,7 +272,7 @@ namespace Application.Service
 
                     if (request.imgsAsString.IsNullOrEmpty() && getBarById.Images.IsNullOrEmpty())
                     {
-                        throw new CustomException.InvalidDataException("Invalid data");
+                        throw new CustomException.InvalidDataException("Dữ liệu không hợp lệ, vui lòng thử lại !");
                     }
 
                     _mapper.Map(request, getBarById);

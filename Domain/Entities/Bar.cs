@@ -28,5 +28,6 @@ namespace Domain.Entities
         public virtual ICollection<TableType> TableTypes { get; set; }
         public virtual ICollection<BarEvent> BarEvent { get; set; }
         public virtual ICollection<BarTime> BarTimes { get; set; }
+        public virtual ICollection<DrinkCategory> DrinkCategories { get; set; }
     }
 }

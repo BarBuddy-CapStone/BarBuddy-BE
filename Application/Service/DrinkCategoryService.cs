@@ -29,11 +29,26 @@ namespace Application.Service
         {
             try
             {
+                var isExistName = _unitOfWork.DrinkCategoryRepository
+                                                    .Get(filter: x => x.DrinksCategoryName
+                                                                    .Contains(request.DrinksCategoryName))
+                                                    .FirstOrDefault();
+
+                var isExistBar = _unitOfWork.BarRepository.Exists(filter: x => x.BarId.Equals(request.BarId));
+
+                if (isExistName != null) {
+                    throw new CustomException.InvalidDataException("Tên thể loại đồ uống đã tồn tại, vui lòng thử lại");
+                }
+
+                if (!isExistBar)
+                {
+                    throw new CustomException.InvalidDataException("Không tìm thấy quán bar, vui lòng thử lại");
+                }
                 var mapper = _mapper.Map<DrinkCategory>(request);
                 mapper.IsDrinkCategory = PrefixKeyConstant.TRUE;
 
                 await _unitOfWork.DrinkCategoryRepository.InsertAsync(mapper);
-                await Task.Delay(200);
+                await Task.Delay(20);
                 await _unitOfWork.SaveAsync();
 
                 var response = _mapper.Map<DrinkCategoryResponse>(mapper);
@@ -94,6 +109,28 @@ namespace Application.Service
             }
         }
 
+        public async Task<IEnumerable<DrinkCategoryResponse>> GetAllDrinkCateOfBar(Guid barId)
+        {
+            try
+            {
+                var getAllDrinkCateOfBar = await _unitOfWork.DrinkCategoryRepository
+                                                            .GetAsync(filter: x => x.BarId.Equals(barId) 
+                                                            && x.IsDrinkCategory == PrefixKeyConstant.TRUE);
+
+                if (getAllDrinkCateOfBar.IsNullOrEmpty())
+                {
+                    throw new CustomException.DataNotFoundException("The list category drink is empty !");
+                }
+
+                var response = _mapper.Map<IEnumerable<DrinkCategoryResponse>>(getAllDrinkCateOfBar);
+                return response;
+            }
+            catch (CustomException.InternalServerErrorException e)
+            {
+                throw new CustomException.InternalServerErrorException(e.Message);
+            }
+        }
+
         public async Task<DrinkCategoryResponse> GetDrinkCategoryById(Guid drinkCateId)
         {
             try
@@ -121,6 +158,8 @@ namespace Application.Service
         {
             try
             {
+
+
                 var getDrinkCateById = await _unitOfWork.DrinkCategoryRepository
                                         .GetAsync(filter: x => x.DrinksCategoryId.Equals(drinkCateId)
                                                             && x.IsDrinkCategory == PrefixKeyConstant.TRUE);
@@ -128,12 +167,27 @@ namespace Application.Service
 
                 if (getOne == null)
                 {
-                    throw new CustomException.DataNotFoundException("Category Drink not found !");
+                    throw new CustomException.DataNotFoundException("Không tìm thấy thể loại đồ uống !");
                 }
 
+                var isExistName = _unitOfWork.DrinkCategoryRepository
+                                                    .Get(filter: x => x.DrinksCategoryName
+                                                                    .Contains(request.DrinksCategoryName))
+                                                    .FirstOrDefault();
+
+                var isExistBar = _unitOfWork.BarRepository.Exists(filter: x => x.BarId.Equals(request.BarId));
+                if (isExistName != null )
+                {
+                    throw new CustomException.InvalidDataException("Tên thể loại đồ uống đã tồn tại, vui lòng thử lại");
+                }
+
+                if (!isExistBar)
+                {
+                    throw new CustomException.InvalidDataException("Không tìm thấy quán bar, vui lòng thử lại");
+                }
                 var mapper = _mapper.Map(request, getOne);
                 await _unitOfWork.DrinkCategoryRepository.UpdateAsync(mapper);
-                await Task.Delay(200);
+                await Task.Delay(20);
                 await _unitOfWork.SaveAsync();
 
                 var response = _mapper.Map<DrinkCategoryResponse>(mapper);
