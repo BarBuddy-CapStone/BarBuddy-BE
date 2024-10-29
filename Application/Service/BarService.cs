@@ -15,6 +15,7 @@ using Domain.Utils;
 using Domain.Common;
 using System.Linq.Expressions;
 using Application.DTOs.BarTime;
+using System.Reflection.Metadata;
 
 namespace Application.Service
 {
@@ -103,9 +104,19 @@ namespace Application.Service
             }
         }
 
-        public async Task<IEnumerable<BarResponse>> GetAllBar()
+        public async Task<IEnumerable<BarResponse>> GetAllBar(ObjectQuery query)
         {
-            var getAllBar = await _unitOfWork.BarRepository.GetAsync(includeProperties: "BarTimes");
+            Expression<Func<Bar, bool>> filter = null;
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                filter = bar => bar.BarName.Contains(query.Search);
+            }
+
+            var getAllBar = await _unitOfWork.BarRepository
+                                                .GetAsync(filter: filter, 
+                                                    pageIndex: query.PageIndex, 
+                                                    pageSize: query.PageSize, 
+                                                    includeProperties: "BarTimes");
 
             if (getAllBar.IsNullOrEmpty() || !getAllBar.Any())
             {

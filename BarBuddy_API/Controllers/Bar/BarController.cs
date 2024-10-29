@@ -24,11 +24,11 @@ namespace BarBuddy_API.Controllers.Bar
         /// </summary>
         /// <returns></returns>
         [HttpGet("admin/barmanager")]
-        public async Task<IActionResult> GetAllBar()
+        public async Task<IActionResult> GetAllBar([FromQuery] ObjectQuery query)
         {
             try
             {
-                var response = await _barService.GetAllBar();
+                var response = await _barService.GetAllBar(query);
                 return CustomResult("Data loaded", response);
             }
             catch (CustomException.DataNotFoundException e)
