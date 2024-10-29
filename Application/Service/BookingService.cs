@@ -321,7 +321,7 @@ namespace Application.Service
                     responses.Add(response);
                 }
 
-                return (responses, totalPage, TimeSpan.MaxValue, TimeSpan.MinValue);
+                return (responses, totalPage);
             }
             catch (Exception ex)
             {
