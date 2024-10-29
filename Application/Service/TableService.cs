@@ -26,6 +26,12 @@ namespace Application.Service
         {
             try
             {
+                var existedName = (await _unitOfWork.TableRepository.GetAsync(filter: t => t.TableName == request.TableName && t.TableTypeId == request.TableTypeId)).FirstOrDefault();
+                if(existedName != null)
+                {
+                    throw new CustomException.DataExistException("Trùng tên bàn");
+                }
+
                 var Table = new Table
                 {
                     //BarId = request.BarId,
@@ -37,7 +43,7 @@ namespace Application.Service
                 await _unitOfWork.TableRepository.InsertAsync(Table);
                 await _unitOfWork.SaveAsync();
             }
-            catch (Exception ex) {
+            catch (CustomException.InternalServerErrorException ex) {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
@@ -71,7 +77,7 @@ namespace Application.Service
             }
         }
 
-        public async Task<(List<TableResponse> response, int TotalPage)> GetAll(Guid? TableTypeId, int? Status, int PageIndex, int PageSize)
+        public async Task<(List<TableResponse> response, int TotalPage)> GetAll(Guid? TableTypeId, string? TableName, int? Status, int PageIndex, int PageSize)
         {
             try
             {
@@ -83,6 +89,7 @@ namespace Application.Service
                 (Status == null || t.Status == Status) &&
                 //(BarId == null || t.BarId == BarId) &&
                 (TableTypeId == null || t.TableTypeId == TableTypeId) &&
+                (TableName == null || t.TableName.Contains(TableName)) &&
                 t.IsDeleted == false;
                 
                 var totalTable = (await _unitOfWork.TableRepository.GetAsync(filter: filter)).Count();
@@ -141,6 +148,21 @@ namespace Application.Service
                 {
                     throw new CustomException.DataNotFoundException("Table Id không tồn tại");
                 }
+                var existedName = (await _unitOfWork.TableRepository.GetAsync(t => t.TableName == request.TableName)).Count();
+                if (existedTable.TableName.Equals(request.TableName))
+                {
+                    if(existedName > 1)
+                    {
+                        throw new CustomException.DataExistException("Trùng tên bàn đã có trong hệ thống");
+                    }
+                }
+                else
+                {
+                    if (existedName > 0) { 
+                        throw new CustomException.DataExistException("Trùng tên bàn đã có trong hệ thống");
+                    }
+                }
+
                 existedTable.TableName = request.TableName;
                 existedTable.Status = request.Status;
                 await _unitOfWork.TableRepository.UpdateAsync(existedTable);

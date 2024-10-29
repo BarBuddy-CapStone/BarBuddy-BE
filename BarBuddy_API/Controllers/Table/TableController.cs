@@ -1,6 +1,8 @@
 ﻿using Application.DTOs.Table;
 using Application.IService;
+using Azure;
 using CoreApiResponse;
+using Domain.CustomException;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -27,10 +29,10 @@ namespace BarBuddy_API.Controllers.Table
         /// <param name="PageSize"></param>
         /// <returns></returns>
         [HttpGet("manage")]
-        public async Task<IActionResult> GetAllForBar([FromQuery] Guid? TableTypeId, [FromQuery] int? Status,[FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
+        public async Task<IActionResult> GetAllForBar([FromQuery] Guid? TableTypeId, [FromQuery] string? TableName, [FromQuery] int? Status,[FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
-            var responses = await _tableService.GetAll(TableTypeId, Status, PageIndex, PageSize);
-            return Ok(new { totalPage = responses.TotalPage, response = responses.response });
+            var responses = await _tableService.GetAll(TableTypeId, TableName, Status, PageIndex, PageSize);
+            return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.response });
         }
 
         /// <summary>
@@ -41,8 +43,19 @@ namespace BarBuddy_API.Controllers.Table
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] CreateTableRequest request)
         {
-            await _tableService.CreateTable(request);
-            return Ok("Tạo bàn thành công");
+            try
+            {
+                await _tableService.CreateTable(request);
+                return CustomResult("Tạo bàn thành công");
+            }
+            catch (CustomException.DataExistException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.BadRequest);
+            }
+            catch (CustomException.InternalServerErrorException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -54,8 +67,19 @@ namespace BarBuddy_API.Controllers.Table
         [HttpPatch("{TableId}")]
         public async Task<IActionResult> Patch([FromBody] UpdateTableRequest request, Guid TableId)
         {
-            await _tableService.UpdateTable(TableId, request);
-            return Ok("Cập nhật bàn thành công");
+            try
+            {
+                await _tableService.UpdateTable(TableId, request);
+                return CustomResult("Cập nhật bàn thành công");
+            }
+            catch (CustomException.DataNotFoundException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.NotFound);
+            }
+            catch (CustomException.InternalServerErrorException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -67,8 +91,23 @@ namespace BarBuddy_API.Controllers.Table
         [HttpPatch("status")]
         public async Task<IActionResult> UpdateStatus([FromQuery][Required] Guid TableId ,[FromQuery][Required] int Status)
         {
-            await _tableService.UpdateTableStatus(TableId, Status);
-            return CustomResult("Cập nhật bàn thành công");
+            try
+            {
+                await _tableService.UpdateTableStatus(TableId, Status);
+                return CustomResult("Cập nhật bàn thành công");
+            }
+            catch (CustomException.DataNotFoundException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.NotFound);
+            }
+            catch (CustomException.DataExistException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.BadRequest);
+            }
+            catch (CustomException.InternalServerErrorException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -79,12 +118,23 @@ namespace BarBuddy_API.Controllers.Table
         [HttpDelete("{TableId}")]
         public async Task<IActionResult> Delete(Guid TableId)
         {
-            var isDeleted = await _tableService.DeleteTable(TableId);
-            if (!isDeleted)
+            try
             {
-                return StatusCode(202, "Vẫn còn lịch đặt chỗ của bàn này trong tương lai, hãy cập nhật trước khi xóa");
+                var isDeleted = await _tableService.DeleteTable(TableId);
+                if (!isDeleted)
+                {
+                    return CustomResult("Vẫn còn lịch đặt chỗ của bàn này trong tương lai, hãy cập nhật trước khi xóa", System.Net.HttpStatusCode.BadRequest);
+                }
+                return CustomResult("Xóa bàn thành công");
             }
-            return Ok("Xóa bàn thành công");
+            catch (CustomException.DataNotFoundException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.NotFound);
+            }
+            catch (CustomException.InternalServerErrorException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
     }
 }
