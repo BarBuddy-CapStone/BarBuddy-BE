@@ -11,6 +11,8 @@ namespace Application.DTOs.Bar
     public class UpdateBarRequest : BarBaseRequest
     {
         [Required]
+        public Guid BarId { get; set; }
+        [Required]
         public List<UpdateBarTimeRequest> UpdateBarTimeRequests { get; set; }
     }
 }

@@ -167,17 +167,17 @@ namespace BarBuddy_API.Controllers.Bar
         }
 
         /// <summary>
-        /// Update Bar by BarId
+        /// Update Bar
         /// </summary>
         /// <param name="barId"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPatch("admin/updateBar/{barId}")]
-        public async Task<IActionResult> UpdateBar(Guid barId, [FromBody] UpdateBarRequest request)
+        [HttpPatch("admin/updateBar")]
+        public async Task<IActionResult> UpdateBar([FromBody] UpdateBarRequest request)
         {
             try
             {
-                var response = await _barService.UpdateBarById(barId, request);
+                var response = await _barService.UpdateBarById(request);
                 return CustomResult("Updated Successfully", response);
             }
             catch (CustomException.InvalidDataException e)

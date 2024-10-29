@@ -71,14 +71,6 @@ namespace Application.Service
                             throw new CustomException.InvalidDataException($" Thời gian đóng mở cửa không đủ cho một slot -> {isValidTimeSlot.DayOfWeek} !");
                         }
                     }
-                    foreach (var isValidTimeSlot in request.BarTimeRequest)
-                    {
-                        var isValid = Utils.IValidSlot(request.TimeSlot, isValidTimeSlot.StartTime, isValidTimeSlot.EndTime);
-                        if (!isValid)
-                        {
-                            throw new CustomException.InvalidDataException($" Thời gian đóng mở cửa không đủ cho một slot -> {isValidTimeSlot.DayOfWeek} !");
-                        }
-                    }
                     await _barTimeService.CreateBarTimeOfBar(mapper.BarId, request.BarTimeRequest);
                     await Task.Delay(10);
                     await _unitOfWork.SaveAsync();
@@ -251,7 +243,7 @@ namespace Application.Service
             return response;
         }
 
-        public async Task<OnlyBarResponse> UpdateBarById(Guid barId, UpdateBarRequest request)
+        public async Task<OnlyBarResponse> UpdateBarById(UpdateBarRequest request)
         {
             var response = new OnlyBarResponse();
             string imageUrl = null;
@@ -264,7 +256,7 @@ namespace Application.Service
                 try
                 {
                     var getBarById = (await _unitOfWork.BarRepository
-                                                            .GetAsync(filter: x => x.BarId.Equals(barId),
+                                                            .GetAsync(filter: x => x.BarId.Equals(request.BarId),
                                                                 includeProperties: "BarTimes"))
                                                             .FirstOrDefault();
 
@@ -273,9 +265,9 @@ namespace Application.Service
                         throw new CustomException.DataNotFoundException("Không tìm thấy quán bar muốn thay đổi !");
                     }
 
-                    var isBarName = _unitOfWork.BarRepository.Get(filter: x => x.BarName.Contains(request.BarName)).FirstOrDefault();
+                    var isBarName = _unitOfWork.BarRepository.Get(filter: x => x.BarName.Contains(request.BarName)).ToList();
 
-                    if (isBarName != null)
+                    if (isBarName.Count > 1)
                     {
                         throw new CustomException.InvalidDataException("Tên quán Bar đã tồn tại, vui lòng thử lại !");
                     }
@@ -291,10 +283,18 @@ namespace Application.Service
                         throw new CustomException.InvalidDataException("Dữ liệu không hợp lệ, vui lòng thử lại !");
                     }
 
+                    foreach (var isValidTimeSlot in request.UpdateBarTimeRequests)
+                    {
+                        var isValid = Utils.IValidSlot(request.TimeSlot, isValidTimeSlot.StartTime, isValidTimeSlot.EndTime);
+                        if (!isValid)
+                        {
+                            throw new CustomException.InvalidDataException($" Thời gian đóng mở cửa không đủ cho slot !");
+                        }
+                    }
                     _mapper.Map(request, getBarById);
-                    //Update với img là ""
                     getBarById.Images = "";
                     await _unitOfWork.BarRepository.UpdateAsync(getBarById);
+                    
                     await _barTimeService.UpdateBarTimeOfBar(getBarById.BarId, request.UpdateBarTimeRequests);
                     await Task.Delay(200);
                     await _unitOfWork.SaveAsync();
@@ -313,7 +313,6 @@ namespace Application.Service
 
                     var allImg = string.IsNullOrEmpty(imgsAsString) ? imgsUploaed : $"{imgsUploaed},{imgsAsString}";
 
-                    //Sau khi Upd ở trên thành công => lưu img lên firebase
                     getBarById.Images = allImg;
                     await _unitOfWork.BarRepository.UpdateAsync(getBarById);
                     await Task.Delay(200);
