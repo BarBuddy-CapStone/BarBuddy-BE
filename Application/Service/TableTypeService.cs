@@ -201,5 +201,26 @@ namespace Application.Service
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
+
+        public async Task<List<TableTypeResponse>> GetAllTTOfBar(Guid barId)
+        {
+            try
+            {
+                var tableTypes = (await _unitOfWork.TableTypeRepository
+                                                        .GetAsync(filter: t => t.IsDeleted == false 
+                                                                            && t.BarId.Equals(barId),
+                                                        orderBy: o => o.OrderByDescending(t => t.MinimumPrice)))
+                                                        .ToList();
+
+                var response = _mapper.Map<List<TableTypeResponse>>(tableTypes);
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
+
     }
 }

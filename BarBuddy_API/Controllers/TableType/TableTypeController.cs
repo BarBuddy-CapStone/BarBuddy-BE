@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.TableType;
 using Application.IService;
 using CoreApiResponse;
+using Domain.CustomException;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -90,6 +91,18 @@ namespace BarBuddy_API.Controllers.TableType
                 return StatusCode(202, "Vẫn còn bàn đang hoạt động thuộc loại bàn này, vui lòng cập nhật lại tất cả bàn của các chi nhánh trước khi xóa loại bàn này");
             }
             return CustomResult("Cập nhật thành công");
+        }
+        [HttpGet("getTTOfBar/{barId}")]
+        public async Task<IActionResult> GetAllTTOfBar(Guid barId)
+        {
+            try
+            {
+                var response  = await _tableTypeService.GetAllTTOfBar(barId);
+                return CustomResult("Đã tải dữ liệu thành công.", response);
+            }catch(CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult($"{ex.Message}", System.Net.HttpStatusCode.InternalServerError);
+            }
         }
     }
 }
