@@ -73,7 +73,7 @@ namespace BarBuddy_API.Controllers.Booking
             [FromQuery] DateTimeOffset? bookingDate, [FromQuery] TimeSpan? bookingTime, [FromQuery] int? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
             var responses = await _bookingService.GetListBookingAuthorized(BarId, CustomerName, Phone, Email, bookingDate, bookingTime, Status, PageIndex, PageSize);
-            return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, startTime = responses.startTime, endTime = responses.endTime, response = responses.responses });
+            return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.responses });
         }
         /// <summary>
         /// Get Booking Detail By Manager
@@ -92,7 +92,7 @@ namespace BarBuddy_API.Controllers.Booking
             [FromQuery] DateTimeOffset? bookingDate, [FromQuery] TimeSpan? bookingTime, [FromQuery] int? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
             var responses = await _bookingService.GetListBookingAuthorized(BarId, CustomerName, Phone, Email, bookingDate, bookingTime, Status, PageIndex, PageSize);
-            return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, startTime = responses.startTime, endTime = responses.endTime, response = responses.responses });
+            return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.responses });
         }
         /// <summary>
         /// Get Booking Detail By Manager

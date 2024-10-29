@@ -265,7 +265,7 @@ namespace Application.Service
             }
         }
 
-        public async Task<(List<StaffBookingReponse> responses, int TotalPage, TimeSpan startTime, TimeSpan endTime)> GetListBookingAuthorized(Guid BarId, string? CustomerName, string? Phone, string? Email, DateTimeOffset? bookingDate, TimeSpan? bookingTime, int? Status, int PageIndex, int PageSize)
+        public async Task<(List<StaffBookingReponse> responses, int TotalPage)> GetListBookingAuthorized(Guid BarId, string? CustomerName, string? Phone, string? Email, DateTimeOffset? bookingDate, TimeSpan? bookingTime, int? Status, int PageIndex, int PageSize)
         {
             try
             {
@@ -276,8 +276,6 @@ namespace Application.Service
                 {
                     throw new CustomException.DataNotFoundException("Không có thông tin của Bar");
                 }
-                //TimeSpan startTime = Bar.StartTime;
-                //TimeSpan endTime = Bar.EndTime;
 
                 Expression<Func<Booking, bool>> filter = b =>
                 b.BarId == BarId &&
