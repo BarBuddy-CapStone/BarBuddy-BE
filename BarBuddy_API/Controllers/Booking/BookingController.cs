@@ -2,6 +2,7 @@
 using Application.IService;
 using Azure;
 using CoreApiResponse;
+using Domain.CustomException;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -96,8 +97,23 @@ namespace BarBuddy_API.Controllers.Booking
         [HttpPatch("status")]
         public async Task<IActionResult> UpdateBookingByStaff([FromQuery][Required] Guid BookingId, [FromQuery][Required] int Status, [FromQuery] double? AdditionalFee)
         {
-            await _bookingService.UpdateBookingStatus(BookingId, Status, AdditionalFee);
-            return Ok("Cập nhật trạng thái thành công");
+            try
+            {
+                await _bookingService.UpdateBookingStatus(BookingId, Status, AdditionalFee);
+                return CustomResult("Cập nhật trạng thái thành công");
+            }
+            catch (CustomException.DataNotFoundException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.NotFound);
+            }
+            catch (CustomException.InvalidDataException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.BadRequest);
+            }
+            catch (CustomException.InternalServerErrorException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>

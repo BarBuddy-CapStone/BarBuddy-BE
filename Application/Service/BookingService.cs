@@ -514,6 +514,16 @@ namespace Application.Service
                 }
                 _unitOfWork.CommitTransaction();
             }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                _unitOfWork.RollBack();
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                _unitOfWork.RollBack();
+                throw new CustomException.InvalidDataException(ex.Message);
+            }
             catch (Exception ex)
             {
                 _unitOfWork.RollBack();
