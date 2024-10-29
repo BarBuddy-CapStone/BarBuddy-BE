@@ -17,8 +17,6 @@ namespace Application.DTOs.Bar
         public string Description { get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
-        public TimeSpan StartTime { get; set; }
-        public TimeSpan EndTime { get; set; }
         public string Images { get; set; }
         public double Discount { get; set; }
         public bool Status { get; set; }
