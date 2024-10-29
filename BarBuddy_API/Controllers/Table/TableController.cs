@@ -19,18 +19,17 @@ namespace BarBuddy_API.Controllers.Table
         }
 
         /// <summary>
-        /// Get All Table For Staff
+        /// Get All Table For Managing by Manage/Staff
         /// </summary>
-        /// <param name="BarId"></param>
         /// <param name="TableTypeId"></param>
         /// <param name="Status"></param>
         /// <param name="PageIndex"></param>
         /// <param name="PageSize"></param>
         /// <returns></returns>
-        [HttpGet("staff")]
-        public async Task<IActionResult> GetAllForStaff([FromQuery] Guid? BarId, [FromQuery][Required] Guid TableTypeId, [FromQuery] int? Status,[FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
+        [HttpGet("manage")]
+        public async Task<IActionResult> GetAllForBar([FromQuery][Required] Guid TableTypeId, [FromQuery] int? Status,[FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
-            var responses = await _tableService.GetAll(BarId, TableTypeId, Status, PageIndex, PageSize);
+            var responses = await _tableService.GetAll(TableTypeId, Status, PageIndex, PageSize);
             return Ok(new { TableTypeId = responses.TableTypeId, TableTypeName = responses.TableTypeName, totalPage = responses.TotalPage, response = responses.response });
         }
 

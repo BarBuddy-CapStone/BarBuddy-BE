@@ -71,7 +71,7 @@ namespace Application.Service
             }
         }
 
-        public async Task<(List<TableResponse> response, int TotalPage, string TableTypeName, Guid TableTypeId)> GetAll(Guid? BarId, Guid TableTypeId, int? Status, int PageIndex, int PageSize)
+        public async Task<(List<TableResponse> response, int TotalPage, string TableTypeName, Guid TableTypeId)> GetAll(Guid TableTypeId, int? Status, int PageIndex, int PageSize)
         {
             try
             {
