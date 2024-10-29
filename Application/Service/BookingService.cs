@@ -228,7 +228,7 @@ namespace Application.Service
                 response.TotalPrice = booking.TotalPrice;
                 response.Note = booking.Note;
 
-                if (booking.TotalPrice == 0)
+                if (booking.TotalPrice >= 0)
                 {
                     var bookingDrinks = await _unitOfWork.BookingDrinkRepository.GetAsync(bd => bd.BookingId == booking.BookingId, includeProperties: "Drink");
                     foreach (var drink in bookingDrinks)
@@ -320,7 +320,6 @@ namespace Application.Service
                     };
                     responses.Add(response);
                 }
-
                 return (responses, totalPage);
             }
             catch (Exception ex)
