@@ -72,19 +72,38 @@ namespace BarBuddy_API.Controllers.Booking
         public async Task<IActionResult> GetListBookingByStaff([FromQuery][Required] Guid BarId, [FromQuery] string? CustomerName, [FromQuery] string? Phone, [FromQuery] string? Email, 
             [FromQuery] DateTimeOffset? bookingDate, [FromQuery] TimeSpan? bookingTime, [FromQuery] int? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
-            var responses = await _bookingService.GetListBookingByStaff(BarId, CustomerName, Phone, Email, bookingDate, bookingTime, Status, PageIndex, PageSize);
-            return Ok(new { totalPage = responses.TotalPage, startTime = responses.startTime, endTime = responses.endTime , response = responses.responses});
+            var responses = await _bookingService.GetListBookingAuthorized(BarId, CustomerName, Phone, Email, bookingDate, bookingTime, Status, PageIndex, PageSize);
+            return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, startTime = responses.startTime, endTime = responses.endTime, response = responses.responses });
         }
         /// <summary>
-        /// Get Booking Detail By Staff
+        /// Get Booking Detail By Manager
         /// </summary>
         /// <param name="bookingId"></param>
         /// <returns></returns>
         [HttpGet("staff/{bookingId}")]
         public async Task<IActionResult> GetBookingDetailByStaff(Guid bookingId)
         {
-            var responses = await _bookingService.GetBookingDetailByStaff(bookingId);
-            return Ok(responses);
+            var responses = await _bookingService.GetBookingDetailAuthorized(bookingId);
+            return CustomResult("Tải dữ liệu thành công", responses);
+        }
+
+        [HttpGet("manager")]
+        public async Task<IActionResult> GetListBookingByManager([FromQuery][Required] Guid BarId, [FromQuery] string? CustomerName, [FromQuery] string? Phone, [FromQuery] string? Email,
+            [FromQuery] DateTimeOffset? bookingDate, [FromQuery] TimeSpan? bookingTime, [FromQuery] int? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
+        {
+            var responses = await _bookingService.GetListBookingAuthorized(BarId, CustomerName, Phone, Email, bookingDate, bookingTime, Status, PageIndex, PageSize);
+            return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, startTime = responses.startTime, endTime = responses.endTime, response = responses.responses });
+        }
+        /// <summary>
+        /// Get Booking Detail By Manager
+        /// </summary>
+        /// <param name="bookingId"></param>
+        /// <returns></returns>
+        [HttpGet("manager/{bookingId}")]
+        public async Task<IActionResult> GetBookingDetailByManager(Guid bookingId)
+        {
+            var responses = await _bookingService.GetBookingDetailAuthorized(bookingId);
+            return CustomResult("Tải dữ liệu thành công", responses);
         }
 
         /// <summary>

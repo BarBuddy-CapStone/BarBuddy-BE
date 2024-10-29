@@ -200,7 +200,7 @@ namespace Application.Service
             }
         }
 
-        public async Task<BookingDetailByStaff> GetBookingDetailByStaff(Guid BookingId)
+        public async Task<BookingDetailByStaff> GetBookingDetailByAuthorized(Guid BookingId)
         {
             try
             {
@@ -265,7 +265,7 @@ namespace Application.Service
             }
         }
 
-        public async Task<(List<StaffBookingReponse> responses, int TotalPage, TimeSpan startTime, TimeSpan endTime)> GetListBookingByStaff(Guid BarId, string? CustomerName, string? Phone, string? Email, DateTimeOffset? bookingDate, TimeSpan? bookingTime, int? Status, int PageIndex, int PageSize)
+        public async Task<(List<StaffBookingReponse> responses, int TotalPage, TimeSpan startTime, TimeSpan endTime)> GetListBookingAuthorized(Guid BarId, string? CustomerName, string? Phone, string? Email, DateTimeOffset? bookingDate, TimeSpan? bookingTime, int? Status, int PageIndex, int PageSize)
         {
             try
             {
