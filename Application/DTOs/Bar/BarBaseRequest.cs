@@ -20,7 +20,7 @@ namespace Application.DTOs.Bar
         public string Address { get; set; }
 
         [Required(ErrorMessage = "Mô tả Bar không thể trống !")]
-        [StringLength(500, MinimumLength = 7, ErrorMessage = "Địa chỉ Bar phải từ 7 đến 500 kí tự !")]
+        [StringLength(500, MinimumLength = 7, ErrorMessage = "Mô tả Bar phải từ 7 đến 500 kí tự !")]
         public string Description { get; set; }
         [Required]
         [RegularExpression(@"^\d+$", ErrorMessage = "Số điện thoại không hợp lệ. Vui lòng nhập số điện thoại Việt Nam hợp lệ !")]

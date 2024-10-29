@@ -68,7 +68,7 @@ namespace Application.Service
                         var isValid = Utils.IValidSlot(request.TimeSlot, isValidTimeSlot.StartTime, isValidTimeSlot.EndTime);
                         if(!isValid)
                         {
-                            throw new CustomException.InvalidDataException($" Thời gian đóng mở cửa không đủ cho một slot -> {isValidTimeSlot.DayOfWeek} !");
+                            throw new CustomException.InvalidDataException($" Thời gian đóng mở cửa không đủ cho một slot vào {Utils.GetDayName(isValidTimeSlot.DayOfWeek)}!");
                         }
                     }
                     await _barTimeService.CreateBarTimeOfBar(mapper.BarId, request.BarTimeRequest);
@@ -288,7 +288,7 @@ namespace Application.Service
                         var isValid = Utils.IValidSlot(request.TimeSlot, isValidTimeSlot.StartTime, isValidTimeSlot.EndTime);
                         if (!isValid)
                         {
-                            throw new CustomException.InvalidDataException($" Thời gian đóng mở cửa không đủ cho slot !");
+                            throw new CustomException.InvalidDataException($" Thời gian đóng mở cửa không đủ cho slot vào {Utils.GetDayName(isValidTimeSlot.DayOfWeek)}!");
                         }
                     }
                     _mapper.Map(request, getBarById);
