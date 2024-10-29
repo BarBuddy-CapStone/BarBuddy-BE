@@ -27,10 +27,10 @@ namespace BarBuddy_API.Controllers.Table
         /// <param name="PageSize"></param>
         /// <returns></returns>
         [HttpGet("manage")]
-        public async Task<IActionResult> GetAllForBar([FromQuery][Required] Guid TableTypeId, [FromQuery] int? Status,[FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
+        public async Task<IActionResult> GetAllForBar([FromQuery] Guid? TableTypeId, [FromQuery] int? Status,[FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
             var responses = await _tableService.GetAll(TableTypeId, Status, PageIndex, PageSize);
-            return Ok(new { TableTypeId = responses.TableTypeId, TableTypeName = responses.TableTypeName, totalPage = responses.TotalPage, response = responses.response });
+            return Ok(new { totalPage = responses.TotalPage, response = responses.response });
         }
 
         /// <summary>

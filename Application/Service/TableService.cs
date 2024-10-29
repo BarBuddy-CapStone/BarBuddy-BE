@@ -71,27 +71,18 @@ namespace Application.Service
             }
         }
 
-        public async Task<(List<TableResponse> response, int TotalPage, string TableTypeName, Guid TableTypeId)> GetAll(Guid TableTypeId, int? Status, int PageIndex, int PageSize)
+        public async Task<(List<TableResponse> response, int TotalPage)> GetAll(Guid? TableTypeId, int? Status, int PageIndex, int PageSize)
         {
             try
             {
                 var responses = new List<TableResponse>();
                 int totalPage = 1;
 
-                var tableType = await _unitOfWork.TableTypeRepository.GetByIdAsync(TableTypeId);
-
-                if (tableType == null) {
-                    throw new Exception("Table Type not found");
-                }
-
-                string TableTypeName = tableType.TypeName;
-                Guid tableTypeId = tableType.TableTypeId;
-
                 // filter expression
                 Expression<Func<Table, bool>> filter = t =>
                 (Status == null || t.Status == Status) &&
                 //(BarId == null || t.BarId == BarId) &&
-                t.TableTypeId == TableTypeId &&
+                (TableTypeId == null || t.TableTypeId == TableTypeId) &&
                 t.IsDeleted == false;
                 
                 var totalTable = (await _unitOfWork.TableRepository.GetAsync(filter: filter)).Count();
@@ -130,7 +121,7 @@ namespace Application.Service
                     }
                 }
 
-                return (responses, totalPage, TableTypeName, tableTypeId);
+                return (responses, totalPage);
             } catch (Exception ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
