@@ -200,7 +200,7 @@ namespace Application.Service
             }
         }
 
-        public async Task<BookingDetailByStaff> GetBookingDetailByAuthorized(Guid BookingId)
+        public async Task<BookingDetailByStaff> GetBookingDetailAuthorized(Guid BookingId)
         {
             try
             {
