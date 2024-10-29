@@ -21,5 +21,6 @@ namespace Application.IService
         Task<string> UpdateCustomerAvatar(Guid accountId, IFormFile Image);
         Task<ManagerAccountResponse> UpdateManagerAccount(Guid accountId, ManagerAccountRequest request);
         Task<StaffAccountResponse> UpdateStaffAccount(Guid accountId, StaffAccountRequest request);
+        Task<CustomerAccountResponse> UpdateCustomerSts(UpdCustomerStsRequest request);
     }
 }

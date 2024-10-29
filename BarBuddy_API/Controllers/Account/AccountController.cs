@@ -308,5 +308,22 @@ namespace BarBuddy_API.Controllers.Account
             var res = await _accountService.UpdateCustomerAvatar(accountId, Image);
             return CustomResult(new { url = res });
         }
+
+        [HttpPatch("/api/v1/customer/updSts")]
+        public async Task<IActionResult> UpdateCustomeStatus(UpdCustomerStsRequest request)
+        {
+            try
+            {
+                var response = await _accountService.UpdateCustomerSts(request);
+                return CustomResult("Đã thay đổi trạng thái thành công !", response);
+            }catch(CustomException.DataNotFoundException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.NotFound);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }

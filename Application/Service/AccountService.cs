@@ -6,6 +6,7 @@ using Application.IService;
 using AutoMapper;
 using Azure;
 using Azure.Core;
+using Domain.Constants;
 using Domain.CustomException;
 using Domain.Entities;
 using Domain.IRepository;
@@ -639,6 +640,35 @@ namespace Application.Service
             catch (Exception ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
+
+        public async Task<CustomerAccountResponse> UpdateCustomerSts(UpdCustomerStsRequest request)
+        {
+            try
+            {
+                var getOneCustomer = (await _accountRepository
+                                                .GetAsync(filter: x => x.AccountId.Equals(request.AccountId) 
+                                                                    && !x.BarId.HasValue
+                                                                    && x.Role.RoleName.Equals(PrefixKeyConstant.CUSTOMER),
+                                                                    includeProperties: "Role"))
+                                                                    .FirstOrDefault();
+
+                if(getOneCustomer == null)
+                {
+                    throw new DataNotFoundException("Không tìm thấy khách hàng !");
+                }
+                getOneCustomer.Status = request.Status;
+                await _unitOfWork.AccountRepository.UpdateRangeAsync(getOneCustomer);
+                await Task.Delay(10);
+                await _unitOfWork.SaveAsync();
+
+                var response = _mapper.Map<CustomerAccountResponse>(getOneCustomer);
+                return response;
+            }
+            catch (InternalServerErrorException ex)
+            {
+                throw new InternalServerErrorException(ex.Message);
             }
         }
 
