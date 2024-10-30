@@ -17,6 +17,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
+using System.Threading;
 
 namespace Application.Service
 {
@@ -29,7 +30,7 @@ namespace Application.Service
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<BookingTableService> _logger;
         private readonly IAuthentication _authentication;
-
+        //private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
         public BookingTableService
                 (IUnitOfWork unitOfWork, IMapper mapper,
                 IMemoryCache memoryCache, IBookingHubService bookingHub,
@@ -118,86 +119,104 @@ namespace Application.Service
             var accountId = _authentication.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
             var tableIsExist = _unitOfWork.TableRepository
                                         .Get(filter: x => x.TableType.BarId.Equals(request.BarId)
-                                                            && x.TableId.Equals(request.TableId),
+                                                            && x.TableId.Equals(request.TableId)
+                                                            && x.IsDeleted == PrefixKeyConstant.FALSE,
                                                             includeProperties: "TableType.Bar")
                                         .FirstOrDefault();
-
-            if (tableIsExist == null)
+            if(tableIsExist == null)
             {
-                throw new CustomException.DataNotFoundException("Không tìm thấy table trong quán bar!");
+                throw new CustomException.DataNotFoundException("Không tìm thấy bàn trong quán Bar, vui lòng thử lại !");
             }
 
-            var getTimeOfBar = _unitOfWork.BarTimeRepository
+            try
+            {
+                var currentHeldTables = await HoldTableList(request.BarId, new DateTimeRequest
+                {
+                    Date = request.Date,
+                    Time = request.Time
+                });
+
+                if (currentHeldTables.Count >= 5)
+                {
+                    throw new CustomException.InvalidDataException("Bạn chỉ được phép giữ tối đa 5 bàn cùng lúc.");
+                }
+                var getTimeOfBar = _unitOfWork.BarTimeRepository
                                             .Get(filter: x => x.BarId.Equals(tableIsExist.TableType.BarId)
                                                         && x.DayOfWeek == (int)request.Date.DayOfWeek).ToList();
 
-            if(getTimeOfBar == null)
-            {
-                throw new CustomException.DataNotFoundException("Không tìm thấy khung giờ trong quán bar!");
-            }
-
-            Utils.ValidateOpenCloseTime(request.Date, request.Time, getTimeOfBar);
-
-            var cacheKey = $"{request.BarId}_{request.TableId}_{accountId}_{request.Date.Date.Date}_{request.Time}";
-            var cacheEntry = _memoryCache.GetOrCreate(cacheKey, entry =>
-            {
-                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
-
-                entry.RegisterPostEvictionCallback((key, value, reason, state) =>
+                if (getTimeOfBar == null)
                 {
-                    var tableDictionary = value as Dictionary<Guid, TableHoldInfo>;
+                    throw new CustomException.DataNotFoundException("Không tìm thấy khung giờ trong quán bar!");
+                }
 
-                    if (tableDictionary != null)
+                Utils.ValidateOpenCloseTime(request.Date, request.Time, getTimeOfBar);
+
+                var cacheKey = $"{request.BarId}_{request.TableId}_{accountId}_{request.Date.Date.Date}_{request.Time}";
+                var cacheEntry = _memoryCache.GetOrCreate(cacheKey, entry =>
+                {
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+
+                    entry.RegisterPostEvictionCallback((key, value, reason, state) =>
                     {
-                        foreach (var tableEntry in tableDictionary)
+                        var tableDictionary = value as Dictionary<Guid, TableHoldInfo>;
+
+                        if (tableDictionary != null)
                         {
-                            var tableId = tableEntry.Key;
-                            var tableHoldInfo = tableEntry.Value;
-
-                            if (tableHoldInfo.HoldExpiry < DateTimeOffset.Now)
+                            foreach (var tableEntry in tableDictionary)
                             {
-                                tableHoldInfo.IsHeld = false;
-                                tableHoldInfo.AccountId = Guid.Empty;
-                            }
+                                var tableId = tableEntry.Key;
+                                var tableHoldInfo = tableEntry.Value;
 
-                            _logger.LogInformation($"Cache entry {key} for TableId {tableId} was removed because {reason}. Table is now released.");
+                                if (tableHoldInfo.HoldExpiry < DateTimeOffset.Now)
+                                {
+                                    tableHoldInfo.IsHeld = false;
+                                    tableHoldInfo.AccountId = Guid.Empty;
+                                }
+
+                                _logger.LogInformation($"Cache entry {key} for TableId {tableId} was removed because {reason}. Table is now released.");
+                            }
                         }
-                    }
+                    });
+
+                    return new Dictionary<Guid, TableHoldInfo>();
                 });
 
-                return new Dictionary<Guid, TableHoldInfo>();
-            });
+                if (cacheEntry.ContainsKey(request.TableId)
+                    && cacheEntry[request.TableId].IsHeld
+                    && !cacheEntry[request.TableId].AccountId.Equals(accountId))
+                {
+                    throw new CustomException.InvalidDataException($"Bàn {request.TableId} đã bị giữ bởi người khác.");
+                }
 
-            if (cacheEntry.ContainsKey(request.TableId)
-                && cacheEntry[request.TableId].IsHeld
-                && !cacheEntry[request.TableId].AccountId.Equals(accountId))
+                var tableHoldInfo = new TableHoldInfo
+                {
+                    AccountId = accountId,
+                    TableId = tableIsExist.TableId,
+                    TableName = tableIsExist.TableName,
+                    IsHeld = true,
+                    HoldExpiry = DateTimeOffset.Now.AddMinutes(5),
+                    Date = request.Date,
+                    Time = request.Time,
+                };
+
+                cacheEntry[request.TableId] = tableHoldInfo;
+
+                var bkHubResponse = _mapper.Map<BookingHubResponse>(tableHoldInfo);
+
+                await _bookingHub.HoldTable(bkHubResponse);
+
+                _memoryCache.Set(cacheKey, cacheEntry, new MemoryCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                });
+
+                return tableHoldInfo;
+
+            }catch(CustomException.InternalServerErrorException ex)
             {
-                throw new CustomException.InvalidDataException($"Bàn {request.TableId} đã bị giữ bởi người khác.");
-            }
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            } 
 
-            var tableHoldInfo = new TableHoldInfo
-            {
-                AccountId = accountId,
-                TableId = tableIsExist.TableId,
-                TableName = tableIsExist.TableName,
-                IsHeld = true,
-                HoldExpiry = DateTimeOffset.Now.AddMinutes(5),
-                Date = request.Date,
-                Time = request.Time,
-            };
-
-            cacheEntry[request.TableId] = tableHoldInfo;
-
-            var bkHubResponse = _mapper.Map<BookingHubResponse>(tableHoldInfo);
-
-            await _bookingHub.HoldTable(bkHubResponse);
-
-            _memoryCache.Set(cacheKey, cacheEntry, new MemoryCacheEntryOptions
-            {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
-            });
-
-            return tableHoldInfo;
         }
 
         public Task<List<TableHoldInfo>> HoldTableList(Guid barId, DateTimeRequest request)
