@@ -176,5 +176,24 @@ namespace BarBuddy_API.Controllers.Drink
                 return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
             }
         }
+
+        [HttpGet("customer/{barId}")]
+        public async Task<IActionResult> GetAllDrinkCustomer(Guid barId)
+        {
+            try
+            {
+                var response = await _drinkService.GetAllDrinkCustomerOfBar(barId);
+                return CustomResult("Data loaded", response);
+            }
+            catch (CustomException.DataNotFoundException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.NotFound);
+            }
+
+            catch (CustomException.InternalServerErrorException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }
