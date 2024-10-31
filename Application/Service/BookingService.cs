@@ -73,6 +73,7 @@ namespace Application.Service
                 var creNoti = new NotificationRequest
                 {
                     BarId = booking.BarId,
+                    Title = booking.Bar.BarName,
                     Message = string.Format(PrefixKeyConstant.BOOKING_CANCEL_NOTI, booking.Bar.BarName, booking.BookingDate.ToString("yyyy/mm/dd"), booking.BookingTime)
                 };
 
