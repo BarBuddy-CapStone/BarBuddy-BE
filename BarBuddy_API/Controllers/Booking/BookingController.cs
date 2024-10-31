@@ -69,10 +69,10 @@ namespace BarBuddy_API.Controllers.Booking
         /// <param name="PageSize"></param>
         /// <returns></returns>
         [HttpGet("staff")]
-        public async Task<IActionResult> GetListBookingByStaff([FromQuery][Required] Guid BarId, [FromQuery] string? CustomerName, [FromQuery] string? Phone, [FromQuery] string? Email, 
+        public async Task<IActionResult> GetListBookingByStaff([FromQuery] string? qrTicket, [FromQuery][Required] Guid BarId, [FromQuery] string? CustomerName, [FromQuery] string? Phone, [FromQuery] string? Email, 
             [FromQuery] DateTimeOffset? bookingDate, [FromQuery] TimeSpan? bookingTime, [FromQuery] int? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
-            var responses = await _bookingService.GetListBookingAuthorized(BarId, CustomerName, Phone, Email, bookingDate, bookingTime, Status, PageIndex, PageSize);
+            var responses = await _bookingService.GetListBookingAuthorized(qrTicket, BarId, CustomerName, Phone, Email, bookingDate, bookingTime, Status, PageIndex, PageSize);
             return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.responses });
         }
         /// <summary>
@@ -88,10 +88,10 @@ namespace BarBuddy_API.Controllers.Booking
         }
 
         [HttpGet("manager")]
-        public async Task<IActionResult> GetListBookingByManager([FromQuery][Required] Guid BarId, [FromQuery] string? CustomerName, [FromQuery] string? Phone, [FromQuery] string? Email,
+        public async Task<IActionResult> GetListBookingByManager([FromQuery] string? qrTicket, [FromQuery][Required] Guid BarId, [FromQuery] string? CustomerName, [FromQuery] string? Phone, [FromQuery] string? Email,
             [FromQuery] DateTimeOffset? bookingDate, [FromQuery] TimeSpan? bookingTime, [FromQuery] int? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
-            var responses = await _bookingService.GetListBookingAuthorized(BarId, CustomerName, Phone, Email, bookingDate, bookingTime, Status, PageIndex, PageSize);
+            var responses = await _bookingService.GetListBookingAuthorized(qrTicket, BarId, CustomerName, Phone, Email, bookingDate, bookingTime, Status, PageIndex, PageSize);
             return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.responses });
         }
         /// <summary>

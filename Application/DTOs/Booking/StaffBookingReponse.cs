@@ -18,5 +18,6 @@ namespace Application.DTOs.Booking
         public double? TotalPrice { get; set; }
         public double? AdditionalFee { get; set; }
         public int Status { get; set; }
+        public string? QRTicket { get; set; }
     }
 }

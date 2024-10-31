@@ -227,6 +227,7 @@ namespace Application.Service
                 response.AdditionalFee = booking.AdditionalFee;
                 response.TotalPrice = booking.TotalPrice;
                 response.Note = booking.Note;
+                response.QRTicket = booking.QRTicket;
 
                 if (booking.TotalPrice >= 0)
                 {
@@ -265,7 +266,7 @@ namespace Application.Service
             }
         }
 
-        public async Task<(List<StaffBookingReponse> responses, int TotalPage)> GetListBookingAuthorized(Guid BarId, string? CustomerName, string? Phone, string? Email, DateTimeOffset? bookingDate, TimeSpan? bookingTime, int? Status, int PageIndex, int PageSize)
+        public async Task<(List<StaffBookingReponse> responses, int TotalPage)> GetListBookingAuthorized(string qrTicket, Guid BarId, string? CustomerName, string? Phone, string? Email, DateTimeOffset? bookingDate, TimeSpan? bookingTime, int? Status, int PageIndex, int PageSize)
         {
             try
             {
@@ -284,7 +285,8 @@ namespace Application.Service
                 (string.IsNullOrEmpty(Email) || b.Account.Email.Contains(Email)) &&
                 (!bookingDate.HasValue || b.BookingDate.Date.Day == bookingDate.Value.Date.Day) &&
                 (!bookingTime.HasValue || b.BookingTime == bookingTime.Value) &&
-                (!Status.HasValue || b.Status == Status.Value);
+                (!Status.HasValue || b.Status == Status.Value) &&
+                (string.IsNullOrEmpty(qrTicket) || b.BookingId.Equals(Guid.Parse(qrTicket)));
 
                 var bookings = await _unitOfWork.BookingRepository.GetAsync(filter);
 
@@ -316,7 +318,8 @@ namespace Application.Service
                         Status = booking.Status,
                         BookingCode = booking.BookingCode,
                         AdditionalFee = booking.AdditionalFee,
-                        TotalPrice = booking.TotalPrice
+                        TotalPrice = booking.TotalPrice,
+                        QRTicket = booking.QRTicket,
                     };
                     responses.Add(response);
                 }
