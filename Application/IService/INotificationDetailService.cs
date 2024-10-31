@@ -11,5 +11,6 @@ namespace Application.IService
     public interface INotificationDetailService
     {
         public Task<bool> CreateNotificationDetail(NotificationDetailRequest request);
+        Task<bool> CreateNotificationDetailJob(NotificationDetailRequest request);
     }
 }

@@ -133,5 +133,32 @@ namespace Application.Service
             }
 
         }
+
+        public async Task<NotificationResponse> CreateNotificationAllCustomer(Guid accountId, NotificationRequest request)
+        {
+            try
+            {
+                var mapper = _mapper.Map<Notification>(request);
+
+                mapper.UpdatedAt = mapper.CreatedAt;
+
+                var notiDetailMapper = new NotificationDetailRequest
+                {
+                    AccountId = accountId,
+                    NotificationId = mapper.NotificationId
+                };
+
+                await _unitOfWork.NotificationRepository.InsertAsync(mapper);
+                await Task.Delay(200);
+                await _unitOfWork.SaveAsync();
+                await _notificationDetailService.CreateNotificationDetailJob(notiDetailMapper);
+                var response = _mapper.Map<NotificationResponse>(mapper);
+                return response;
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
     }
 }

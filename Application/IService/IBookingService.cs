@@ -22,6 +22,6 @@ namespace Application.IService
         Task<bool> CancelBooking(Guid BookingId);
         Task<BookingResponse> CreateBookingTableOnly(BookingTableRequest request, HttpContext httpContext);
         Task<PaymentLink> CreateBookingTableWithDrinks(BookingDrinkRequest request, HttpContext httpContext);
-        //Task<BookingDetailByStaff> GetBookDetailByBkCode(string bookingCode);
+        Task<List<BookingCustomResponse>> GetAllBookingByStsPending();
     }
 }

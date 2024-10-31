@@ -28,10 +28,10 @@ namespace BarBuddy_API.Controllers.Booking
         /// <param name="PageSize"></param>
         /// <returns></returns>
         [HttpGet("{CustomerId}")]
-        public async Task<IActionResult> GetAllBookingByCustomerId (Guid CustomerId, [FromQuery] int? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
+        public async Task<IActionResult> GetAllBookingByCustomerId(Guid CustomerId, [FromQuery] int? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
             var responses = await _bookingService.GetAllCustomerBooking(CustomerId, Status, PageIndex, PageSize);
-            return CustomResult(new { TotalPage = responses.TotalPage, response = responses.responses} );
+            return CustomResult(new { TotalPage = responses.TotalPage, response = responses.responses });
         }
         /// <summary>
         /// Get Booking By Id
@@ -39,7 +39,8 @@ namespace BarBuddy_API.Controllers.Booking
         /// <param name="BookingId"></param>
         /// <returns></returns>
         [HttpGet("detail/{BookingId}")]
-        public async Task<IActionResult> GetBookingById(Guid BookingId) {
+        public async Task<IActionResult> GetBookingById(Guid BookingId)
+        {
             var response = await _bookingService.GetBookingById(BookingId);
             return CustomResult(response);
         }
@@ -50,7 +51,7 @@ namespace BarBuddy_API.Controllers.Booking
         /// <param name="NumOfBookings"></param>
         /// <returns></returns>
         [HttpGet("top-booking")]
-        public async Task<IActionResult> GetTopBookingByCustomer([FromQuery] [Required] Guid CustomerId, [FromQuery] int NumOfBookings = 4)
+        public async Task<IActionResult> GetTopBookingByCustomer([FromQuery][Required] Guid CustomerId, [FromQuery] int NumOfBookings = 4)
         {
             var responses = await _bookingService.GetTopBookingByCustomer(CustomerId, NumOfBookings);
             return CustomResult(responses);
@@ -69,7 +70,7 @@ namespace BarBuddy_API.Controllers.Booking
         /// <param name="PageSize"></param>
         /// <returns></returns>
         [HttpGet("staff")]
-        public async Task<IActionResult> GetListBookingByStaff([FromQuery] string? qrTicket, [FromQuery][Required] Guid BarId, [FromQuery] string? CustomerName, [FromQuery] string? Phone, [FromQuery] string? Email, 
+        public async Task<IActionResult> GetListBookingByStaff([FromQuery] string? qrTicket, [FromQuery][Required] Guid BarId, [FromQuery] string? CustomerName, [FromQuery] string? Phone, [FromQuery] string? Email,
             [FromQuery] DateTimeOffset? bookingDate, [FromQuery] TimeSpan? bookingTime, [FromQuery] int? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
             var responses = await _bookingService.GetListBookingAuthorized(qrTicket, BarId, CustomerName, Phone, Email, bookingDate, bookingTime, Status, PageIndex, PageSize);

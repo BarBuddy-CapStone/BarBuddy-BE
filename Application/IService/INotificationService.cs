@@ -13,5 +13,6 @@ namespace Application.IService
         Task<NotificationResponse> CreateNotification(NotificationRequest request);
         Task<List<NotificationResponse>> UpdateIsReadNoti(UpdateNotiRequest request);
         public Task<NotificationDetailResponse> GetAllNotiOfCus(Guid accountId);
+        Task<NotificationResponse> CreateNotificationAllCustomer(Guid accountId,NotificationRequest request);
     }
 }

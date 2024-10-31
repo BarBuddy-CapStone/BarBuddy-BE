@@ -28,6 +28,9 @@ namespace Application.Mappers.Booking
 
             CreateMap<BookingDrink, BookingDrinkDetailResponse>()
                 .ForMember(x => x.DrinkName, opt => opt.MapFrom(y => y.Drink.DrinkName));
+
+            CreateMap<Domain.Entities.Booking, BookingCustomResponse>()
+                .ForMember(dst => dst.BarName, src => src.MapFrom(x => x.Bar.BarName));
         }
     }
 }

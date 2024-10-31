@@ -14,6 +14,8 @@ using Domain.Enums;
 using Domain.IRepository;
 using Domain.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.SqlServer.Server;
 using System.Linq.Expressions;
 using static Domain.CustomException.CustomException;
@@ -30,6 +32,7 @@ namespace Application.Service
         private readonly INotificationService _notificationService;
         private readonly IQRCodeService _qrCodeService;
         private readonly IFirebase _firebase;
+        private readonly ILogger<BookingService> _logger;
 
         public BookingService(IUnitOfWork unitOfWork, IMapper mapper, IAuthentication authentication,
             IPaymentService paymentService, IEmailSender emailSender, 
@@ -638,6 +641,45 @@ namespace Application.Service
             catch (Exception ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
+
+        public async Task<List<BookingCustomResponse>> GetAllBookingByStsPending()
+        {
+            try
+            {
+                DateTimeOffset now = DateTimeOffset.Now;
+                TimeSpan roundedTimeOfDay = TimeSpan.FromHours(now.TimeOfDay.Hours)
+                                                   .Add(TimeSpan.FromMinutes(now.TimeOfDay.Minutes))
+                                                   .Add(TimeSpan.FromSeconds(now.TimeOfDay.Seconds));
+                TimeSpan roundedTwoHoursLater = new TimeSpan(
+                                                    now.AddHours(2).TimeOfDay.Hours,
+                                                    now.AddHours(2).TimeOfDay.Minutes,
+                                                    now.AddHours(2).TimeOfDay.Seconds
+);
+                var getBkByStsPending = await _unitOfWork.BookingRepository
+                    .GetAsync(filter: x => (
+                        (x.BookingDate.Date == now.Date &&
+                         x.BookingTime >= roundedTimeOfDay &&
+                         x.BookingTime <= roundedTwoHoursLater)
+                        ||
+                        (x.BookingDate.Date == now.Date.AddDays(1) &&
+                         x.BookingTime <= roundedTwoHoursLater)
+                    ) &&
+                    x.Status == (int)PrefixValueEnum.PendingBooking,
+                    includeProperties: "Bar");
+
+                if (getBkByStsPending.IsNullOrEmpty())
+                {
+                    return new List<BookingCustomResponse>();
+                }
+
+                var response = _mapper.Map<List<BookingCustomResponse>>(getBkByStsPending);
+                return response;
+            }
+            catch (InternalServerErrorException ex)
+            {
+                throw new InternalServerErrorException("Lỗi hệ thống !");
             }
         }
     }

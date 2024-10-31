@@ -38,6 +38,7 @@ namespace Domain.Constants
 
         #region Notification
         public static string BOOKING_SUCCESS = "Bạn đã đặt bàn thành công!";
+        public static string BOOKING_PENDING_NOTI = "Chúng tôi xin nhắc nhở bạn rằng thời gian check-in của bạn tại {0} vào ngày {1} sẽ diễn ra trong khoảng thời gian 2 giờ tới.";
         #endregion
     }
 }

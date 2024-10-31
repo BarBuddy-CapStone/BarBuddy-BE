@@ -20,7 +20,7 @@ namespace Application.Service
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
-        private IHttpContextAccessor _contextAccessor;
+        private readonly IHttpContextAccessor _contextAccessor;
         private IAuthentication _authentication;
 
         public NotificationDetailService(IMapper mapper, IUnitOfWork unitOfWork, IHttpContextAccessor contextAccessor, IAuthentication authentication)
@@ -48,6 +48,24 @@ namespace Application.Service
                 await Task.Delay(200);
                 await _unitOfWork.SaveAsync();
 
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+                throw new CustomException.InternalServerErrorException(ex.Message, ex);
+            }
+        }
+
+        private async Task<bool> CreateNotificationDetailJob(NotificationDetailRequest request)
+        {
+            try
+            {
+                var mapper = _mapper.Map<NotificationDetail>(request);
+                mapper.IsRead = false;
+                await _unitOfWork.NotificationDetailRepository.InsertAsync(mapper);
+                await Task.Delay(200);
+                await _unitOfWork.SaveAsync();
                 return true;
             }
             catch (Exception ex)

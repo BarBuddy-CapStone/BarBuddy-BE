@@ -19,6 +19,7 @@ using Infrastructure.Momo.Config;
 
 using Quartz;
 using Infrastructure.QRService;
+using Infrastructure.Quartz;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -73,6 +74,7 @@ namespace Infrastructure.DependencyInjection
             services.AddTransient<IBookingHubService, BookingHubService>();
             services.AddScoped<IGoogleAuthService, GoogleAuthService>();
             services.AddScoped<IQRCodeService, QRCodeService>();
+            services.AddScoped<NotificationJob>();
 
             services.AddScoped<IEmotionalDrinkCategoryService, EmotionalDrinkCategoryService>();
             services.AddScoped<IFeedBackService, FeedBackService>();
@@ -167,19 +169,18 @@ namespace Infrastructure.DependencyInjection
             {
                 options.UseMicrosoftDependencyInjectionJobFactory();
                 //Add cac Job vao day 
-                //AddJobWithTrigger<TJob>(options, nameOf(TJob), second)
+                AddJobWithTrigger<NotificationJob>(options, nameof(NotificationJob));
             });
 
             services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
         }
 
-        public static void AddJobWithTrigger<TJob>(QuartzOptions options, string jobName, int intervalInSeconds) where TJob : IJob
+        public static void AddJobWithTrigger<TJob>(IServiceCollectionQuartzConfigurator options, string jobName) where TJob : IJob
         {
             var jobKey = JobKey.Create(jobName);
             options.AddJob<TJob>(joinBuilder => joinBuilder.WithIdentity(jobKey))
-                        .AddTrigger(trigger => trigger.ForJob(jobKey)
-                        .WithSimpleSchedule(schedule => schedule.WithIntervalInMinutes(intervalInSeconds)
-                                                                .RepeatForever()));
+                   .AddTrigger(trigger => trigger.ForJob(jobKey)
+                   .WithCronSchedule("36 * * ? * *"));
         }
     }
 }
