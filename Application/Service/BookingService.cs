@@ -80,8 +80,9 @@ namespace Application.Service
                 booking.Status = 1;
                 _unitOfWork.BeginTransaction();
                 await _unitOfWork.BookingRepository.UpdateAsync(booking);
-                await _notificationService.CreateNotification(creNoti);
+                //await _notificationService.CreateNotification(creNoti);
                 await _unitOfWork.SaveAsync();
+                _unitOfWork.CommitTransaction();
                 return true;
             }
             catch (Exception ex)
