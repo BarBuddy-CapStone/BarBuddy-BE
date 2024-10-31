@@ -85,6 +85,24 @@ namespace BarBuddy_API.Controllers.Authencation
         }
 
         /// <summary>
+        /// ResetPassword From Email
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] string email)
+        {
+            var response = await _authenService.ResetPassword(email);
+            if(response)
+            {
+                return CustomResult("Đặt lại mật khẩu thành công", "Quý khách hãy check Email hoặc tin Spam");
+            } else
+            {
+                return CustomResult("Đặt lại mật khẩu không thành công");
+            }
+        }
+
+        /// <summary>
         /// SendOtp From Email Bar to Email Register
         /// </summary>
         /// <param name="email"></param>

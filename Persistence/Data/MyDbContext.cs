@@ -544,21 +544,102 @@ namespace Persistence.Data
 
             // BarTime Data
             modelBuilder.Entity<BarTime>().HasData(
+                // Bar Buddy 1 mở hàng ngày từ 17:00 đến 23:00
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Bar Buddy 1
+                    DayOfWeek = 0, // Chủ Nhật
+                    StartTime = new TimeSpan(17, 0, 0), // 5:00 PM
+                    EndTime = new TimeSpan(23, 0, 0) // 11:00 PM
+                },
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Bar Buddy 1
+                    DayOfWeek = 1, // Thứ Hai
+                    StartTime = new TimeSpan(17, 0, 0), // 5:00 PM
+                    EndTime = new TimeSpan(23, 0, 0) // 11:00 PM
+                },
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Bar Buddy 1
+                    DayOfWeek = 2, // Thứ Ba
+                    StartTime = new TimeSpan(17, 0, 0), // 5:00 PM
+                    EndTime = new TimeSpan(23, 0, 0) // 11:00 PM
+                },
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Bar Buddy 1
+                    DayOfWeek = 3, // Thứ Tư
+                    StartTime = new TimeSpan(17, 0, 0), // 5:00 PM
+                    EndTime = new TimeSpan(23, 0, 0) // 11:00 PM
+                },
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Bar Buddy 1
+                    DayOfWeek = 4, // Thứ Năm
+                    StartTime = new TimeSpan(17, 0, 0), // 5:00 PM
+                    EndTime = new TimeSpan(23, 0, 0) // 11:00 PM
+                },
                 new BarTime
                 {
                     BarTimeId = Guid.NewGuid(),
                     BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Bar Buddy 1
                     DayOfWeek = 5, // Thứ Sáu
-                    StartTime = new TimeSpan(18, 0, 0), // 6:00 PM
-                    EndTime = new TimeSpan(2, 0, 0) // 2:00 AM
+                    StartTime = new TimeSpan(17, 0, 0), // 5:00 PM
+                    EndTime = new TimeSpan(23, 0, 0) // 11:00 PM
+                },
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000"), // Bar Buddy 1
+                    DayOfWeek = 6, // Thứ Bảy
+                    StartTime = new TimeSpan(17, 0, 0), // 5:00 PM
+                    EndTime = new TimeSpan(23, 0, 0) // 11:00 PM
+                },
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"), // Bar Buddy 2
+                    DayOfWeek = 2, // Thứ Ba
+                    StartTime = new TimeSpan(17, 0, 0), // 5:00 PM
+                    EndTime = new TimeSpan(23, 0, 0) // 11:00 PM
+                },
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"), // Bar Buddy 2
+                    DayOfWeek = 4, // Thứ Năm
+                    StartTime = new TimeSpan(17, 0, 0), // 5:00 PM
+                    EndTime = new TimeSpan(23, 0, 0) // 11:00 PM
                 },
                 new BarTime
                 {
                     BarTimeId = Guid.NewGuid(),
                     BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440001"), // Bar Buddy 2
                     DayOfWeek = 6, // Thứ Bảy
-                    StartTime = new TimeSpan(19, 0, 0), // 7:00 PM
-                    EndTime = new TimeSpan(3, 0, 0) // 3:00 AM
+                    StartTime = new TimeSpan(17, 0, 0), // 5:00 PM
+                    EndTime = new TimeSpan(23, 0, 0) // 11:00 PM
+                },
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"), // Bar Buddy 3
+                    DayOfWeek = 3, // Thứ Tư
+                    StartTime = new TimeSpan(17, 0, 0), // 5:00 PM
+                    EndTime = new TimeSpan(23, 0, 0) // 11:00 PM
+                },
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"), // Bar Buddy 3
+                    DayOfWeek = 5, // Thứ Sáu
+                    StartTime = new TimeSpan(17, 0, 0), // 5:00 PM
+                    EndTime = new TimeSpan(23, 0, 0) // 11:00 PM
                 },
                 new BarTime
                 {
@@ -566,9 +647,84 @@ namespace Persistence.Data
                     BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440002"), // Bar Buddy 3
                     DayOfWeek = 0, // Chủ Nhật
                     StartTime = new TimeSpan(17, 0, 0), // 5:00 PM
+                    EndTime = new TimeSpan(23, 0, 0) // 11:00 PM
+                },
+                // Bar Buddy 4 mở 2,4,6 từ 18:00 đến 24:00
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Bar Buddy 4
+                    DayOfWeek = 1, // Thứ Hai
+                    StartTime = new TimeSpan(18, 0, 0), // 6:00 PM
+                    EndTime = new TimeSpan(24, 0, 0) // 12:00 AM
+                },
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Bar Buddy 4
+                    DayOfWeek = 3, // Thứ Tư
+                    StartTime = new TimeSpan(18, 0, 0), // 6:00 PM
+                    EndTime = new TimeSpan(24, 0, 0) // 12:00 AM
+                },
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440003"), // Bar Buddy 4
+                    DayOfWeek = 5, // Thứ Sáu
+                    StartTime = new TimeSpan(18, 0, 0), // 6:00 PM
+                    EndTime = new TimeSpan(24, 0, 0) // 12:00 AM
+                },
+                // Bar Buddy 5 mở 3,5,7 từ 19:00 đến 01:00
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440004"), // Bar Buddy 5
+                    DayOfWeek = 2, // Thứ Ba
+                    StartTime = new TimeSpan(19, 0, 0), // 7:00 PM
                     EndTime = new TimeSpan(1, 0, 0) // 1:00 AM
+                },
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440004"), // Bar Buddy 5
+                    DayOfWeek = 4, // Thứ Năm
+                    StartTime = new TimeSpan(19, 0, 0), // 7:00 PM
+                    EndTime = new TimeSpan(1, 0, 0) // 1:00 AM
+                },
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440004"), // Bar Buddy 5
+                    DayOfWeek = 6, // Thứ Bảy
+                    StartTime = new TimeSpan(19, 0, 0), // 7:00 PM
+                    EndTime = new TimeSpan(1, 0, 0) // 1:00 AM
+                },
+                // Bar Buddy 6 mở 4,6,7 từ 20:00 đến 02:00
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440005"), // Bar Buddy 6
+                    DayOfWeek = 3, // Thứ Tư
+                    StartTime = new TimeSpan(20, 0, 0), // 8:00 PM
+                    EndTime = new TimeSpan(2, 0, 0) // 2:00 AM
+                },
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440005"), // Bar Buddy 6
+                    DayOfWeek = 5, // Thứ Sáu
+                    StartTime = new TimeSpan(20, 0, 0), // 8:00 PM
+                    EndTime = new TimeSpan(2, 0, 0) // 2:00 AM
+                },
+                new BarTime
+                {
+                    BarTimeId = Guid.NewGuid(),
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440005"), // Bar Buddy 6
+                    DayOfWeek = 6, // Thứ Bảy
+                    StartTime = new TimeSpan(20, 0, 0), // 8:00 PM
+                    EndTime = new TimeSpan(2, 0, 0) // 2:00 AM
                 }
-                // ... thêm dữ liệu mẫu cho các quán bar khác nếu cần ...
+                // Add more BarTime data for other bars as needed
             );
 
             //Table

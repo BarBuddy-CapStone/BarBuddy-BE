@@ -342,5 +342,54 @@ namespace Application.Service
             }
             return response;
         }
+
+        public async Task<IEnumerable<OnlyBarResponse>> GetAllAvailableBars(DateTime dateTime)
+        {
+            try
+            {
+                var bars = await _unitOfWork.BarRepository
+                    .GetAsync(filter: x => x.BarTimes.Any(x => x.DayOfWeek == (int)dateTime.DayOfWeek) 
+                            && x.Status == true,
+                        includeProperties: "Feedbacks,BarTimes");
+                var currentDateTime = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now);
+                var response = new List<OnlyBarResponse>();
+
+                if (bars.IsNullOrEmpty() || !bars.Any())
+                {
+                    throw new CustomException.DataNotFoundException("Danh sách đang trống !");
+                }
+
+                foreach (var bar in bars)
+                {
+                    var tables = await _unitOfWork.TableRepository
+                                                    .GetAsync(t => t.IsDeleted == false);
+                    bool isAnyTableAvailable = false;
+                    foreach (var table in tables)
+                    {
+                        var reservations = await _unitOfWork.BookingTableRepository
+                            .GetAsync(filter: bt => bt.TableId == table.TableId &&
+                            (bt.Booking.BookingDate + bt.Booking.BookingTime) >= currentDateTime &&
+                            (bt.Booking.Status == (int)PrefixValueEnum.Pending || bt.Booking.Status == (int)PrefixValueEnum.Serving),
+                            includeProperties: "Booking");
+
+                        if (!reservations.Any())
+                        {
+                            isAnyTableAvailable = true;
+                            break;
+                        }
+                    }
+                    var mapper = _mapper.Map<OnlyBarResponse>(bar);
+                    mapper.IsAnyTableAvailable = isAnyTableAvailable;
+                    mapper.BarTimeResponses = _mapper.Map<List<BarTimeResponse>>(bar.BarTimes);
+                    response.Add(mapper);
+                }
+
+                return response;
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

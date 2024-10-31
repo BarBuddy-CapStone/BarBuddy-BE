@@ -25,10 +25,12 @@ namespace Application.Service
         private readonly IMemoryCache _cache;
         private readonly IOtpSender _otpSender;
         private readonly IGoogleAuthService _googleAuthService;
+        private readonly IEmailSender _emailSender;
 
         public AuthenService(IUnitOfWork unitOfWork, IMapper mapper,
                             IAuthentication authentication, IMemoryCache cache,
-                            IOtpSender otpSender, IGoogleAuthService googleAuthService)
+                            IOtpSender otpSender, IGoogleAuthService googleAuthService,
+                            IEmailSender emailSender)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -36,6 +38,7 @@ namespace Application.Service
             _cache = cache;
             _otpSender = otpSender;
             _googleAuthService = googleAuthService;
+            _emailSender = emailSender;
         }
 
         public async Task<LoginResponse> Login(LoginRequest request)
@@ -203,6 +206,42 @@ namespace Application.Service
             {
                 _unitOfWork.RollBack();
             } finally
+            {
+                _unitOfWork.Dispose();
+            }
+            return flag;
+        }
+
+        public async Task<bool> ResetPassword(string email)
+        {
+            bool flag = false;
+            var existAccount = _unitOfWork.AccountRepository
+                .Get(filter: x => x.Email.Equals(email)).FirstOrDefault();
+            if (existAccount == null)
+            {
+                throw new DataNotFoundException("Tài khoản không tồn tại");
+            }
+            else if (existAccount.Status == (int)PrefixValueEnum.Inactive)
+            {
+                throw new ForbbidenException("Tài khoản ngưng hoạt động cần liên hệ admin");
+            }
+
+            try
+            {
+                var randomPassword = RandomHelper.GenerateRandomString();
+                _unitOfWork.BeginTransaction();
+                existAccount.Password = await _authentication.HashedPassword(randomPassword);
+                _unitOfWork.AccountRepository.Update(existAccount);
+                _unitOfWork.CommitTransaction();
+                await _unitOfWork.SaveAsync();
+                await _emailSender.SendEmail(existAccount.Email, "Reset Password", $"Your new password is {randomPassword}");
+                flag = true;
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollBack();
+            }
+            finally
             {
                 _unitOfWork.Dispose();
             }

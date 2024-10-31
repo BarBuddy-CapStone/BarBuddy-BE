@@ -66,6 +66,29 @@ namespace BarBuddy_API.Controllers.Bar
         }
 
         /// <summary>
+        /// Get All Bars Available with Date
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("/api/v1/bars/{datePicker}")]
+        public async Task<IActionResult> GetAllBarByDate(DateTime datePicker)
+        {
+            try
+            {
+                var response = await _barService.GetAllAvailableBars(datePicker);
+                return CustomResult("Data loaded", response);
+            }
+            catch (CustomException.DataNotFoundException e)
+            {
+                return CustomResult(e.Message, HttpStatusCode.NotFound);
+            }
+
+            catch (Exception e)
+            {
+                return CustomResult(e.Message, HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
         /// Get Bar With Feedback By barId
         /// </summary>
         /// <param name="barId"></param>

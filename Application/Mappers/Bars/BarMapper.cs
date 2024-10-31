@@ -12,7 +12,9 @@ namespace Application.Mappers.Bars
     public class BarMapper : Profile
     {
         public BarMapper() {
-            CreateMap<Bar, BarResponse>();
+            CreateMap<Bar, BarResponse>()
+                .ForMember(re => re.BarTimeResponses, opt => opt.MapFrom(src => src.BarTimes))
+                .ReverseMap();
             CreateMap<BarBaseRequest, Bar>().ReverseMap();
             CreateMap<Bar, OnlyBarResponse>();
         }

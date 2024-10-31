@@ -12,5 +12,6 @@ namespace Application.IService
         Task<IEnumerable<OnlyBarResponse>> GetAllBarWithFeedback(ObjectQuery query);
         Task<BarResponse> GetBarByIdWithFeedback(Guid barId);
         Task<BarResponse> GetBarByIdWithTable(Guid barId);
+        Task<IEnumerable<OnlyBarResponse>> GetAllAvailableBars(DateTime dateTime);
     }
 }
