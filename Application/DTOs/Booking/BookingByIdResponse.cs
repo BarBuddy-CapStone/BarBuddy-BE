@@ -22,6 +22,7 @@ namespace Application.DTOs.Booking
         public DateTimeOffset BookingDate { get; set; }
         public TimeSpan BookingTime { get; set; }
         public DateTime CreateAt { get; set; }
+        public string? QrTicket { get; set; }
         public List<string> Images { get; set; }
         public int Status { get; set; }
         public List<string> TableNameList { get; set; } = new List<string>();

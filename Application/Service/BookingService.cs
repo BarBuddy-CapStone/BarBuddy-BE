@@ -170,9 +170,10 @@ namespace Application.Service
                 response.AdditionalFee = booking.AdditionalFee;
                 response.TotalPrice = booking.TotalPrice;
                 response.Note = booking.Note;
+                response.QrTicket = booking.QRTicket;
                 response.Images = booking.Bar.Images.Split(',').ToList();
 
-                if (booking.TotalPrice == 0)
+                if (booking.TotalPrice >= 0)
                 {
                     var bookingDrinks = await _unitOfWork.BookingDrinkRepository.GetAsync(bd => bd.BookingId == booking.BookingId, includeProperties: "Drink");
                     foreach (var drink in bookingDrinks)
