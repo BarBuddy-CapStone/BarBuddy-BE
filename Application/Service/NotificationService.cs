@@ -27,7 +27,7 @@ namespace Application.Service
         private IAuthentication _authentication;
         private IHttpContextAccessor _contextAccessor;
         private INotificationDetailService _notificationDetailService;
-        public NotificationService(IMapper mapper, IUnitOfWork unitOfWork, 
+        public NotificationService(IMapper mapper, IUnitOfWork unitOfWork,
                                     IAuthentication authentication, IHttpContextAccessor contextAccessor,
                                     INotificationDetailService notificationDetailService)
         {
@@ -41,11 +41,11 @@ namespace Application.Service
         public async Task<NotificationResponse> CreateNotification(NotificationRequest request)
         {
             var userId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-            
+
             try
             {
-                var mapper  = _mapper.Map<Notification>(request);
-                
+                var mapper = _mapper.Map<Notification>(request);
+
                 mapper.UpdatedAt = mapper.CreatedAt;
 
                 var notiDetailMapper = new NotificationDetailRequest
@@ -67,34 +67,37 @@ namespace Application.Service
             }
         }
 
-        public async Task<List<NotificationResponse>> UpdateIsReadNoti(UpdateNotiRequest request) 
+        public async Task<List<NotificationResponse>> UpdateIsReadNoti(UpdateNotiRequest request)
         {
             try
             {
                 var listNoti = new List<NotificationDetail>();
                 var userId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
                 _ = userId.Equals(request.AccountId) ? true : throw new CustomException.InvalidDataException("Bạn không có quyền!");
-                foreach(var notiId in request.NotificationId)
-                {
-                    var isExist = _unitOfWork.NotificationDetailRepository
-                                                .Get(filter: x => x.AccountId.Equals(userId)
-                                                                && x.NotificationId.Equals(notiId)
-                                                                && x.IsRead == PrefixKeyConstant.FALSE,
-                                                            includeProperties: "Notification")
-                                                .FirstOrDefault();
-                    if (isExist == null)
-                    {
-                        continue;
-                    }
 
-                    isExist.IsRead = PrefixKeyConstant.TRUE;
-                    isExist.Notification.UpdatedAt = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.UtcNow);
-                    await _unitOfWork.NotificationRepository.UpdateAsync(isExist.Notification);
-                    listNoti.Add(isExist);
+                var isExist = _unitOfWork.NotificationDetailRepository
+                                            .Get(filter: x => x.AccountId.Equals(userId)
+                                                            && x.IsRead == PrefixKeyConstant.FALSE,
+                                                        includeProperties: "Notification.Bar")
+                                            .ToList();
+                if (isExist.Any())
+                {
+
+                    isExist.ForEach(x =>
+                    {
+                        x.IsRead = PrefixKeyConstant.TRUE;
+                        x.Notification.UpdatedAt = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.UtcNow);
+                    });
+                    foreach (var noti in isExist)
+                    {
+                        await _unitOfWork.NotificationRepository.UpdateAsync(noti.Notification);
+                        await Task.Delay(10);
+                        await _unitOfWork.NotificationDetailRepository.UpdateAsync(noti);
+                    }
                 }
                 await Task.Delay(200);
                 await _unitOfWork.SaveAsync();
-                var response = _mapper.Map<List<NotificationResponse>>(listNoti);
+                var response = _mapper.Map<List<NotificationResponse>>(isExist);
                 return response;
             }
             catch (CustomException.InternalServerErrorException ex)
@@ -118,7 +121,7 @@ namespace Application.Service
                 var getNotiOfCusById = await _unitOfWork.NotificationRepository
                                                     .GetAsync(filter: x => x.NotificationDetails.Any(x => x.AccountId.Equals(accountId))
                                                         , includeProperties: "NotificationDetails.Account,Bar");
-                if(!getNotiOfCusById.IsNullOrEmpty())
+                if (!getNotiOfCusById.IsNullOrEmpty())
                 {
                     var getInfo = getNotiOfCusById?.FirstOrDefault()?.NotificationDetails?.FirstOrDefault()?.Account;
                     response = _mapper.Map<NotificationDetailResponse>(getInfo);

@@ -23,7 +23,10 @@ namespace Application.Mappers.Notifications
             CreateMap<NotificationDetail, NotificationResponse>()
                 .ForMember(dst => dst.IsRead, src => src.MapFrom(x => x.IsRead))
                 .ForMember(dst => dst.Title, src => src.MapFrom(x => x.Notification.Title))
-                .ForMember(dst => dst.Message, src => src.MapFrom(x => x.Notification.Message));
+                .ForMember(dst => dst.Message, src => src.MapFrom(x => x.Notification.Message))
+                .ForMember(dst => dst.Image, src => src.MapFrom(x => !string.IsNullOrEmpty(x.Notification.Bar.Images)
+                                        ? x.Notification.Bar.Images.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault()
+                                        : null));
         }
     }
 }

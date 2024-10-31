@@ -9,6 +9,5 @@ namespace Application.DTOs.Notification
     public class UpdateNotiRequest
     {
         public Guid AccountId { get; set; }
-        public List<Guid> NotificationId { get; set; }
     }
 }
