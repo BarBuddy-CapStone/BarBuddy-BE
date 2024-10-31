@@ -137,7 +137,8 @@ namespace Application.Service
                         CreateAt = booking.CreateAt,
                         Status = booking.Status,
                         Image = booking.Bar.Images.Split(',')[0],
-                        IsRated = checkIsRated
+                        IsRated = checkIsRated,
+                        BookingCode = booking.BookingCode
                     };
                     responses.Add(response);
                 }
@@ -376,7 +377,8 @@ namespace Application.Service
                         CreateAt = booking.CreateAt,
                         Status = booking.Status,
                         Image = booking.Bar.Images.Split(',')[0],
-                        IsRated = checkIsRated
+                        IsRated = checkIsRated,
+                        BookingCode = booking.BookingCode
                     };
                     responses.Add(response);
                 }
