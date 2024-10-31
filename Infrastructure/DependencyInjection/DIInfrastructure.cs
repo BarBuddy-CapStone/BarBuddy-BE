@@ -180,7 +180,7 @@ namespace Infrastructure.DependencyInjection
             var jobKey = JobKey.Create(jobName);
             options.AddJob<TJob>(joinBuilder => joinBuilder.WithIdentity(jobKey))
                    .AddTrigger(trigger => trigger.ForJob(jobKey)
-                   .WithCronSchedule("36 * * ? * *"));
+                   .WithCronSchedule("0 * * ? * *"));
         }
     }
 }

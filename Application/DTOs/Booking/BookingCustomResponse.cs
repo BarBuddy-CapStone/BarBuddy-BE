@@ -9,5 +9,7 @@ namespace Application.DTOs.Booking
     public class BookingCustomResponse : TopBookingResponse
     {
         public Guid AccountId { get; set; }
+        public double TimeSlot { get; set; }
+        public double? TotalPrice { get; set; }
     }
 }

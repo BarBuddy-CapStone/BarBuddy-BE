@@ -35,7 +35,7 @@ namespace Application.Service
         private readonly ILogger<BookingService> _logger;
 
         public BookingService(IUnitOfWork unitOfWork, IMapper mapper, IAuthentication authentication,
-            IPaymentService paymentService, IEmailSender emailSender, 
+            IPaymentService paymentService, IEmailSender emailSender,
             INotificationService notificationService, IQRCodeService qrCodeService, IFirebase firebase)
         {
             _unitOfWork = unitOfWork;
@@ -341,9 +341,9 @@ namespace Application.Service
             {
                 var responses = new List<TopBookingResponse>();
 
-                var bookings = await _unitOfWork.BookingRepository.GetAsync(b => b.AccountId == CustomerId, 
-                    pageIndex: 1, pageSize: NumOfBookings, 
-                    orderBy: o => o.OrderByDescending(b => b.CreateAt).ThenByDescending(b => b.BookingDate), 
+                var bookings = await _unitOfWork.BookingRepository.GetAsync(b => b.AccountId == CustomerId,
+                    pageIndex: 1, pageSize: NumOfBookings,
+                    orderBy: o => o.OrderByDescending(b => b.CreateAt).ThenByDescending(b => b.BookingDate),
                     includeProperties: "Bar");
                 foreach (var booking in bookings)
                 {
@@ -478,17 +478,17 @@ namespace Application.Service
                 {
                     throw new CustomException.DataNotFoundException("Không tìm thấy Id Đặt bàn.");
                 }
-                if(booking.Status == 1 && (Status == 2 || Status == 3))
+                if (booking.Status == 1 && (Status == 2 || Status == 3))
                 {
                     throw new CustomException.InvalidDataException("Không thể thực hiện check-in: Lịch đặt chỗ đã bị hủy");
                 }
-                if(booking.Status == 0 && booking.BookingDate.Date != DateTime.Now.Date && (Status == 2 || Status == 3))
+                if (booking.Status == 0 && booking.BookingDate.Date != DateTime.Now.Date && (Status == 2 || Status == 3))
                 {
                     throw new CustomException.InvalidDataException("Không thể thực hiện check-in: vẫn chưa đến ngày đặt bàn");
                 }
-                if(Status == 3)
+                if (Status == 3)
                 {
-                    booking.AdditionalFee = AdditionalFee == null ? 0 : (AdditionalFee < 0 ?  throw new CustomException.InvalidDataException("Dịch vụ cộng thêm không thể nhỏ hơn 0") : AdditionalFee);
+                    booking.AdditionalFee = AdditionalFee == null ? 0 : (AdditionalFee < 0 ? throw new CustomException.InvalidDataException("Dịch vụ cộng thêm không thể nhỏ hơn 0") : AdditionalFee);
                 }
                 booking.Status = Status;
                 _unitOfWork.BookingRepository.Update(booking);
@@ -657,7 +657,7 @@ namespace Application.Service
                                                     now.AddHours(2).TimeOfDay.Hours,
                                                     now.AddHours(2).TimeOfDay.Minutes,
                                                     now.AddHours(2).TimeOfDay.Seconds
-);
+                                                    );
                 var getBkByStsPending = await _unitOfWork.BookingRepository
                     .GetAsync(filter: x => (
                         (x.BookingDate.Date == now.Date &&
@@ -669,6 +669,39 @@ namespace Application.Service
                     ) &&
                     x.Status == (int)PrefixValueEnum.PendingBooking,
                     includeProperties: "Bar");
+
+                if (getBkByStsPending.IsNullOrEmpty())
+                {
+                    return new List<BookingCustomResponse>();
+                }
+
+                var response = _mapper.Map<List<BookingCustomResponse>>(getBkByStsPending);
+                return response;
+            }
+            catch (InternalServerErrorException ex)
+            {
+                throw new InternalServerErrorException("Lỗi hệ thống !");
+            }
+        }
+
+        public async Task<List<BookingCustomResponse>> GetAllBookingByStsPendingCus()
+        {
+            try
+            {
+                DateTimeOffset now = DateTimeOffset.Now;
+                TimeSpan roundedTimeOfDay = TimeSpan.FromHours(now.TimeOfDay.Hours)
+                                                   .Add(TimeSpan.FromMinutes(now.TimeOfDay.Minutes))
+                                                   .Add(TimeSpan.FromSeconds(now.TimeOfDay.Seconds));
+                TimeSpan roundedTwoHoursLater = new TimeSpan(
+                                                    now.AddHours(2).TimeOfDay.Hours,
+                                                    now.AddHours(2).TimeOfDay.Minutes,
+                                                    now.AddHours(2).TimeOfDay.Seconds
+                                                    );
+                var getBkByStsPending = await _unitOfWork.BookingRepository
+                    .GetAsync(filter: x => x.BookingDate.Date == now.Date &&
+                                            x.BookingTime <= roundedTimeOfDay &&
+                                            x.Status == (int)PrefixValueEnum.PendingBooking,
+                                            includeProperties: "Bar");
 
                 if (getBkByStsPending.IsNullOrEmpty())
                 {

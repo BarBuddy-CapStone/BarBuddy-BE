@@ -23,5 +23,6 @@ namespace Application.IService
         Task<BookingResponse> CreateBookingTableOnly(BookingTableRequest request, HttpContext httpContext);
         Task<PaymentLink> CreateBookingTableWithDrinks(BookingDrinkRequest request, HttpContext httpContext);
         Task<List<BookingCustomResponse>> GetAllBookingByStsPending();
+        Task<List<BookingCustomResponse>> GetAllBookingByStsPendingCus();
     }
 }

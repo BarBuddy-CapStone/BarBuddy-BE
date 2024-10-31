@@ -30,7 +30,8 @@ namespace Application.Mappers.Booking
                 .ForMember(x => x.DrinkName, opt => opt.MapFrom(y => y.Drink.DrinkName));
 
             CreateMap<Domain.Entities.Booking, BookingCustomResponse>()
-                .ForMember(dst => dst.BarName, src => src.MapFrom(x => x.Bar.BarName));
+                .ForMember(dst => dst.BarName, src => src.MapFrom(x => x.Bar.BarName))
+                .ForMember(dst => dst.TimeSlot, src => src.MapFrom(x => x.Bar.TimeSlot));
         }
     }
 }

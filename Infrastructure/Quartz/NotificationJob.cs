@@ -3,6 +3,8 @@ using Application.Interfaces;
 using Application.IService;
 using Domain.Constants;
 using Domain.CustomException;
+using Domain.Entities;
+using Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -39,11 +41,62 @@ namespace Infrastructure.Quartz
         {
             try
             {
+                DateTimeOffset now = DateTimeOffset.Now;
+                TimeSpan roundedTimeOfDay = TimeSpan.FromHours(now.TimeOfDay.Hours)
+                                                   .Add(TimeSpan.FromMinutes(now.TimeOfDay.Minutes))
+                                                   .Add(TimeSpan.FromSeconds(now.TimeOfDay.Seconds));
+                TimeSpan roundedTwoHoursLater = new TimeSpan(
+                                                    now.AddHours(2).TimeOfDay.Hours,
+                                                    now.AddHours(2).TimeOfDay.Minutes,
+                                                    now.AddHours(2).TimeOfDay.Seconds
+                                                    );
+
                 var getListBooking = await _bookingService.GetAllBookingByStsPending();
-                if (getListBooking.IsNullOrEmpty())
+                var getBkOTWStsPending = await _bookingService.GetAllBookingByStsPendingCus();
+
+                foreach (var booking in getBkOTWStsPending)
                 {
-                    _logger.LogInformation("Không có danh sách booking nào đang chờ !");
+                    var cacheKey = $"{booking.BarName}_{booking.BookingDate.Date}_{booking.BookingTime}_{booking.BookingId}";
+                    if (_cache.TryGetValue(cacheKey, out _))
+                    {
+                        if (booking.BookingDate.Date == now.Date &&
+                        booking.BookingTime + TimeSpan.FromHours(booking.TimeSlot) == roundedTimeOfDay &&
+                        booking.TotalPrice != null &&
+                        booking.Status == (int)PrefixValueEnum.PendingBooking)
+                        {
+                            await _bookingService.UpdateBookingStatus(booking.BookingId, (int)PrefixValueEnum.Completed, null);
+                            _cache.Remove(cacheKey);
+                            var messages = string.Format(PrefixKeyConstant.BOOKING_DRINKS_COMPLETED_NOTI, booking.BarName);
+                            var creNotiRequest = new NotificationRequest
+                            {
+                                Title = booking.BarName,
+                                Message = messages
+                            };
+                            await _notificationService.CreateNotificationAllCustomer(booking.AccountId, creNotiRequest);
+                            _logger.LogInformation("Đã hoàn thành đơn hàng đặt với đồ uống");
+                        }
+                        else if (booking.BookingDate.Date == now.Date &&
+                           booking.BookingTime + TimeSpan.FromHours(1) == roundedTimeOfDay &&
+                           booking.TotalPrice == null &&
+                           booking.Status == (int)PrefixValueEnum.PendingBooking)
+                        {
+                            await _bookingService.UpdateBookingStatus(booking.BookingId, (int)PrefixValueEnum.Cancelled, null);
+                            var messages = string.Format(PrefixKeyConstant.BOOKING_CANCEL_NOTI, booking.BarName);
+                            var creNotiRequest = new NotificationRequest
+                            {
+                                Title = booking.BarName,
+                                Message = messages
+                            };
+                            await _notificationService.CreateNotificationAllCustomer(booking.AccountId, creNotiRequest);
+                            _cache.Remove(cacheKey);
+                            _logger.LogInformation("Đã hoàn thành đơn hàng đặt với đồ uống");
+                        }
+                    }
                 }
+                //if (getListBooking.IsNullOrEmpty())
+                //{
+                //    _logger.LogInformation("Không có danh sách booking nào đang chờ !");
+                //}
                 foreach (var booking in getListBooking)
                 {
                     var cacheKey = $"{booking.BarName}_{booking.BookingDate.Date}_{booking.BookingTime}_{booking.BookingId}";
@@ -56,9 +109,27 @@ namespace Infrastructure.Quartz
                             Message = messages
                         };
                         await _notificationService.CreateNotificationAllCustomer(booking.AccountId, creNotiRequest);
-                        _cache.Set(cacheKey, true, TimeSpan.FromHours(3));
+                        _cache.Set(cacheKey, true, TimeSpan.FromHours(2 + booking.TimeSlot));
 
-                        _logger.LogInformation($"Sent notification for account {booking.AccountId} with {getListBooking.Count()} bookings");
+                        _logger.LogInformation($"Đã gửi thông báo cho tài khoản {booking.AccountId} với {getListBooking.Count()} đơn đặt !");
+                    }
+                    else
+                    {
+                        if (booking.BookingDate.Date == now.Date &&
+                           booking.BookingTime != roundedTimeOfDay &&
+                           booking.Status == (int)PrefixValueEnum.PendingBooking)
+                        {
+                            continue;
+                        }
+
+                        var messages = string.Format(PrefixKeyConstant.BOOKING_REMIND_NOTI, booking.BarName, booking.BookingDate.ToString("dd/MM/yyyy"), roundedTimeOfDay);
+                        var creNotiRequest = new NotificationRequest
+                        {
+                            Title = booking.BarName,
+                            Message = messages
+                        };
+                        await _notificationService.CreateNotificationAllCustomer(booking.AccountId, creNotiRequest);
+                        _logger.LogInformation($"Đã gửi thông báo cho tài khoản {booking.AccountId} với {getListBooking.Count()} đơn đặt !");
                     }
                 }
             }
