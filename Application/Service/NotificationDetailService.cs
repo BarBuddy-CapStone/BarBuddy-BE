@@ -57,7 +57,7 @@ namespace Application.Service
             }
         }
 
-        private async Task<bool> CreateNotificationDetailJob(NotificationDetailRequest request)
+        public async Task<bool> CreateNotificationDetailJob(NotificationDetailRequest request)
         {
             try
             {
