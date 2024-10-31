@@ -70,10 +70,17 @@ namespace Application.Service
                     return false;
                 }
 
+                var creNoti = new NotificationRequest
+                {
+                    BarId = booking.BarId,
+                    Message = string.Format(PrefixKeyConstant.BOOKING_CANCEL_NOTI, booking.Bar.BarName, booking.BookingDate.ToString("yyyy/mm/dd"), booking.BookingTime)
+                };
+
                 // Cancelled status (temp)
                 booking.Status = 1;
-
+                _unitOfWork.BeginTransaction();
                 await _unitOfWork.BookingRepository.UpdateAsync(booking);
+                await _notificationService.CreateNotification(creNoti);
                 await _unitOfWork.SaveAsync();
                 return true;
             }
@@ -435,7 +442,8 @@ namespace Application.Service
                 var creNoti = new NotificationRequest
                 {
                     Title = booking.Bar.BarName,
-                    Message = PrefixKeyConstant.BOOKING_SUCCESS
+                    Message = PrefixKeyConstant.BOOKING_SUCCESS,
+                    BarId = booking.Bar.BarId,
                 };
 
                 try

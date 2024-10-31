@@ -81,7 +81,7 @@ namespace Infrastructure.Quartz
                            booking.Status == (int)PrefixValueEnum.PendingBooking)
                         {
                             await _bookingService.UpdateBookingStatus(booking.BookingId, (int)PrefixValueEnum.Cancelled, null);
-                            var messages = string.Format(PrefixKeyConstant.BOOKING_CANCEL_NOTI, booking.BarName);
+                            var messages = string.Format(PrefixKeyConstant.BOOKING_CANCEL_NOTI_JOB, booking.BarName);
                             var creNotiRequest = new NotificationRequest
                             {
                                 Title = booking.BarName,

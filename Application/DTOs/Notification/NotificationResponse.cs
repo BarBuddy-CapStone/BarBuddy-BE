@@ -12,6 +12,8 @@ namespace Application.DTOs.Notification
         public Guid NotificationId { get; set; }
         public string Title { get; set; }
         public string Message { get; set; }
+        public string Image { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
         public bool IsRead { get; set; }
     }
 }

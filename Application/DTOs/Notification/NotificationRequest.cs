@@ -9,6 +9,8 @@ namespace Application.DTOs.Notification
 {
     public class NotificationRequest
     {
+        [Required]
+        public Guid BarId { get; set; }
         [Required(ErrorMessage ="Tựa thông báo không thể để trống!")]
         [StringLength(50,MinimumLength =7,ErrorMessage =("Tựa thông báo phải từ 7 đến 50 kí tự !"))]
         public string Title { get; set; }

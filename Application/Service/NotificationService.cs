@@ -117,7 +117,7 @@ namespace Application.Service
                 var response = new NotificationDetailResponse();
                 var getNotiOfCusById = await _unitOfWork.NotificationRepository
                                                     .GetAsync(filter: x => x.NotificationDetails.Any(x => x.AccountId.Equals(accountId))
-                                                        , includeProperties: "NotificationDetails.Account");
+                                                        , includeProperties: "NotificationDetails.Account,Bar");
                 if(!getNotiOfCusById.IsNullOrEmpty())
                 {
                     var getInfo = getNotiOfCusById?.FirstOrDefault()?.NotificationDetails?.FirstOrDefault()?.Account;

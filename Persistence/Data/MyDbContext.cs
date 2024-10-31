@@ -1563,7 +1563,8 @@ namespace Persistence.Data
                     Title = "Welcome Notification",
                     Message = "Welcome to the system!",
                     CreatedAt = DateTimeOffset.Now,
-                    UpdatedAt = DateTimeOffset.Now
+                    UpdatedAt = DateTimeOffset.Now,
+                    BarId= Guid.Parse("550e8400-e29b-41d4-a716-446655440000")
                 },
                 new Notification
                 {
@@ -1571,7 +1572,8 @@ namespace Persistence.Data
                     Title = "System Maintenance",
                     Message = "System will undergo maintenance at midnight.",
                     CreatedAt = DateTimeOffset.Now,
-                    UpdatedAt = DateTimeOffset.Now
+                    UpdatedAt = DateTimeOffset.Now,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000")
                 },
                 // Thêm thông báo mẫu thứ 3
                 new Notification
@@ -1580,7 +1582,8 @@ namespace Persistence.Data
                     Title = "Booking Confirmation",
                     Message = "Your table reservation is confirmed!",
                     CreatedAt = DateTimeOffset.Now,
-                    UpdatedAt = DateTimeOffset.Now
+                    UpdatedAt = DateTimeOffset.Now,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000")
                 },
                 // Thêm thông báo mẫu thứ 4
                 new Notification
@@ -1589,7 +1592,8 @@ namespace Persistence.Data
                     Title = "Happy Hour Reminder",
                     Message = "Don't forget, Happy Hour starts at 5 PM today!",
                     CreatedAt = DateTimeOffset.Now,
-                    UpdatedAt = DateTimeOffset.Now
+                    UpdatedAt = DateTimeOffset.Now,
+                    BarId = Guid.Parse("550e8400-e29b-41d4-a716-446655440000")
                 }
                 );
 

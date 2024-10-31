@@ -14,6 +14,7 @@ namespace Domain.Entities
     {
         [Key]
         public Guid NotificationId { get; set; } = Guid.NewGuid();
+        public Guid BarId { get; set; }
         public string Title { get; set; }
         public string Message { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
@@ -23,5 +24,7 @@ namespace Domain.Entities
             CreatedAt = CoreHelper.SystemTimeNow;
         }
         public virtual ICollection<NotificationDetail> NotificationDetails { get; set; }
+        [ForeignKey("BarId")]
+        public virtual Bar Bar { get; set; }
     }
 }
