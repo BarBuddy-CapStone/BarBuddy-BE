@@ -25,6 +25,7 @@ namespace Application.DTOs.Booking
         public string? QrTicket { get; set; }
         public List<string> Images { get; set; }
         public int Status { get; set; }
+        public bool? IsRated { get; set; }
         public List<string> TableNameList { get; set; } = new List<string>();
         public List<BookingDrinkDetailResponse> bookingDrinksList { get; set; } = new List<BookingDrinkDetailResponse>();
     }

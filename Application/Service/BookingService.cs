@@ -166,6 +166,19 @@ namespace Application.Service
                     throw new CustomException.DataNotFoundException("Không tìm thấy Id Đặt bàn");
                 }
 
+                bool? isRated = null;
+
+                if (booking.Status == 3)
+                {
+                    var feedback = (await _unitOfWork.FeedbackRepository.GetAsync(f => f.BookingId == booking.BookingId)).FirstOrDefault();
+                    if (feedback != null) {
+                        isRated = true;
+                    } else
+                    {
+                        isRated = false;
+                    }
+                }
+
                 response.BookingId = booking.BookingId;
                 response.BookingTime = booking.BookingTime;
                 response.Status = booking.Status;
@@ -181,6 +194,7 @@ namespace Application.Service
                 response.TotalPrice = booking.TotalPrice;
                 response.Note = booking.Note;
                 response.QrTicket = booking.QRTicket;
+                response.IsRated = isRated;
                 response.Images = booking.Bar.Images.Split(',').ToList();
 
                 if (booking.TotalPrice >= 0)
