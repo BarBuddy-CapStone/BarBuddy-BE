@@ -49,25 +49,32 @@ namespace Infrastructure.Payment.Service
             this.mapper = mapper;
         }
 
-        public PaymentLink GetPaymentLink(Guid bookingId, Guid accountId, string PaymentDestination, double totalPrice)
+        public PaymentLink GetPaymentLink(Guid bookingId, Guid accountId, 
+            string PaymentDestination, double totalPrice, bool isMobile = false)
         {
-
-
-            switch (PaymentDestination)
+            if(isMobile)
             {
-                case "VNPAY":
-                    return GetVnpayPaymentLink(bookingId, accountId, PaymentDestination, totalPrice);
-                case "ZALOPAY":
-                    return GetZalopayPaymentLink(bookingId, accountId, PaymentDestination, totalPrice);
-                case "MOMO":
-                    return GetMomopayPaymentLink(bookingId, accountId, PaymentDestination, totalPrice);
-                default:
-                    throw new InternalServerErrorException("Không tìm thấy phương thức thích hợp");
+                return GetVnpayPaymentLinkByMobile(bookingId, accountId, PaymentDestination, totalPrice);
+            } else
+            {
+                switch (PaymentDestination)
+                {
+                    case "VNPAY":
+                        return GetVnpayPaymentLink(bookingId, accountId, PaymentDestination, totalPrice);
+                    case "ZALOPAY":
+                        return GetZalopayPaymentLink(bookingId, accountId, PaymentDestination, totalPrice);
+                    case "MOMO":
+                        return GetMomopayPaymentLink(bookingId, accountId, PaymentDestination, totalPrice);
+                    default:
+                        throw new InternalServerErrorException("Không tìm thấy phương thức thích hợp");
+                }
             }
+
+            
         }
 
-
-        private PaymentLink GetVnpayPaymentLink(Guid bookingId, Guid accountId, string paymentDestination, double totalPrice)
+        private PaymentLink GetVnpayPaymentLink(Guid bookingId, Guid accountId, 
+            string paymentDestination, double totalPrice)
         {
             try
             {
@@ -95,7 +102,8 @@ namespace Infrastructure.Payment.Service
             }
         }
 
-        private PaymentLink GetZalopayPaymentLink(Guid bookingId, Guid accountId, string paymentDestination, double totalPrice)
+        private PaymentLink GetZalopayPaymentLink(Guid bookingId, Guid accountId, 
+            string paymentDestination, double totalPrice)
         {
             var paymentHistory = CreatePaymentHistory(bookingId, accountId, paymentDestination, totalPrice);
 
@@ -144,6 +152,35 @@ namespace Infrastructure.Payment.Service
             else
             {
                 throw new InternalServerErrorException("Có lỗi tại GetPaymentLink");
+            }
+        }
+
+        private PaymentLink GetVnpayPaymentLinkByMobile(Guid bookingId, Guid accountId,
+            string paymentDestination, double totalPrice)
+        {
+            try
+            {
+                var paymentHistory = CreatePaymentHistory(bookingId, accountId, paymentDestination, totalPrice);
+
+                var outputIdParam = RandomHelper.GenerateRandomNumberString();
+                var IpAddress = httpContextAccessor?.HttpContext?.Connection?.LocalIpAddress?.ToString();
+                var vnpayPayRequest = new VnpayRequest(vnPayConfig.Version, vnPayConfig.TmnCode,
+                            DateTime.Now, IpAddress ?? string.Empty,
+                            (decimal)paymentHistory.TotalPrice, "VND",
+                            "other", paymentHistory.PaymentHistoryId.ToString(),
+                            vnPayConfig.ReturnUrlMobile, paymentHistory.PaymentHistoryId.ToString() ?? string.Empty);
+
+                var paymentUrl = vnpayPayRequest.GetLink(vnPayConfig.PaymentUrl, vnPayConfig.HashSecret);
+                var vnPayResult = new PaymentLink
+                {
+                    PaymentId = outputIdParam,
+                    PaymentUrl = paymentUrl
+                };
+                return vnPayResult;
+            }
+            catch (Exception ex)
+            {
+                throw new InternalServerErrorException("An internal error: " + ex.Message);
             }
         }
 

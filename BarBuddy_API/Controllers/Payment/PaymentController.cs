@@ -52,6 +52,33 @@ namespace BarBuddy_API.Controllers.Payment
             }
             return Redirect($"{redirectUrl}{result}");
         }
+
+        /// <summary>
+        /// Get Vnpay Return
+        /// </summary>
+        /// <param name="vnpayReturn"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        [HttpGet("vnpay-return/mobile")]
+        public async Task<IActionResult> GetVnpayReturnForMobile([FromQuery] VnpayResponse vnpayReturn)
+        {
+            string? redirectUrl = _configuration["MobileHost:PaymentSuccessUrl"];
+            var result = Guid.Empty;
+            try
+            {
+                result = await _paymentService.ProcessVnpayPaymentReturn(vnpayReturn);
+            }
+            catch (CustomException.InvalidDataException)
+            {
+                redirectUrl = _configuration["MobileHost:PaymentFailureUrl"];
+            }
+            catch (Exception ex)
+            {
+                redirectUrl = _configuration["MobileHost:PaymentErrorUrl"];
+            }
+            Console.WriteLine($"{redirectUrl}/{result}");
+            return Redirect($"{redirectUrl}/{result}");
+        }
         /// <summary>
         /// Get Momo Return
         /// </summary>

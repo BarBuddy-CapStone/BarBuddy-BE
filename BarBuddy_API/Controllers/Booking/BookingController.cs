@@ -185,5 +185,22 @@ namespace BarBuddy_API.Controllers.Booking
             var response = await _bookingService.CreateBookingTableWithDrinks(request, HttpContext);
             return CustomResult("Đặt bàn kèm đồ uống thành công", response);
         }
+
+        /// <summary>
+        /// Create Booking Table With Drinks
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost("booking-drink/mobile")]
+        public async Task<IActionResult> CreateBookingTableWithDrinksForMobile([FromBody] BookingDrinkRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var response = await _bookingService.CreateBookingTableWithDrinks(request, HttpContext, true);
+            return CustomResult("Đặt bàn kèm đồ uống thành công", response);
+        }
     }
 }
