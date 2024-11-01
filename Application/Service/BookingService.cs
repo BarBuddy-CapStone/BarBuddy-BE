@@ -561,7 +561,7 @@ namespace Application.Service
             }
         }
 
-        public async Task<PaymentLink> CreateBookingTableWithDrinks(BookingDrinkRequest request, HttpContext httpContext)
+        public async Task<PaymentLink> CreateBookingTableWithDrinks(BookingDrinkRequest request, HttpContext httpContext, bool isMobile = false)
         {
             try
             {
@@ -640,6 +640,7 @@ namespace Application.Service
 
                 var creNoti = new NotificationRequest
                 {
+                    BarId = booking.BarId,
                     Title = booking.Bar.BarName,
                     Message = PrefixKeyConstant.BOOKING_SUCCESS
                 };
@@ -659,7 +660,7 @@ namespace Application.Service
                     throw new InternalServerErrorException($"An Internal error occurred: {ex.Message}");
                 }
                 return _paymentService.GetPaymentLink(booking.BookingId, booking.AccountId,
-                            request.PaymentDestination, totalPrice);
+                            request.PaymentDestination, totalPrice, isMobile);
             }
             catch (CustomException.InvalidDataException ex)
             {
