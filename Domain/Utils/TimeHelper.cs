@@ -15,6 +15,11 @@ namespace Domain.Utils
             return dateTimeOffset.ToOffset(utcPlus7Offset);
         }
 
+        public static DateTime ConvertDateTimeToUtcPlus7(DateTime dateTime)
+        {
+            return dateTime.AddHours(7);
+        }
+
         public static DateTimeOffset ConvertToUtcPlus7NotChanges(DateTimeOffset dateTimeOffset)
         {
             // UTC+7 is 7 hours ahead of UTC

@@ -60,14 +60,33 @@ namespace Application.Service
 
                 var getTimeOfBar = _unitOfWork.BarTimeRepository
                                                     .Get(filter: x => x.BarId.Equals(request.BarId)
-                                                            && x.DayOfWeek == getDayOfWeek).ToList();
+                                                            && (x.DayOfWeek == getDayOfWeek || x.DayOfWeek == (getDayOfWeek + 1))).ToList();
 
                 if (getDayOfWeek == null)
                 {
                     throw new CustomException.DataNotFoundException("Không tìm thấy khung giờ của quán Bar !");
                 }
 
-                Utils.ValidateOpenCloseTime(requestDate, request.Time, getTimeOfBar);
+                if(getTimeOfBar.Count > 1)
+                {
+                    foreach (var time in getTimeOfBar)
+                    {
+                        if (time.DayOfWeek != getDayOfWeek)
+                        {
+                            getTimeOfBar.Remove(time);
+                        }
+                    }
+                    Utils.ValidateOpenCloseTime(requestDate, request.Time, getTimeOfBar);
+                } else
+                {
+                    if (getTimeOfBar[0].StartTime > getTimeOfBar[0].EndTime && request.Time < getTimeOfBar[0].StartTime) {
+                        requestDate = requestDate.AddDays(1);
+                        request.Date = request.Date.AddDays(1);
+                    } else
+                    {
+                        Utils.ValidateOpenCloseTime(requestDate, request.Time, getTimeOfBar);
+                    }
+                }
 
                 var data = await _unitOfWork.TableRepository.GetAsync(
                                                 filter: x => x.TableType.BarId.Equals(request.BarId)

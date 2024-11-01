@@ -136,7 +136,7 @@ namespace Application.Service
                         BookingDate = booking.BookingDate,
                         BookingId = booking.BookingId,
                         BookingTime = booking.BookingTime,
-                        CreateAt = booking.CreateAt,
+                        CreateAt = TimeHelper.ConvertDateTimeToUtcPlus7(booking.CreateAt),
                         Status = booking.Status,
                         Image = booking.Bar.Images.Split(',')[0],
                         IsRated = checkIsRated,
@@ -182,7 +182,7 @@ namespace Application.Service
                 response.BookingId = booking.BookingId;
                 response.BookingTime = booking.BookingTime;
                 response.Status = booking.Status;
-                response.CreateAt = booking.CreateAt;
+                response.CreateAt = TimeHelper.ConvertDateTimeToUtcPlus7(booking.CreateAt);
                 response.BookingDate = booking.BookingDate;
                 response.BarName = booking.Bar.BarName;
                 response.BarAddress = booking.Bar.Address;
@@ -244,7 +244,7 @@ namespace Application.Service
                 response.BookingId = booking.BookingId;
                 response.BookingTime = booking.BookingTime;
                 response.Status = booking.Status;
-                response.CreateAt = booking.CreateAt;
+                response.CreateAt = TimeHelper.ConvertDateTimeToUtcPlus7(booking.CreateAt);
                 response.BookingDate = booking.BookingDate;
                 response.BarName = booking.Bar.BarName;
                 response.BarAddress = booking.Bar.Address;
@@ -390,7 +390,7 @@ namespace Application.Service
                         BookingDate = booking.BookingDate,
                         BookingId = booking.BookingId,
                         BookingTime = booking.BookingTime,
-                        CreateAt = booking.CreateAt,
+                        CreateAt = TimeHelper.ConvertDateTimeToUtcPlus7(booking.CreateAt),
                         Status = booking.Status,
                         Image = booking.Bar.Images.Split(',')[0],
                         IsRated = checkIsRated,
