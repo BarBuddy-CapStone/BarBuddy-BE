@@ -136,7 +136,7 @@ namespace Application.Service
                         BookingDate = booking.BookingDate,
                         BookingId = booking.BookingId,
                         BookingTime = booking.BookingTime,
-                        CreateAt = TimeHelper.ConvertDateTimeToUtcPlus7(booking.CreateAt),
+                        CreateAt = booking.CreateAt,
                         Status = booking.Status,
                         Image = booking.Bar.Images.Split(',')[0],
                         IsRated = checkIsRated,
@@ -182,7 +182,7 @@ namespace Application.Service
                 response.BookingId = booking.BookingId;
                 response.BookingTime = booking.BookingTime;
                 response.Status = booking.Status;
-                response.CreateAt = TimeHelper.ConvertDateTimeToUtcPlus7(booking.CreateAt);
+                response.CreateAt = booking.CreateAt;
                 response.BookingDate = booking.BookingDate;
                 response.BarName = booking.Bar.BarName;
                 response.BarAddress = booking.Bar.Address;
@@ -244,7 +244,7 @@ namespace Application.Service
                 response.BookingId = booking.BookingId;
                 response.BookingTime = booking.BookingTime;
                 response.Status = booking.Status;
-                response.CreateAt = TimeHelper.ConvertDateTimeToUtcPlus7(booking.CreateAt);
+                response.CreateAt = booking.CreateAt;
                 response.BookingDate = booking.BookingDate;
                 response.BarName = booking.Bar.BarName;
                 response.BarAddress = booking.Bar.Address;
@@ -390,7 +390,7 @@ namespace Application.Service
                         BookingDate = booking.BookingDate,
                         BookingId = booking.BookingId,
                         BookingTime = booking.BookingTime,
-                        CreateAt = TimeHelper.ConvertDateTimeToUtcPlus7(booking.CreateAt),
+                        CreateAt = booking.CreateAt,
                         Status = booking.Status,
                         Image = booking.Bar.Images.Split(',')[0],
                         IsRated = checkIsRated,
@@ -426,10 +426,10 @@ namespace Application.Service
                 booking.BookingTables = booking.BookingTables ?? new List<BookingTable>();
                 booking.BookingCode = $"{booking.BookingDate.ToString("yyMMdd")}{RandomHelper.GenerateRandomNumberString()}";
                 booking.Status = (int)BookingStatusEnum.Pending;
-
+                booking.CreateAt = TimeHelper.ConvertDateTimeToUtcPlus7(DateTime.Now);
                 var qrCode = _qrCodeService.GenerateQRCode(booking.BookingId);
                 booking.QRTicket = await _firebase.UploadImageAsync(Utils.ConvertBase64ToFile(qrCode));
-
+                
                 booking.ExpireAt = (request.BookingDate + request.BookingTime).AddHours(2);
                 booking.TotalPrice = null;
 
