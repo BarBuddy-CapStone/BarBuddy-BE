@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Domain.CustomException.CustomException;
 
 namespace Application.Service
 {
@@ -111,30 +112,47 @@ namespace Application.Service
 
             try
             {
-                var userId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-
-                if (!userId.Equals(accountId))
-                {
-                    throw new CustomException.InvalidDataException("Bạn không có quyền !");
-                }
                 var response = new NotificationDetailResponse();
                 var getNotiOfCusById = await _unitOfWork.NotificationRepository
-                                                    .GetAsync(filter: x => x.NotificationDetails.Any(x => x.AccountId.Equals(accountId))
-                                                        , includeProperties: "NotificationDetails.Account,Bar");
-                if (!getNotiOfCusById.IsNullOrEmpty())
+                    .GetAsync(
+                        filter: x => x.NotificationDetails.Any(x => x.AccountId.Equals(accountId)),
+                        includeProperties: "NotificationDetails.Account,Bar"
+                    );
+
+                var getInfo = getNotiOfCusById.FirstOrDefault();
+                if (getInfo == null)
                 {
-                    var getInfo = getNotiOfCusById?.FirstOrDefault()?.NotificationDetails?.FirstOrDefault()?.Account;
-                    response = _mapper.Map<NotificationDetailResponse>(getInfo);
-                    response.NotificationResponses = _mapper.Map<List<NotificationResponse>>(getNotiOfCusById);
+                    throw new DataNotFoundException("Không có thông báo!");
                 }
+
+                // Map thông tin account
+                response = _mapper.Map<NotificationDetailResponse>(
+                    getInfo.NotificationDetails.FirstOrDefault(nd => nd.AccountId == accountId).Account
+                );
+
+                // Map notifications sang NotificationResponses
+                response.NotificationResponses = _mapper.Map<List<NotificationResponse>>(getNotiOfCusById);
+
+                // Cập nhật IsRead cho từng notification response
+                foreach (var notificationResponse in response.NotificationResponses)
+                {
+                    var notification = getNotiOfCusById.FirstOrDefault(n => n.NotificationId == notificationResponse.NotificationId);
+                    if (notification != null)
+                    {
+                        var notificationDetail = notification.NotificationDetails
+                            .FirstOrDefault(nd => nd.AccountId == accountId);
+                        if (notificationDetail != null)
+                        {
+                            notificationResponse.IsRead = notificationDetail.IsRead;
+                        }
+                    }
+                }
+
                 response.AccountId = accountId;
                 return response;
-            }
-            catch (CustomException.InternalServerErrorException ex)
-            {
-                throw new CustomException.InternalServerErrorException(ex.Message, ex);
-            }
-
+            } catch (Exception ẽx) {
+                throw new Exception(ẽx.Message);
+                }
         }
 
         public async Task<NotificationResponse> CreateNotificationAllCustomer(Guid accountId, NotificationRequest request)
