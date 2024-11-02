@@ -13,5 +13,6 @@ namespace Application.IService
         Task<BarResponse> GetBarByIdWithFeedback(Guid barId);
         Task<BarResponse> GetBarByIdWithTable(Guid barId);
         Task<IEnumerable<OnlyBarResponse>> GetAllAvailableBars(DateTime dateTime);
+        Task<RevenueResponse> GetRevenueOfBar(RevenueRequest request);
     }
 }

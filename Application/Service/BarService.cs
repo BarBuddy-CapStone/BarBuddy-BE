@@ -25,7 +25,7 @@ namespace Application.Service
         private readonly IMapper _mapper;
         private readonly IFirebase _fireBase;
         private readonly IBarTimeService _barTimeService;
-        public BarService(IUnitOfWork unitOfWork, IMapper mapper, 
+        public BarService(IUnitOfWork unitOfWork, IMapper mapper,
                             IFirebase fireBase, IBarTimeService barTimeService)
         {
             _unitOfWork = unitOfWork;
@@ -50,10 +50,10 @@ namespace Application.Service
                     }
 
                     var isBarName = _unitOfWork.BarRepository.Get(filter: x => x.BarName.Contains(request.BarName)).FirstOrDefault();
-                    
+
                     if (isBarName != null)
                     {
-                        throw new CustomException.InvalidDataException("Tên quán Bar đã tồn tại, vui lòng thử lại !");    
+                        throw new CustomException.InvalidDataException("Tên quán Bar đã tồn tại, vui lòng thử lại !");
                     }
 
                     var images = Utils.ConvertBase64ListToFiles(request.Images);
@@ -64,10 +64,10 @@ namespace Application.Service
                     var mapper = _mapper.Map<Bar>(request);
                     mapper.Images = "";
                     await _unitOfWork.BarRepository.InsertAsync(mapper);
-                    foreach(var isValidTimeSlot in request.BarTimeRequest)
+                    foreach (var isValidTimeSlot in request.BarTimeRequest)
                     {
                         var isValid = Utils.IValidSlot(request.TimeSlot, isValidTimeSlot.StartTime, isValidTimeSlot.EndTime);
-                        if(!isValid)
+                        if (!isValid)
                         {
                             throw new CustomException.InvalidDataException($" Thời gian đóng mở cửa không đủ cho một slot vào {Utils.GetDayName(isValidTimeSlot.DayOfWeek)}!");
                         }
@@ -113,9 +113,9 @@ namespace Application.Service
             }
 
             var getAllBar = await _unitOfWork.BarRepository
-                                                .GetAsync(filter: filter, 
-                                                    pageIndex: query.PageIndex, 
-                                                    pageSize: query.PageSize, 
+                                                .GetAsync(filter: filter,
+                                                    pageIndex: query.PageIndex,
+                                                    pageSize: query.PageSize,
                                                     includeProperties: "BarTimes");
 
             if (getAllBar.IsNullOrEmpty() || !getAllBar.Any())
@@ -124,7 +124,7 @@ namespace Application.Service
             }
             var response = _mapper.Map<IEnumerable<BarResponse>>(getAllBar);
 
-            foreach(var barTime in response)
+            foreach (var barTime in response)
             {
                 var getOneBar = getAllBar.Where(x => x.BarId.Equals(barTime.BarId)).FirstOrDefault();
                 barTime.BarTimeResponses = _mapper.Map<List<BarTimeResponse>>(getOneBar?.BarTimes);
@@ -138,14 +138,14 @@ namespace Application.Service
 
             Expression<Func<Bar, bool>> filter = null;
 
-            if(!string.IsNullOrWhiteSpace(query.Search))
+            if (!string.IsNullOrWhiteSpace(query.Search))
             {
                 filter = barName => barName.BarName.Contains(query.Search);
             }
 
             var bars = await _unitOfWork.BarRepository
                                     .GetAsync(filter: filter,
-                                              pageIndex: query.PageIndex, 
+                                              pageIndex: query.PageIndex,
                                               pageSize: query.PageSize,
                                               includeProperties: "Feedbacks,BarTimes");
 
@@ -162,7 +162,7 @@ namespace Application.Service
             foreach (var bar in bars)
             {
                 var tables = await _unitOfWork.TableRepository
-                                                .GetAsync(t =>t.IsDeleted == false);
+                                                .GetAsync(t => t.IsDeleted == false);
                 bool isAnyTableAvailable = false;
                 foreach (var table in tables)
                 {
@@ -189,8 +189,8 @@ namespace Application.Service
         public async Task<BarResponse> GetBarById(Guid barId)
         {
             var getBarById = (await _unitOfWork.BarRepository
-                                                    .GetAsync(filter: x=> x.BarId.Equals(barId), 
-                                                              includeProperties:"BarTimes"))
+                                                    .GetAsync(filter: x => x.BarId.Equals(barId),
+                                                              includeProperties: "BarTimes"))
                                                               .FirstOrDefault();
 
             if (getBarById == null)
@@ -305,7 +305,7 @@ namespace Application.Service
                     _mapper.Map(request, getBarById);
                     getBarById.Images = "";
                     await _unitOfWork.BarRepository.UpdateAsync(getBarById);
-                    
+
                     await _barTimeService.UpdateBarTimeOfBar(getBarById.BarId, request.UpdateBarTimeRequests);
                     await Task.Delay(200);
                     await _unitOfWork.SaveAsync();
@@ -348,7 +348,7 @@ namespace Application.Service
             try
             {
                 var bars = await _unitOfWork.BarRepository
-                    .GetAsync(filter: x => x.BarTimes.Any(x => x.DayOfWeek == (int)dateTime.DayOfWeek) 
+                    .GetAsync(filter: x => x.BarTimes.Any(x => x.DayOfWeek == (int)dateTime.DayOfWeek)
                             && x.Status == true,
                         includeProperties: "Feedbacks,BarTimes");
                 var currentDateTime = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now);
@@ -386,9 +386,55 @@ namespace Application.Service
 
                 return response;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<RevenueResponse> GetRevenueOfBar(RevenueRequest request)
+        {
+            try
+            {
+               
+                DateTime? targetDate = request.DateTime;
+
+                if(targetDate != null && request.Type.IsNullOrEmpty())
+                {
+                    throw new CustomException.InvalidDataException("Đã nhập ngày thì vui lòng nhập type bạn muốn filter !");
+                }
+
+                if (targetDate == null && !request.Type.IsNullOrEmpty())
+                {
+                    throw new CustomException.InvalidDataException("Đã nhập type thì vui lòng nhập ngày bạn muốn filter !");
+                }
+
+                var bookings = await _unitOfWork.BookingRepository.GetAsync(
+                                        filter: x =>
+                                            x.Status == (int)PrefixValueEnum.Completed &&
+                                            x.BarId == request.BarId &&
+                                            (!targetDate.HasValue || (
+                                                (request.Type != null && request.Type.ToLower() == "day" && 
+                                                    x.BookingDate.Date == targetDate.Value.Date) ||
+                                                (request.Type != null && request.Type.ToLower() == "month" && 
+                                                    x.BookingDate.Year == targetDate.Value.Year && 
+                                                    x.BookingDate.Month == targetDate.Value.Month) ||
+                                                (request.Type != null && request.Type.ToLower() == "year" && 
+                                                    x.BookingDate.Year == targetDate.Value.Year)
+                                            ))
+                                    );
+
+                var totalRevenue = bookings.Sum(b => b.TotalPrice + b.AdditionalFee);
+
+                return new RevenueResponse
+                {
+                    RevenueOfBar = totalRevenue ?? 0,
+                    BarId = bookings.FirstOrDefault().BarId 
+                };
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
     }

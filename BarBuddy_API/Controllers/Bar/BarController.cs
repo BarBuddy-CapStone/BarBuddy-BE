@@ -218,5 +218,28 @@ namespace BarBuddy_API.Controllers.Bar
                 return CustomResult(e.Message, HttpStatusCode.InternalServerError);
             }
         }
+
+        [HttpGet("admin/dashboard/revenue")]
+        public async Task<IActionResult> GetRevenueOfBar([FromQuery] RevenueRequest request)
+        {
+            try
+            {
+                var response = await _barService.GetRevenueOfBar(request);
+                return CustomResult("Đã tải dữ liệu", response);
+            }
+            catch (CustomException.DataNotFoundException e)
+            {
+                return CustomResult(e.Message, HttpStatusCode.NotFound);
+            }
+
+            catch (CustomException.InvalidDataException e)
+            {
+                return CustomResult(e.Message, HttpStatusCode.BadRequest);
+            }
+            catch (CustomException.InternalServerErrorException e)
+            {
+                return CustomResult(e.Message, HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }
