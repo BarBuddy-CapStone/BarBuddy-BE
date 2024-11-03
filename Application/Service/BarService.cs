@@ -409,6 +409,13 @@ namespace Application.Service
                     throw new CustomException.InvalidDataException("Đã nhập type thì vui lòng nhập ngày bạn muốn filter !");
                 }
 
+                var IsBarExist = await _unitOfWork.BarRepository.GetByIdAsync(request.BarId);
+
+                if(IsBarExist == null)
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy quán bar !");
+                }
+
                 var bookings = await _unitOfWork.BookingRepository.GetAsync(
                                         filter: x =>
                                             x.Status == (int)PrefixValueEnum.Completed &&
@@ -429,7 +436,7 @@ namespace Application.Service
                 return new RevenueResponse
                 {
                     RevenueOfBar = totalRevenue ?? 0,
-                    BarId = bookings.FirstOrDefault().BarId 
+                    BarId = IsBarExist.BarId
                 };
             }
             catch (CustomException.InternalServerErrorException ex)
