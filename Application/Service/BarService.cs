@@ -409,17 +409,19 @@ namespace Application.Service
                     throw new CustomException.InvalidDataException("Đã nhập type thì vui lòng nhập ngày bạn muốn filter !");
                 }
 
-                var IsBarExist = await _unitOfWork.BarRepository.GetByIdAsync(request.BarId);
-
-                if(IsBarExist == null)
+                if (request.BarId != null)
                 {
-                    throw new CustomException.DataNotFoundException("Không tìm thấy quán bar !");
+                    var IsBarExist = await _unitOfWork.BarRepository.GetByIdAsync(Guid.Parse(request.BarId));
+                    if (IsBarExist == null)
+                    {
+                        throw new CustomException.DataNotFoundException("Không tìm thấy quán bar !");
+                    }
                 }
 
                 var bookings = await _unitOfWork.BookingRepository.GetAsync(
                                         filter: x =>
                                             x.Status == (int)PrefixValueEnum.Completed &&
-                                            x.BarId == request.BarId &&
+                                            (request.BarId == null || x.BarId == Guid.Parse(request.BarId)) &&
                                             (!targetDate.HasValue || (
                                                 (request.Type != null && request.Type.ToLower() == "day" && 
                                                     x.BookingDate.Date == targetDate.Value.Date) ||
@@ -436,7 +438,7 @@ namespace Application.Service
                 return new RevenueResponse
                 {
                     RevenueOfBar = totalRevenue ?? 0,
-                    BarId = IsBarExist.BarId
+                    BarId = request.BarId ?? null,
                 };
             }
             catch (CustomException.InternalServerErrorException ex)

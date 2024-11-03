@@ -8,7 +8,7 @@ namespace Application.DTOs.Bar
 {
     public class RevenueResponse
     {
-        public Guid BarId { get; set; }
+        public string BarId { get; set; }
         public double RevenueOfBar { get; set; }
     }
 }
