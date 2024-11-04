@@ -320,8 +320,8 @@ namespace Application.Service
             try
             {
                 var getAllDrink = await _unitOfWork.DrinkRepository
-                                        .GetAsync(filter: x => x.Status == PrefixKeyConstant.TRUE &&
-                                                x.DrinkCategory.BarId.Equals(barId),
+                                        .GetAsync(filter: x => x.Status == PrefixKeyConstant.TRUE /*&&
+                                                x.DrinkCategory.BarId.Equals(barId)*/,
                                                 includeProperties: "DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory");
                 var response = _mapper.Map<IEnumerable<DrinkResponse>>(getAllDrink);
                 return response;
