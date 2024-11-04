@@ -17,6 +17,7 @@ using System.Linq.Expressions;
 using Application.DTOs.BarTime;
 using System.Reflection.Metadata;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Application.DTOs.Booking;
 
 namespace Application.Service
 {
@@ -397,17 +398,15 @@ namespace Application.Service
         {
             try
             {
-               
-                DateTime? targetDate = request.DateTime;
-
-                if(targetDate != null && request.Type.IsNullOrEmpty())
+                if ((request.FromTime.HasValue && !request.ToTime.HasValue) ||
+                    (!request.FromTime.HasValue && request.ToTime.HasValue))
                 {
-                    throw new CustomException.InvalidDataException("Đã nhập ngày thì vui lòng nhập type bạn muốn filter !");
+                    throw new CustomException.InvalidDataException("Vui lòng nhập cả FromTime và ToTime!");
                 }
 
-                if (targetDate == null && !request.Type.IsNullOrEmpty())
+                if (request.FromTime > request.ToTime)
                 {
-                    throw new CustomException.InvalidDataException("Đã nhập type thì vui lòng nhập ngày bạn muốn filter !");
+                    throw new CustomException.InvalidDataException("FromTime không thể lớn hơn ToTime!");
                 }
 
                 if (request.BarId != null)
@@ -415,32 +414,40 @@ namespace Application.Service
                     var IsBarExist = await _unitOfWork.BarRepository.GetByIdAsync(Guid.Parse(request.BarId));
                     if (IsBarExist == null)
                     {
-                        throw new CustomException.DataNotFoundException("Không tìm thấy quán bar !");
+                        throw new CustomException.DataNotFoundException("Không tìm thấy quán bar!");
                     }
                 }
 
                 var bookings = await _unitOfWork.BookingRepository.GetAsync(
-                                        filter: x =>
-                                            x.Status != (int)PrefixValueEnum.Serving &&
-                                            (request.BarId == null || x.BarId == Guid.Parse(request.BarId)) &&
-                                            (!targetDate.HasValue || (
-                                                (request.Type != null && request.Type.ToLower() == "day" && 
-                                                    x.BookingDate.Date == targetDate.Value.Date) ||
-                                                (request.Type != null && request.Type.ToLower() == "month" && 
-                                                    x.BookingDate.Year == targetDate.Value.Year && 
-                                                    x.BookingDate.Month == targetDate.Value.Month) ||
-                                                (request.Type != null && request.Type.ToLower() == "year" && 
-                                                    x.BookingDate.Year == targetDate.Value.Year)
-                                            ))
-                                    );
+                    filter: x =>
+                        x.Status != (int)PrefixValueEnum.Serving &&
+                        x.Status != (int)PrefixValueEnum.Pending &&
+                        (request.BarId == null || x.BarId == Guid.Parse(request.BarId)) &&
+                        (!request.FromTime.HasValue || x.BookingDate >= request.FromTime.Value.Date) &&
+                        (!request.ToTime.HasValue || x.BookingDate <= request.ToTime.Value.Date),
+                    orderBy: x => x.OrderBy(x => x.BookingDate)
+                );
+                var basedBookingDate = bookings.GroupBy(x => x.BookingDate.Date).ToList();
 
-                var totalRevenue = bookings.Sum(b => b.TotalPrice + b.AdditionalFee);
-                var totalBooking = bookings.Count();
+                var totalRevenue = basedBookingDate.Sum(group =>
+                {
+                    var total = group.Sum(x => (x.TotalPrice ?? 0) + (x.AdditionalFee ?? 0));
+                    return total;
+                });
+
                 return new RevenueResponse
                 {
-                    RevenueOfBar = totalRevenue ?? 0,
+                    RevenueOfBar = totalRevenue,
                     BarId = request.BarId ?? null,
-                    TotalBooking = totalBooking
+                    TotalBooking = bookings.Count(),
+                    FromTime = request.FromTime ?? DateTime.MinValue,
+                    ToTime = request.ToTime ?? DateTime.MinValue,
+                    BookingReveueResponses = basedBookingDate.Select(x => new BookingReveueResponse
+                    {
+                        Date = x.Key.Date,
+                        TotalBookingOfDay = x.Count(),
+                        TotalPrice = x.Sum(x => (x.TotalPrice ?? 0) + (x.AdditionalFee ?? 0))
+                    }).ToList(),
                 };
             }
             catch (CustomException.InternalServerErrorException ex)

@@ -11,5 +11,8 @@ namespace Application.DTOs.Bar
         public string BarId { get; set; }
         public double RevenueOfBar { get; set; }
         public int TotalBooking { get; set; }
+        public DateTime FromTime { get; set; }
+        public DateTime ToTime { get; set; }
+        public List<Booking.BookingReveueResponse>? BookingReveueResponses { get; set; }
     }
 }

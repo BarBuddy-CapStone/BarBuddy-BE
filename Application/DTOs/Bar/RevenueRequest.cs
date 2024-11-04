@@ -10,8 +10,7 @@ namespace Application.DTOs.Bar
     public class RevenueRequest
     {
         public string? BarId { get; set; }
-        public DateTime? DateTime { get; set; }
-        [RegularExpression("^(day|month|year)$", ErrorMessage = "Type must be 'day', 'month', or 'year'.")]
-        public string? Type { get; set; }
+        public DateTime? FromTime { get; set; }
+        public DateTime? ToTime { get; set; }
     }
 }
