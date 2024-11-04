@@ -421,7 +421,7 @@ namespace Application.Service
 
                 var bookings = await _unitOfWork.BookingRepository.GetAsync(
                                         filter: x =>
-                                            x.Status == (int)PrefixValueEnum.Completed &&
+                                            x.Status != (int)PrefixValueEnum.Serving &&
                                             (request.BarId == null || x.BarId == Guid.Parse(request.BarId)) &&
                                             (!targetDate.HasValue || (
                                                 (request.Type != null && request.Type.ToLower() == "day" && 
