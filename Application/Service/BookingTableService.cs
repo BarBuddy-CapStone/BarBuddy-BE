@@ -67,17 +67,23 @@ namespace Application.Service
                     throw new CustomException.DataNotFoundException("Không tìm thấy khung giờ của quán Bar !");
                 }
 
-                if(getTimeOfBar.Count > 1)
+                if (getTimeOfBar.Count > 1)
                 {
+                    var timesToRemove = new List<BarTime>();
                     foreach (var time in getTimeOfBar)
                     {
                         if (time.DayOfWeek != getDayOfWeek)
                         {
-                            getTimeOfBar.Remove(time);
+                            timesToRemove.Add(time); 
                         }
                     }
+                    foreach (var time in timesToRemove)
+                    {
+                        getTimeOfBar.Remove(time);
+                    }
                     Utils.ValidateOpenCloseTime(requestDate, request.Time, getTimeOfBar);
-                } else
+                }
+                else
                 {
                     if (getTimeOfBar[0].StartTime > getTimeOfBar[0].EndTime && request.Time < getTimeOfBar[0].StartTime) {
                         requestDate = requestDate.AddDays(1);
