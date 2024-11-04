@@ -435,11 +435,12 @@ namespace Application.Service
                                     );
 
                 var totalRevenue = bookings.Sum(b => b.TotalPrice + b.AdditionalFee);
-
+                var totalBooking = bookings.Count();
                 return new RevenueResponse
                 {
                     RevenueOfBar = totalRevenue ?? 0,
                     BarId = request.BarId ?? null,
+                    TotalBooking = totalBooking
                 };
             }
             catch (CustomException.InternalServerErrorException ex)

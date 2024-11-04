@@ -10,5 +10,6 @@ namespace Application.DTOs.Bar
     {
         public string BarId { get; set; }
         public double RevenueOfBar { get; set; }
+        public int TotalBooking { get; set; }
     }
 }
