@@ -17,6 +17,7 @@ namespace Application.Mappers.Bars
                 .ReverseMap();
             CreateMap<BarBaseRequest, Bar>().ReverseMap();
             CreateMap<Bar, OnlyBarResponse>();
+            CreateMap<Bar, OnlyIdNameResponse>();
         }
     }
 }

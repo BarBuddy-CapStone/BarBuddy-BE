@@ -16,6 +16,7 @@ using Domain.Common;
 using System.Linq.Expressions;
 using Application.DTOs.BarTime;
 using System.Reflection.Metadata;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Application.Service
 {
@@ -445,6 +446,28 @@ namespace Application.Service
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
+        }
+
+        public async Task<List<OnlyIdNameResponse>> GetBarNameId(ObjectQuery query)
+        {
+            Expression<Func<Bar, bool>> filter = null;
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                filter = bar => bar.BarName.Contains(query.Search);
+            }
+
+            var getAllBar = await _unitOfWork.BarRepository
+                                .GetAsync(filter: filter,
+                                pageIndex: query.PageIndex,
+                                pageSize: query.PageSize);
+
+            if (getAllBar.IsNullOrEmpty() || !getAllBar.Any())
+            {
+                throw new CustomException.DataNotFoundException("Danh sách đang trống !");
+            }
+
+            var response = _mapper.Map<List<OnlyIdNameResponse>>(getAllBar);
+            return response;
         }
     }
 }
