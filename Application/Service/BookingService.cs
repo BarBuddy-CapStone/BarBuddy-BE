@@ -81,7 +81,7 @@ namespace Application.Service
                 booking.Status = 1;
                 _unitOfWork.BeginTransaction();
                 await _unitOfWork.BookingRepository.UpdateAsync(booking);
-                //await _notificationService.CreateNotification(creNoti);
+                await _notificationService.CreateNotification(creNoti);
                 await _unitOfWork.SaveAsync();
                 _unitOfWork.CommitTransaction();
                 return true;
@@ -429,7 +429,7 @@ namespace Application.Service
                 booking.CreateAt = TimeHelper.ConvertDateTimeToUtcPlus7(DateTime.Now);
                 var qrCode = _qrCodeService.GenerateQRCode(booking.BookingId);
                 booking.QRTicket = await _firebase.UploadImageAsync(Utils.ConvertBase64ToFile(qrCode));
-                
+                booking.BookingTime = request.BookingTime;
                 booking.ExpireAt = (request.BookingDate + request.BookingTime).AddHours(2);
                 booking.TotalPrice = null;
 
@@ -580,8 +580,10 @@ namespace Application.Service
                 booking.BookingTables = booking.BookingTables ?? new List<BookingTable>();
                 booking.BookingDrinks = booking.BookingDrinks ?? new List<BookingDrink>();
                 booking.BookingDate = request.BookingDate.Date;
-                booking.BookingCode = $"BOOKING-{RandomHelper.GenerateRandomNumberString()}";
+                booking.BookingCode = $"{booking.BookingDate.ToString("yyMMdd")}{RandomHelper.GenerateRandomNumberString()}";
                 booking.Status = (int)BookingStatusEnum.Pending;
+                booking.BookingTime = request.BookingTime;
+                booking.CreateAt = TimeHelper.ConvertDateTimeToUtcPlus7(DateTime.UtcNow);
 
                 var qrCode = _qrCodeService.GenerateQRCode(booking.BookingId);
                 booking.QRTicket = await _firebase.UploadImageAsync(Utils.ConvertBase64ToFile(qrCode));
