@@ -183,7 +183,7 @@ namespace BarBuddy_API.Controllers.Drink
             try
             {
                 var response = await _drinkService.GetAllDrinkCustomerOfBar(barId);
-                return CustomResult("Data loaded", response);
+                return CustomResult("Đã tải dữ liệu.", response);
             }
             catch (CustomException.DataNotFoundException e)
             {
