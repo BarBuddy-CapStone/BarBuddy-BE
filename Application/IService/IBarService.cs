@@ -15,5 +15,6 @@ namespace Application.IService
         Task<IEnumerable<OnlyBarResponse>> GetAllAvailableBars(DateTime dateTime);
         Task<RevenueResponse> GetRevenueOfBar(RevenueRequest request);
         Task<List<OnlyBarIdNameResponse>> GetBarNameId(ObjectQuery query);
+        Task<RevenueBranchResponse> GetAllRevenueBranch();
     }
 }

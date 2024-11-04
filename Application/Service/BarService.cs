@@ -18,6 +18,7 @@ using Application.DTOs.BarTime;
 using System.Reflection.Metadata;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using Application.DTOs.Booking;
+using Azure.Core;
 
 namespace Application.Service
 {
@@ -476,6 +477,38 @@ namespace Application.Service
 
             var response = _mapper.Map<List<OnlyBarIdNameResponse>>(getAllBar);
             return response;
+        }
+
+        public async Task<RevenueBranchResponse> GetAllRevenueBranch()
+        {
+            try
+            {
+                var bookings = await _unitOfWork.BookingRepository.GetAsync(
+                    filter: x =>
+                        x.Status != (int)PrefixValueEnum.Serving &&
+                        x.Status != (int)PrefixValueEnum.Pending,
+                    orderBy: x => x.OrderBy(x => x.BookingDate)
+                );
+
+                var barList = await _unitOfWork.BarRepository.GetAllAsync();
+
+                var totalRevenue = bookings.Sum(x => (x.TotalPrice ?? 0) + (x.AdditionalFee ?? 0));
+                var totalBooking = bookings.Count();
+                var totalBar = barList.Count();
+
+                var response = new RevenueBranchResponse
+                {
+                    RevenueBranch = totalRevenue,
+                    TotalBarBranch = totalBar,
+                    TotalBooking = totalBooking,
+                };
+
+                return response;
+            }
+            catch(CustomException.InternalServerErrorException ex)
+            {
+                throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
+            }
         }
     }
 }

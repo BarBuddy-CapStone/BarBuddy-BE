@@ -219,7 +219,7 @@ namespace BarBuddy_API.Controllers.Bar
             }
         }
 
-        [HttpGet("admin/dashboard/revenue")]
+        [HttpGet("admin/dashboard/revenueChart")]
         public async Task<IActionResult> GetRevenueOfBar([FromQuery] RevenueRequest request)
         {
             try
@@ -257,6 +257,29 @@ namespace BarBuddy_API.Controllers.Bar
             catch (CustomException.InternalServerErrorException ex)
             {
                 return CustomResult("Lỗi hệ thống !", HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpGet("admin/dashboard/getAllRevenue")]
+        public async Task<IActionResult> GetAllRevenue()
+        {
+            try
+            {
+                var response = await _barService.GetAllRevenueBranch();
+                return CustomResult("Đã tải dữ liệu", response);
+            }
+            catch (CustomException.DataNotFoundException e)
+            {
+                return CustomResult(e.Message, HttpStatusCode.NotFound);
+            }
+
+            catch (CustomException.InvalidDataException e)
+            {
+                return CustomResult(e.Message, HttpStatusCode.BadRequest);
+            }
+            catch (CustomException.InternalServerErrorException e)
+            {
+                return CustomResult(e.Message, HttpStatusCode.InternalServerError);
             }
         }
     }
