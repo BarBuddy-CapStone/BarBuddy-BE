@@ -126,8 +126,8 @@ namespace Application.Service
             try
             {
                 var getAllDrinkCateOfBar = await _unitOfWork.DrinkCategoryRepository
-                                                            .GetAsync(filter: x => x.BarId.Equals(barId) 
-                                                            && x.IsDrinkCategory == PrefixKeyConstant.TRUE);
+                                                            .GetAsync(filter: x => /*x.BarId.Equals(barId) 
+                                                            &&*/ x.IsDrinkCategory == PrefixKeyConstant.TRUE);
 
                 if (getAllDrinkCateOfBar.IsNullOrEmpty())
                 {

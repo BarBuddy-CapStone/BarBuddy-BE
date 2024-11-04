@@ -13,6 +13,7 @@ namespace Domain.Entities
     {
         [Key]
         public Guid DrinkId { get; set; } = Guid.NewGuid();
+        public Guid BarId { get; set; }
         public string DrinkCode { get; set; }
         public Guid DrinkCategoryId { get; set; }
         public string DrinkName { get; set; }
@@ -22,6 +23,9 @@ namespace Domain.Entities
         public DateTime UpdatedDate { get; set; }
         public string Image {  get; set; }
         public bool Status { get; set; }
+
+        [ForeignKey("BarId")]
+        public virtual Bar Bar { get; set; }
 
         public virtual ICollection<BookingDrink> BookingDrinks { get; set; }
         public virtual ICollection<DrinkEmotionalCategory> DrinkEmotionalCategories { get; set; }

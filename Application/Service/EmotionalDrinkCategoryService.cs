@@ -59,8 +59,8 @@ namespace Application.Service
         public async Task<List<EmotionCategoryResponse>> GetEmotionCategoryOfBar(Guid barId)
         {
             var emotionid = await _unitOfWork.EmotionalDrinkCategoryRepository
-                                        .GetAsync(e => e.BarId.Equals(barId)
-                                            && e.IsDeleted == PrefixKeyConstant.FALSE);
+                                        .GetAsync(e => /*e.BarId.Equals(barId)
+                                            &&*/ e.IsDeleted == PrefixKeyConstant.FALSE);
             if (emotionid == null)
             {
                 throw new CustomException.DataNotFoundException("Không tìm thấy thể loại cảm xúc, vui lòng thử lại !");
