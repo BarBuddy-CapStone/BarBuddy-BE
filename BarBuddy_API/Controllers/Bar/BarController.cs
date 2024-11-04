@@ -135,7 +135,7 @@ namespace BarBuddy_API.Controllers.Bar
                 return CustomResult(e.Message, HttpStatusCode.InternalServerError);
             }
         }
-        
+
         /// <summary>
         /// Get Bar By Id
         /// </summary>
@@ -239,6 +239,24 @@ namespace BarBuddy_API.Controllers.Bar
             catch (CustomException.InternalServerErrorException e)
             {
                 return CustomResult(e.Message, HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpGet("admin/dashboard/getBar")]
+        public async Task<IActionResult> GetBarNameId([FromQuery] ObjectQuery query)
+        {
+            try
+            {
+                var response = await _barService.GetBarNameId(query);
+                return CustomResult("Đã tải dữ liệu.", response);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.NotFound);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult("Lỗi hệ thống !", HttpStatusCode.InternalServerError);
             }
         }
     }
