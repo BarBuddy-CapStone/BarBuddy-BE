@@ -86,12 +86,6 @@ namespace Application.Service
                 throw new CustomException.InvalidDataException("Tên thể loại cảm xúc đã tồn tại, vui lòng thử lại!");
             }
 
-            var isExistBar = _unitOfWork.BarRepository.Exists(filter: x => x.BarId.Equals(request.BarId));
-
-            if (!isExistBar)
-            {
-                throw new CustomException.DataNotFoundException("Không tìm thấy quán bar, vui lòng thử lại!");
-            }
             var emotionRequest = _mapper.Map<EmotionalDrinkCategory>(request);
             emotionRequest.IsDeleted = PrefixKeyConstant.FALSE;
             _unitOfWork.EmotionalDrinkCategoryRepository.Insert(emotionRequest);
@@ -116,12 +110,6 @@ namespace Application.Service
             if (isExistName)
             {
                 throw new CustomException.InvalidDataException("Tên thể loại cảm xúc đã tồn tại, vui lòng thử lại!");
-            }
-
-            var isExistBar = _unitOfWork.BarRepository.Exists(filter: x => x.BarId.Equals(request.BarId));
-            if (!isExistBar)
-            {
-                throw new CustomException.DataNotFoundException("Không tìm thấy quán bar, vui lòng thử lại!");
             }
 
             var emotionCategory = _mapper.Map(request, emotionCategoryID);
