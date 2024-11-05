@@ -19,7 +19,6 @@ namespace Application.Mappers.Drinks
             CreateMap<DrinkEmotionalCategory, EmotionCategoryResponse>()
             .ForMember(dest => dest.EmotionalDrinksCategoryId, opt => opt.MapFrom(src => src.EmotionalDrinkCategory.EmotionalDrinksCategoryId))
             .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.EmotionalDrinkCategory.CategoryName))
-            .ForMember(dest => dest.BarId, opt => opt.MapFrom(src => src.Drink.BarId))
             .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.EmotionalDrinkCategory.Description));
         }
     }
