@@ -9,8 +9,6 @@ namespace Application.DTOs.DrinkCategory
 {
     public class DrinkCategoryRequest
     {
-        [Required(ErrorMessage = "Không thể thiếu barId !")]
-        public Guid BarId { get; set; }
         [Required(AllowEmptyStrings = false, ErrorMessage = "Tên thể loại đồ uống không được trống !")]
         [StringLength(50, MinimumLength =7, ErrorMessage = "Tên thể loại đồ uống phải từ 7 đến 50 kí tự !")]
         public string DrinksCategoryName { get; set; }

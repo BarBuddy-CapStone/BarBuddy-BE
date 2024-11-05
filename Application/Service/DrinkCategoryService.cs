@@ -34,16 +34,10 @@ namespace Application.Service
                                                                     .Contains(request.DrinksCategoryName))
                                                     .FirstOrDefault();
 
-                var isExistBar = _unitOfWork.BarRepository.Exists(filter: x => x.BarId.Equals(request.BarId));
-
                 if (isExistName != null) {
                     throw new CustomException.InvalidDataException("Tên thể loại đồ uống đã tồn tại, vui lòng thử lại");
                 }
 
-                if (!isExistBar)
-                {
-                    throw new CustomException.DataNotFoundException("Không tìm thấy quán bar, vui lòng thử lại");
-                }
                 var mapper = _mapper.Map<DrinkCategory>(request);
                 mapper.IsDrinkCategory = PrefixKeyConstant.TRUE;
 
@@ -191,16 +185,11 @@ namespace Application.Service
                                                                     .Contains(request.DrinksCategoryName))
                                                     .FirstOrDefault();
 
-                var isExistBar = _unitOfWork.BarRepository.Exists(filter: x => x.BarId.Equals(request.BarId));
                 if (isExistName != null )
                 {
                     throw new CustomException.InvalidDataException("Tên thể loại đồ uống đã tồn tại, vui lòng thử lại");
                 }
 
-                if (!isExistBar)
-                {
-                    throw new CustomException.DataNotFoundException("Không tìm thấy quán bar, vui lòng thử lại");
-                }
                 var mapper = _mapper.Map(request, getOne);
                 await _unitOfWork.DrinkCategoryRepository.UpdateAsync(mapper);
                 await Task.Delay(20);
