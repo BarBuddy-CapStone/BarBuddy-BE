@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.DrinkCategory;
 using Application.IService;
 using CoreApiResponse;
+using Domain.Common;
 using Domain.CustomException;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,11 +23,11 @@ namespace BarBuddy_API.Controllers.DrinkCategory
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IActionResult> GetAllDrinkCate()
+        public async Task<IActionResult> GetAllDrinkCate([FromQuery] ObjectQuery query)
         {
             try
             {
-                var response = await _drinkCategoryService.GetAllDrinkCategory();
+                var response = await _drinkCategoryService.GetAllDrinkCategory(query);
                 return CustomResult("Data loaded", response);
             }
             catch (CustomException.DataNotFoundException e)

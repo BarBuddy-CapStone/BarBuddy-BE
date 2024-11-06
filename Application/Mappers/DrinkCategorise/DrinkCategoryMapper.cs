@@ -10,6 +10,7 @@ namespace Application.Mappers.DrinkCategorise
         {
             CreateMap<DrinkCategoryRequest, DrinkCategory>().ReverseMap();
             CreateMap<DrinkCategory, DrinkCategoryResponse>().ReverseMap();
+            CreateMap<UpdDrinkCategoryRequest, DrinkCategory>().ReverseMap();
             CreateMap<DeleteDrinkCateRequest, DrinkCategory>()
                 .ForMember(dst => dst.IsDrinkCategory, src => src.MapFrom(x => x.IsDeleted));
         }
