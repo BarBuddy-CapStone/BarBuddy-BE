@@ -17,7 +17,7 @@ namespace Infrastructure.SignalR
 
         public async Task ReleaseTable(Guid barId)
         {
-            await Clients.All.SendAsync("TableReleased", barId);
+            await Clients.Group(barId.ToString()).SendAsync("TableReleased", barId);
         }
 
         public async Task ReleaseListTable(Guid barId)

@@ -176,7 +176,7 @@ namespace Application.Service
 
                 Utils.ValidateOpenCloseTime(request.Date, request.Time, getTimeOfBar);
 
-                var cacheKey = $"{request.BarId}_{request.TableId}_{accountId}_{request.Date.Date.Date}_{request.Time}";
+                var cacheKey = $"{request.BarId}_{request.TableId}_{request.Date.Date.Date}_{request.Time}";
                 var cacheEntry = _memoryCache.GetOrCreate(cacheKey, entry =>
                 {
                     entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
@@ -253,7 +253,7 @@ namespace Application.Service
             List<TableHoldInfo> tableHolds = new List<TableHoldInfo>();
             foreach (var table in tableIsExist)
             {
-                var cacheKey = $"{barId}_{table.TableId}_{accountId}_{request.Date.Date.Date}_{request.Time}";
+                var cacheKey = $"{barId}_{table.TableId}_{request.Date.Date.Date}_{request.Time}";
                 var cacheEntry = _memoryCache.GetOrCreate(cacheKey, entry =>
                 {
                     return new Dictionary<Guid, TableHoldInfo>();
@@ -284,7 +284,7 @@ namespace Application.Service
                 throw new CustomException.DataNotFoundException("Không tìm thấy table trong quán bar!");
             }
 
-            var cacheKey = $"{request.BarId}_{request.TableId}_{accountId}_{request.Date.Date.Date}_{request.Time}";
+            var cacheKey = $"{request.BarId}_{request.TableId}_{request.Date.Date.Date}_{request.Time}";
 
             var cacheEntry = _memoryCache.GetOrCreate(cacheKey, entry =>
             {
@@ -299,7 +299,7 @@ namespace Application.Service
             {
                 _memoryCache.Remove(cacheKey);
             }
-            await _bookingHub.ReleaseListTablee(request.BarId);
+            await _bookingHub.ReleaseTable(request.BarId);
         }
 
         public async Task ReleaseListTable(ReleaseListTableRequest request)
@@ -313,7 +313,7 @@ namespace Application.Service
                 {
                     throw new CustomException.InvalidDataException("Không hợp lệ");
                 }
-                var cacheKey = $"{request.BarId}_{table.TableId}_{accountId}_{request.Date.Date.Date}_{table.Time}";
+                var cacheKey = $"{request.BarId}_{table.TableId}_{request.Date.Date.Date}_{table.Time}";
                 if (_memoryCache.TryGetValue(cacheKey, out Dictionary<Guid, TableHoldInfo>? cacheTbHold))
                 {
                     if (cacheTbHold.TryGetValue(table.TableId, out var tbHold))
