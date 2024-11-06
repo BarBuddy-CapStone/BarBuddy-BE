@@ -11,6 +11,6 @@ namespace Application.DTOs.DrinkCategory
         public string DrinksCategoryId { get; set; }
         public string DrinksCategoryName { get; set; }
         public string Description { get; set; }
-        public bool IsDrinkCategory { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

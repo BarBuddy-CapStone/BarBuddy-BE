@@ -4,6 +4,7 @@ using Application.DTOs.Response.EmotionCategory;
 using Application.IService;
 using AutoMapper;
 using Azure.Core;
+using Domain.Common;
 using Domain.Constants;
 using Domain.CustomException;
 using Domain.Entities;
@@ -11,6 +12,7 @@ using Domain.IRepository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,10 +29,19 @@ namespace Application.Service
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<EmotionCategoryResponse>> GetEmotionCategory()
+        public async Task<IEnumerable<EmotionCategoryResponse>> GetEmotionCategory(ObjectQuery query)
         {
+            Expression<Func<EmotionalDrinkCategory, bool>> filter = null;
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                filter = bar => bar.CategoryName.Contains(query.Search);
+            }
+
             var emotionCategory = _unitOfWork.EmotionalDrinkCategoryRepository
-                                                .Get(filter: e => e.IsDeleted == PrefixKeyConstant.FALSE);
+                                                .Get(filter: filter,
+                                                    pageIndex: query.PageIndex,
+                                                    pageSize: query.PageSize)
+                                                .Where(e => e.IsDeleted == PrefixKeyConstant.FALSE);
 
             if (!emotionCategory.Any())
             {

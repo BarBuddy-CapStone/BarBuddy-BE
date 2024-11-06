@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.DrinkCategory;
 using Application.IService;
 using AutoMapper;
+using Domain.Common;
 using Domain.Constants;
 using Domain.CustomException;
 using Domain.Entities;
@@ -9,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -39,7 +41,7 @@ namespace Application.Service
                 }
 
                 var mapper = _mapper.Map<DrinkCategory>(request);
-                mapper.IsDrinkCategory = PrefixKeyConstant.TRUE;
+                mapper.IsDeleted = PrefixKeyConstant.FALSE;
 
                 await _unitOfWork.DrinkCategoryRepository.InsertAsync(mapper);
                 await Task.Delay(20);
@@ -66,7 +68,7 @@ namespace Application.Service
             {
                 var getDrinkCateById = await _unitOfWork.DrinkCategoryRepository
                                                         .GetAsync(filter: x => x.DrinksCategoryId.Equals(drinkCateId)
-                                                                            && x.IsDrinkCategory == PrefixKeyConstant.TRUE);
+                                                                            && x.IsDeleted == PrefixKeyConstant.FALSE);
                 var getOne = getDrinkCateById.FirstOrDefault();
 
                 if (getOne == null)
@@ -74,7 +76,7 @@ namespace Application.Service
                     throw new CustomException.DataNotFoundException("Không tìm thấy thể loại đồ uống!");
                 }
 
-                getOne.IsDrinkCategory = PrefixKeyConstant.FALSE;
+                getOne.IsDeleted = PrefixKeyConstant.TRUE;
                 await _unitOfWork.DrinkCategoryRepository.UpdateAsync(getOne);
                 await Task.Delay(200);
                 await _unitOfWork.SaveAsync();
@@ -91,11 +93,21 @@ namespace Application.Service
             }
         }
 
-        public async Task<IEnumerable<DrinkCategoryResponse>> GetAllDrinkCategory()
+        public async Task<IEnumerable<DrinkCategoryResponse>> GetAllDrinkCategory(ObjectQuery query)
         {
             try
             {
-                var getAllDrinkCate = await _unitOfWork.DrinkCategoryRepository.GetAsync(filter: x => x.IsDrinkCategory == PrefixKeyConstant.TRUE);
+                Expression<Func<DrinkCategory, bool>> filter = null;
+                if (!string.IsNullOrWhiteSpace(query.Search))
+                {
+                    filter = bar => bar.DrinksCategoryName.Contains(query.Search);
+                }
+
+                var getAllDrinkCate = (await _unitOfWork.DrinkCategoryRepository
+                                                            .GetAsync(filter: filter,
+                                                            pageIndex: query.PageIndex,
+                                                            pageSize: query.PageSize))
+                                                            .Where(x => x.IsDeleted == PrefixKeyConstant.FALSE);
 
                 if (getAllDrinkCate.IsNullOrEmpty())
                 {
@@ -121,7 +133,7 @@ namespace Application.Service
             {
                 var getAllDrinkCateOfBar = await _unitOfWork.DrinkCategoryRepository
                                                             .GetAsync(filter: x => /*x.BarId.Equals(barId) 
-                                                            &&*/ x.IsDrinkCategory == PrefixKeyConstant.TRUE);
+                                                            &&*/ x.IsDeleted == PrefixKeyConstant.FALSE);
 
                 if (getAllDrinkCateOfBar.IsNullOrEmpty())
                 {
@@ -147,7 +159,7 @@ namespace Application.Service
             {
                 var getDrinkCateById = await _unitOfWork.DrinkCategoryRepository
                                         .GetAsync(filter: x => x.DrinksCategoryId.Equals(drinkCateId)
-                                                            && x.IsDrinkCategory == PrefixKeyConstant.TRUE);
+                                                            && x.IsDeleted == PrefixKeyConstant.FALSE);
                 var getOne = getDrinkCateById.FirstOrDefault();
 
                 if (getOne == null)
@@ -170,7 +182,7 @@ namespace Application.Service
             {
                 var getDrinkCateById = await _unitOfWork.DrinkCategoryRepository
                                         .GetAsync(filter: x => x.DrinksCategoryId.Equals(drinkCateId)
-                                                            && x.IsDrinkCategory == PrefixKeyConstant.TRUE);
+                                                            && x.IsDeleted == PrefixKeyConstant.FALSE);
                 var getOne = getDrinkCateById.FirstOrDefault();
 
                 if (getOne == null)

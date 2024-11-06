@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.Request.EmotionCategoryRequest;
 using Application.DTOs.Response.EmotionCategory;
+using Domain.Common;
 using Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace Application.IService
 {
     public interface IEmotionalDrinkCategoryService
     {
-        Task<IEnumerable<EmotionCategoryResponse>> GetEmotionCategory();
+        Task<IEnumerable<EmotionCategoryResponse>> GetEmotionCategory(ObjectQuery query);
         Task<EmotionCategoryResponse> GetEmotionCategoryByID(Guid id);
         Task<EmotionCategoryResponse> CreateEmotionCategory(CreateEmotionCategoryRequest request);
         Task<EmotionCategoryResponse> UpdateEmotionCategory(Guid id , UpdateEmotionCategoryRequest request);
