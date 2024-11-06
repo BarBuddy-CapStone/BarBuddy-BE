@@ -299,7 +299,9 @@ namespace Application.Service
             {
                 _memoryCache.Remove(cacheKey);
             }
-            await _bookingHub.ReleaseTable(request.BarId);
+
+            var bkHubResponse = _mapper.Map<BookingHubResponse>(cacheEntry[request.TableId]);
+            await _bookingHub.ReleaseTable(bkHubResponse);
         }
 
         public async Task ReleaseListTable(ReleaseListTableRequest request)

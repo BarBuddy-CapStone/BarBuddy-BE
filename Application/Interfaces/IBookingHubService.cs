@@ -11,7 +11,7 @@ namespace Application.Interfaces
     {
         Task HoldTable(BookingHubResponse response);
         Task BookedTable(BookingHubResponse response);
-        Task ReleaseTable(Guid barId);
+        Task ReleaseTable(BookingHubResponse response);
         Task ReleaseListTablee(Guid barId);
     }
 }
