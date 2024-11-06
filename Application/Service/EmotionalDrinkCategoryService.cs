@@ -106,12 +106,6 @@ namespace Application.Service
                 throw new CustomException.DataNotFoundException("Không tìm thấy thể loại cảm xúc, vui lòng thử lại !");
             }
 
-            var isExistName = _unitOfWork.EmotionalDrinkCategoryRepository.Exists(filter: x => x.CategoryName.Contains(request.CategoryName));
-            if (isExistName)
-            {
-                throw new CustomException.InvalidDataException("Tên thể loại cảm xúc đã tồn tại, vui lòng thử lại!");
-            }
-
             var emotionCategory = _mapper.Map(request, emotionCategoryID);
             emotionCategory.IsDeleted = PrefixKeyConstant.FALSE;
 
