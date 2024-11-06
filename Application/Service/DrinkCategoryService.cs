@@ -164,12 +164,10 @@ namespace Application.Service
             }
         }
 
-        public async Task<DrinkCategoryResponse> UpdateDrinkCategory(Guid drinkCateId, DrinkCategoryRequest request)
+        public async Task<DrinkCategoryResponse> UpdateDrinkCategory(Guid drinkCateId, UpdDrinkCategoryRequest request)
         {
             try
             {
-
-
                 var getDrinkCateById = await _unitOfWork.DrinkCategoryRepository
                                         .GetAsync(filter: x => x.DrinksCategoryId.Equals(drinkCateId)
                                                             && x.IsDrinkCategory == PrefixKeyConstant.TRUE);

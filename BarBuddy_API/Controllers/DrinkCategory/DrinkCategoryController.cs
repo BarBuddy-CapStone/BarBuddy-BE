@@ -108,7 +108,7 @@ namespace BarBuddy_API.Controllers.DrinkCategory
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPatch("/updateCateDrink/{cateDrinkId}")]
-        public async Task<IActionResult> UpdateDrinkCategory(Guid cateDrinkId, [FromBody] DrinkCategoryRequest request)
+        public async Task<IActionResult> UpdateDrinkCategory(Guid cateDrinkId, [FromBody] UpdDrinkCategoryRequest request)
         {
             try
             {
