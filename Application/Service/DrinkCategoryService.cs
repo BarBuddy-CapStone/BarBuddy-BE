@@ -180,15 +180,15 @@ namespace Application.Service
                     throw new CustomException.DataNotFoundException("Không tìm thấy thể loại đồ uống !");
                 }
 
-                var isExistName = _unitOfWork.DrinkCategoryRepository
-                                                    .Get(filter: x => x.DrinksCategoryName
-                                                                    .Contains(request.DrinksCategoryName))
-                                                    .FirstOrDefault();
+                //var isExistName = _unitOfWork.DrinkCategoryRepository
+                //                                    .Get(filter: x => x.DrinksCategoryName
+                //                                                    .Contains(request.DrinksCategoryName))
+                //                                    .FirstOrDefault();
 
-                if (isExistName != null )
-                {
-                    throw new CustomException.InvalidDataException("Tên thể loại đồ uống đã tồn tại, vui lòng thử lại");
-                }
+                //if (isExistName != null )
+                //{
+                //    throw new CustomException.InvalidDataException("Tên thể loại đồ uống đã tồn tại, vui lòng thử lại");
+                //}
 
                 var mapper = _mapper.Map(request, getOne);
                 await _unitOfWork.DrinkCategoryRepository.UpdateAsync(mapper);
