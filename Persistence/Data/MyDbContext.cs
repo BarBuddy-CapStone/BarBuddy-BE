@@ -548,63 +548,63 @@ namespace Persistence.Data
                     DrinksCategoryId = Constants.Ids.DrinkCategories.SoftDrink,
                     DrinksCategoryName = "Nước ngọt",
                     Description = "Đồ uống khng cồn như soda, nước ngọt có ga, và nước ngọt có hương vị.",
-                    IsDrinkCategory = true
+                    IsDeleted = false
                 },
                 new DrinkCategory
                 {
                     DrinksCategoryId = Constants.Ids.DrinkCategories.Cocktail,
                     DrinksCategoryName = "Cocktail",
                     Description = "Đồ uống pha trộn thường chứa cồn, kết hợp với nước trái cây, soda hoặc các nguyên liệu khác.",
-                    IsDrinkCategory = true
+                    IsDeleted = false
                 },
                 new DrinkCategory
                 {
                     DrinksCategoryId = Constants.Ids.DrinkCategories.Mocktail,
                     DrinksCategoryName = "Mocktail",
                     Description = "Phiên bản không cồn của các loại cocktail, phù hợp cho những người không uống rượu.",
-                    IsDrinkCategory = true
+                    IsDeleted = false
                 },
                 new DrinkCategory
                 {
                     DrinksCategoryId = Constants.Ids.DrinkCategories.Spirits,
                     DrinksCategoryName = "Rượu mạnh",
                     Description = "Đồ uống có cồn mạnh như vodka, whisky, gin, rum, v.v.",
-                    IsDrinkCategory = true
+                    IsDeleted = false
                 },
                 new DrinkCategory
                 {
                     DrinksCategoryId = Constants.Ids.DrinkCategories.Beer,
                     DrinksCategoryName = "Bia",
                     Description = "Đồ uống có cồn được ủ từ lúa mạch, hoa bia và nước. Có nhiều loại khác nhau như lager, ale, stout.",
-                    IsDrinkCategory = true
+                    IsDeleted = false
                 },
                 new DrinkCategory
                 {
                     DrinksCategoryId = Constants.Ids.DrinkCategories.Wine,
                     DrinksCategoryName = "Rượu vang",
                     Description = "Đồ uống có cồn được làm từ nho lên men, có nhiều loại như vang đỏ, vang trắng và vang hồng.",
-                    IsDrinkCategory = true
+                    IsDeleted = false
                 },
                 new DrinkCategory
                 {
                     DrinksCategoryId = Constants.Ids.DrinkCategories.Tea,
                     DrinksCategoryName = "Trà",
                     Description = "Đồ uống nóng hoặc lạnh được pha từ lá trà, có nhiều loại như trà đen, trà xanh và trà thảo mộc.",
-                    IsDrinkCategory = true
+                    IsDeleted = false
                 },
                 new DrinkCategory
                 {
                     DrinksCategoryId = Constants.Ids.DrinkCategories.Coffee,
                     DrinksCategoryName = "Cà phê",
                     Description = "Đồ uống nóng hoặc lạnh được pha từ hạt cà phê rang, bao gồm espresso, cappuccino, latte và nhiều loại khác.",
-                    IsDrinkCategory = true
+                    IsDeleted = false
                 },
                 new DrinkCategory
                 {
                     DrinksCategoryId = Constants.Ids.DrinkCategories.Juice,
                     DrinksCategoryName = "Nước ép",
                     Description = "Đồ uống tự nhiên được làm từ nước ép trái cây hoặc rau củ. Các loi phổ biến gồm nước cam, nước táo, và nước ép cà rốt.",
-                    IsDrinkCategory = true
+                    IsDeleted = false
                 }
             };
         }
