@@ -325,7 +325,8 @@ namespace Application.Service
                             && tbHold.AccountId.Equals(accountId))
                         {
                             _memoryCache.Remove(cacheKey);
-                            await _bookingHub.ReleaseListTablee(request.BarId);
+                            var mapper = _mapper.Map<BookingHubResponse>(cacheTbHold[table.TableId]);
+                            await _bookingHub.ReleaseListTablee(mapper);
                         }
                     }
                 };
