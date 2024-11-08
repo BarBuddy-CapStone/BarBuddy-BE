@@ -9,10 +9,13 @@ namespace Application.DTOs.ML
 {
     public class DrinkEmotionPrediction
     {
-        [ColumnName("PredictedLabel")]
-        public string EmotionCategory { get; set; }
+        [LoadColumn(0)]
+        public string? Emotion { get; set; }
+        [LoadColumn(1)]
+        public string? DrinkName { get; set; }
+        //[LoadColumn(2)]
+        //public string? AccountName { get; set; }
 
-        [ColumnName("Score")]
-        public float[] Score { get; set; }
     }
+
 }

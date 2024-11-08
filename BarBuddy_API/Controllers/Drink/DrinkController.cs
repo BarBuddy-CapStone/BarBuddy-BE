@@ -177,18 +177,16 @@ namespace BarBuddy_API.Controllers.Drink
             }
         }
 
-        [HttpGet("customer/{barId}")]
-        public async Task<IActionResult> GetAllDrinkCustomer(Guid barId)
+        /// <summary>
+        /// Crawl-Drink Data
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("/crawl-drink")]
+        public async Task<IActionResult> CrawlDrink()
         {
-            try
-            {
-                var response = await _drinkService.GetAllDrinkCustomerOfBar(barId);
-                return CustomResult("Đã tải dữ liệu.", response);
-            }
-            catch (CustomException.DataNotFoundException e)
-            {
-                return CustomResult(e.Message, System.Net.HttpStatusCode.NotFound);
-            }
+            var response = await _drinkService.CrawlDrink();
+            return CustomResult(response);
+        }
 
             catch (CustomException.InternalServerErrorException e)
             {

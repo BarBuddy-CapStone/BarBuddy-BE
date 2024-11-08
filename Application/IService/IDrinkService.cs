@@ -16,6 +16,8 @@ namespace Application.IService
         Task<DrinkResponse> UpdateDrink(Guid drinkId,DrinkRequest request);
         Task<IEnumerable<DrinkResponse>> GetAllDrinkBasedCateId(Guid cateId);
         Task<IEnumerable<DrinkResponse>> GetAllDrinkBasedEmoId(Guid emoId);
-        Task<IEnumerable<DrinkResponse>> GetAllDrinkCustomerOfBar(Guid barId);
+
+        Task<string> CrawlDrink();
+        Task ExportDrinkDataToCsv();
     }
 }
