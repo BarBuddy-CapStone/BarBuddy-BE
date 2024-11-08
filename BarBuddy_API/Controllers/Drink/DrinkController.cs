@@ -187,11 +187,5 @@ namespace BarBuddy_API.Controllers.Drink
             var response = await _drinkService.CrawlDrink();
             return CustomResult(response);
         }
-
-            catch (CustomException.InternalServerErrorException e)
-            {
-                return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
-            }
-        }
     }
 }

@@ -18,6 +18,6 @@ namespace Application.IService
         Task<IEnumerable<DrinkResponse>> GetAllDrinkBasedEmoId(Guid emoId);
 
         Task<string> CrawlDrink();
-        Task ExportDrinkDataToCsv();
+        //Task ExportDrinkDataToCsv();
     }
 }
