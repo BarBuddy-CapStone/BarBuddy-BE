@@ -151,12 +151,12 @@ namespace Application.Service
                 throw new CustomException.InternalServerErrorException(e.Message);
             }
         }
-        public async Task<IEnumerable<DrinkResponse>> GetDrinkCustomer(Guid drinkId)
+        public async Task<IEnumerable<DrinkResponse>> GetDrinkCustomerOfBar(Guid barId)
         {
             try
             {
                 var getAllDrink = await _unitOfWork.DrinkRepository
-                                        .GetAsync(filter: x => x.Status == PrefixKeyConstant.TRUE && x.DrinkId.Equals(drinkId),
+                                        .GetAsync(filter: x => x.Status == PrefixKeyConstant.TRUE && x.Bar.BarId.Equals(barId),
                                                 includeProperties: "DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory,Bar");
                 var response = _mapper.Map<IEnumerable<DrinkResponse>>(getAllDrink);
                 return response;

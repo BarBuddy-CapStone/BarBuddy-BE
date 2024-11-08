@@ -64,12 +64,12 @@ namespace BarBuddy_API.Controllers.Drink
                 return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
             }
         }
-        [HttpGet("customer/{drinkId}")]
-        public async Task<IActionResult> GetDrinkCustomer(Guid drinkId)
+        [HttpGet("customer/{barId}")]
+        public async Task<IActionResult> GetDrinkCustomer(Guid barId)
         {
             try
             {
-                var response = await _drinkService.GetDrinkCustomer(drinkId);
+                var response = await _drinkService.GetDrinkCustomerOfBar(barId);
                 return CustomResult("Data loaded", response);
             }
             catch (CustomException.DataNotFoundException e)
