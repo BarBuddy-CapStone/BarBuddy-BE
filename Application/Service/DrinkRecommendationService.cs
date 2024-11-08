@@ -238,7 +238,7 @@ namespace Application.Service
                 Price = 0
             });
 
-            return prediction.EmotionCategory;
+            return $"{prediction.Emotion}";
         }
 
         private async Task<IDataView> GetTrainingData()

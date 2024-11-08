@@ -12,6 +12,14 @@ using Domain.IRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using System.Transactions;
+using HtmlAgilityPack;
+using System.Globalization;
+using System.Text.RegularExpressions;
+using System.Net.Http;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using Application.DTOs.ML;
+using CsvHelper.Configuration;
+using CsvHelper;
 
 namespace Application.Service
 {
@@ -315,14 +323,178 @@ namespace Application.Service
             }
         }
 
+        public async Task<string> CrawlDrink()
+        {
+            try
+            {
+                HttpClient httpClient = new HttpClient();
+                HtmlDocument homepageDoc = new HtmlDocument();
+                var drinkCategory = (await _unitOfWork.DrinkCategoryRepository.GetAsync(x => x.DrinksCategoryName == "Rượu mạnh")).First();
+                var bars = _unitOfWork.BarRepository.GetAll().ToArray();
+
+                string[] childUrls = ["whisky", "vang-champagne", "spirits-liqueur", "sake-beer"];
+                int totalCrawled = 0;
+
+                foreach (var childUrl in childUrls)
+                {
+                    try 
+                    {
+                        string baseUrl = $"https://sanhruou.com/{childUrl}.html";
+                        Console.WriteLine($"Đang crawl category: {childUrl}");
+
+                        var initialResponse = await httpClient.GetStringAsync(baseUrl);
+                        homepageDoc.LoadHtml(initialResponse);
+                        
+                        var productCountNode = homepageDoc.DocumentNode
+                            .SelectSingleNode("//b[contains(@class, 'page-count-total')]");
+                        
+                        if (productCountNode == null) continue;
+
+                        string productCountText = productCountNode.InnerText.Replace(".", "");
+                        if (!int.TryParse(productCountText, out int totalProducts))
+                        {
+                            continue;
+                        }
+
+                        int productsPerPage = 30;
+                        int totalPages = (int)Math.Ceiling((double)totalProducts / productsPerPage);
+                        Console.WriteLine($"Tổng số trang cần crawl: {totalPages}");
+
+                        for (int page = 1; page <= totalPages; page++)
+                        {
+                            try
+                            {
+                                string pageUrl = page == 1 ? baseUrl : $"{baseUrl}?i={page}";
+                                Console.WriteLine($"Đang crawl trang {page}/{totalPages}: {pageUrl}");
+
+                                var pageResponse = await httpClient.GetStringAsync(pageUrl);
+                                homepageDoc.LoadHtml(pageResponse);
+
+                                var productLinks = homepageDoc.DocumentNode
+                                    .SelectNodes("//a[contains(@class, 'art-card no-rating')]");
+
+                                if (productLinks != null)
+                                {
+                                    List<Drink> pageDrinks = new List<Drink>();
+                                    int j = 0;
+                                    foreach (var link in productLinks)
+                                    {
+                                        try
+                                        {
+                                            if (j >= 10) j = 0;
+                                            string productUrl = $"https://sanhruou.com/{link.Attributes["href"].Value}";
+                                            var drink = await CrawlSingleDrink(httpClient, productUrl, drinkCategory.DrinksCategoryId, bars[j].BarId);
+                                            if (drink != null)
+                                            {
+                                                pageDrinks.Add(drink);
+                                                totalCrawled++;
+                                                j++;
+                                            }
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Console.WriteLine($"Lỗi crawl sản phẩm: {ex.Message}");
+                                            continue;
+                                        }
+                                    }
+
+                                    if (pageDrinks.Any())
+                                    {
+                                        using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                                        {
+                                            try
+                                            {
+                                                _unitOfWork.DrinkRepository.InsertRange(pageDrinks);
+                                                await _unitOfWork.SaveAsync();
+                                                transaction.Complete();
+                                                Console.WriteLine($"Đã lưu {pageDrinks.Count} sản phẩm từ trang {page}");
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Console.WriteLine($"Lỗi lưu dữ liệu trang {page}: {ex.Message}");
+                                            }
+                                        }
+                                    }
+                                }
+
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Lỗi crawl trang {page}: {ex.Message}");
+                                continue;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Lỗi crawl category {childUrl}: {ex.Message}");
+                        continue;
+                    }
+                }
+
+                return $"Crawl thành công {totalCrawled} sản phẩm";
+            }
+            catch (Exception ex)
+            {
+                return $"Lỗi: {ex.Message}";
+            }
+        }
+
+        private async Task<Drink> CrawlSingleDrink(HttpClient httpClient, string productUrl, Guid categoryId, Guid barId)
+        {
+            try
+            {
+                var productResponse = await httpClient.GetStringAsync(productUrl);
+                HtmlDocument productDoc = new HtmlDocument();
+                productDoc.LoadHtml(productResponse);
+
+                var productNameNode = productDoc.DocumentNode
+                    .SelectSingleNode("//h1[contains(@class, 'pd-name')]");
+                var descriptionNode = productDoc.DocumentNode
+                    .SelectSingleNode("//div[contains(@itemprop, 'description')]");
+                var priceNode = productDoc.DocumentNode
+                    .SelectSingleNode("//div[contains(@class, 'pd-price')]/meta[@itemprop='price']");
+                var imgNode = productDoc.DocumentNode
+                    .SelectSingleNode("//img[contains(@class, 'gal-item-content file-img')]");
+
+                if (productNameNode == null) return null;
+
+                string name = productNameNode.InnerText.Trim();
+                string description = descriptionNode?.InnerText?.Trim() ?? "Chưa có mô tả";
+                string priceText = priceNode?.GetAttributeValue("content", "0") ?? "0";
+                string image = imgNode?.GetAttributeValue("src", "") ?? "";
+
+                string cleanedPrice = Regex.Replace(priceText, @"[^\d]", "");
+                double price = double.TryParse(cleanedPrice, out double p) ? p : 0;
+
+                return new Drink
+                {
+                    DrinkName = name,
+                    BarId = barId,
+                    Image = image,
+                    Price = price,
+                    Description = description,
+                    DrinkCode = PrefixKeyConstant.DRINK,
+                    DrinkCategoryId = categoryId,
+                    Status = PrefixKeyConstant.TRUE,
+                    CreatedDate = DateTime.UtcNow,
+                    UpdatedDate = DateTime.UtcNow
+                };
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         public async Task<IEnumerable<DrinkResponse>> GetAllDrinkCustomerOfBar(Guid barId)
         {
             try
             {
                 var getAllDrink = await _unitOfWork.DrinkRepository
-                                        .GetAsync(filter: x => x.Status == PrefixKeyConstant.TRUE &&
-                                                x.BarId.Equals(barId),
-                                                includeProperties: "DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory,Bar");
+                                        .GetAsync(filter: x => x.Status == PrefixKeyConstant.TRUE /*&&
+                                                x.DrinkCategory.BarId.Equals(barId)*/,
+                                                includeProperties: "DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory");
                 var response = _mapper.Map<IEnumerable<DrinkResponse>>(getAllDrink);
                 return response;
             }

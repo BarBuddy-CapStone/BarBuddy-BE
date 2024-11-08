@@ -13,7 +13,8 @@ namespace Application
 {
     public partial class EmotionModel
     {
-        public const string RetrainFilePath =  @"D:\MachineLearningDocs\Dataseed\emotionDataset.csv";
+        private static string RetrainFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Dataset", "emotionDataset.tsv");
+            //@"D:\MachineLearningDocs\Dataseed\emotionDataset.tsv";
         public const char RetrainSeparatorChar = ',';
         public const bool RetrainHasHeader =  true;
         public const bool RetrainAllowQuoting =  false;
@@ -25,9 +26,10 @@ namespace Application
         /// <param name="inputDataFilePath">Path to the data file for training.</param>
         /// <param name="separatorChar">Separator character for delimited training file.</param>
         /// <param name="hasHeader">Boolean if training file has a header.</param>
-        public static void Train(string outputModelPath, string inputDataFilePath = RetrainFilePath, char separatorChar = RetrainSeparatorChar, bool hasHeader = RetrainHasHeader, bool allowQuoting = RetrainAllowQuoting)
+        public static void Train(string outputModelPath, string inputDataFilePath = "", char separatorChar = RetrainSeparatorChar, bool hasHeader = RetrainHasHeader, bool allowQuoting = RetrainAllowQuoting)
         {
             var mlContext = new MLContext();
+            inputDataFilePath = RetrainFilePath;
 
             var data = LoadIDataViewFromFile(mlContext, inputDataFilePath, separatorChar, hasHeader, allowQuoting);
             var model = RetrainModel(mlContext, data);
@@ -92,7 +94,7 @@ namespace Application
             var pipeline = mlContext.Transforms.Text.FeaturizeText(inputColumnName:@"text",outputColumnName:@"text")      
                                     .Append(mlContext.Transforms.Concatenate(@"Features", new []{@"text"}))      
                                     .Append(mlContext.Transforms.Conversion.MapValueToKey(outputColumnName:@"label",inputColumnName:@"label",addKeyValueAnnotationsAsText:false))      
-                                    .Append(mlContext.MulticlassClassification.Trainers.LbfgsMaximumEntropy(new LbfgsMaximumEntropyMulticlassTrainer.Options(){L1Regularization=0.03125F,L2Regularization=0.03125F,LabelColumnName=@"label",FeatureColumnName=@"Features"}))      
+                                    .Append(mlContext.MulticlassClassification.Trainers.OneVersusAll(binaryEstimator: mlContext.BinaryClassification.Trainers.LbfgsLogisticRegression(new LbfgsLogisticRegressionBinaryTrainer.Options(){L1Regularization=0.03125F,L2Regularization=0.03125F,LabelColumnName=@"label",FeatureColumnName=@"Features"}), labelColumnName:@"label"))      
                                     .Append(mlContext.Transforms.Conversion.MapKeyToValue(outputColumnName:@"PredictedLabel",inputColumnName:@"PredictedLabel"));
 
             return pipeline;
