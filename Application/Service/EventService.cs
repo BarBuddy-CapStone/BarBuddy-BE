@@ -2,6 +2,7 @@
 using Application.DTOs.Event;
 using Application.DTOs.Events;
 using Application.DTOs.Events.EventTime;
+using Application.DTOs.Events.EventVoucher;
 using Application.Interfaces;
 using Application.IService;
 using AutoMapper;
@@ -10,6 +11,7 @@ using Domain.CustomException;
 using Domain.Entities;
 using Domain.IRepository;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq.Expressions;
 
@@ -21,14 +23,15 @@ namespace Application.Service
         private readonly IUnitOfWork _unitOfWork;
         private readonly IEventTimeService _eventTimeService;
         private readonly IFirebase _fireBase;
-
+        private readonly ILogger<EventService> _logger;
         public EventService(IMapper mapper, IUnitOfWork unitOfWork, IFirebase fireBase,
-                            IEventTimeService eventTimeService)
+                            IEventTimeService eventTimeService, ILogger<EventService> logger)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _eventTimeService = eventTimeService;
             _fireBase = fireBase;
+            _logger = logger;
         }
 
         public async Task CreateEvent(EventRequest request)
@@ -108,7 +111,7 @@ namespace Application.Service
                                             .GetAsync(filter: filter,
                                                         pageIndex: query.PageIndex,
                                                         pageSize: query.PageSize,
-                                                 includeProperties: "Bar,TimeEvent");
+                                                 includeProperties: "Bar,TimeEvent.EventVouchers");
             if (getAll.IsNullOrEmpty())
             {
                 throw new CustomException.DataNotFoundException("Không tìm thấy dữ liệu");
@@ -119,6 +122,15 @@ namespace Application.Service
             {
                 var events = getAll.First(x => x.EventId.Equals(item.EventId));
                 item.EventTimeResponses = _mapper.Map<List<EventTimeResponse>>(events.TimeEvent);
+                item.EventTimeResponses.Select(x =>
+                {
+                    var voucherOfEventTime = _unitOfWork.EventVoucherRepository.Get(c => c.TimeEventId.Equals(x.TimeEventId)).FirstOrDefault();
+                    if (voucherOfEventTime != null)
+                    {
+                        x.EventVoucherResponse = _mapper.Map<EventVoucherResponse>(voucherOfEventTime);
+                    }
+                    return x;
+                }).ToList();
             }
             return response;
         }
@@ -136,6 +148,15 @@ namespace Application.Service
 
                 var response = _mapper.Map<EventResponse>(getOne);
                 response.EventTimeResponses = _mapper.Map<List<EventTimeResponse>>(getOne.TimeEvent);
+                response.EventTimeResponses.Select(x =>
+                {
+                    var voucherOfEventTime = _unitOfWork.EventVoucherRepository.Get(c => c.TimeEventId.Equals(x.TimeEventId)).FirstOrDefault();
+                    if (voucherOfEventTime != null)
+                    {
+                        x.EventVoucherResponse = _mapper.Map<EventVoucherResponse>(voucherOfEventTime);
+                    }
+                    return x;
+                }).ToList();
                 return response;
             }
             catch (CustomException.InternalServerErrorException ex)

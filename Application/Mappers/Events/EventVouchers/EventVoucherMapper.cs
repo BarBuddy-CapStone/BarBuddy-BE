@@ -13,6 +13,7 @@ namespace Application.Mappers.Events.EventVouchers
     {
         public EventVoucherMapper() { 
             CreateMap<EventVoucherRequest, EventVoucher>().ReverseMap();
+            CreateMap<EventVoucher, EventVoucherResponse>().ReverseMap();
         }
     }
 }
