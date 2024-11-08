@@ -326,6 +326,8 @@ namespace Application.Service
                         {
                             _memoryCache.Remove(cacheKey);
                             var mapper = _mapper.Map<BookingHubResponse>(cacheTbHold[table.TableId]);
+                            mapper.BarId = request.BarId;
+                            mapper.AccountId = Guid.Empty;
                             await _bookingHub.ReleaseListTablee(mapper);
                         }
                     }
