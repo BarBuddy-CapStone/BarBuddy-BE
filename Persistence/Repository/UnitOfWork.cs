@@ -24,7 +24,6 @@ namespace Persistence.Repository
         private IGenericRepository<TableType> _tableTypeRepository;
         private IGenericRepository<Notification> _notificationRepository;
         private IGenericRepository<NotificationDetail> _notificationDetailRepository;
-        private IGenericRepository<BarEvent> _barEventRepository;
         private IGenericRepository<Event> _eventRepository;
         private IGenericRepository<TimeEvent> _timeEventRepository;
         private IGenericRepository<EventVoucher> _eventVoucherRepository;
@@ -240,19 +239,6 @@ namespace Persistence.Repository
                     _notificationDetailRepository = new GenericRepository<NotificationDetail>(_context);
                 }
                 return _notificationDetailRepository;
-            }
-        }
-
-        public IGenericRepository<BarEvent> BarEventRepository
-        {
-            get
-            {
-
-                if (_barEventRepository == null)
-                {
-                    _barEventRepository = new GenericRepository<BarEvent>(_context);
-                }
-                return _barEventRepository;
             }
         }
 

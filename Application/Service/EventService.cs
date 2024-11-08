@@ -1,25 +1,17 @@
 ﻿using Application.Common;
 using Application.DTOs.Event;
 using Application.DTOs.Events;
-using Application.DTOs.Events.EventBar;
 using Application.DTOs.Events.EventTime;
 using Application.Interfaces;
 using Application.IService;
 using AutoMapper;
-using Domain.Common;
 using Domain.Constants;
 using Domain.CustomException;
 using Domain.Entities;
 using Domain.IRepository;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Service
 {
@@ -28,16 +20,14 @@ namespace Application.Service
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IEventTimeService _eventTimeService;
-        private readonly IEventBarService _eventBarService;
         private readonly IFirebase _fireBase;
 
         public EventService(IMapper mapper, IUnitOfWork unitOfWork, IFirebase fireBase,
-                            IEventTimeService eventTimeService, IEventBarService eventBarService)
+                            IEventTimeService eventTimeService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _eventTimeService = eventTimeService;
-            _eventBarService = eventBarService;
             _fireBase = fireBase;
         }
 
@@ -95,20 +85,6 @@ namespace Application.Service
                     {
                         throw new CustomException.InvalidDataException("Ngày trong tuần và ngày diễn ra sự kiện, cả 2 không thể có giá trị cùng một lúc !");
                     }
-
-                    foreach (var barId in request.BarId)
-                    {
-                        var getbar = _unitOfWork.BarRepository.GetByID(barId);
-
-
-                        //Utils.ValidateEventTime(eventTime.Date, eventTime.StartTime, eventTime.EndTime, getbar.StartTime, getbar.EndTime);
-                        var eventBar = new BarEventRequest
-                        {
-                            BarId = barId,
-                            EventId = mapper.EventId
-                        };
-                        await _eventBarService.CreateEventBar(eventBar);
-                    }
                     await _eventTimeService.CreateEventTime(mapper.EventId, eventTime);
                 }
                 await _unitOfWork.SaveAsync();
@@ -123,22 +99,17 @@ namespace Application.Service
         public async Task<List<EventResponse>> GetAllEvent(EventQuery query)
         {
             Expression<Func<Event, bool>> filter = null;
-            if(!string.IsNullOrWhiteSpace(query.Search))
+            if (!string.IsNullOrWhiteSpace(query.Search))
             {
                 filter = events => events.EventId.ToString().Equals(query.Search);
-                
-            }
-            if (filter == null)
-            {
-                if(!string.IsNullOrWhiteSpace(query.BarName))
-                    filter = events => events.BarEvent.Any(x => x.Bar.BarName.Equals(query.BarName));
+
             }
             var getAll = await _unitOfWork.EventRepository
-                                            .GetAsync(filter: filter, 
-                                                        pageIndex: query.PageIndex, 
+                                            .GetAsync(filter: filter,
+                                                        pageIndex: query.PageIndex,
                                                         pageSize: query.PageSize,
-                                                 includeProperties: "BarEvent.Bar,TimeEvent");
-            if(getAll.IsNullOrEmpty())
+                                                 includeProperties: "Bar,TimeEvent");
+            if (getAll.IsNullOrEmpty())
             {
                 throw new CustomException.DataNotFoundException("Không tìm thấy dữ liệu");
             }
@@ -148,7 +119,6 @@ namespace Application.Service
             {
                 var events = getAll.First(x => x.EventId.Equals(item.EventId));
                 item.EventTimeResponses = _mapper.Map<List<EventTimeResponse>>(events.TimeEvent);
-                item.BarEventResponses = _mapper.Map<List<BarEventResponse>>(events.BarEvent);
             }
             return response;
         }
@@ -159,13 +129,12 @@ namespace Application.Service
             {
                 var getEventById = _unitOfWork.EventRepository
                                             .Get(filter: x => x.EventId.Equals(eventId)
-                                            , includeProperties: "BarEvent.Bar,TimeEvent");
-                var getOne = getEventById.FirstOrDefault() 
+                                            , includeProperties: "Bar,TimeEvent");
+                var getOne = getEventById.FirstOrDefault()
                             ?? throw new CustomException.DataNotFoundException("Không tìm thấy sự kiện bạn đang tìm!");
-                
+
 
                 var response = _mapper.Map<EventResponse>(getOne);
-                response.BarEventResponses = _mapper.Map<List<BarEventResponse>>(getOne.BarEvent);
                 response.EventTimeResponses = _mapper.Map<List<EventTimeResponse>>(getOne.TimeEvent);
                 return response;
             }

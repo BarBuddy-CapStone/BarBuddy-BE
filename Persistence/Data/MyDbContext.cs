@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Persistence.Data
 {
@@ -33,7 +34,6 @@ namespace Persistence.Data
         public DbSet<PaymentHistory> PaymentHistories { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<NotificationDetail> NotificationDetails { get; set; }
-        public DbSet<BarEvent> BarEvents { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<TimeEvent> TimeEvents { get; set; }
         public DbSet<EventVoucher> EventVouchers { get; set; }
@@ -97,7 +97,6 @@ namespace Persistence.Data
             modelBuilder.Entity<BookingTable>().HasData(SeedData.GetBookingTables());
             modelBuilder.Entity<BookingDrink>().HasData(SeedData.GetBookingDrinks());
             modelBuilder.Entity<DrinkEmotionalCategory>().HasData(SeedData.GetDrinkEmotionalCategories());
-            modelBuilder.Entity<BarEvent>().HasData(SeedData.GetBarEvents());
             modelBuilder.Entity<EventVoucher>().HasData(SeedData.GetEventVouchers());
             modelBuilder.Entity<Feedback>().HasData(SeedData.GetFeedbacks());
             modelBuilder.Entity<Notification>().HasData(SeedData.GetNotifications());
@@ -243,6 +242,14 @@ namespace Persistence.Data
                 public static readonly Guid HappyHour = Guid.Parse("660d7300-f30c-40c3-b827-335544330173");
                 public static readonly Guid NewEvent = Guid.Parse("660d7300-f30c-40c3-b827-335544330174");
                 public static readonly Guid SpecialOffer = Guid.Parse("660d7300-f30c-40c3-b827-335544330175");
+            }
+            public static class Event
+            {
+                public static readonly Guid EventId = Guid.Parse("660d7300-f30c-40c3-b827-335544330170");
+            }
+            public static class EventTime
+            {
+                public static readonly Guid EventTimeId = Guid.Parse("660d7300-f30c-40c3-b827-335544330170");
             }
         }
     }
@@ -659,8 +666,63 @@ namespace Persistence.Data
             };
         }
 
-        public static Event[] GetEvents() => new Event[] { /* ... */ };
-        public static TimeEvent[] GetTimeEvents() => new TimeEvent[] { /* ... */ };
+        public static Event[] GetEvents() {
+            return new[]
+            {
+               new Event
+               {
+                   BarId = Constants.Ids.Bars.Bar1,
+                   Description = "event1",
+                   EventName = "event1",
+                   Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/a0d4292c13b0cc51b2487f4c276cd7c0d96510872c4a855db190ff2db8e692d2?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
+                   IsEveryWeek = true,
+                   EventId = Constants.Ids.Event.EventId,
+                   IsDeleted = false
+               },
+               new Event
+               {
+                   BarId = Constants.Ids.Bars.Bar1,
+                   Description = "event2",
+                   EventName = "event2",
+                   Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/a0d4292c13b0cc51b2487f4c276cd7c0d96510872c4a855db190ff2db8e692d2?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
+                   IsEveryWeek = true,
+                   EventId = Guid.NewGuid(),
+                   IsDeleted = false
+               }
+           };
+        }
+        public static TimeEvent[] GetTimeEvents() {
+            return new[]
+            {
+                new TimeEvent
+                {
+                    EventId = Constants.Ids.Event.EventId,
+                    TimeEventId = Constants.Ids.EventTime.EventTimeId,
+                    DayOfWeek = 1,
+                    StartTime = new TimeSpan(17, 0, 0),
+                    EndTime = new TimeSpan(19, 0, 0),
+                    Date = null,
+                }
+            }; 
+        }
+
+        public static EventVoucher[] GetEventVouchers()
+        {
+            return new[]
+            {
+                new EventVoucher
+                {
+                    VoucherCode = "TEST1",
+                    Discount = 10,
+                    EventVoucherId = Guid.NewGuid(),
+                    EventVoucherName = "TEST1",
+                    MaxPrice = 200,
+                    Quantity = 1,
+                    TimeEventId = Constants.Ids.EventTime.EventTimeId,
+                    Status = false,
+                }
+            };
+        }
         public static BarTime[] GetBarTimes()
         {
             var barTimes = new List<BarTime>();
@@ -1183,9 +1245,7 @@ namespace Persistence.Data
                 }
             };
         }
-
-        public static BarEvent[] GetBarEvents() => new BarEvent[] { /* ... */ };
-        public static EventVoucher[] GetEventVouchers() => new EventVoucher[] { /* ... */ };
+        //public static EventVoucher[] GetEventVouchers() => new EventVoucher[] { /* ... */ };
         public static Feedback[] GetFeedbacks()
         {
             return new[]
