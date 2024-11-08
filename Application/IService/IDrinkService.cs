@@ -11,6 +11,7 @@ namespace Application.IService
     {
         Task<IEnumerable<DrinkResponse>> GetAllDrink();
         Task<IEnumerable<DrinkResponse>> GetAllDrinkCustomer();
+        Task<IEnumerable<DrinkResponse>> GetDrinkCustomer(Guid drinkId);
         Task<DrinkResponse> GetDrink(Guid drinkId);
         Task<DrinkResponse> CreateDrink(DrinkRequest request);
         Task<DrinkResponse> UpdateDrink(Guid drinkId,DrinkRequest request);

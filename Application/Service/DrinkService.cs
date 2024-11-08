@@ -142,7 +142,7 @@ namespace Application.Service
             {
                 var getAllDrink = await _unitOfWork.DrinkRepository
                                         .GetAsync(filter: x => x.Status == PrefixKeyConstant.TRUE,
-                                                includeProperties: "DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory");
+                                                includeProperties: "DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory,Bar");
                 var response = _mapper.Map<IEnumerable<DrinkResponse>>(getAllDrink);
                 return response;
             }
@@ -151,7 +151,21 @@ namespace Application.Service
                 throw new CustomException.InternalServerErrorException(e.Message);
             }
         }
-
+        public async Task<IEnumerable<DrinkResponse>> GetDrinkCustomer(Guid drinkId)
+        {
+            try
+            {
+                var getAllDrink = await _unitOfWork.DrinkRepository
+                                        .GetAsync(filter: x => x.Status == PrefixKeyConstant.TRUE && x.DrinkId.Equals(drinkId),
+                                                includeProperties: "DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory,Bar");
+                var response = _mapper.Map<IEnumerable<DrinkResponse>>(getAllDrink);
+                return response;
+            }
+            catch (CustomException.InternalServerErrorException e)
+            {
+                throw new CustomException.InternalServerErrorException(e.Message);
+            }
+        }
         public async Task<IEnumerable<DrinkResponse>> GetAllDrinkBasedCateId(Guid cateId)
         {
             try

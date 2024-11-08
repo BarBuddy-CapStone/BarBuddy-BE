@@ -14,6 +14,7 @@ namespace Application.Mappers.Drinks
             .ForMember(dst => dst.Images, src => src.MapFrom(x => x.Image))
             .ForMember(dst => dst.EmotionsDrink, src => src.MapFrom(x => x.DrinkEmotionalCategories))
             .ForMember(dst => dst.BarName, src => src.MapFrom(x => x.Bar.BarName))
+            .ForMember(dst => dst.BarId, src => src.MapFrom(x => x.Bar.BarId))
             .ReverseMap();
 
             CreateMap<DrinkEmotionalCategory, EmotionCategoryResponse>()
