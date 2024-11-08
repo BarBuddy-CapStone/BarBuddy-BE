@@ -11,6 +11,7 @@ namespace Application.DTOs.Drink
     public class DrinkResponse
     {
         public Guid DrinkId { get; set; }
+        public Guid BarId { get; set; }
         public DrinkCategoryResponse DrinkCategoryResponse { get; set; }
         public string BarName { get; set; }
         public string DrinkName { get; set; }

@@ -142,7 +142,7 @@ namespace Application.Service
             {
                 var getAllDrink = await _unitOfWork.DrinkRepository
                                         .GetAsync(filter: x => x.Status == PrefixKeyConstant.TRUE,
-                                                includeProperties: "DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory");
+                                                includeProperties: "DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory,Bar");
                 var response = _mapper.Map<IEnumerable<DrinkResponse>>(getAllDrink);
                 return response;
             }
