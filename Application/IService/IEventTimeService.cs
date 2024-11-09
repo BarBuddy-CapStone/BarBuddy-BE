@@ -10,5 +10,6 @@ namespace Application.IService
     public interface IEventTimeService
     {
         Task CreateEventTime(Guid eventId, EventTimeRequest request);
+        Task UpdateEventTime(Guid eventId, bool IsEveryWeek, List<UpdateEventTimeRequest> request);
     }
 }

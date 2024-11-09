@@ -14,6 +14,8 @@ namespace Application.Mappers.Events.EventTimes
         public EventTimeMapper() {
             CreateMap<EventTimeRequest, TimeEvent>().ReverseMap();
             CreateMap<TimeEvent, EventTimeResponse>().ReverseMap();
+            CreateMap<UpdateEventTimeRequest, EventTimeRequest>().ReverseMap();
+            CreateMap<UpdateEventTimeRequest, TimeEvent>().ReverseMap();
         }
     }
 }

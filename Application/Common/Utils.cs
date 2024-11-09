@@ -82,18 +82,18 @@ namespace Application.Common
             }
         }
 
-        public static void ValidateEventTime(DateTimeOffset? requestDate, TimeSpan startTime, TimeSpan endTime, TimeSpan openTime, TimeSpan closeTime)
+        public static void ValidateEventTime(DateTimeOffset? requestDate, TimeSpan startTime, TimeSpan endTime, List<BarTime> barTimes)
         {
             if (requestDate != null)
             {
                 ValidateDateNotInPast(requestDate.Value);
-                //ValidateOpenCloseTime(requestDate.Value, startTime, openTime, closeTime);
-                //ValidateOpenCloseTime(requestDate.Value, endTime, openTime, closeTime);
+                ValidateOpenCloseTime(requestDate.Value, startTime, barTimes);
+                ValidateOpenCloseTime(requestDate.Value, endTime, barTimes);
             }
             else
             {
-                ValidateTimeWithinRange(startTime, openTime, closeTime, "Thời gian bắt đầu");
-                ValidateTimeWithinRange(endTime, openTime, closeTime, "Thời gian kết thúc");
+                ValidateTimeWithinRange(startTime, barTimes, "Thời gian bắt đầu");
+                ValidateTimeWithinRange(endTime, barTimes, "Thời gian kết thúc");
             }
 
             ValidateEndTimeAfterStartTime(startTime, endTime);
@@ -108,7 +108,7 @@ namespace Application.Common
             }
         }
 
-        private static void ValidateTimeWithinOpenClose(DateTimeOffset requestDate, TimeSpan time, TimeSpan openTime, TimeSpan closeTime)
+        private static void ValidateTimeWithinOpenClose(DateTimeOffset requestDate, TimeSpan time, List<BarTime> barTimes)
         {
             var currentTimeOfDay = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.UtcNow).TimeOfDay;
 
@@ -117,17 +117,26 @@ namespace Application.Common
                 throw new CustomException.InvalidDataException("Thời gian phải nằm trong giờ mở cửa và giờ đóng cửa của quán Bar!");
             }
 
-            ValidateTimeWithinRange(time, openTime, closeTime, "Thời gian");
+            ValidateTimeWithinRange(time, barTimes, "Thời gian");
         }
 
-        private static void ValidateTimeWithinRange(TimeSpan time, TimeSpan openTime, TimeSpan closeTime, string timeLabel)
+        private static void ValidateTimeWithinRange(TimeSpan time, List<BarTime> barTimes, string timeLabel)
         {
-            if (time > closeTime && time < TimeSpan.FromHours(24))
+            bool isValidTime = barTimes.Any(barTime =>
             {
-                if (time < openTime)
+                if (barTime.StartTime < barTime.EndTime)
                 {
-                    throw new CustomException.InvalidDataException("Thời gian phải nằm trong giờ mở cửa và giờ đóng cửa của quán Bar !");
+                    return time >= barTime.StartTime && time <= barTime.EndTime;
                 }
+                else
+                {
+                    return time >= barTime.StartTime || time <= barTime.EndTime;
+                }
+            });
+
+            if (!isValidTime)
+            {
+                throw new CustomException.InvalidDataException("Thời gian phải nằm trong giờ mở cửa và giờ đóng cửa của quán Bar!");
             }
         }
 

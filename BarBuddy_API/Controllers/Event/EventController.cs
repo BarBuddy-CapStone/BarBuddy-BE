@@ -53,6 +53,7 @@ namespace BarBuddy_API.Controllers.Event
                 return CustomResult(ex.Message, HttpStatusCode.InternalServerError);
             }
         }
+
         [HttpPost("createEvent")]
         public async Task<IActionResult> CreateEvent([FromBody] EventRequest request)
         {
@@ -60,6 +61,28 @@ namespace BarBuddy_API.Controllers.Event
             {
                 await _eventService.CreateEvent(request);
                 return CustomResult("Đã tạo thành công");
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.NotFound);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.BadRequest);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpPatch("updateEvent")]
+        public async Task<IActionResult> UpdateEvent([FromQuery] Guid eventId, [FromBody] UpdateEventRequest request)
+        {
+            try
+            {
+                await _eventService.UpdateEvent(eventId, request);
+                return CustomResult("Đã update thành công");
             }
             catch (CustomException.DataNotFoundException ex)
             {

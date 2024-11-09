@@ -11,6 +11,7 @@ namespace Application.Mappers.Events
         {
             CreateMap<EventRequest, Event>().ReverseMap();
             CreateMap<Event, EventResponse>().ReverseMap();
+            CreateMap<UpdateEventRequest, Event>().ReverseMap();
         }
     }
 }

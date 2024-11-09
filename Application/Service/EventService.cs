@@ -164,5 +164,70 @@ namespace Application.Service
                 throw new CustomException.InternalServerErrorException(ex.Message, ex);
             }
         }
+
+        public async Task UpdateEvent(Guid eventId, UpdateEventRequest request)
+        {
+            try
+            {
+                List<string> imgStr = new List<string>();
+                List<IFormFile> images = new List<IFormFile>();
+                List<IFormFile> imgToUpload = new List<IFormFile>();
+                string imgsAsString = string.Empty;
+                string oldImgsUploaded = string.Empty;
+
+                if (request.Images.IsNullOrEmpty() && request.OldImages.IsNullOrEmpty())
+                {
+                    throw new CustomException.InvalidDataException("Không thể thiếu hình ảnh !");
+                }
+
+                if (!request.Images.IsNullOrEmpty())
+                {
+                    images = Utils.ConvertBase64ListToFiles(request.Images);
+                    imgToUpload = Utils.CheckValidateImageFile(images);
+                }
+                _unitOfWork.BeginTransaction();
+                var isExistEvent = _unitOfWork.EventRepository
+                                                .Get(filter: e => e.EventId.Equals(eventId) &&
+                                                                e.IsDeleted == PrefixKeyConstant.FALSE,
+                                                                includeProperties: "TimeEvent.EventVouchers")
+                                                .FirstOrDefault();
+                if (isExistEvent == null)
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy Event !");
+                }
+
+                var mapper = _mapper.Map(request, isExistEvent);
+                mapper.Images = "";
+                mapper.IsDeleted = PrefixKeyConstant.FALSE;
+                await _unitOfWork.EventRepository.UpdateRangeAsync(mapper);
+                await Task.Delay(200);
+                await _unitOfWork.SaveAsync();
+
+
+                foreach (var img in imgToUpload)
+                {
+                    var uploadImg = await _fireBase.UploadImageAsync(img);
+                    imgStr.Add(uploadImg);
+                }
+
+                imgsAsString = string.Join(", ", imgStr);
+                oldImgsUploaded = string.Join(", ", request.OldImages);
+                mapper.Images = string.IsNullOrEmpty(imgsAsString) ? oldImgsUploaded : $"{imgsAsString},{oldImgsUploaded}";
+
+                await _unitOfWork.EventRepository.UpdateRangeAsync(mapper);
+                await Task.Delay(200);
+                await _unitOfWork.SaveAsync();
+
+                await _eventTimeService.UpdateEventTime(mapper.EventId, mapper.IsEveryWeek, request.UpdateEventTimeRequests);
+
+                await _unitOfWork.SaveAsync();
+                _unitOfWork.CommitTransaction();
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.DisposeAsync();
+                throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
+            }
+        }
     }
 }

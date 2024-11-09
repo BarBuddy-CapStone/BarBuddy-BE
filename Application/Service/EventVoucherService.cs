@@ -29,7 +29,7 @@ namespace Application.Service
             try
             {
                 var isExist = _unitOfWork.EventVoucherRepository
-                                            .Get(filter: x => x.EventVoucherName.Equals(request.EventVoucherName) 
+                                            .Get(filter: x => x.EventVoucherName.Equals(request.EventVoucherName)
                                                         || x.VoucherCode.Equals(request.VoucherCode)
                                                         && x.Status == PrefixKeyConstant.TRUE).FirstOrDefault();
                 if (isExist != null)
@@ -48,6 +48,53 @@ namespace Application.Service
             catch (CustomException.InternalServerErrorException ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message, ex);
+            }
+        }
+        public async Task UpdateEventVoucher(Guid eventTimeId, List<UpdateEventVoucherRequest> request)
+        {
+            try
+            {
+                foreach (var voucher in request)
+                {
+                    var getOneVoucher = await _unitOfWork.EventVoucherRepository.GetByIdAsync(voucher.EventVoucherId);
+
+                    if(getOneVoucher == null)
+                    {
+                        throw new CustomException.DataNotFoundException("Voucher không tồn tại !");
+                    }
+
+                    var mapper = _mapper.Map(voucher, getOneVoucher);
+                    await _unitOfWork.EventVoucherRepository.UpdateRangeAsync(mapper);
+                    await Task.Delay(10);
+                    await _unitOfWork.SaveAsync();
+                }
+            }
+            catch
+            {
+                throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
+            }
+        }
+        public async Task DeleteEventVoucher(Guid eventTimeId, List<Guid> eventVoucherId)
+        {
+            try
+            {
+                foreach (var id in eventVoucherId)
+                {
+                    var isExistVoucher = _unitOfWork.EventVoucherRepository
+                                                        .Get(filter: x => x.TimeEvent.TimeEventId.Equals(eventTimeId))
+                                                        .FirstOrDefault();
+
+                    if (isExistVoucher != null)
+                    {
+                        await _unitOfWork.EventVoucherRepository.DeleteAsync(id);
+                        await Task.Delay(10);
+                        await _unitOfWork.SaveAsync();
+                    }
+                }
+            }
+            catch
+            {
+                throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
             }
         }
     }

@@ -14,5 +14,6 @@ namespace Application.IService
         Task CreateEvent(EventRequest request);
         Task<List<EventResponse>> GetAllEvent(EventQuery query);
         Task<EventResponse> GetOneEvent(Guid eventId);
+        Task UpdateEvent(Guid eventId, UpdateEventRequest request);
     }
 }
