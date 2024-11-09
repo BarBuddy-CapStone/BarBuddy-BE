@@ -12,7 +12,7 @@ namespace Application.DTOs.Event
     public class EventRequest
     {
         [Required]
-        public List<Guid> BarId { get; set; }
+        public Guid BarId { get; set; }
         [Required]
         public string EventName { get; set; }
         [Required]

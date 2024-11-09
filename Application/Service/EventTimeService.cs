@@ -36,6 +36,11 @@ namespace Application.Service
                 await Task.Delay(10);
                 await _unitOfWork.SaveAsync();
 
+                if(request.EventVoucherRequest.Count > 1)
+                {
+                    throw new CustomException.InvalidDataException("Chỉ có 1 voucher cho thời gian diễn ra sự kiện !");
+                }
+
                 foreach (var voucher in request.EventVoucherRequest)
                 {
                     await _eventVoucherService.CreateEventVoucher(mapper.TimeEventId, voucher);

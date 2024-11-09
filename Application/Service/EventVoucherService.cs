@@ -34,7 +34,7 @@ namespace Application.Service
                                                         && x.Status == PrefixKeyConstant.TRUE).FirstOrDefault();
                 if (isExist != null)
                 {
-                    throw new CustomException.InvalidDataException("Voucher Name đã tồn tại, vui lòng thử lại !");
+                    throw new CustomException.InvalidDataException("Voucher Name hoặc voucher Code  đã tồn tại, vui lòng thử lại !");
                 }
 
                 var response = _mapper.Map<EventVoucher>(request);
