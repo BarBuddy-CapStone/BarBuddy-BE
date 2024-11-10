@@ -5,6 +5,7 @@ using CoreApiResponse;
 using Domain.Common;
 using Domain.CustomException;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 
 namespace BarBuddy_API.Controllers.Event
@@ -19,6 +20,7 @@ namespace BarBuddy_API.Controllers.Event
         {
             _eventService = eventService;
         }
+
         [HttpGet]
         public async Task<IActionResult> GetAllEvent([FromQuery] EventQuery query)
         {
@@ -96,7 +98,7 @@ namespace BarBuddy_API.Controllers.Event
         }
 
         [HttpPatch("updateEvent")]
-        public async Task<IActionResult> UpdateEvent([FromQuery] Guid eventId, [FromBody] UpdateEventRequest request)
+        public async Task<IActionResult> UpdateEvent([FromQuery][Required] Guid eventId, [FromBody] UpdateEventRequest request)
         {
             try
             {
@@ -110,6 +112,24 @@ namespace BarBuddy_API.Controllers.Event
             catch (CustomException.InvalidDataException ex)
             {
                 return CustomResult(ex.Message, HttpStatusCode.BadRequest);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpDelete("deleteEvent")]
+        public async Task<IActionResult> DeleteEvent([FromQuery][Required] Guid eventId)
+        {
+            try
+            {
+                await _eventService.DeleteEvent(eventId);
+                return CustomResult("Đã xóa thành công");
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.NotFound);
             }
             catch (CustomException.InternalServerErrorException ex)
             {

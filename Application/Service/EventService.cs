@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq.Expressions;
+using System.Reflection.Metadata;
 
 namespace Application.Service
 {
@@ -49,6 +50,10 @@ namespace Application.Service
                     throw new CustomException.InvalidDataException("Không thể thiếu hình ảnh !");
                 }
 
+                if(request.EventTimeRequest.Count < 1)
+                {
+                    throw new CustomException.InvalidDataException("Không thể tạo event khi không có thời gian diễn ra sự kiện !");
+                }
 
                 images = Utils.ConvertBase64ListToFiles(request.Images);
                 var imgToUpload = Utils.CheckValidateImageFile(images);
@@ -98,6 +103,32 @@ namespace Application.Service
             catch (CustomException.InternalServerErrorException ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message, ex);
+            }
+        }
+
+        public async Task DeleteEvent(Guid eventId)
+        {
+            try
+            {
+                var isExistEvent = _unitOfWork.EventRepository
+                                                .Get(filter: x => x.EventId.Equals(eventId) &&
+                                                x.IsDeleted == PrefixKeyConstant.FALSE).FirstOrDefault();
+
+                if(isExistEvent == null)
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy event !");
+                }
+
+                isExistEvent.IsDeleted = PrefixKeyConstant.TRUE;
+
+                await _unitOfWork.EventRepository.UpdateRangeAsync(isExistEvent);
+                await Task.Delay(10);
+                await _unitOfWork.SaveAsync();
+
+            }
+            catch
+            {
+                throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
             }
         }
 
@@ -216,6 +247,11 @@ namespace Application.Service
                 if (request.Images.IsNullOrEmpty() && request.OldImages.IsNullOrEmpty())
                 {
                     throw new CustomException.InvalidDataException("Không thể thiếu hình ảnh !");
+                }
+
+                if (request.UpdateEventTimeRequests.Count < 1)
+                {
+                    throw new CustomException.InvalidDataException("Không thể chỉnhh sửa event khi không có thời gian diễn ra sự kiện !");
                 }
 
                 if (!request.Images.IsNullOrEmpty())
