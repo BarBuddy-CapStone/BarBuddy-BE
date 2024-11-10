@@ -186,7 +186,7 @@ namespace Application.Service
                     var emotionLabelUpper = result.PredictedLabel.ToUpper();
                     var drinks = await _unitOfWork.DrinkRepository.GetAsync(
                         filter: x => x.BarId.Equals(barId) && x.DrinkEmotionalCategories.Any(d => d.EmotionalDrinkCategory.CategoryName.ToUpper().Equals(emotionLabelUpper)),
-                        includeProperties: "DrinkEmotionalCategories.EmotionalDrinkCategory");
+                        includeProperties: "Bar,DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory");
                     return _mapper.Map<List<DrinkResponse>>(drinks.ToList());
                 }
 
