@@ -22,6 +22,6 @@ namespace Domain.Entities
         public virtual ICollection<TimeEvent> TimeEvent { get; set; }
         public virtual EventVoucher EventVoucher { get; set; }
         [ForeignKey("BarId")]
-        public virtual Bar? Bar { get; set; }
+        public virtual Bar Bar { get; set; }
     }
 }

@@ -14,6 +14,5 @@ namespace Application.DTOs.Events.EventTime
         public TimeSpan StartTime { get; set; }
         public TimeSpan EndTime { get; set; }
         public int? DayOfWeek { get; set; }
-        public EventVoucherResponse EventVoucherResponse { get; set; }
     }
 }

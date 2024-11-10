@@ -9,7 +9,7 @@ namespace Application.DTOs.Events.EventVoucher
     public class EventVoucherResponse
     {
         public Guid EventVoucherId { get; set; }
-        public Guid TimeEventId { get; set; }
+        public Guid EventId { get; set; }
         public string EventVoucherName { get; set; }
         public string VoucherCode { get; set; }
         public double Discount { get; set; }

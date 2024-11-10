@@ -153,7 +153,7 @@ namespace Application.Service
                                             .GetAsync(filter: filter,
                                                         pageIndex: query.PageIndex,
                                                         pageSize: query.PageSize,
-                                                 includeProperties: "Bar,TimeEvent.EventVouchers"))
+                                                 includeProperties: "Bar,TimeEvent,EventVoucher"))
                                                  .Where(x => x.IsDeleted == PrefixKeyConstant.FALSE);
             if (getAll.IsNullOrEmpty())
             {
@@ -165,15 +165,7 @@ namespace Application.Service
             {
                 var events = getAll.First(x => x.EventId.Equals(item.EventId));
                 item.EventTimeResponses = _mapper.Map<List<EventTimeResponse>>(events.TimeEvent);
-                //item.EventTimeResponses.Select(x =>
-                //{
-                //    var voucherOfEventTime = _unitOfWork.EventVoucherRepository.Get(c => c.TimeEventId.Equals(x.TimeEventId)).FirstOrDefault();
-                //    if (voucherOfEventTime != null)
-                //    {
-                //        x.EventVoucherResponse = _mapper.Map<EventVoucherResponse>(voucherOfEventTime);
-                //    }
-                //    return x;
-                //}).ToList();
+                item.EventVoucherResponse = _mapper.Map<EventVoucherResponse>(events.EventVoucher);
             }
             return response;
         }
@@ -183,7 +175,7 @@ namespace Application.Service
             if (!barId.HasValue) throw new CustomException.InvalidDataException(nameof(barId));
 
             var getAll = (await _unitOfWork.EventRepository.GetAsync(filter: e => e.BarId.Equals(barId),
-                    includeProperties: "Bar,TimeEvent.EventVouchers",
+                    includeProperties: "Bar,TimeEvent,EventVoucher",
                     pageIndex: query.PageIndex,
                     pageSize: query.PageSize
                     )).Where(x => x.IsDeleted == PrefixKeyConstant.FALSE);
@@ -198,15 +190,7 @@ namespace Application.Service
             {
                 var events = getAll.First(x => x.EventId.Equals(item.EventId));
                 item.EventTimeResponses = _mapper.Map<List<EventTimeResponse>>(events.TimeEvent);
-                //item.EventTimeResponses.Select(x =>
-                //{
-                //    var voucherOfEventTime = _unitOfWork.EventVoucherRepository.Get(c => c.TimeEventId.Equals(x.TimeEventId)).FirstOrDefault();
-                //    if (voucherOfEventTime != null)
-                //    {
-                //        x.EventVoucherResponse = _mapper.Map<EventVoucherResponse>(voucherOfEventTime);
-                //    }
-                //    return x;
-                //}).ToList();
+                item.EventVoucherResponse = _mapper.Map<EventVoucherResponse>(events.EventVoucher);
             }
             return response;
 
@@ -219,22 +203,14 @@ namespace Application.Service
                 var getEventById = _unitOfWork.EventRepository
                                             .Get(filter: x => x.EventId.Equals(eventId) &&
                                                         x.IsDeleted == PrefixKeyConstant.FALSE
-                                            , includeProperties: "Bar,TimeEvent");
+                                            , includeProperties: "Bar,TimeEvent,EventVoucher");
                 var getOne = getEventById.FirstOrDefault()
                             ?? throw new CustomException.DataNotFoundException("Không tìm thấy sự kiện bạn đang tìm!");
 
 
                 var response = _mapper.Map<EventResponse>(getOne);
                 response.EventTimeResponses = _mapper.Map<List<EventTimeResponse>>(getOne.TimeEvent);
-                //response.EventTimeResponses.Select(x =>
-                //{
-                //    var voucherOfEventTime = _unitOfWork.EventVoucherRepository.Get(c => c.TimeEventId.Equals(x.TimeEventId)).FirstOrDefault();
-                //    if (voucherOfEventTime != null)
-                //    {
-                //        x.EventVoucherResponse = _mapper.Map<EventVoucherResponse>(voucherOfEventTime);
-                //    }
-                //    return x;
-                //}).ToList();
+                response.EventVoucherResponse = _mapper.Map<EventVoucherResponse>(getOne.EventVoucher);
                 return response;
             }
             catch (CustomException.InternalServerErrorException ex)
