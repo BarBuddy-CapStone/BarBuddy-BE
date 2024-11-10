@@ -742,7 +742,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar1,
                     EventName = "Happy Hour Friday",
                     Description = "Giảm giá 30% tất cả đồ uống từ 18h-20h mỗi thứ 6",
-                    Images = "https://example.com/happy-hour.jpg",
+                    Images = "https://vietnamnightlife.com/uploads/images/2020/02/1581867705-single_product1-chillskybarhappyhour.jpg",
                     IsEveryWeek = true,
                     IsDeleted = false
                 },
@@ -752,7 +752,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar2,
                     EventName = "Live Music Night",
                     Description = "Đêm nhạc acoustic với các nghệ sĩ nổi tiếng",
-                    Images = "https://example.com/live-music.jpg", 
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg", 
                     IsEveryWeek = false,
                     IsDeleted = false
                 },
@@ -762,7 +762,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar3, 
                     EventName = "Ladies Night",
                     Description = "Miễn phí đồ uống đầu tiên cho phái nữ",
-                    Images = "https://example.com/ladies-night.jpg",
+                    Images = "https://vietnamnightlife.com/uploads/images/2023/06/1685613730-single_product1-bambamladiesnight.png.webp",
                     IsEveryWeek = true,
                     IsDeleted = false
                 },
@@ -772,7 +772,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar4,
                     EventName = "Cocktail Masterclass",
                     Description = "Học cách pha chế cocktail cùng bartender chuyên nghiệp",
-                    Images = "https://example.com/cocktail-class.jpg",
+                    Images = "https://familyapp.com/wp-content/uploads/2021/07/summer_cocktails.jpg",
                     IsEveryWeek = true,
                     IsDeleted = false
                 },
@@ -782,7 +782,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar5,
                     EventName = "Wine Tasting Night",
                     Description = "Thưởng thức các loại rượu vang đặc sắc từ khắp thế giới",
-                    Images = "https://example.com/wine-tasting.jpg",
+                    Images = "https://www.foodandwine.com/thmb/i3ppax3dzfKhybD3SuxsZSVHW9E=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/the-antler-room-natural-wine-bars-FT-SS1018-c1625c58d9aa4fd08c0216b6a84a6863.jpg",
                     IsEveryWeek = false,
                     IsDeleted = false
                 },
@@ -792,7 +792,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar1,
                     EventName = "Jazz Night",
                     Description = "Đêm nhạc Jazz với các nghệ sĩ hàng đầu",
-                    Images = "https://example.com/jazz-night.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = true,
                     IsDeleted = false
                 },
@@ -802,7 +802,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar2,
                     EventName = "Singles Mixer",
                     Description = "Tối giao lưu dành cho người độc thân",
-                    Images = "https://example.com/singles-mixer.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = false,
                     IsDeleted = false
                 },
@@ -812,7 +812,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar3,
                     EventName = "Karaoke Contest",
                     Description = "Cuộc thi karaoke với giải thưởng hấp dẫn",
-                    Images = "https://example.com/karaoke.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = false,
                     IsDeleted = false
                 },
@@ -822,7 +822,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar4,
                     EventName = "Beer Festival",
                     Description = "Lễ hội bia với nhiều loại bia thủ công",
-                    Images = "https://example.com/beer-fest.jpg",
+                    Images = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRkx-FWT-R5lCzsm7Zz0cNKX1WH6gtuVakaYg&s",
                     IsEveryWeek = false,
                     IsDeleted = false
                 },
@@ -832,7 +832,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar5,
                     EventName = "Salsa Night",
                     Description = "Đêm khiêu vũ Salsa sôi động",
-                    Images = "https://example.com/salsa.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = true,
                     IsDeleted = false
                 },
@@ -842,7 +842,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar1,
                     EventName = "Neon Party Night",
                     Description = "Đêm tiệc sôi động với chủ đề Neon, dress code: Neon colors. Tặng ngay 1 vòng tay phát sáng cho 100 khách đầu tiên. DJ nổi tiếng và vũ công LED performance.",
-                    Images = "https://example.com/neon-party.jpg,https://example.com/neon-party2.jpg,https://example.com/neon-party3.jpg", // Multiple images
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg", // Multiple images
                     IsEveryWeek = false,
                     IsDeleted = false
                 },
@@ -852,7 +852,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar2,
                     EventName = "Bartender Battle",
                     Description = "Cuộc thi pha chế đỉnh cao giữa các bartender hàng đầu Sài Gòn. Khách tham dự được thưởng thức miễn phí các cocktail độc đáo và vote cho bartender yêu thích.",
-                    Images = "https://example.com/bartender-battle.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = false,
                     IsDeleted = false
                 },
@@ -862,7 +862,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar3,
                     EventName = "Sunday Brunch & Jazz",
                     Description = "Brunch sang trọng với âm nhạc Jazz mộc mạc. Set menu brunch đặc biệt kèm free flow rượu vang và cocktail trong 2 giờ.",
-                    Images = "https://example.com/brunch-jazz.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = true, // Sự kiện hàng tuần vào Chủ nhật
                     IsDeleted = false
                 },
@@ -872,7 +872,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar4,
                     EventName = "Midnight Mystery",
                     Description = "Sự kiện bí ẩn diễn ra vào lúc nửa đêm. Dress code: Black & White. Menu đồ uống được giữ bí mật cho đến phút chót.",
-                    Images = "https://example.com/midnight-mystery.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = false,
                     IsDeleted = false
                 },
@@ -882,7 +882,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar5,
                     EventName = "Full Moon Party",
                     Description = "Tiệc trăng tròn trên tầng thượng với DJ quốc tế. Fire show và múa lửa. Tặng body painting cho khách tham dự.",
-                    Images = "https://example.com/fullmoon1.jpg,https://example.com/fullmoon2.jpg", // Multiple images
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg", // Multiple images
                     IsEveryWeek = false, // Chỉ diễn ra vào đêm trăng tròn
                     IsDeleted = false
                 },
@@ -892,7 +892,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar1,
                     EventName = "Rock Band Night",
                     Description = "Đêm nhạc rock với ban nhạc Underground nổi tiếng. Âm thanh sống động và không khí cuồng nhiệt.",
-                    Images = "https://example.com/rock-band.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = false,
                     IsDeleted = false
                 },
@@ -902,7 +902,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar2,
                     EventName = "Tequila Festival",
                     Description = "Lễ hội Tequila với đa dạng hương vị từ Mexico. Workshop pha chế và thưởng thức Tequila.",
-                    Images = "https://example.com/tequila-fest.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = false,
                     IsDeleted = false
                 },
@@ -912,7 +912,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar3,
                     EventName = "Stand-up Comedy",
                     Description = "Đêm hài độc thoại với các nghệ sĩ hài hàng đầu.",
-                    Images = "https://example.com/comedy-night.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = true,
                     IsDeleted = false
                 },
@@ -922,7 +922,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar4,
                     EventName = "Retro Disco Night",
                     Description = "Quay ngược thời gian với nhạc Disco những năm 80s. Dress code: Retro style.",
-                    Images = "https://example.com/retro-disco.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = true,
                     IsDeleted = false
                 },
@@ -932,7 +932,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar5,
                     EventName = "Halloween Special",
                     Description = "Đêm hội Halloween với trang trí ma quái, cuộc thi hóa trang và cocktail đặc biệt.",
-                    Images = "https://example.com/halloween.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = false,
                     IsDeleted = false
                 },
@@ -942,7 +942,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar1,
                     EventName = "Summer Beach Party",
                     Description = "Bữa tiệc bãi biển mùa hè với DJ quốc tế, vũ công và cocktail đặc biệt.",
-                    Images = "https://example.com/summer-beach-party.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = false,
                     IsDeleted = false
                 },
@@ -952,7 +952,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar2,
                     EventName = "Latin Dance Night",
                     Description = "Đêm khiêu vũ Latin sôi động với các điệu Salsa, Bachata và Merengue.",
-                    Images = "https://example.com/latin-dance.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = true,
                     IsDeleted = false
                 },
@@ -962,7 +962,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar3,
                     EventName = "Whiskey Tasting Experience",
                     Description = "Trải nghiệm nếm thử whiskey từ khắp nơi trên thế giới với chuyên gia.",
-                    Images = "https://example.com/whiskey-tasting.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = false,
                     IsDeleted = false
                 },
@@ -972,7 +972,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar4,
                     EventName = "EDM Explosion",
                     Description = "Đêm nhạc điện tử bùng nổ với các DJ hàng đầu trong nước.",
-                    Images = "https://example.com/edm-night.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = true,
                     IsDeleted = false
                 },
@@ -982,7 +982,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar5,
                     EventName = "Acoustic Coffee Night",
                     Description = "Đêm nhạc acoustic ấm cúng với cà phê và bánh ngọt.",
-                    Images = "https://example.com/acoustic-night.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = true,
                     IsDeleted = false
                 },
@@ -992,7 +992,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar1,
                     EventName = "Mixology Workshop",
                     Description = "Workshop pha chế cocktail cùng các bartender chuyên nghiệp.",
-                    Images = "https://example.com/mixology.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = false,
                     IsDeleted = false
                 },
@@ -1002,7 +1002,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar2,
                     EventName = "Wine & Jazz",
                     Description = "Thưởng thức rượu vang và nhạc Jazz trong không gian sang trọng.",
-                    Images = "https://example.com/wine-jazz.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = true,
                     IsDeleted = false
                 },
@@ -1012,7 +1012,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar3,
                     EventName = "Singles Mixer",
                     Description = "Đêm giao lưu dành cho người độc thân với các trò chơi thú vị.",
-                    Images = "https://example.com/singles-mixer.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = false,
                     IsDeleted = false
                 },
@@ -1022,7 +1022,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar4,
                     EventName = "Retro Game Night",
                     Description = "Đêm chơi game retro với các máy game cổ điển và cocktail theo chủ đề.",
-                    Images = "https://example.com/retro-game.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = true,
                     IsDeleted = false
                 },
@@ -1032,7 +1032,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar5,
                     EventName = "Poetry & Drinks",
                     Description = "Đêm thơ và đồ uống với các nhà thơ địa phương.",
-                    Images = "https://example.com/poetry-night.jpg",
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = false,
                     IsDeleted = false
                 }
