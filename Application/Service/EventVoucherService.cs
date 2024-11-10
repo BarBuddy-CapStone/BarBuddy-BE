@@ -34,7 +34,7 @@ namespace Application.Service
                                                         && x.Status == PrefixKeyConstant.TRUE).FirstOrDefault();
                 if (isExist != null)
                 {
-                    throw new CustomException.InvalidDataException("Voucher Name hoặc voucher Code  đã tồn tại, vui lòng thử lại !");
+                    throw new CustomException.InvalidDataException("Tên voucher hoặc mã voucher đã tồn tại, vui lòng thử lại !");
                 }
 
                 var response = _mapper.Map<EventVoucher>(request);
@@ -50,47 +50,64 @@ namespace Application.Service
                 throw new CustomException.InternalServerErrorException(ex.Message, ex);
             }
         }
-        public async Task UpdateEventVoucher(Guid eventTimeId, List<UpdateEventVoucherRequest> request)
+        public async Task UpdateEventVoucher(Guid eventId, UpdateEventVoucherRequest request)
         {
             try
             {
-                foreach (var voucher in request)
+                var getOneVoucher = await _unitOfWork.EventVoucherRepository.GetByIdAsync(request.EventVoucherId);
+
+                if (getOneVoucher == null)
                 {
-                    var getOneVoucher = await _unitOfWork.EventVoucherRepository.GetByIdAsync(voucher.EventVoucherId);
-
-                    if(getOneVoucher == null)
-                    {
-                        throw new CustomException.DataNotFoundException("Voucher không tồn tại !");
-                    }
-
-                    var mapper = _mapper.Map(voucher, getOneVoucher);
-                    await _unitOfWork.EventVoucherRepository.UpdateRangeAsync(mapper);
-                    await Task.Delay(10);
-                    await _unitOfWork.SaveAsync();
+                    throw new CustomException.DataNotFoundException("Voucher không tồn tại !");
                 }
+
+                var mapper = _mapper.Map(request, getOneVoucher);
+                await _unitOfWork.EventVoucherRepository.UpdateRangeAsync(mapper);
+                await Task.Delay(10);
+                await _unitOfWork.SaveAsync();
+
             }
             catch
             {
                 throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
             }
         }
-        public async Task DeleteEventVoucher(Guid eventId, List<Guid> eventVoucherId)
+        public async Task DeleteEventVoucher(Guid eventId, Guid eventVoucherId)
         {
             try
             {
-                foreach (var id in eventVoucherId)
-                {
-                    var isExistVoucher = _unitOfWork.EventVoucherRepository
-                                                        .Get(filter: x => x.Event.EventId.Equals(eventId))
-                                                        .FirstOrDefault();
+                var isExistVoucher = _unitOfWork.EventVoucherRepository
+                                                    .Get(filter: x => x.Event.EventId.Equals(eventId))
+                                                    .FirstOrDefault();
 
-                    if (isExistVoucher != null)
-                    {
-                        await _unitOfWork.EventVoucherRepository.DeleteAsync(id);
-                        await Task.Delay(10);
-                        await _unitOfWork.SaveAsync();
-                    }
+                if (isExistVoucher == null)
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy voucher !");
                 }
+
+                await _unitOfWork.EventVoucherRepository.DeleteAsync(eventVoucherId);
+                await Task.Delay(10);
+                await _unitOfWork.SaveAsync();
+            }
+
+            catch
+            {
+                throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
+            }
+        }
+
+        public async Task<EventVoucher> GetVoucherBasedEventId(Guid eventId)
+        {
+            try
+            {
+                var getVoucher = (await _unitOfWork.EventVoucherRepository
+                                                    .GetAsync(filter: x => x.EventId.Equals(eventId)))
+                                                    .FirstOrDefault();
+                if(getVoucher == null)
+                {
+                    return null;
+                }
+                return getVoucher;
             }
             catch
             {

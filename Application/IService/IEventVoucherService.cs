@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Events.EventVoucher;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +10,9 @@ namespace Application.IService
 {
     public interface IEventVoucherService
     {
+        Task<EventVoucher> GetVoucherBasedEventId(Guid eventId);
         Task CreateEventVoucher(Guid eventId, EventVoucherRequest request);
-        Task DeleteEventVoucher(Guid eventTimeId, List<Guid> eventVoucherId);
-        Task UpdateEventVoucher(Guid eventTimeId, List<UpdateEventVoucherRequest> request);
+        Task DeleteEventVoucher(Guid eventId, Guid VoucherId);
+        Task UpdateEventVoucher(Guid eventId, UpdateEventVoucherRequest request);
     }
 }

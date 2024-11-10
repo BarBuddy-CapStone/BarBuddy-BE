@@ -52,8 +52,7 @@ namespace Application.Service
 
                 var getEvTimeBaseEventId = _unitOfWork.TimeEventRepository
                                                         .Get(filter: x => x.EventId.Equals(eventId) &&
-                                                                        x.Event.IsDeleted == PrefixKeyConstant.FALSE,
-                                                                        includeProperties: "EventVouchers");
+                                                                        x.Event.IsDeleted == PrefixKeyConstant.FALSE);
 
                 var newEventTime = request.Where(x => x.TimeEventId == null);
 
@@ -102,19 +101,6 @@ namespace Application.Service
                     await _unitOfWork.TimeEventRepository.UpdateRangeAsync(getOne);
                     await Task.Delay(10);
                     await _unitOfWork.SaveAsync();
-
-                    //if (getOne.EventVouchers.Count() < 1)
-                    //{
-                    //    await _eventVoucherService.DeleteEventVoucher(getOne.TimeEventId, eventTime?.UpdateEventVoucherRequests?.Select(x => x.EventVoucherId).ToList());
-                    //}
-                    //else if (getOne.EventVouchers.Count() > 1)
-                    //{
-                    //    throw new CustomException.InvalidDataException("Chỉ có 1 voucher cho thời gian diễn ra sự kiện !");
-                    //}
-                    //else
-                    //{
-                    //    await _eventVoucherService.UpdateEventVoucher(getOne.TimeEventId, eventTime?.UpdateEventVoucherRequests?.ToList());
-                    //}
                 }
 
                 await DeleteEventTime(eventId, deleteEventTime);

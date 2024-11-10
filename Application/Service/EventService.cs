@@ -248,7 +248,7 @@ namespace Application.Service
                 var isExistEvent = _unitOfWork.EventRepository
                                                 .Get(filter: e => e.EventId.Equals(eventId) &&
                                                                 e.IsDeleted == PrefixKeyConstant.FALSE,
-                                                                includeProperties: "TimeEvent.EventVouchers")
+                                                                includeProperties: "TimeEvent,EventVoucher")
                                                 .FirstOrDefault();
                 if (isExistEvent == null)
                 {
@@ -278,6 +278,19 @@ namespace Application.Service
                 await Task.Delay(200);
                 await _unitOfWork.SaveAsync();
 
+                var isExistVoucher = await _eventVoucherService.GetVoucherBasedEventId(mapper.EventId);
+                if (request.UpdateEventVoucherRequests == null)
+                {
+                    if (isExistEvent != null)
+                    {
+                        await _eventVoucherService.DeleteEventVoucher(mapper.EventId, isExistVoucher.EventVoucherId);
+                    }
+                }
+
+                if (mapper.EventVoucher.EventVoucherId.Equals(request.UpdateEventVoucherRequests.EventVoucherId))
+                {
+                    await _eventVoucherService.UpdateEventVoucher(mapper.EventId, request.UpdateEventVoucherRequests);
+                }
                 await _eventTimeService.UpdateEventTime(mapper.EventId, mapper.IsEveryWeek, request.UpdateEventTimeRequests);
 
                 await _unitOfWork.SaveAsync();

@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Events.EventTime;
+using Application.DTOs.Events.EventVoucher;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -22,5 +23,6 @@ namespace Application.DTOs.Events
         public bool IsEveryWeek { get; set; }
         [Required]
         public List<UpdateEventTimeRequest> UpdateEventTimeRequests { get; set; }
+        public UpdateEventVoucherRequest? UpdateEventVoucherRequests { get; set; }
     }
 }
