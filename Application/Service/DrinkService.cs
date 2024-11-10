@@ -440,8 +440,14 @@ namespace Application.Service
                                 Console.WriteLine($"Lỗi crawl trang {page}: {ex.Message}");
                                 continue;
                             }
+                            var breakPoint = _unitOfWork.DrinkRepository.GetAll().Count();
+                            if (breakPoint > 100) throw new InvalidDataException("BreakPoint");
                         }
                     }
+                    catch (InvalidDataException ix)
+                    {
+                        throw new InvalidDataException(ix.Message);
+                    } 
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Lỗi crawl category {childUrl}: {ex.Message}");
@@ -488,7 +494,7 @@ namespace Application.Service
                 {
                     DrinkName = name.Trim(),
                     BarId = barId,
-                    Image = image,
+                    Image = $"https:{image}",
                     Price = price,
                     Description = description.Trim(),
                     DrinkCode = PrefixKeyConstant.DRINK,
