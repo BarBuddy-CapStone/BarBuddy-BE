@@ -24,7 +24,7 @@ namespace Application.Service
             _mapper = mapper;
         }
 
-        public async Task CreateEventVoucher(Guid eventTimeId, EventVoucherRequest request)
+        public async Task CreateEventVoucher(Guid eventId, EventVoucherRequest request)
         {
             try
             {
@@ -39,7 +39,7 @@ namespace Application.Service
 
                 var response = _mapper.Map<EventVoucher>(request);
                 response.Status = PrefixKeyConstant.TRUE;
-                response.TimeEventId = eventTimeId;
+                response.EventId = eventId;
 
                 await _unitOfWork.EventVoucherRepository.InsertAsync(response);
                 await Task.Delay(10);
@@ -74,14 +74,14 @@ namespace Application.Service
                 throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
             }
         }
-        public async Task DeleteEventVoucher(Guid eventTimeId, List<Guid> eventVoucherId)
+        public async Task DeleteEventVoucher(Guid eventId, List<Guid> eventVoucherId)
         {
             try
             {
                 foreach (var id in eventVoucherId)
                 {
                     var isExistVoucher = _unitOfWork.EventVoucherRepository
-                                                        .Get(filter: x => x.TimeEvent.TimeEventId.Equals(eventTimeId))
+                                                        .Get(filter: x => x.Event.EventId.Equals(eventId))
                                                         .FirstOrDefault();
 
                     if (isExistVoucher != null)

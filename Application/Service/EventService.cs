@@ -26,14 +26,17 @@ namespace Application.Service
         private readonly IEventTimeService _eventTimeService;
         private readonly IFirebase _fireBase;
         private readonly ILogger<EventService> _logger;
+        private readonly IEventVoucherService _eventVoucherService;
+
         public EventService(IMapper mapper, IUnitOfWork unitOfWork, IFirebase fireBase,
-                            IEventTimeService eventTimeService, ILogger<EventService> logger)
+                            IEventTimeService eventTimeService, ILogger<EventService> logger, IEventVoucherService eventVoucherService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _eventTimeService = eventTimeService;
             _fireBase = fireBase;
             _logger = logger;
+            _eventVoucherService = eventVoucherService;
         }
 
         public async Task CreateEvent(EventRequest request)
@@ -50,7 +53,7 @@ namespace Application.Service
                     throw new CustomException.InvalidDataException("Không thể thiếu hình ảnh !");
                 }
 
-                if(request.EventTimeRequest.Count < 1)
+                if (request.EventTimeRequest.Count < 1)
                 {
                     throw new CustomException.InvalidDataException("Không thể tạo event khi không có thời gian diễn ra sự kiện !");
                 }
@@ -74,6 +77,12 @@ namespace Application.Service
                 var listImgToStr = string.Join(", ", imgStr);
                 mapper.Images = listImgToStr;
                 await _unitOfWork.EventRepository.UpdateAsync(mapper);
+
+                if (request.EventVoucherRequest != null)
+                {
+                    await _eventVoucherService.CreateEventVoucher(mapper.EventId, request.EventVoucherRequest);
+                }
+
                 foreach (var eventTime in request.EventTimeRequest)
                 {
                     if (request.IsEveryWeek == PrefixKeyConstant.FALSE && eventTime.DayOfWeek != null)
@@ -114,7 +123,7 @@ namespace Application.Service
                                                 .Get(filter: x => x.EventId.Equals(eventId) &&
                                                 x.IsDeleted == PrefixKeyConstant.FALSE).FirstOrDefault();
 
-                if(isExistEvent == null)
+                if (isExistEvent == null)
                 {
                     throw new CustomException.DataNotFoundException("Không tìm thấy event !");
                 }
@@ -156,15 +165,15 @@ namespace Application.Service
             {
                 var events = getAll.First(x => x.EventId.Equals(item.EventId));
                 item.EventTimeResponses = _mapper.Map<List<EventTimeResponse>>(events.TimeEvent);
-                item.EventTimeResponses.Select(x =>
-                {
-                    var voucherOfEventTime = _unitOfWork.EventVoucherRepository.Get(c => c.TimeEventId.Equals(x.TimeEventId)).FirstOrDefault();
-                    if (voucherOfEventTime != null)
-                    {
-                        x.EventVoucherResponse = _mapper.Map<EventVoucherResponse>(voucherOfEventTime);
-                    }
-                    return x;
-                }).ToList();
+                //item.EventTimeResponses.Select(x =>
+                //{
+                //    var voucherOfEventTime = _unitOfWork.EventVoucherRepository.Get(c => c.TimeEventId.Equals(x.TimeEventId)).FirstOrDefault();
+                //    if (voucherOfEventTime != null)
+                //    {
+                //        x.EventVoucherResponse = _mapper.Map<EventVoucherResponse>(voucherOfEventTime);
+                //    }
+                //    return x;
+                //}).ToList();
             }
             return response;
         }
@@ -173,13 +182,13 @@ namespace Application.Service
         {
             if (!barId.HasValue) throw new CustomException.InvalidDataException(nameof(barId));
 
-            var getAll = (await _unitOfWork.EventRepository.GetAsync(filter: e => e.BarId.Equals(barId), 
+            var getAll = (await _unitOfWork.EventRepository.GetAsync(filter: e => e.BarId.Equals(barId),
                     includeProperties: "Bar,TimeEvent.EventVouchers",
                     pageIndex: query.PageIndex,
                     pageSize: query.PageSize
                     )).Where(x => x.IsDeleted == PrefixKeyConstant.FALSE);
 
-            if(!getAll.Any())
+            if (!getAll.Any())
             {
                 throw new CustomException.DataNotFoundException("Không tìm thấy dữ liệu");
             }
@@ -189,15 +198,15 @@ namespace Application.Service
             {
                 var events = getAll.First(x => x.EventId.Equals(item.EventId));
                 item.EventTimeResponses = _mapper.Map<List<EventTimeResponse>>(events.TimeEvent);
-                item.EventTimeResponses.Select(x =>
-                {
-                    var voucherOfEventTime = _unitOfWork.EventVoucherRepository.Get(c => c.TimeEventId.Equals(x.TimeEventId)).FirstOrDefault();
-                    if (voucherOfEventTime != null)
-                    {
-                        x.EventVoucherResponse = _mapper.Map<EventVoucherResponse>(voucherOfEventTime);
-                    }
-                    return x;
-                }).ToList();
+                //item.EventTimeResponses.Select(x =>
+                //{
+                //    var voucherOfEventTime = _unitOfWork.EventVoucherRepository.Get(c => c.TimeEventId.Equals(x.TimeEventId)).FirstOrDefault();
+                //    if (voucherOfEventTime != null)
+                //    {
+                //        x.EventVoucherResponse = _mapper.Map<EventVoucherResponse>(voucherOfEventTime);
+                //    }
+                //    return x;
+                //}).ToList();
             }
             return response;
 
@@ -208,7 +217,7 @@ namespace Application.Service
             try
             {
                 var getEventById = _unitOfWork.EventRepository
-                                            .Get(filter: x => x.EventId.Equals(eventId) && 
+                                            .Get(filter: x => x.EventId.Equals(eventId) &&
                                                         x.IsDeleted == PrefixKeyConstant.FALSE
                                             , includeProperties: "Bar,TimeEvent");
                 var getOne = getEventById.FirstOrDefault()
@@ -217,15 +226,15 @@ namespace Application.Service
 
                 var response = _mapper.Map<EventResponse>(getOne);
                 response.EventTimeResponses = _mapper.Map<List<EventTimeResponse>>(getOne.TimeEvent);
-                response.EventTimeResponses.Select(x =>
-                {
-                    var voucherOfEventTime = _unitOfWork.EventVoucherRepository.Get(c => c.TimeEventId.Equals(x.TimeEventId)).FirstOrDefault();
-                    if (voucherOfEventTime != null)
-                    {
-                        x.EventVoucherResponse = _mapper.Map<EventVoucherResponse>(voucherOfEventTime);
-                    }
-                    return x;
-                }).ToList();
+                //response.EventTimeResponses.Select(x =>
+                //{
+                //    var voucherOfEventTime = _unitOfWork.EventVoucherRepository.Get(c => c.TimeEventId.Equals(x.TimeEventId)).FirstOrDefault();
+                //    if (voucherOfEventTime != null)
+                //    {
+                //        x.EventVoucherResponse = _mapper.Map<EventVoucherResponse>(voucherOfEventTime);
+                //    }
+                //    return x;
+                //}).ToList();
                 return response;
             }
             catch (CustomException.InternalServerErrorException ex)

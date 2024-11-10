@@ -1377,7 +1377,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time1,
+                    EventId = Constants.Ids.Event.Event1,
                     EventVoucherName = "Happy Hour 30% Off",
                     VoucherCode = "HAPPY30",
                     Discount = 30,
@@ -1388,7 +1388,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time2,
+                    EventId = Constants.Ids.Event.Event2,
                     EventVoucherName = "Live Music Special",
                     VoucherCode = "LIVE20",
                     Discount = 20,
@@ -1399,7 +1399,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time3,
+                    EventId = Constants.Ids.Event.Event3,
                     EventVoucherName = "Ladies Night Free Drink",
                     VoucherCode = "LADIES100",
                     Discount = 100,
@@ -1410,7 +1410,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time4,
+                    EventId = Constants.Ids.Event.Event4,
                     EventVoucherName = "Masterclass Special",
                     VoucherCode = "MASTER40",
                     Discount = 40,
@@ -1421,7 +1421,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time5,
+                    EventId = Constants.Ids.Event.Event5,
                     EventVoucherName = "Wine Night",
                     VoucherCode = "WINE25",
                     Discount = 25,
@@ -1432,7 +1432,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time6,
+                    EventId = Constants.Ids.Event.Event6,
                     EventVoucherName = "Jazz Special",
                     VoucherCode = "JAZZ20",
                     Discount = 20,
@@ -1443,7 +1443,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time7,
+                    EventId = Constants.Ids.Event.Event7,
                     EventVoucherName = "Singles Night",
                     VoucherCode = "SINGLE50",
                     Discount = 50,
@@ -1454,7 +1454,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time8,
+                    EventId = Constants.Ids.Event.Event8,
                     EventVoucherName = "Karaoke Deal",
                     VoucherCode = "KARA35",
                     Discount = 35,
@@ -1465,7 +1465,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time9,
+                    EventId = Constants.Ids.Event.Event9,
                     EventVoucherName = "Beer Fest Special",
                     VoucherCode = "BEER45",
                     Discount = 45,
@@ -1476,7 +1476,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time10,
+                    EventId = Constants.Ids.Event.Event10,
                     EventVoucherName = "Salsa Night",
                     VoucherCode = "SALSA30",
                     Discount = 30,
@@ -1487,7 +1487,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time11,
+                    EventId = Constants.Ids.Event.Event11,
                     EventVoucherName = "Neon Party VIP Access",
                     VoucherCode = "NEONVIP",
                     Discount = 100, // 100% discount
@@ -1498,7 +1498,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time12,
+                    EventId = Constants.Ids.Event.Event12,
                     EventVoucherName = "Bartender's Choice",
                     VoucherCode = "BATTLE50",
                     Discount = 50,
@@ -1509,7 +1509,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time13,
+                    EventId = Constants.Ids.Event.Event13,
                     EventVoucherName = "Sunday Brunch Premium",
                     VoucherCode = "JAZZ2HOUR",
                     Discount = 30,
@@ -1520,7 +1520,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time14,
+                    EventId = Constants.Ids.Event.Event14,
                     EventVoucherName = "Mystery Box Special",
                     VoucherCode = "MIDNIGHT",
                     Discount = 75, // High discount
@@ -1531,7 +1531,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time15,
+                    EventId = Constants.Ids.Event.Event15,
                     EventVoucherName = "Full Moon Experience",
                     VoucherCode = "FULLMOON",
                     Discount = 40,
@@ -1542,7 +1542,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time16_1,
+                    EventId = Constants.Ids.Event.Event16,
                     EventVoucherName = "Rock Early Bird",
                     VoucherCode = "ROCK40",
                     Discount = 40,
@@ -1553,7 +1553,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time16_2,
+                    EventId = Constants.Ids.Event.Event17,
                     EventVoucherName = "Rock Group Deal",
                     VoucherCode = "ROCKGROUP",
                     Discount = 25,
@@ -1564,7 +1564,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time17_1,
+                    EventId = Constants.Ids.Event.Event18,
                     EventVoucherName = "Tequila Day 1",
                     VoucherCode = "TEQ1",
                     Discount = 30,
@@ -1575,7 +1575,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time17_2,
+                    EventId = Constants.Ids.Event.Event19,
                     EventVoucherName = "Tequila Day 2",
                     VoucherCode = "TEQ2",
                     Discount = 35,
@@ -1586,7 +1586,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time17_3,
+                    EventId = Constants.Ids.Event.Event20,
                     EventVoucherName = "Tequila Final Day",
                     VoucherCode = "TEQ3",
                     Discount = 40,
@@ -1597,7 +1597,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time18_1,
+                    EventId = Constants.Ids.Event.Event21,
                     EventVoucherName = "Comedy Night",
                     VoucherCode = "LAUGH25",
                     Discount = 25,
@@ -1608,7 +1608,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time19_1,
+                    EventId = Constants.Ids.Event.Event22,
                     EventVoucherName = "Disco Friday",
                     VoucherCode = "DISCO1",
                     Discount = 30,
@@ -1619,7 +1619,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time19_2,
+                    EventId = Constants.Ids.Event.Event23,
                     EventVoucherName = "Disco Saturday",
                     VoucherCode = "DISCO2",
                     Discount = 35,
@@ -1630,7 +1630,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time20_1,
+                    EventId = Constants.Ids.Event.Event24,
                     EventVoucherName = "Halloween Early",
                     VoucherCode = "HALL1",
                     Discount = 30,
@@ -1641,7 +1641,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time20_2,
+                    EventId = Constants.Ids.Event.Event25,
                     EventVoucherName = "Halloween Pre-Party",
                     VoucherCode = "HALL2",
                     Discount = 35,
@@ -1652,7 +1652,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time20_3,
+                    EventId = Constants.Ids.Event.Event26,
                     EventVoucherName = "Halloween Night Special",
                     VoucherCode = "HALL3",
                     Discount = 50,
@@ -1663,7 +1663,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time21,
+                    EventId = Constants.Ids.Event.Event27,
                     EventVoucherName = "Summer Party Special",
                     VoucherCode = "SUMMER50",
                     Discount = 50,
@@ -1674,7 +1674,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time22,
+                    EventId = Constants.Ids.Event.Event28,
                     EventVoucherName = "Latin Night Discount",
                     VoucherCode = "LATIN30",
                     Discount = 30,
@@ -1685,7 +1685,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time23,
+                    EventId = Constants.Ids.Event.Event29,
                     EventVoucherName = "Latin Night Discount",
                     VoucherCode = "LATIN30",
                     Discount = 30,
@@ -1696,7 +1696,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time24,
+                    EventId = Constants.Ids.Event.Event30,
                     EventVoucherName = "Latin Night Discount",
                     VoucherCode = "LATIN30",
                     Discount = 30,
@@ -1707,7 +1707,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time25,
+                    EventId = Constants.Ids.Event.Event27,
                     EventVoucherName = "Latin Night Discount",
                     VoucherCode = "LATIN30",
                     Discount = 30,
@@ -1718,7 +1718,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time26,
+                    EventId = Constants.Ids.Event.Event27,
                     EventVoucherName = "Latin Night Discount",
                     VoucherCode = "LATIN30",
                     Discount = 30,
@@ -1729,7 +1729,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time27,
+                    EventId = Constants.Ids.Event.Event27,
                     EventVoucherName = "Latin Night Discount",
                     VoucherCode = "LATIN30",
                     Discount = 30,
@@ -1740,7 +1740,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time28,
+                    EventId = Constants.Ids.Event.Event27,
                     EventVoucherName = "Latin Night Discount",
                     VoucherCode = "LATIN30",
                     Discount = 30,
@@ -1751,7 +1751,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time29,
+                    EventId = Constants.Ids.Event.Event27,
                     EventVoucherName = "Latin Night Discount",
                     VoucherCode = "LATIN30",
                     Discount = 30,
@@ -1762,7 +1762,7 @@ namespace Persistence.Data
                 new EventVoucher
                 {
                     EventVoucherId = Guid.NewGuid(),
-                    TimeEventId = Constants.Ids.EventTime.Time30,
+                    EventId = Constants.Ids.Event.Event27,
                     EventVoucherName = "Latin Night Discount",
                     VoucherCode = "LATIN30",
                     Discount = 30,

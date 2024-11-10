@@ -37,18 +37,6 @@ namespace Application.Service
                 await _unitOfWork.TimeEventRepository.InsertAsync(mapper);
                 await Task.Delay(10);
                 await _unitOfWork.SaveAsync();
-
-                if (request.EventVoucherRequest.Count > 1)
-                {
-                    throw new CustomException.InvalidDataException("Chỉ có 1 voucher cho thời gian diễn ra sự kiện !");
-                }
-
-                foreach (var voucher in request.EventVoucherRequest)
-                {
-                    await _eventVoucherService.CreateEventVoucher(mapper.TimeEventId, voucher);
-                }
-
-
             }
             catch (CustomException.InternalServerErrorException ex)
             {
@@ -115,18 +103,18 @@ namespace Application.Service
                     await Task.Delay(10);
                     await _unitOfWork.SaveAsync();
 
-                    if (getOne.EventVouchers.Count() < 1)
-                    {
-                        await _eventVoucherService.DeleteEventVoucher(getOne.TimeEventId, eventTime?.UpdateEventVoucherRequests?.Select(x => x.EventVoucherId).ToList());
-                    }
-                    else if (getOne.EventVouchers.Count() > 1)
-                    {
-                        throw new CustomException.InvalidDataException("Chỉ có 1 voucher cho thời gian diễn ra sự kiện !");
-                    }
-                    else
-                    {
-                        await _eventVoucherService.UpdateEventVoucher(getOne.TimeEventId, eventTime?.UpdateEventVoucherRequests?.ToList());
-                    }
+                    //if (getOne.EventVouchers.Count() < 1)
+                    //{
+                    //    await _eventVoucherService.DeleteEventVoucher(getOne.TimeEventId, eventTime?.UpdateEventVoucherRequests?.Select(x => x.EventVoucherId).ToList());
+                    //}
+                    //else if (getOne.EventVouchers.Count() > 1)
+                    //{
+                    //    throw new CustomException.InvalidDataException("Chỉ có 1 voucher cho thời gian diễn ra sự kiện !");
+                    //}
+                    //else
+                    //{
+                    //    await _eventVoucherService.UpdateEventVoucher(getOne.TimeEventId, eventTime?.UpdateEventVoucherRequests?.ToList());
+                    //}
                 }
 
                 await DeleteEventTime(eventId, deleteEventTime);
@@ -157,7 +145,7 @@ namespace Application.Service
                         continue;
                     }
 
-                    await _eventVoucherService.DeleteEventVoucher(id, isExistEvent?.EventVouchers?.Select(x => x.EventVoucherId).ToList());
+                    //await _eventVoucherService.DeleteEventVoucher(id, isExistEvent?.EventVouchers?.Select(x => x.EventVoucherId).ToList());
 
                     await _unitOfWork.TimeEventRepository.DeleteAsync(id);
                     await Task.Delay(10);

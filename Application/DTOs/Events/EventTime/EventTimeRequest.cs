@@ -17,7 +17,5 @@ namespace Application.DTOs.Events.EventTime
         public TimeSpan EndTime { get; set; }
         [Range(0, 6, ErrorMessage = "Giá trị chỉ có thể từ 0 đến 6 !")]
         public int? DayOfWeek { get; set; }
-        [Required]
-        public List<EventVoucherRequest> EventVoucherRequest { get; set; }
     }
 }

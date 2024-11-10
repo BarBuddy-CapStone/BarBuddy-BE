@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Events.EventTime;
+using Application.DTOs.Events.EventVoucher;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -23,5 +24,7 @@ namespace Application.DTOs.Event
         public bool IsEveryWeek { get; set; }
         [Required]
         public List<EventTimeRequest> EventTimeRequest { get; set; }
+        [Required]
+        public EventVoucherRequest? EventVoucherRequest { get; set; }
     }
 }

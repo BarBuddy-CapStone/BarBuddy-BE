@@ -19,6 +19,5 @@ namespace Domain.Entities
         public int? DayOfWeek { get; set; }
         [ForeignKey("EventId")]
         public virtual Event Event { get; set; }
-        public virtual ICollection<EventVoucher>? EventVouchers { get; set; }
     }
 }

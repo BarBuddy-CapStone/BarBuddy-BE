@@ -9,7 +9,7 @@ namespace Application.IService
 {
     public interface IEventVoucherService
     {
-        Task CreateEventVoucher(Guid eventTimeId, EventVoucherRequest request);
+        Task CreateEventVoucher(Guid eventId, EventVoucherRequest request);
         Task DeleteEventVoucher(Guid eventTimeId, List<Guid> eventVoucherId);
         Task UpdateEventVoucher(Guid eventTimeId, List<UpdateEventVoucherRequest> request);
     }

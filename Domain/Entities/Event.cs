@@ -20,6 +20,7 @@ namespace Domain.Entities
         public bool IsHide {  get; set; }
         public bool IsDeleted { get; set; }
         public virtual ICollection<TimeEvent> TimeEvent { get; set; }
+        public virtual EventVoucher EventVoucher { get; set; }
         [ForeignKey("BarId")]
         public virtual Bar? Bar { get; set; }
     }
