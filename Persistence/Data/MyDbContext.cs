@@ -1565,7 +1565,7 @@ namespace Persistence.Data
                 {
                     EventVoucherId = Guid.NewGuid(),
                     EventId = Constants.Ids.Event.Event18,
-                    EventVoucherName = "Tequila Day 1",
+                    EventVoucherName = "Tequila Day",
                     VoucherCode = "TEQ1",
                     Discount = 30,
                     MaxPrice = 500000,
@@ -1697,72 +1697,6 @@ namespace Persistence.Data
                 {
                     EventVoucherId = Guid.NewGuid(),
                     EventId = Constants.Ids.Event.Event30,
-                    EventVoucherName = "Latin Night Discount",
-                    VoucherCode = "LATIN30",
-                    Discount = 30,
-                    MaxPrice = 300000,
-                    Quantity = 50,
-                    Status = true
-                },
-                new EventVoucher
-                {
-                    EventVoucherId = Guid.NewGuid(),
-                    EventId = Constants.Ids.Event.Event27,
-                    EventVoucherName = "Latin Night Discount",
-                    VoucherCode = "LATIN30",
-                    Discount = 30,
-                    MaxPrice = 300000,
-                    Quantity = 50,
-                    Status = true
-                },
-                new EventVoucher
-                {
-                    EventVoucherId = Guid.NewGuid(),
-                    EventId = Constants.Ids.Event.Event27,
-                    EventVoucherName = "Latin Night Discount",
-                    VoucherCode = "LATIN30",
-                    Discount = 30,
-                    MaxPrice = 300000,
-                    Quantity = 50,
-                    Status = true
-                },
-                new EventVoucher
-                {
-                    EventVoucherId = Guid.NewGuid(),
-                    EventId = Constants.Ids.Event.Event27,
-                    EventVoucherName = "Latin Night Discount",
-                    VoucherCode = "LATIN30",
-                    Discount = 30,
-                    MaxPrice = 300000,
-                    Quantity = 50,
-                    Status = true
-                },
-                new EventVoucher
-                {
-                    EventVoucherId = Guid.NewGuid(),
-                    EventId = Constants.Ids.Event.Event27,
-                    EventVoucherName = "Latin Night Discount",
-                    VoucherCode = "LATIN30",
-                    Discount = 30,
-                    MaxPrice = 300000,
-                    Quantity = 50,
-                    Status = true
-                },
-                new EventVoucher
-                {
-                    EventVoucherId = Guid.NewGuid(),
-                    EventId = Constants.Ids.Event.Event27,
-                    EventVoucherName = "Latin Night Discount",
-                    VoucherCode = "LATIN30",
-                    Discount = 30,
-                    MaxPrice = 300000,
-                    Quantity = 50,
-                    Status = true
-                },
-                new EventVoucher
-                {
-                    EventVoucherId = Guid.NewGuid(),
-                    EventId = Constants.Ids.Event.Event27,
                     EventVoucherName = "Latin Night Discount",
                     VoucherCode = "LATIN30",
                     Discount = 30,
