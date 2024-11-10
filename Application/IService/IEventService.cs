@@ -16,5 +16,6 @@ namespace Application.IService
         Task<EventResponse> GetOneEvent(Guid eventId);
         Task UpdateEvent(Guid eventId, UpdateEventRequest request);
         Task<List<EventResponse>> GetEventsByBarId(ObjectQuery query, Guid? barId);
+        Task DeleteEvent(Guid eventId);
     }
 }
