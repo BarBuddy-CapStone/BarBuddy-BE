@@ -20,6 +20,7 @@ namespace Domain.IRepository
         TEntity GetByID(object id);
         void Insert(TEntity entity);
         void InsertRange(IList<TEntity> obj);
+        Task InsertRangeAsync(IEnumerable<TEntity> obj);
         void Delete(object id);
         void Delete(TEntity entityToDelete);
         void Update(TEntity entityToUpdate);

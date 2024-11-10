@@ -166,6 +166,11 @@ namespace Persistence.Repository
         {
             dbSet.AddRange(obj);
         }
+
+        public async Task InsertRangeAsync(IEnumerable<TEntity> obj)
+        {
+            await dbSet.AddRangeAsync(obj);
+        }
         public void Save()
         {
             context.SaveChanges();

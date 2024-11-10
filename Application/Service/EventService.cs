@@ -6,6 +6,7 @@ using Application.DTOs.Events.EventVoucher;
 using Application.Interfaces;
 using Application.IService;
 using AutoMapper;
+using Domain.Common;
 using Domain.Constants;
 using Domain.CustomException;
 using Domain.Entities;
@@ -133,6 +134,40 @@ namespace Application.Service
                 }).ToList();
             }
             return response;
+        }
+
+        public async Task<List<EventResponse>> GetEventsByBarId(ObjectQuery query, Guid? barId)
+        {
+            if (!barId.HasValue) throw new CustomException.InvalidDataException(nameof(barId));
+
+            var getAll = await _unitOfWork.EventRepository.GetAsync(filter: e => e.BarId.Equals(barId), 
+                    includeProperties: "Bar,TimeEvent.EventVouchers",
+                    pageIndex: query.PageIndex,
+                    pageSize: query.PageSize
+                    );
+
+            if(!getAll.Any())
+            {
+                throw new CustomException.DataNotFoundException("Không tìm thấy dữ liệu");
+            }
+
+            var response = _mapper.Map<List<EventResponse>>(getAll);
+            foreach (var item in response)
+            {
+                var events = getAll.First(x => x.EventId.Equals(item.EventId));
+                item.EventTimeResponses = _mapper.Map<List<EventTimeResponse>>(events.TimeEvent);
+                item.EventTimeResponses.Select(x =>
+                {
+                    var voucherOfEventTime = _unitOfWork.EventVoucherRepository.Get(c => c.TimeEventId.Equals(x.TimeEventId)).FirstOrDefault();
+                    if (voucherOfEventTime != null)
+                    {
+                        x.EventVoucherResponse = _mapper.Map<EventVoucherResponse>(voucherOfEventTime);
+                    }
+                    return x;
+                }).ToList();
+            }
+            return response;
+
         }
 
         public async Task<EventResponse> GetOneEvent(Guid eventId)

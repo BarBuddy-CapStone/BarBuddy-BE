@@ -2,6 +2,7 @@
 using Application.DTOs.Events;
 using Application.IService;
 using CoreApiResponse;
+using Domain.Common;
 using Domain.CustomException;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -24,6 +25,24 @@ namespace BarBuddy_API.Controllers.Event
             try
             {
                 var response = await _eventService.GetAllEvent(query);
+                return CustomResult("Đã tải dữ liệu thành công", response);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.NotFound);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpGet("{barId}")]
+        public async Task<IActionResult> GetEventByBarId(Guid barId, [FromQuery] ObjectQuery query)
+        {
+            try
+            {
+                var response = await _eventService.GetEventsByBarId(query, barId);
                 return CustomResult("Đã tải dữ liệu thành công", response);
             }
             catch (CustomException.DataNotFoundException ex)

@@ -348,6 +348,7 @@ namespace Application.Service
 
                 string[] childUrls = ["whisky", "vang-champagne", "spirits-liqueur", "sake-beer"];
                 int totalCrawled = 0;
+                var random = new Random();
 
                 foreach (var childUrl in childUrls)
                 {
@@ -400,6 +401,8 @@ namespace Application.Service
                                             var drink = await CrawlSingleDrink(httpClient, productUrl, drinkCategory.DrinksCategoryId, bars[j].BarId);
                                             if (drink != null)
                                             {
+                                                drink.DrinkEmotionalCategories = RandomDrinkEmotionalCategories(
+                                                    drink.DrinkId, random.Next(6), random);
                                                 pageDrinks.Add(drink);
                                                 totalCrawled++;
                                                 j++;
@@ -483,11 +486,11 @@ namespace Application.Service
 
                 return new Drink
                 {
-                    DrinkName = name,
+                    DrinkName = name.Trim(),
                     BarId = barId,
                     Image = image,
                     Price = price,
-                    Description = description,
+                    Description = description.Trim(),
                     DrinkCode = PrefixKeyConstant.DRINK,
                     DrinkCategoryId = categoryId,
                     Status = PrefixKeyConstant.TRUE,
@@ -500,6 +503,34 @@ namespace Application.Service
                 return null;
             }
         }
+
+        private List<DrinkEmotionalCategory> RandomDrinkEmotionalCategories(Guid drinkId, int count, 
+            Random random)
+        {
+            var emotions = _unitOfWork.EmotionalDrinkCategoryRepository.GetAll().ToList();
+
+            var drinkEmotionalCategories = new List<DrinkEmotionalCategory>();
+
+            count = Math.Min(count, emotions.Count);
+
+            for (int i = 0; i < count; i++)
+            {
+                var randomEmotion = emotions.OrderBy(x => random.Next()).First();
+
+                var drinkEmotionalCategory = new DrinkEmotionalCategory
+                {
+                    DrinkId = drinkId,
+                    EmotionalDrinkCategoryId = randomEmotion.EmotionalDrinksCategoryId
+                };
+
+                drinkEmotionalCategories.Add(drinkEmotionalCategory);
+
+                emotions.Remove(randomEmotion);
+            }
+
+            return drinkEmotionalCategories;
+        }
+
 
         public async Task<IEnumerable<DrinkResponse>> GetAllDrinkCustomerOfBar(Guid barId)
         {

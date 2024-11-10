@@ -245,11 +245,77 @@ namespace Persistence.Data
             }
             public static class Event
             {
-                public static readonly Guid EventId = Guid.Parse("660d7300-f30c-40c3-b827-335544330170");
+                public static readonly Guid EventId = Guid.NewGuid();
+                public static readonly Guid Event1 = Guid.NewGuid();
+                public static readonly Guid Event2 = Guid.NewGuid(); 
+                public static readonly Guid Event3 = Guid.NewGuid();
+                public static readonly Guid Event4 = Guid.NewGuid();
+                public static readonly Guid Event5 = Guid.NewGuid();
+                public static readonly Guid Event6 = Guid.NewGuid();
+                public static readonly Guid Event7 = Guid.NewGuid();
+                public static readonly Guid Event8 = Guid.NewGuid();
+                public static readonly Guid Event9 = Guid.NewGuid();
+                public static readonly Guid Event10 = Guid.NewGuid();
+                public static readonly Guid Event11 = Guid.NewGuid();
+                public static readonly Guid Event12 = Guid.NewGuid();
+                public static readonly Guid Event13 = Guid.NewGuid();
+                public static readonly Guid Event14 = Guid.NewGuid();
+                public static readonly Guid Event15 = Guid.NewGuid();
+                public static readonly Guid Event16 = Guid.NewGuid();
+                public static readonly Guid Event17 = Guid.NewGuid();
+                public static readonly Guid Event18 = Guid.NewGuid();
+                public static readonly Guid Event19 = Guid.NewGuid();
+                public static readonly Guid Event20 = Guid.NewGuid();
+                public static readonly Guid Event21 = Guid.NewGuid();
+                public static readonly Guid Event22 = Guid.NewGuid();
+                public static readonly Guid Event23 = Guid.NewGuid();
+                public static readonly Guid Event24 = Guid.NewGuid();
+                public static readonly Guid Event25 = Guid.NewGuid();
+                public static readonly Guid Event26 = Guid.NewGuid();
+                public static readonly Guid Event27 = Guid.NewGuid();
+                public static readonly Guid Event28 = Guid.NewGuid();
+                public static readonly Guid Event29 = Guid.NewGuid();
+                public static readonly Guid Event30 = Guid.NewGuid();
             }
             public static class EventTime
             {
-                public static readonly Guid EventTimeId = Guid.Parse("660d7300-f30c-40c3-b827-335544330170");
+                public static readonly Guid EventTimeId = Guid.NewGuid();
+                public static readonly Guid Time1 = Guid.NewGuid();
+                public static readonly Guid Time2 = Guid.NewGuid();
+                public static readonly Guid Time3 = Guid.NewGuid();
+                public static readonly Guid Time4 = Guid.NewGuid();
+                public static readonly Guid Time5 = Guid.NewGuid();
+                public static readonly Guid Time6 = Guid.NewGuid();
+                public static readonly Guid Time7 = Guid.NewGuid();
+                public static readonly Guid Time8 = Guid.NewGuid();
+                public static readonly Guid Time9 = Guid.NewGuid();
+                public static readonly Guid Time10 = Guid.NewGuid();
+                public static readonly Guid Time11 = Guid.NewGuid();
+                public static readonly Guid Time12 = Guid.NewGuid();
+                public static readonly Guid Time13 = Guid.NewGuid();
+                public static readonly Guid Time14 = Guid.NewGuid();
+                public static readonly Guid Time15 = Guid.NewGuid();
+                public static readonly Guid Time16_1 = Guid.NewGuid();
+                public static readonly Guid Time16_2 = Guid.NewGuid();
+                public static readonly Guid Time17_1 = Guid.NewGuid();
+                public static readonly Guid Time17_2 = Guid.NewGuid();
+                public static readonly Guid Time17_3 = Guid.NewGuid();
+                public static readonly Guid Time18_1 = Guid.NewGuid();
+                public static readonly Guid Time19_1 = Guid.NewGuid();
+                public static readonly Guid Time19_2 = Guid.NewGuid();
+                public static readonly Guid Time20_1 = Guid.NewGuid();
+                public static readonly Guid Time20_2 = Guid.NewGuid();
+                public static readonly Guid Time20_3 = Guid.NewGuid();
+                public static readonly Guid Time21 = Guid.NewGuid();
+                public static readonly Guid Time22 = Guid.NewGuid();
+                public static readonly Guid Time23 = Guid.NewGuid();
+                public static readonly Guid Time24 = Guid.NewGuid();
+                public static readonly Guid Time25 = Guid.NewGuid();
+                public static readonly Guid Time26 = Guid.NewGuid();
+                public static readonly Guid Time27 = Guid.NewGuid();
+                public static readonly Guid Time28 = Guid.NewGuid();
+                public static readonly Guid Time29 = Guid.NewGuid();
+                public static readonly Guid Time30 = Guid.NewGuid();
             }
         }
     }
@@ -603,7 +669,7 @@ namespace Persistence.Data
                 {
                     DrinksCategoryId = Constants.Ids.DrinkCategories.Coffee,
                     DrinksCategoryName = "Cà phê",
-                    Description = "Đồ uống nóng hoặc lạnh được pha từ hạt cà phê rang, bao gồm espresso, cappuccino, latte và nhiều loại khác.",
+                    Description = "Đồ uống nóng hoặc lạnh đư��c pha từ hạt cà phê rang, bao gồm espresso, cappuccino, latte và nhiều loại khác.",
                     IsDeleted = false
                 },
                 new DrinkCategory
@@ -666,44 +732,642 @@ namespace Persistence.Data
             };
         }
 
-        public static Event[] GetEvents() {
+        public static Event[] GetEvents()
+        {
             return new[]
             {
-               new Event
-               {
-                   BarId = Constants.Ids.Bars.Bar1,
-                   Description = "event1",
-                   EventName = "event1",
-                   Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/a0d4292c13b0cc51b2487f4c276cd7c0d96510872c4a855db190ff2db8e692d2?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
-                   IsEveryWeek = true,
-                   EventId = Constants.Ids.Event.EventId,
-                   IsDeleted = false
-               },
-               new Event
-               {
-                   BarId = Constants.Ids.Bars.Bar1,
-                   Description = "event2",
-                   EventName = "event2",
-                   Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/a0d4292c13b0cc51b2487f4c276cd7c0d96510872c4a855db190ff2db8e692d2?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
-                   IsEveryWeek = true,
-                   EventId = Guid.NewGuid(),
-                   IsDeleted = false
-               }
-           };
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event1,
+                    BarId = Constants.Ids.Bars.Bar1,
+                    EventName = "Happy Hour Friday",
+                    Description = "Giảm giá 30% tất cả đồ uống từ 18h-20h mỗi thứ 6",
+                    Images = "https://example.com/happy-hour.jpg",
+                    IsEveryWeek = true,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event2, 
+                    BarId = Constants.Ids.Bars.Bar2,
+                    EventName = "Live Music Night",
+                    Description = "Đêm nhạc acoustic với các nghệ sĩ nổi tiếng",
+                    Images = "https://example.com/live-music.jpg", 
+                    IsEveryWeek = false,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event3,
+                    BarId = Constants.Ids.Bars.Bar3, 
+                    EventName = "Ladies Night",
+                    Description = "Miễn phí đồ uống đầu tiên cho phái nữ",
+                    Images = "https://example.com/ladies-night.jpg",
+                    IsEveryWeek = true,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event4,
+                    BarId = Constants.Ids.Bars.Bar4,
+                    EventName = "Cocktail Masterclass",
+                    Description = "Học cách pha chế cocktail cùng bartender chuyên nghiệp",
+                    Images = "https://example.com/cocktail-class.jpg",
+                    IsEveryWeek = true,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event5,
+                    BarId = Constants.Ids.Bars.Bar5,
+                    EventName = "Wine Tasting Night",
+                    Description = "Thưởng thức các loại rượu vang đặc sắc từ khắp thế giới",
+                    Images = "https://example.com/wine-tasting.jpg",
+                    IsEveryWeek = false,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event6,
+                    BarId = Constants.Ids.Bars.Bar1,
+                    EventName = "Jazz Night",
+                    Description = "Đêm nhạc Jazz với các nghệ sĩ hàng đầu",
+                    Images = "https://example.com/jazz-night.jpg",
+                    IsEveryWeek = true,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event7,
+                    BarId = Constants.Ids.Bars.Bar2,
+                    EventName = "Singles Mixer",
+                    Description = "Tối giao lưu dành cho người độc thân",
+                    Images = "https://example.com/singles-mixer.jpg",
+                    IsEveryWeek = false,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event8,
+                    BarId = Constants.Ids.Bars.Bar3,
+                    EventName = "Karaoke Contest",
+                    Description = "Cuộc thi karaoke với giải thưởng hấp dẫn",
+                    Images = "https://example.com/karaoke.jpg",
+                    IsEveryWeek = false,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event9,
+                    BarId = Constants.Ids.Bars.Bar4,
+                    EventName = "Beer Festival",
+                    Description = "Lễ hội bia với nhiều loại bia thủ công",
+                    Images = "https://example.com/beer-fest.jpg",
+                    IsEveryWeek = false,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event10,
+                    BarId = Constants.Ids.Bars.Bar5,
+                    EventName = "Salsa Night",
+                    Description = "Đêm khiêu vũ Salsa sôi động",
+                    Images = "https://example.com/salsa.jpg",
+                    IsEveryWeek = true,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event11,
+                    BarId = Constants.Ids.Bars.Bar1,
+                    EventName = "Neon Party Night",
+                    Description = "Đêm tiệc sôi động với chủ đề Neon, dress code: Neon colors. Tặng ngay 1 vòng tay phát sáng cho 100 khách đầu tiên. DJ nổi tiếng và vũ công LED performance.",
+                    Images = "https://example.com/neon-party.jpg,https://example.com/neon-party2.jpg,https://example.com/neon-party3.jpg", // Multiple images
+                    IsEveryWeek = false,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event12,
+                    BarId = Constants.Ids.Bars.Bar2,
+                    EventName = "Bartender Battle",
+                    Description = "Cuộc thi pha chế đỉnh cao giữa các bartender hàng đầu Sài Gòn. Khách tham dự được thưởng thức miễn phí các cocktail độc đáo và vote cho bartender yêu thích.",
+                    Images = "https://example.com/bartender-battle.jpg",
+                    IsEveryWeek = false,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event13,
+                    BarId = Constants.Ids.Bars.Bar3,
+                    EventName = "Sunday Brunch & Jazz",
+                    Description = "Brunch sang trọng với âm nhạc Jazz mộc mạc. Set menu brunch đặc biệt kèm free flow rượu vang và cocktail trong 2 giờ.",
+                    Images = "https://example.com/brunch-jazz.jpg",
+                    IsEveryWeek = true, // Sự kiện hàng tuần vào Chủ nhật
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event14,
+                    BarId = Constants.Ids.Bars.Bar4,
+                    EventName = "Midnight Mystery",
+                    Description = "Sự kiện bí ẩn diễn ra vào lúc nửa đêm. Dress code: Black & White. Menu đồ uống được giữ bí mật cho đến phút chót.",
+                    Images = "https://example.com/midnight-mystery.jpg",
+                    IsEveryWeek = false,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event15,
+                    BarId = Constants.Ids.Bars.Bar5,
+                    EventName = "Full Moon Party",
+                    Description = "Tiệc trăng tròn trên tầng thượng với DJ quốc tế. Fire show và múa lửa. Tặng body painting cho khách tham dự.",
+                    Images = "https://example.com/fullmoon1.jpg,https://example.com/fullmoon2.jpg", // Multiple images
+                    IsEveryWeek = false, // Chỉ diễn ra vào đêm trăng tròn
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event16,
+                    BarId = Constants.Ids.Bars.Bar1,
+                    EventName = "Rock Band Night",
+                    Description = "Đêm nhạc rock với ban nhạc Underground nổi tiếng. Âm thanh sống động và không khí cuồng nhiệt.",
+                    Images = "https://example.com/rock-band.jpg",
+                    IsEveryWeek = false,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event17,
+                    BarId = Constants.Ids.Bars.Bar2,
+                    EventName = "Tequila Festival",
+                    Description = "Lễ hội Tequila với đa dạng hương vị từ Mexico. Workshop pha chế và thưởng thức Tequila.",
+                    Images = "https://example.com/tequila-fest.jpg",
+                    IsEveryWeek = false,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event18,
+                    BarId = Constants.Ids.Bars.Bar3,
+                    EventName = "Stand-up Comedy",
+                    Description = "Đêm hài độc thoại với các nghệ sĩ hài hàng đầu.",
+                    Images = "https://example.com/comedy-night.jpg",
+                    IsEveryWeek = true,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event19,
+                    BarId = Constants.Ids.Bars.Bar4,
+                    EventName = "Retro Disco Night",
+                    Description = "Quay ngược thời gian với nhạc Disco những năm 80s. Dress code: Retro style.",
+                    Images = "https://example.com/retro-disco.jpg",
+                    IsEveryWeek = true,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event20,
+                    BarId = Constants.Ids.Bars.Bar5,
+                    EventName = "Halloween Special",
+                    Description = "Đêm hội Halloween với trang trí ma quái, cuộc thi hóa trang và cocktail đặc biệt.",
+                    Images = "https://example.com/halloween.jpg",
+                    IsEveryWeek = false,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event21,
+                    BarId = Constants.Ids.Bars.Bar1,
+                    EventName = "Summer Beach Party",
+                    Description = "Bữa tiệc bãi biển mùa hè với DJ quốc tế, vũ công và cocktail đặc biệt.",
+                    Images = "https://example.com/summer-beach-party.jpg",
+                    IsEveryWeek = false,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event22,
+                    BarId = Constants.Ids.Bars.Bar2,
+                    EventName = "Latin Dance Night",
+                    Description = "Đêm khiêu vũ Latin sôi động với các điệu Salsa, Bachata và Merengue.",
+                    Images = "https://example.com/latin-dance.jpg",
+                    IsEveryWeek = true,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event23,
+                    BarId = Constants.Ids.Bars.Bar3,
+                    EventName = "Whiskey Tasting Experience",
+                    Description = "Trải nghiệm nếm thử whiskey từ khắp nơi trên thế giới với chuyên gia.",
+                    Images = "https://example.com/whiskey-tasting.jpg",
+                    IsEveryWeek = false,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event24,
+                    BarId = Constants.Ids.Bars.Bar4,
+                    EventName = "EDM Explosion",
+                    Description = "Đêm nhạc điện tử bùng nổ với các DJ hàng đầu trong nước.",
+                    Images = "https://example.com/edm-night.jpg",
+                    IsEveryWeek = true,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event25,
+                    BarId = Constants.Ids.Bars.Bar5,
+                    EventName = "Acoustic Coffee Night",
+                    Description = "Đêm nhạc acoustic ấm cúng với cà phê và bánh ngọt.",
+                    Images = "https://example.com/acoustic-night.jpg",
+                    IsEveryWeek = true,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event26,
+                    BarId = Constants.Ids.Bars.Bar1,
+                    EventName = "Mixology Workshop",
+                    Description = "Workshop pha chế cocktail cùng các bartender chuyên nghiệp.",
+                    Images = "https://example.com/mixology.jpg",
+                    IsEveryWeek = false,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event27,
+                    BarId = Constants.Ids.Bars.Bar2,
+                    EventName = "Wine & Jazz",
+                    Description = "Thưởng thức rượu vang và nhạc Jazz trong không gian sang trọng.",
+                    Images = "https://example.com/wine-jazz.jpg",
+                    IsEveryWeek = true,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event28,
+                    BarId = Constants.Ids.Bars.Bar3,
+                    EventName = "Singles Mixer",
+                    Description = "Đêm giao lưu dành cho người độc thân với các trò chơi thú vị.",
+                    Images = "https://example.com/singles-mixer.jpg",
+                    IsEveryWeek = false,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event29,
+                    BarId = Constants.Ids.Bars.Bar4,
+                    EventName = "Retro Game Night",
+                    Description = "Đêm chơi game retro với các máy game cổ điển và cocktail theo chủ đề.",
+                    Images = "https://example.com/retro-game.jpg",
+                    IsEveryWeek = true,
+                    IsDeleted = false
+                },
+                new Event
+                {
+                    EventId = Constants.Ids.Event.Event30,
+                    BarId = Constants.Ids.Bars.Bar5,
+                    EventName = "Poetry & Drinks",
+                    Description = "Đêm thơ và đồ uống với các nhà thơ địa phương.",
+                    Images = "https://example.com/poetry-night.jpg",
+                    IsEveryWeek = false,
+                    IsDeleted = false
+                }
+            };
         }
-        public static TimeEvent[] GetTimeEvents() {
+
+        public static TimeEvent[] GetTimeEvents()
+        {
             return new[]
             {
                 new TimeEvent
                 {
-                    EventId = Constants.Ids.Event.EventId,
-                    TimeEventId = Constants.Ids.EventTime.EventTimeId,
-                    DayOfWeek = 1,
-                    StartTime = new TimeSpan(17, 0, 0),
-                    EndTime = new TimeSpan(19, 0, 0),
+                    TimeEventId = Constants.Ids.EventTime.Time1,
+                    EventId = Constants.Ids.Event.Event1,
                     Date = null,
+                    StartTime = new TimeSpan(18, 0, 0),
+                    EndTime = new TimeSpan(20, 0, 0),
+                    DayOfWeek = 5
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time2,
+                    EventId = Constants.Ids.Event.Event2,
+                    Date = DateTimeOffset.Now.AddDays(7),
+                    StartTime = new TimeSpan(19, 30, 0),
+                    EndTime = new TimeSpan(22, 30, 0),
+                    DayOfWeek = null
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time3,
+                    EventId = Constants.Ids.Event.Event3,
+                    Date = null,
+                    StartTime = new TimeSpan(19, 0, 0),
+                    EndTime = new TimeSpan(23, 0, 0),
+                    DayOfWeek = 4
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time4,
+                    EventId = Constants.Ids.Event.Event4,
+                    Date = null,
+                    StartTime = new TimeSpan(19, 0, 0),
+                    EndTime = new TimeSpan(21, 0, 0),
+                    DayOfWeek = 2
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time5,
+                    EventId = Constants.Ids.Event.Event5,
+                    Date = DateTimeOffset.Now.AddDays(14),
+                    StartTime = new TimeSpan(20, 0, 0),
+                    EndTime = new TimeSpan(23, 0, 0),
+                    DayOfWeek = null
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time6,
+                    EventId = Constants.Ids.Event.Event6,
+                    Date = null,
+                    StartTime = new TimeSpan(20, 30, 0),
+                    EndTime = new TimeSpan(23, 30, 0),
+                    DayOfWeek = 6
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time7,
+                    EventId = Constants.Ids.Event.Event7,
+                    Date = DateTimeOffset.Now.AddDays(21),
+                    StartTime = new TimeSpan(19, 0, 0),
+                    EndTime = new TimeSpan(22, 0, 0),
+                    DayOfWeek = null
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time8,
+                    EventId = Constants.Ids.Event.Event8,
+                    Date = DateTimeOffset.Now.AddDays(10),
+                    StartTime = new TimeSpan(19, 30, 0),
+                    EndTime = new TimeSpan(22, 30, 0),
+                    DayOfWeek = null
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time9,
+                    EventId = Constants.Ids.Event.Event9,
+                    Date = DateTimeOffset.Now.AddDays(30),
+                    StartTime = new TimeSpan(16, 0, 0),
+                    EndTime = new TimeSpan(23, 0, 0),
+                    DayOfWeek = null
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time10,
+                    EventId = Constants.Ids.Event.Event10,
+                    Date = null,
+                    StartTime = new TimeSpan(20, 0, 0),
+                    EndTime = new TimeSpan(23, 0, 0),
+                    DayOfWeek = 3
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time11,
+                    EventId = Constants.Ids.Event.Event11,
+                    Date = DateTimeOffset.Now.AddDays(15), // Specific date
+                    StartTime = new TimeSpan(21, 0, 0), // 9 PM
+                    EndTime = new TimeSpan(4, 0, 0), // 4 AM next day
+                    DayOfWeek = null // One-time event
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time12,
+                    EventId = Constants.Ids.Event.Event12,
+                    Date = DateTimeOffset.Now.AddDays(25),
+                    StartTime = new TimeSpan(18, 30, 0), // 6:30 PM
+                    EndTime = new TimeSpan(23, 30, 0), // 11:30 PM
+                    DayOfWeek = null
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time13,
+                    EventId = Constants.Ids.Event.Event13,
+                    Date = null,
+                    StartTime = new TimeSpan(11, 0, 0), // 11 AM
+                    EndTime = new TimeSpan(15, 0, 0), // 3 PM
+                    DayOfWeek = 0 // Every Sunday
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time14,
+                    EventId = Constants.Ids.Event.Event14,
+                    Date = DateTimeOffset.Now.AddDays(13),
+                    StartTime = new TimeSpan(23, 59, 0), // 11:59 PM
+                    EndTime = new TimeSpan(5, 0, 0), // 5 AM next day
+                    DayOfWeek = null
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time15,
+                    EventId = Constants.Ids.Event.Event15,
+                    Date = DateTimeOffset.Now.AddMonths(1).Date.AddDays(15), // Next full moon
+                    StartTime = new TimeSpan(20, 0, 0), // 8 PM
+                    EndTime = new TimeSpan(5, 0, 0), // 5 AM next day
+                    DayOfWeek = null
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time16_1,
+                    EventId = Constants.Ids.Event.Event16,
+                    Date = DateTimeOffset.Now.AddDays(20),
+                    StartTime = new TimeSpan(20, 0, 0),
+                    EndTime = new TimeSpan(23, 0, 0),
+                    DayOfWeek = null
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time16_2,
+                    EventId = Constants.Ids.Event.Event16,
+                    Date = DateTimeOffset.Now.AddDays(21),
+                    StartTime = new TimeSpan(20, 0, 0),
+                    EndTime = new TimeSpan(23, 0, 0),
+                    DayOfWeek = null
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time17_1,
+                    EventId = Constants.Ids.Event.Event17,
+                    Date = DateTimeOffset.Now.AddDays(30),
+                    StartTime = new TimeSpan(18, 0, 0),
+                    EndTime = new TimeSpan(22, 0, 0),
+                    DayOfWeek = null
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time17_2,
+                    EventId = Constants.Ids.Event.Event17,
+                    Date = DateTimeOffset.Now.AddDays(31),
+                    StartTime = new TimeSpan(18, 0, 0),
+                    EndTime = new TimeSpan(22, 0, 0),
+                    DayOfWeek = null
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time17_3,
+                    EventId = Constants.Ids.Event.Event17,
+                    Date = DateTimeOffset.Now.AddDays(32),
+                    StartTime = new TimeSpan(18, 0, 0),
+                    EndTime = new TimeSpan(22, 0, 0),
+                    DayOfWeek = null
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time18_1,
+                    EventId = Constants.Ids.Event.Event18,
+                    Date = null,
+                    StartTime = new TimeSpan(21, 0, 0),
+                    EndTime = new TimeSpan(23, 0, 0),
+                    DayOfWeek = 3 // Thứ 4 hàng tuần
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time19_1,
+                    EventId = Constants.Ids.Event.Event19,
+                    Date = null,
+                    StartTime = new TimeSpan(21, 0, 0),
+                    EndTime = new TimeSpan(1, 0, 0),
+                    DayOfWeek = 5 // Thứ 6
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time19_2,
+                    EventId = Constants.Ids.Event.Event19,
+                    Date = null,
+                    StartTime = new TimeSpan(21, 0, 0),
+                    EndTime = new TimeSpan(1, 0, 0),
+                    DayOfWeek = 6 // Thứ 7
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time20_1,
+                    EventId = Constants.Ids.Event.Event20,
+                    Date = DateTimeOffset.Parse("2024-10-29"),
+                    StartTime = new TimeSpan(20, 0, 0),
+                    EndTime = new TimeSpan(2, 0, 0),
+                    DayOfWeek = null
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time20_2,
+                    EventId = Constants.Ids.Event.Event20,
+                    Date = DateTimeOffset.Parse("2024-10-30"),
+                    StartTime = new TimeSpan(20, 0, 0),
+                    EndTime = new TimeSpan(2, 0, 0),
+                    DayOfWeek = null
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time20_3,
+                    EventId = Constants.Ids.Event.Event20,
+                    Date = DateTimeOffset.Parse("2024-10-31"),
+                    StartTime = new TimeSpan(20, 0, 0),
+                    EndTime = new TimeSpan(4, 0, 0), // Halloween night kéo dài hơn
+                    DayOfWeek = null
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time21,
+                    EventId = Constants.Ids.Event.Event21,
+                    Date = DateTimeOffset.Now.AddDays(30),
+                    StartTime = new TimeSpan(18, 0, 0),
+                    EndTime = new TimeSpan(23, 0, 0),
+                    DayOfWeek = null
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time22,
+                    EventId = Constants.Ids.Event.Event22,
+                    Date = null,
+                    StartTime = new TimeSpan(20, 0, 0),
+                    EndTime = new TimeSpan(23, 0, 0),
+                    DayOfWeek = 5 // Thứ 6
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time23,
+                    EventId = Constants.Ids.Event.Event23, // ID của Whiskey Tasting
+                    Date = DateTimeOffset.Now.AddDays(15),
+                    StartTime = new TimeSpan(19, 0, 0),
+                    EndTime = new TimeSpan(22, 0, 0),
+                    DayOfWeek = null
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time24,
+                    EventId = Constants.Ids.Event.Event24, // ID của EDM Explosion
+                    Date = null,
+                    StartTime = new TimeSpan(22, 0, 0),
+                    EndTime = new TimeSpan(4, 0, 0),
+                    DayOfWeek = 6 // Thứ 7
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time25,
+                    EventId = Constants.Ids.Event.Event25, // ID của Acoustic Coffee Night
+                    Date = null,
+                    StartTime = new TimeSpan(19, 30, 0),
+                    EndTime = new TimeSpan(22, 30, 0),
+                    DayOfWeek = 3 // Thứ 4
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time26,
+                    EventId = Constants.Ids.Event.Event26, // ID của Mixology Workshop
+                    Date = DateTimeOffset.Now.AddDays(20),
+                    StartTime = new TimeSpan(15, 0, 0),
+                    EndTime = new TimeSpan(18, 0, 0),
+                    DayOfWeek = null
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time27,
+                    EventId = Constants.Ids.Event.Event27, // ID của Wine & Jazz
+                    Date = null,
+                    StartTime = new TimeSpan(20, 0, 0),
+                    EndTime = new TimeSpan(23, 0, 0),
+                    DayOfWeek = 5 // Thứ 6
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time28,
+                    EventId = Constants.Ids.Event.Event28, // ID của Singles Mixer
+                    Date = DateTimeOffset.Now.AddDays(25),
+                    StartTime = new TimeSpan(19, 0, 0),
+                    EndTime = new TimeSpan(23, 0, 0),
+                    DayOfWeek = null
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time29,
+                    EventId = Constants.Ids.Event.Event29, // ID của Retro Game Night
+                    Date = null,
+                    StartTime = new TimeSpan(18, 0, 0),
+                    EndTime = new TimeSpan(23, 0, 0),
+                    DayOfWeek = 4 // Thứ 5
+                },
+                new TimeEvent
+                {
+                    TimeEventId = Constants.Ids.EventTime.Time30,
+                    EventId = Constants.Ids.Event.Event30, // ID của Poetry & Drinks
+                    Date = DateTimeOffset.Now.AddDays(10),
+                    StartTime = new TimeSpan(19, 30, 0),
+                    EndTime = new TimeSpan(22, 30, 0),
+                    DayOfWeek = null
                 }
-            }; 
+            };
         }
 
         public static EventVoucher[] GetEventVouchers()
@@ -712,17 +1376,403 @@ namespace Persistence.Data
             {
                 new EventVoucher
                 {
-                    VoucherCode = "TEST1",
-                    Discount = 10,
                     EventVoucherId = Guid.NewGuid(),
-                    EventVoucherName = "TEST1",
-                    MaxPrice = 200,
-                    Quantity = 1,
-                    TimeEventId = Constants.Ids.EventTime.EventTimeId,
-                    Status = false,
+                    TimeEventId = Constants.Ids.EventTime.Time1,
+                    EventVoucherName = "Happy Hour 30% Off",
+                    VoucherCode = "HAPPY30",
+                    Discount = 30,
+                    MaxPrice = 200000,
+                    Quantity = 100,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time2,
+                    EventVoucherName = "Live Music Special",
+                    VoucherCode = "LIVE20",
+                    Discount = 20,
+                    MaxPrice = 150000,
+                    Quantity = 50,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time3,
+                    EventVoucherName = "Ladies Night Free Drink",
+                    VoucherCode = "LADIES100",
+                    Discount = 100,
+                    MaxPrice = 100000,
+                    Quantity = 200,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time4,
+                    EventVoucherName = "Masterclass Special",
+                    VoucherCode = "MASTER40",
+                    Discount = 40,
+                    MaxPrice = 300000,
+                    Quantity = 30,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time5,
+                    EventVoucherName = "Wine Night",
+                    VoucherCode = "WINE25",
+                    Discount = 25,
+                    MaxPrice = 500000,
+                    Quantity = 50,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time6,
+                    EventVoucherName = "Jazz Special",
+                    VoucherCode = "JAZZ20",
+                    Discount = 20,
+                    MaxPrice = 200000,
+                    Quantity = 80,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time7,
+                    EventVoucherName = "Singles Night",
+                    VoucherCode = "SINGLE50",
+                    Discount = 50,
+                    MaxPrice = 250000,
+                    Quantity = 100,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time8,
+                    EventVoucherName = "Karaoke Deal",
+                    VoucherCode = "KARA35",
+                    Discount = 35,
+                    MaxPrice = 300000,
+                    Quantity = 60,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time9,
+                    EventVoucherName = "Beer Fest Special",
+                    VoucherCode = "BEER45",
+                    Discount = 45,
+                    MaxPrice = 400000,
+                    Quantity = 200,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time10,
+                    EventVoucherName = "Salsa Night",
+                    VoucherCode = "SALSA30",
+                    Discount = 30,
+                    MaxPrice = 150000,
+                    Quantity = 70,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time11,
+                    EventVoucherName = "Neon Party VIP Access",
+                    VoucherCode = "NEONVIP",
+                    Discount = 100, // 100% discount
+                    MaxPrice = 1000000, // Giá trị cao cho VIP access
+                    Quantity = 20, // Limited quantity
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time12,
+                    EventVoucherName = "Bartender's Choice",
+                    VoucherCode = "BATTLE50",
+                    Discount = 50,
+                    MaxPrice = 300000,
+                    Quantity = 150, // Nhiều voucher cho sự kiện lớn
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time13,
+                    EventVoucherName = "Sunday Brunch Premium",
+                    VoucherCode = "JAZZ2HOUR",
+                    Discount = 30,
+                    MaxPrice = 800000, // High value for premium event
+                    Quantity = 40,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time14,
+                    EventVoucherName = "Mystery Box Special",
+                    VoucherCode = "MIDNIGHT",
+                    Discount = 75, // High discount
+                    MaxPrice = 500000,
+                    Quantity = 50,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time15,
+                    EventVoucherName = "Full Moon Experience",
+                    VoucherCode = "FULLMOON",
+                    Discount = 40,
+                    MaxPrice = 1500000, // Highest value voucher
+                    Quantity = 100,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time16_1,
+                    EventVoucherName = "Rock Early Bird",
+                    VoucherCode = "ROCK40",
+                    Discount = 40,
+                    MaxPrice = 300000,
+                    Quantity = 50,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time16_2,
+                    EventVoucherName = "Rock Group Deal",
+                    VoucherCode = "ROCKGROUP",
+                    Discount = 25,
+                    MaxPrice = 1000000,
+                    Quantity = 30,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time17_1,
+                    EventVoucherName = "Tequila Day 1",
+                    VoucherCode = "TEQ1",
+                    Discount = 30,
+                    MaxPrice = 500000,
+                    Quantity = 100,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time17_2,
+                    EventVoucherName = "Tequila Day 2",
+                    VoucherCode = "TEQ2",
+                    Discount = 35,
+                    MaxPrice = 500000,
+                    Quantity = 100,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time17_3,
+                    EventVoucherName = "Tequila Final Day",
+                    VoucherCode = "TEQ3",
+                    Discount = 40,
+                    MaxPrice = 500000,
+                    Quantity = 100,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time18_1,
+                    EventVoucherName = "Comedy Night",
+                    VoucherCode = "LAUGH25",
+                    Discount = 25,
+                    MaxPrice = 200000,
+                    Quantity = 80,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time19_1,
+                    EventVoucherName = "Disco Friday",
+                    VoucherCode = "DISCO1",
+                    Discount = 30,
+                    MaxPrice = 300000,
+                    Quantity = 60,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time19_2,
+                    EventVoucherName = "Disco Saturday",
+                    VoucherCode = "DISCO2",
+                    Discount = 35,
+                    MaxPrice = 300000,
+                    Quantity = 60,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time20_1,
+                    EventVoucherName = "Halloween Early",
+                    VoucherCode = "HALL1",
+                    Discount = 30,
+                    MaxPrice = 400000,
+                    Quantity = 100,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time20_2,
+                    EventVoucherName = "Halloween Pre-Party",
+                    VoucherCode = "HALL2",
+                    Discount = 35,
+                    MaxPrice = 400000,
+                    Quantity = 100,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time20_3,
+                    EventVoucherName = "Halloween Night Special",
+                    VoucherCode = "HALL3",
+                    Discount = 50,
+                    MaxPrice = 1000000,
+                    Quantity = 50,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time21,
+                    EventVoucherName = "Summer Party Special",
+                    VoucherCode = "SUMMER50",
+                    Discount = 50,
+                    MaxPrice = 500000,
+                    Quantity = 100,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time22,
+                    EventVoucherName = "Latin Night Discount",
+                    VoucherCode = "LATIN30",
+                    Discount = 30,
+                    MaxPrice = 300000,
+                    Quantity = 50,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time23,
+                    EventVoucherName = "Latin Night Discount",
+                    VoucherCode = "LATIN30",
+                    Discount = 30,
+                    MaxPrice = 300000,
+                    Quantity = 50,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time24,
+                    EventVoucherName = "Latin Night Discount",
+                    VoucherCode = "LATIN30",
+                    Discount = 30,
+                    MaxPrice = 300000,
+                    Quantity = 50,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time25,
+                    EventVoucherName = "Latin Night Discount",
+                    VoucherCode = "LATIN30",
+                    Discount = 30,
+                    MaxPrice = 300000,
+                    Quantity = 50,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time26,
+                    EventVoucherName = "Latin Night Discount",
+                    VoucherCode = "LATIN30",
+                    Discount = 30,
+                    MaxPrice = 300000,
+                    Quantity = 50,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time27,
+                    EventVoucherName = "Latin Night Discount",
+                    VoucherCode = "LATIN30",
+                    Discount = 30,
+                    MaxPrice = 300000,
+                    Quantity = 50,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time28,
+                    EventVoucherName = "Latin Night Discount",
+                    VoucherCode = "LATIN30",
+                    Discount = 30,
+                    MaxPrice = 300000,
+                    Quantity = 50,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time29,
+                    EventVoucherName = "Latin Night Discount",
+                    VoucherCode = "LATIN30",
+                    Discount = 30,
+                    MaxPrice = 300000,
+                    Quantity = 50,
+                    Status = true
+                },
+                new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    TimeEventId = Constants.Ids.EventTime.Time30,
+                    EventVoucherName = "Latin Night Discount",
+                    VoucherCode = "LATIN30",
+                    Discount = 30,
+                    MaxPrice = 300000,
+                    Quantity = 50,
+                    Status = true
                 }
             };
         }
+
         public static BarTime[] GetBarTimes()
         {
             var barTimes = new List<BarTime>();
@@ -1469,7 +2519,7 @@ namespace Persistence.Data
                     IsRead = false
                 },
 
-                // Thông báo bảo trì cho Manager
+                // Thông báo b��o trì cho Manager
                 new NotificationDetail
                 {
                     NotificationDetailId = Constants.Ids.NotificationDetails.Maintenance,

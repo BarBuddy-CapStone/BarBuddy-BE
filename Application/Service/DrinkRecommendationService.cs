@@ -197,7 +197,6 @@ namespace Application.Service
                 throw new Exception(ex.Message);
             }
         }
-        // Hàm tính độ tương đồng giữa 2 chuỗi
         private int LevenshteinDistance(string s1, string s2)
         {
             int[,] d = new int[s1.Length + 1, s2.Length + 1];
