@@ -17,6 +17,7 @@ namespace Domain.Entities
         public string Description { get; set; }
         public string Images { get; set; }
         public bool IsEveryWeek { get; set; }
+        public bool IsHide {  get; set; }
         public bool IsDeleted { get; set; }
         public virtual ICollection<TimeEvent> TimeEvent { get; set; }
         [ForeignKey("BarId")]

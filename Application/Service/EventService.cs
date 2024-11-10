@@ -55,6 +55,7 @@ namespace Application.Service
 
                 mapper.Images = "";
                 mapper.IsDeleted = PrefixKeyConstant.FALSE;
+                mapper.IsHide = PrefixKeyConstant.FALSE;
                 await _unitOfWork.EventRepository.InsertAsync(mapper);
                 await Task.Delay(200);
                 await _unitOfWork.SaveAsync();
@@ -108,11 +109,12 @@ namespace Application.Service
                 filter = events => events.EventId.ToString().Equals(query.Search);
 
             }
-            var getAll = await _unitOfWork.EventRepository
+            var getAll = (await _unitOfWork.EventRepository
                                             .GetAsync(filter: filter,
                                                         pageIndex: query.PageIndex,
                                                         pageSize: query.PageSize,
-                                                 includeProperties: "Bar,TimeEvent.EventVouchers");
+                                                 includeProperties: "Bar,TimeEvent.EventVouchers"))
+                                                 .Where(x => x.IsDeleted == PrefixKeyConstant.FALSE);
             if (getAll.IsNullOrEmpty())
             {
                 throw new CustomException.DataNotFoundException("Không tìm thấy dữ liệu");
@@ -140,11 +142,11 @@ namespace Application.Service
         {
             if (!barId.HasValue) throw new CustomException.InvalidDataException(nameof(barId));
 
-            var getAll = await _unitOfWork.EventRepository.GetAsync(filter: e => e.BarId.Equals(barId), 
+            var getAll = (await _unitOfWork.EventRepository.GetAsync(filter: e => e.BarId.Equals(barId), 
                     includeProperties: "Bar,TimeEvent.EventVouchers",
                     pageIndex: query.PageIndex,
                     pageSize: query.PageSize
-                    );
+                    )).Where(x => x.IsDeleted == PrefixKeyConstant.FALSE);
 
             if(!getAll.Any())
             {
@@ -175,7 +177,8 @@ namespace Application.Service
             try
             {
                 var getEventById = _unitOfWork.EventRepository
-                                            .Get(filter: x => x.EventId.Equals(eventId)
+                                            .Get(filter: x => x.EventId.Equals(eventId) && 
+                                                        x.IsDeleted == PrefixKeyConstant.FALSE
                                             , includeProperties: "Bar,TimeEvent");
                 var getOne = getEventById.FirstOrDefault()
                             ?? throw new CustomException.DataNotFoundException("Không tìm thấy sự kiện bạn đang tìm!");
@@ -234,6 +237,7 @@ namespace Application.Service
                 var mapper = _mapper.Map(request, isExistEvent);
                 mapper.Images = "";
                 mapper.IsDeleted = PrefixKeyConstant.FALSE;
+                mapper.IsHide = PrefixKeyConstant.FALSE;
                 await _unitOfWork.EventRepository.UpdateRangeAsync(mapper);
                 await Task.Delay(200);
                 await _unitOfWork.SaveAsync();
