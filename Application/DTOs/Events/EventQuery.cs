@@ -9,6 +9,6 @@ namespace Application.DTOs.Events
 {
     public class EventQuery : ObjectQuery
     {
-        public string? BarName { get; set; }
+        public Guid? BarId { get; set; }
     }
 }

@@ -144,10 +144,18 @@ namespace Application.Service
         public async Task<List<EventResponse>> GetAllEvent(EventQuery query)
         {
             Expression<Func<Event, bool>> filter = null;
-            if (!string.IsNullOrWhiteSpace(query.Search))
+            if (!string.IsNullOrWhiteSpace(query.Search) && query.BarId != null)
             {
-                filter = events => events.EventId.ToString().Equals(query.Search);
-
+                filter = events => events.EventName.Contains(query.Search) &&
+                                   events.Bar.BarId.Equals(query.BarId);
+            }
+            else if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                filter = events => events.EventName.Contains(query.Search);
+            }
+            else if (query.BarId != null)
+            {
+                filter = events => events.Bar.BarId.Equals(query.BarId);
             }
             var getAll = (await _unitOfWork.EventRepository
                                             .GetAsync(filter: filter,
