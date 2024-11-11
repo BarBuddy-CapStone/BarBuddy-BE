@@ -10,6 +10,7 @@ namespace Application.DTOs.Events
         public string EventName { get; set; }
         public string Images { get; set; }
         public bool IsHide {  get; set; }
+        public int? IsStill {  get; set; }
         public EventVoucherResponse EventVoucherResponse { get; set; }
         public List<EventTimeResponse> EventTimeResponses { get; set; }
     }

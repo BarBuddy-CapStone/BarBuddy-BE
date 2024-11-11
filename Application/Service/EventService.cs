@@ -143,6 +143,11 @@ namespace Application.Service
 
         public async Task<List<EventResponse>> GetAllEvent(EventQuery query)
         {
+            DateTimeOffset dateTime = DateTimeOffset.Now;
+            TimeSpan getTime = TimeSpan.FromHours(dateTime.TimeOfDay.Hours)
+                                        .Add(TimeSpan.FromMinutes(dateTime.TimeOfDay.Minutes))
+                                        .Add(TimeSpan.FromSeconds(dateTime.TimeOfDay.Seconds));
+
             Expression<Func<Event, bool>> filter = null;
             if (!string.IsNullOrWhiteSpace(query.Search) && query.BarId != null)
             {
@@ -174,6 +179,29 @@ namespace Application.Service
                 var events = getAll.First(x => x.EventId.Equals(item.EventId));
                 item.EventTimeResponses = _mapper.Map<List<EventTimeResponse>>(events.TimeEvent);
                 item.EventVoucherResponse = _mapper.Map<EventVoucherResponse>(events.EventVoucher);
+                var check = (int)dateTime.DayOfWeek;
+                var isStillDate = item.EventTimeResponses.Exists(t => t.Date != null && Utils.CheckTimeActiveEvent(getTime, events.TimeEvent.ToList()));
+                var isStillDOW = item.EventTimeResponses.Exists(t => t.DayOfWeek != null &&
+                                                                    (t.DayOfWeek == (int)dateTime.DayOfWeek ) &&
+                                                                    Utils.CheckTimeActiveEvent(getTime, events.TimeEvent.ToList()));
+
+                if (isStillDate || isStillDOW)
+                {
+                    item.IsStill = 0;
+                }
+                else if (!isStillDOW)
+                {
+                    item.IsStill = 1;
+                }
+                else if (!isStillDate)
+                {
+                    item.IsStill = 2;
+                }
+                
+            }
+            if (query.IsStill != null)
+            {
+                response = response.Where(x => x.IsStill == 0 || x.IsStill == 1).ToList();
             }
             return response;
         }
