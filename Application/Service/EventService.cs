@@ -10,10 +10,12 @@ using Domain.Common;
 using Domain.Constants;
 using Domain.CustomException;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.IRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection.Metadata;
 
@@ -179,30 +181,15 @@ namespace Application.Service
                 var events = getAll.First(x => x.EventId.Equals(item.EventId));
                 item.EventTimeResponses = _mapper.Map<List<EventTimeResponse>>(events.TimeEvent);
                 item.EventVoucherResponse = _mapper.Map<EventVoucherResponse>(events.EventVoucher);
-                var check = (int)dateTime.DayOfWeek;
-                var isStillDate = item.EventTimeResponses.Exists(t => t.Date != null && Utils.CheckTimeActiveEvent(getTime, events.TimeEvent.ToList()));
-                var isStillDOW = item.EventTimeResponses.Exists(t => t.DayOfWeek != null &&
-                                                                    (t.DayOfWeek == (int)dateTime.DayOfWeek ) &&
-                                                                    Utils.CheckTimeActiveEvent(getTime, events.TimeEvent.ToList()));
+                item.IsStill = Utils.DetermineEventStatus(item.EventTimeResponses,
+                                                            events.TimeEvent.ToList(),
+                                                            getTime);
 
-                if (isStillDate || isStillDOW)
-                {
-                    item.IsStill = 0;
-                }
-                else if (!isStillDOW)
-                {
-                    item.IsStill = 1;
-                }
-                else if (!isStillDate)
-                {
-                    item.IsStill = 2;
-                }
-                
             }
-            if (query.IsStill != null)
-            {
-                response = response.Where(x => x.IsStill == 0 || x.IsStill == 1).ToList();
-            }
+            response = response.Where(x => x.IsStill != (int)PrefixValueEnum.Ended)
+                                .Where(x => !query.IsStill.HasValue || x.IsStill == query.IsStill.Value)
+                                .ToList();
+
             return response;
         }
 
@@ -236,17 +223,28 @@ namespace Application.Service
         {
             try
             {
-                var getEventById = _unitOfWork.EventRepository
-                                            .Get(filter: x => x.EventId.Equals(eventId) &&
+                DateTimeOffset dateTime = DateTimeOffset.Now;
+                TimeSpan getTime = TimeSpan.FromHours(dateTime.TimeOfDay.Hours)
+                                            .Add(TimeSpan.FromMinutes(dateTime.TimeOfDay.Minutes))
+                                            .Add(TimeSpan.FromSeconds(dateTime.TimeOfDay.Seconds));
+
+                var getEventById = await _unitOfWork.EventRepository
+                                            .GetAsync(filter: x => x.EventId.Equals(eventId) &&
                                                         x.IsDeleted == PrefixKeyConstant.FALSE
                                             , includeProperties: "Bar,TimeEvent,EventVoucher");
                 var getOne = getEventById.FirstOrDefault()
                             ?? throw new CustomException.DataNotFoundException("Không tìm thấy sự kiện bạn đang tìm!");
 
-
                 var response = _mapper.Map<EventResponse>(getOne);
                 response.EventTimeResponses = _mapper.Map<List<EventTimeResponse>>(getOne.TimeEvent);
                 response.EventVoucherResponse = _mapper.Map<EventVoucherResponse>(getOne.EventVoucher);
+                response.IsStill = Utils.DetermineEventStatus(response.EventTimeResponses,
+                                                            getOne.TimeEvent.ToList(),
+                                                            getTime);
+                if(response.IsStill == (int)PrefixValueEnum.Ended)
+                {
+                    throw new CustomException.InvalidDataException("Không hợp lệ !");
+                }
                 return response;
             }
             catch (CustomException.InternalServerErrorException ex)

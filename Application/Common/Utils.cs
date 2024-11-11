@@ -1,6 +1,8 @@
-﻿using Azure.Core;
+﻿using Application.DTOs.Events.EventTime;
+using Azure.Core;
 using Domain.CustomException;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
@@ -33,7 +35,6 @@ namespace Application.Common
             }
             return imgsFile;
         }
-
         public static IFormFile CheckValidateSingleImageFile(IFormFile formImage)
         {
             if (formImage.Length > 10 * 1024 * 1024)
@@ -55,7 +56,6 @@ namespace Application.Common
 
             return age >= 18 ? ValidationResult.Success : new ValidationResult("Bạn phải đủ 18 tuổi.");
         }
-
         public static void ValidateOpenCloseTime(DateTimeOffset requestDate, TimeSpan requestTime, List<BarTime> barTimes)
         {
             var currentDate = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now.Date);
@@ -81,7 +81,6 @@ namespace Application.Common
                 throw new CustomException.InvalidDataException("Thời gian phải nằm trong giờ mở cửa và giờ đóng cửa của quán Bar!");
             }
         }
-
         public static void ValidateEventTime(DateTimeOffset? requestDate, TimeSpan startTime, TimeSpan endTime, List<BarTime> barTimes)
         {
             if (requestDate != null)
@@ -98,7 +97,6 @@ namespace Application.Common
 
             ValidateEndTimeAfterStartTime(startTime, endTime);
         }
-
         private static void ValidateDateNotInPast(DateTimeOffset requestDate)
         {
             var currentDate = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now.Date);
@@ -107,7 +105,6 @@ namespace Application.Common
                 throw new CustomException.InvalidDataException("Không hợp lệ");
             }
         }
-
         private static void ValidateTimeWithinOpenClose(DateTimeOffset requestDate, TimeSpan time, List<BarTime> barTimes)
         {
             var currentTimeOfDay = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.UtcNow).TimeOfDay;
@@ -119,7 +116,6 @@ namespace Application.Common
 
             ValidateTimeWithinRange(time, barTimes, "Thời gian");
         }
-
         public static void ValidateTimeWithinEvent(DateTimeOffset requestDate, TimeSpan time, List<TimeEvent> eventTimes)
         {
             var currentTimeOfDay = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.UtcNow).TimeOfDay;
@@ -131,7 +127,6 @@ namespace Application.Common
 
             ValidateTimeWithinRangeEvent(time, eventTimes, "Thời gian");
         }
-
         private static void ValidateTimeWithinRange(TimeSpan time, List<BarTime> barTimes, string timeLabel)
         {
             bool isValidTime = barTimes.Any(barTime =>
@@ -172,37 +167,69 @@ namespace Application.Common
 
             return isValidTime;
         }
-
-        public static bool CheckTimeActiveEvent(TimeSpan time, List<TimeEvent> eventTimes)
+        public static int CheckTimeActiveEvent(TimeSpan time, List<TimeEvent> eventTimes)
         {
 
             DateTimeOffset dateTime = DateTimeOffset.Now;
-            TimeSpan getTime = TimeSpan.FromHours(dateTime.TimeOfDay.Hours)
-                                        .Add(TimeSpan.FromMinutes(dateTime.TimeOfDay.Minutes))
-                                        .Add(TimeSpan.FromSeconds(dateTime.TimeOfDay.Seconds));
 
-            bool isStill = eventTimes.Any(eventTime =>
+            foreach (var eventTime in eventTimes)
             {
-                if(eventTime.Date > dateTime)
+                if (eventTime.Date.HasValue)
                 {
-                    return true;
+                    if (eventTime.Date?.Date > dateTime.Date)
+                    {
+                        return (int)PrefixValueEnum.IsComming;
+                    }
+                    if (eventTime.Date?.Date == dateTime.Date)
+                    {
+                        if (eventTime.StartTime > eventTime.EndTime)
+                        {
+                            if (time <= eventTime.EndTime || eventTime.StartTime >= time)
+                            {
+                                return (int)PrefixValueEnum.IsGoingOn;
+                            };
+                        }
+                        else
+                        {
+                            if (time <= eventTime.EndTime && time >= eventTime.StartTime)
+                            {
+                                return (int)PrefixValueEnum.IsGoingOn;
+                            }
+                            else if (time < eventTime.StartTime)
+                            {
+                                return (int)PrefixValueEnum.IsComming;
+                            }
+                        }
+                    }
                 }
-                if(eventTime.Date == dateTime)
+                else if (eventTime.DayOfWeek.HasValue && eventTime.DayOfWeek.Value == (int)dateTime.DayOfWeek)
                 {
-                    return time < eventTime.StartTime || eventTime.StartTime <= time && eventTime.EndTime >= time;
+                    if (eventTime.StartTime > eventTime.EndTime)
+                    {
+                        if (time <= eventTime.EndTime || time >= eventTime.StartTime)
+                        {
+                            return (int)PrefixValueEnum.IsGoingOn;
+                        }
+                    }
+                    else
+                    {
+                        if (time <= eventTime.EndTime && time >= eventTime.StartTime)
+                        {
+                            return (int)PrefixValueEnum.IsGoingOn;
+                        }
+                        else if (time < eventTime.StartTime)
+                        {
+                            return (int)PrefixValueEnum.IsComming;
+                        }
+                    }
                 }
-
-                if(eventTime.StartTime > eventTime.EndTime)
+                else if (eventTime.DayOfWeek.HasValue && eventTime.DayOfWeek.Value > (int)dateTime.DayOfWeek)
                 {
-                    return time <= eventTime.EndTime || eventTime.StartTime >= time;
-                }else
-                {
-                    return time >= eventTime.StartTime && time <= eventTime.EndTime;
+                    return (int)PrefixValueEnum.IsComming;
                 }
-            });
-            return isStill;
+            };
+            return (int)PrefixValueEnum.Ended;
         }
-
         private static void ValidateEndTimeAfterStartTime(TimeSpan startTime, TimeSpan endTime)
         {
             if (endTime <= startTime)
@@ -210,7 +237,6 @@ namespace Application.Common
                 throw new CustomException.InvalidDataException("Thời gian kết thúc phải lớn hơn thời gian bắt đầu.");
             }
         }
-
         public static IFormFile ConvertBase64ToFile(string base64String)
         {
             var bytes = Convert.FromBase64String(base64String);
@@ -224,7 +250,6 @@ namespace Application.Common
 
             return file;
         }
-
         public static List<IFormFile> ConvertBase64ListToFiles(List<string> base64Strings)
         {
             var files = new List<IFormFile>();
@@ -237,7 +262,6 @@ namespace Application.Common
 
             return files;
         }
-
         public static bool IValidSlot(double requiredHours, TimeSpan StartTime, TimeSpan EndTime)
         {
             double duration = (EndTime < StartTime)
@@ -258,6 +282,36 @@ namespace Application.Common
                 6 => "Thứ Bảy",
                 _ => "Không xác định"
             };
+        }
+        public static int DetermineEventStatus(List<EventTimeResponse> eventTimeResponses,List<TimeEvent> timeEvent,TimeSpan currentTime)
+        {
+            int? isStillDate = !eventTimeResponses.Any(t => t.Date.HasValue)
+                ? null
+                : eventTimeResponses
+                    .Where(t => t.Date.HasValue)
+                    .Select(t => Utils.CheckTimeActiveEvent(currentTime, timeEvent))
+                    .FirstOrDefault();
+
+            int? isStillDOW = !eventTimeResponses.Any(t => t.DayOfWeek.HasValue)
+                ? null
+                : eventTimeResponses
+                    .Where(t => t.DayOfWeek.HasValue)
+                    .Select(t => Utils.CheckTimeActiveEvent(currentTime, timeEvent))
+                    .FirstOrDefault();
+
+            if (isStillDate.HasValue && isStillDate == (int)PrefixValueEnum.IsGoingOn ||
+                isStillDOW.HasValue && isStillDOW == (int)PrefixValueEnum.IsGoingOn)
+            {
+                return (int)PrefixValueEnum.IsGoingOn;
+            }
+
+            if (isStillDate.HasValue && isStillDate == (int)PrefixValueEnum.IsComming ||
+                isStillDOW.HasValue && isStillDOW == (int)PrefixValueEnum.IsComming)
+            {
+                return (int)PrefixValueEnum.IsComming;
+            }
+
+            return (int)PrefixValueEnum.Ended;
         }
     }
 }
