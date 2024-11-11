@@ -120,6 +120,18 @@ namespace Application.Common
             ValidateTimeWithinRange(time, barTimes, "Thời gian");
         }
 
+        public static void ValidateTimeWithinEvent(DateTimeOffset requestDate, TimeSpan time, List<TimeEvent> eventTimes)
+        {
+            var currentTimeOfDay = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.UtcNow).TimeOfDay;
+
+            if (requestDate == TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now.Date) && time < currentTimeOfDay)
+            {
+                throw new CustomException.InvalidDataException("Thời gian phải nằm trong giờ diễn ra sự kiện của quán Bar!");
+            }
+
+            ValidateTimeWithinRangeEvent(time, eventTimes, "Thời gian");
+        }
+
         private static void ValidateTimeWithinRange(TimeSpan time, List<BarTime> barTimes, string timeLabel)
         {
             bool isValidTime = barTimes.Any(barTime =>
@@ -131,6 +143,25 @@ namespace Application.Common
                 else
                 {
                     return time >= barTime.StartTime || time <= barTime.EndTime;
+                }
+            });
+
+            if (!isValidTime)
+            {
+                throw new CustomException.InvalidDataException("Thời gian phải nằm trong giờ mở cửa và giờ đóng cửa của quán Bar!");
+            }
+        }
+        private static void ValidateTimeWithinRangeEvent(TimeSpan time, List<TimeEvent> eventTimes, string timeLabel)
+        {
+            bool isValidTime = eventTimes.Any(eventTime =>
+            {
+                if (eventTime.StartTime < eventTime.EndTime)
+                {
+                    return time >= eventTime.StartTime && time <= eventTime.EndTime;
+                }
+                else
+                {
+                    return time >= eventTime.StartTime || time <= eventTime.EndTime;
                 }
             });
 

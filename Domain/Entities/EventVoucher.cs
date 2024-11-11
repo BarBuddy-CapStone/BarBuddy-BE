@@ -17,7 +17,7 @@ namespace Domain.Entities
         public string VoucherCode { get; set; }
         public double Discount { get; set; }
         public double MaxPrice { get; set; }
-        public int Quantity { get; set; }
+        public int? Quantity { get; set; }
         public bool Status { get; set; }
         [ForeignKey("EventId")]
         public virtual Event Event { get; set; }

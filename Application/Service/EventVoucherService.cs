@@ -1,4 +1,5 @@
-﻿using Application.DTOs.Events.EventVoucher;
+﻿using Application.Common;
+using Application.DTOs.Events.EventVoucher;
 using Application.IService;
 using AutoMapper;
 using Domain.Constants;
@@ -108,6 +109,38 @@ namespace Application.Service
                     return null;
                 }
                 return getVoucher;
+            }
+            catch
+            {
+                throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
+            }
+        }
+
+        public async Task<EventVoucherResponse> GetVoucherByCode(string voucherCode)
+        {
+            try
+            {
+                var isExistVoucher = _unitOfWork.EventVoucherRepository
+                                                .Get(filter: x => x.VoucherCode.Equals(voucherCode) && 
+                                                            (x.Quantity > 0 || x.Quantity == null) && 
+                                                            x.Status == PrefixKeyConstant.TRUE,
+                                                            includeProperties: "Event.Bar.BarTimes")
+                                                .FirstOrDefault();
+
+                if(isExistVoucher == null)
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy voucher");
+                }
+
+                DateTimeOffset dateTime = DateTime.UtcNow;
+                TimeSpan getTime = TimeSpan.FromHours(dateTime.TimeOfDay.Hours)
+                                            .Add(TimeSpan.FromMinutes(dateTime.TimeOfDay.Minutes))
+                                            .Add(TimeSpan.FromSeconds(dateTime.TimeOfDay.Seconds));
+                
+                Utils.ValidateTimeWithinEvent(dateTime, getTime, isExistVoucher.Event.TimeEvent.ToList());
+
+                var response = _mapper.Map<EventVoucherResponse>(isExistVoucher);
+                return response;   
             }
             catch
             {
