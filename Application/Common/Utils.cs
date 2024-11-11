@@ -151,7 +151,7 @@ namespace Application.Common
                 throw new CustomException.InvalidDataException("Thời gian phải nằm trong giờ mở cửa và giờ đóng cửa của quán Bar!");
             }
         }
-        private static void ValidateTimeWithinRangeEvent(TimeSpan time, List<TimeEvent> eventTimes, string timeLabel)
+        public static bool ValidateTimeWithinRangeEvent(TimeSpan time, List<TimeEvent> eventTimes, string timeLabel)
         {
             bool isValidTime = eventTimes.Any(eventTime =>
             {
@@ -169,6 +169,38 @@ namespace Application.Common
             {
                 throw new CustomException.InvalidDataException("Thời gian phải nằm trong giờ mở cửa và giờ đóng cửa của quán Bar!");
             }
+
+            return isValidTime;
+        }
+
+        public static bool CheckTimeActiveEvent(TimeSpan time, List<TimeEvent> eventTimes)
+        {
+
+            DateTimeOffset dateTime = DateTimeOffset.Now;
+            TimeSpan getTime = TimeSpan.FromHours(dateTime.TimeOfDay.Hours)
+                                        .Add(TimeSpan.FromMinutes(dateTime.TimeOfDay.Minutes))
+                                        .Add(TimeSpan.FromSeconds(dateTime.TimeOfDay.Seconds));
+
+            bool isStill = eventTimes.Any(eventTime =>
+            {
+                if(eventTime.Date > dateTime)
+                {
+                    return true;
+                }
+                if(eventTime.Date == dateTime)
+                {
+                    return time < eventTime.StartTime || eventTime.StartTime <= time && eventTime.EndTime >= time;
+                }
+
+                if(eventTime.StartTime > eventTime.EndTime)
+                {
+                    return time <= eventTime.EndTime || eventTime.StartTime >= time;
+                }else
+                {
+                    return time >= eventTime.StartTime && time <= eventTime.EndTime;
+                }
+            });
+            return isStill;
         }
 
         private static void ValidateEndTimeAfterStartTime(TimeSpan startTime, TimeSpan endTime)

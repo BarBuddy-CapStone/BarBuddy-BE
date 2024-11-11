@@ -11,6 +11,7 @@ namespace Application.DTOs.Booking
     {
         [Required(AllowEmptyStrings = false, ErrorMessage = "PaymentDestination is required.")]
         public string? PaymentDestination { get; set; }
+        public string? VoucherCode { get; set; }
         public List<DrinkRequest>? Drinks { get; set; }
     }
 

@@ -15,5 +15,6 @@ namespace Application.IService
         Task DeleteEventVoucher(Guid eventId, Guid VoucherId);
         Task UpdateEventVoucher(Guid eventId, UpdateEventVoucherRequest request);
         Task<EventVoucherResponse> GetVoucherByCode(string voucherCode);
+        Task UpdateStatusVoucher(Guid eventVoucherId);
     }
 }

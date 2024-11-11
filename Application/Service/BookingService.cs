@@ -33,10 +33,12 @@ namespace Application.Service
         private readonly IQRCodeService _qrCodeService;
         private readonly IFirebase _firebase;
         private readonly ILogger<BookingService> _logger;
+        private readonly IEventVoucherService _eventVoucherService;
 
         public BookingService(IUnitOfWork unitOfWork, IMapper mapper, IAuthentication authentication,
             IPaymentService paymentService, IEmailSender emailSender,
-            INotificationService notificationService, IQRCodeService qrCodeService, IFirebase firebase)
+            INotificationService notificationService, IQRCodeService qrCodeService, IFirebase firebase,
+            IEventVoucherService eventVoucherService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -46,6 +48,7 @@ namespace Application.Service
             _notificationService = notificationService;
             _qrCodeService = qrCodeService;
             _firebase = firebase;
+            _eventVoucherService = eventVoucherService;
         }
 
         public async Task<bool> CancelBooking(Guid BookingId)
@@ -171,9 +174,11 @@ namespace Application.Service
                 if (booking.Status == 3)
                 {
                     var feedback = (await _unitOfWork.FeedbackRepository.GetAsync(f => f.BookingId == booking.BookingId)).FirstOrDefault();
-                    if (feedback != null) {
+                    if (feedback != null)
+                    {
                         isRated = true;
-                    } else
+                    }
+                    else
                     {
                         isRated = false;
                     }
@@ -615,11 +620,15 @@ namespace Application.Service
                 {
                     throw new CustomException.InvalidDataException("Booking request does not have table field");
                 }
+
                 if (request.Drinks != null && request.Drinks.Count > 0)
                 {
                     var drinkIds = request.Drinks.Select(drink => drink.DrinkId).ToList();
                     var existingDrinks = _unitOfWork.DrinkRepository.Get(d => drinkIds.Contains(d.DrinkId),
                             includeProperties: "DrinkCategory");
+                    double discoutVoucher = 0;
+                    double maxPriceVoucher = 0;
+                    double discountMount = 0;
                     if (existingDrinks.Count() != request.Drinks.Count)
                     {
                         throw new CustomException.InvalidDataException("Some DrinkIds do not exist.");
@@ -638,6 +647,33 @@ namespace Application.Service
                         booking.BookingDrinks?.Add(bookingDrink);
                     }
                     totalPrice = totalPrice - totalPrice * booking.Bar.Discount / 100;
+
+                    if (request.VoucherCode != null)
+                    {
+                        var voucher = await _eventVoucherService.GetVoucherByCode(request.VoucherCode);
+                        discoutVoucher = voucher.Discount;
+                        maxPriceVoucher = voucher.MaxPrice;
+
+                        if (voucher?.Quantity != null)
+                        {
+                            voucher.Quantity -= 1;
+                            if (voucher.Quantity == 0)
+                            {
+                                voucher.Status = PrefixKeyConstant.FALSE;
+                            }
+                            await _eventVoucherService.UpdateStatusVoucher(voucher.EventVoucherId);
+                        }
+                    }
+
+                    if (discoutVoucher > 0)
+                    {
+                        discountMount = totalPrice * (discoutVoucher / 100);
+                        if (discountMount > maxPriceVoucher)
+                        {
+                            discountMount = maxPriceVoucher;
+                        }
+                        totalPrice -= discountMount;
+                    }
                 }
 
                 var creNoti = new NotificationRequest

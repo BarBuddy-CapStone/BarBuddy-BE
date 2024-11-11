@@ -96,7 +96,6 @@ namespace Application.Service
                 throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
             }
         }
-
         public async Task<EventVoucher> GetVoucherBasedEventId(Guid eventId)
         {
             try
@@ -115,7 +114,6 @@ namespace Application.Service
                 throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
             }
         }
-
         public async Task<EventVoucherResponse> GetVoucherByCode(string voucherCode)
         {
             try
@@ -124,7 +122,7 @@ namespace Application.Service
                                                 .Get(filter: x => x.VoucherCode.Equals(voucherCode) && 
                                                             (x.Quantity > 0 || x.Quantity == null) && 
                                                             x.Status == PrefixKeyConstant.TRUE,
-                                                            includeProperties: "Event.Bar.BarTimes")
+                                                            includeProperties: "Event.Bar.BarTimes,Event.TimeEvent")
                                                 .FirstOrDefault();
 
                 if(isExistVoucher == null)
@@ -132,7 +130,7 @@ namespace Application.Service
                     throw new CustomException.DataNotFoundException("Không tìm thấy voucher");
                 }
 
-                DateTimeOffset dateTime = DateTime.UtcNow;
+                DateTimeOffset dateTime = DateTimeOffset.Now;
                 TimeSpan getTime = TimeSpan.FromHours(dateTime.TimeOfDay.Hours)
                                             .Add(TimeSpan.FromMinutes(dateTime.TimeOfDay.Minutes))
                                             .Add(TimeSpan.FromSeconds(dateTime.TimeOfDay.Seconds));
@@ -141,6 +139,27 @@ namespace Application.Service
 
                 var response = _mapper.Map<EventVoucherResponse>(isExistVoucher);
                 return response;   
+            }
+            catch
+            {
+                throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
+            }
+        }
+
+        public async Task UpdateStatusVoucher(Guid eventVoucherId)
+        {
+            try
+            {
+                var getOneVoucher = await _unitOfWork.EventVoucherRepository.GetByIdAsync(eventVoucherId);
+                if (getOneVoucher == null) { 
+                    throw new CustomException.DataNotFoundException("Không tìm thấy voucher !");
+                }
+
+                getOneVoucher.Status = PrefixKeyConstant.FALSE;
+
+                await _unitOfWork.EventVoucherRepository.UpdateRangeAsync(getOneVoucher);
+                await Task.Delay(10);
+                await _unitOfWork.SaveAsync();
             }
             catch
             {
