@@ -194,13 +194,26 @@ namespace Application.Service
                                          .Where(x => !query.IsEveryWeekEvent.HasValue ||
                                              (query.IsEveryWeekEvent.Value == 1 ?
                                                  x.EventTimeResponses.Any(t => t.DayOfWeek != null) :
-                                                 x.EventTimeResponses.All(t => t.DayOfWeek == null)))
-                                         .ToList();
+                                                 x.EventTimeResponses.All(t => t.DayOfWeek == null)));
 
-            var totalItems = filteredResponse.Count;
+            var eventsWithDayOfWeek = filteredResponse.Where(x => x.EventTimeResponses.Any(t => t.DayOfWeek != null))
+                                                     .OrderBy(x => x.EventTimeResponses
+                                                         .Where(t => t.DayOfWeek != null)
+                                                         .Min(t => t.DayOfWeek))
+                                                     .ToList();
+
+            var eventsWithDate = filteredResponse.Where(x => x.EventTimeResponses.All(t => t.DayOfWeek == null))
+                                                .OrderBy(x => x.EventTimeResponses
+                                                    .Where(t => t.Date != null)
+                                                    .Min(t => t.Date))
+                                                .ToList();
+
+            var sortedResponse = eventsWithDayOfWeek.Concat(eventsWithDate).ToList();
+
+            var totalItems = sortedResponse.Count;
             var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-            var paginatedEvents = filteredResponse.Skip((pageIndex - 1) * pageSize)
+            var paginatedEvents = sortedResponse.Skip((pageIndex - 1) * pageSize)
                                                 .Take(pageSize)
                                                 .ToList();
 
