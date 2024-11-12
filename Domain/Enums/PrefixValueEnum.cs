@@ -23,7 +23,17 @@ namespace Domain.Enums
         [Description("Serving")]
         Serving = 2,
         [Description("Completed")]
-        Completed = 3
+        Completed = 3,
+
+        #region Event Status
+
+        [Description("IsGoingOn")]
+        IsGoingOn = 0,
+        [Description("IsComing")]
+        IsComming = 1,
+        [Description("Ended")]
+        Ended = -1,
+        #endregion
 
 
     }
