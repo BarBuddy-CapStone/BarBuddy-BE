@@ -12,7 +12,7 @@ namespace Application.IService
     public interface IEventService
     {
         Task CreateEvent(EventRequest request);
-        Task<List<EventResponse>> GetAllEvent(EventQuery query);
+        Task<PagingEventResponse> GetAllEvent(EventQuery query);
         Task<EventResponse> GetOneEvent(Guid eventId);
         Task UpdateEvent(Guid eventId, UpdateEventRequest request);
         Task<List<EventResponse>> GetEventsByBarId(ObjectQuery query, Guid? barId);

@@ -13,5 +13,6 @@ namespace Application.DTOs.Events
         public Guid? BarId { get; set; }
         [Range(0, 1, ErrorMessage = "Giá trị chỉ từ 1 và 2")]
         public int? IsStill {  get; set; }
+        public int? IsEveryWeekEvent { get; set; }
     }
 }

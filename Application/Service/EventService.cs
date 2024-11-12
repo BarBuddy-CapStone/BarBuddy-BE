@@ -143,7 +143,7 @@ namespace Application.Service
             }
         }
 
-        public async Task<List<EventResponse>> GetAllEvent(EventQuery query)
+        public async Task<PagingEventResponse> GetAllEvent(EventQuery query)
         {
             DateTimeOffset dateTime = DateTimeOffset.Now;
             TimeSpan getTime = TimeSpan.FromHours(dateTime.TimeOfDay.Hours)
@@ -166,10 +166,9 @@ namespace Application.Service
             }
             var getAll = (await _unitOfWork.EventRepository
                                             .GetAsync(filter: filter,
-                                                        pageIndex: query.PageIndex,
-                                                        pageSize: query.PageSize,
                                                  includeProperties: "Bar,TimeEvent,EventVoucher"))
-                                                 .Where(x => x.IsDeleted == PrefixKeyConstant.FALSE);
+                                                 .Where(x => x.IsDeleted == PrefixKeyConstant.FALSE)
+                                                 .ToList();
             if (getAll.IsNullOrEmpty())
             {
                 throw new CustomException.DataNotFoundException("Không tìm thấy dữ liệu");
@@ -186,11 +185,33 @@ namespace Application.Service
                                                             getTime);
 
             }
-            response = response.Where(x => x.IsStill != (int)PrefixValueEnum.Ended)
-                                .Where(x => !query.IsStill.HasValue || x.IsStill == query.IsStill.Value)
-                                .ToList();
 
-            return response;
+            var pageIndex = query.PageIndex ?? 1;
+            var pageSize = query.PageSize ?? 6;
+
+            var filteredResponse = response.Where(x => x.IsStill != (int)PrefixValueEnum.Ended)
+                                         .Where(x => !query.IsStill.HasValue || x.IsStill == query.IsStill.Value)
+                                         .Where(x => !query.IsEveryWeekEvent.HasValue ||
+                                             (query.IsEveryWeekEvent.Value == 1 ?
+                                                 x.EventTimeResponses.Any(t => t.DayOfWeek != null) :
+                                                 x.EventTimeResponses.All(t => t.DayOfWeek == null)))
+                                         .ToList();
+
+            var totalItems = filteredResponse.Count;
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var paginatedEvents = filteredResponse.Skip((pageIndex - 1) * pageSize)
+                                                .Take(pageSize)
+                                                .ToList();
+
+            return new PagingEventResponse
+            {
+                EventResponses = paginatedEvents,
+                TotalPages = totalPages,
+                CurrentPage = pageIndex,
+                PageSize = pageSize,
+                TotalItems = totalItems
+            };
         }
 
         public async Task<List<EventResponse>> GetEventsByBarId(ObjectQuery query, Guid? barId)
