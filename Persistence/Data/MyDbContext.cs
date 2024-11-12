@@ -150,10 +150,25 @@ namespace Persistence.Data
                 public static readonly Guid Manager2 = Guid.NewGuid();
                 public static readonly Guid Manager3 = Guid.NewGuid();
                 public static readonly Guid Manager4 = Guid.NewGuid();
+                public static readonly Guid Manager5 = Guid.NewGuid();
+                public static readonly Guid Manager6 = Guid.NewGuid();
+                public static readonly Guid Manager7 = Guid.NewGuid();
+                public static readonly Guid Manager8 = Guid.NewGuid();
+                public static readonly Guid Manager9 = Guid.NewGuid();
+                public static readonly Guid Manager10 = Guid.NewGuid();
                 public static readonly Guid Staff1 = Guid.NewGuid();
                 public static readonly Guid Staff2 = Guid.NewGuid();
+                public static readonly Guid Staff3 = Guid.NewGuid();
+                public static readonly Guid Staff4 = Guid.NewGuid();
+                public static readonly Guid Staff5 = Guid.NewGuid();
+                public static readonly Guid Staff6 = Guid.NewGuid();
+                public static readonly Guid Staff7 = Guid.NewGuid();
+                public static readonly Guid Staff8 = Guid.NewGuid();
+                public static readonly Guid Staff9 = Guid.NewGuid();
+                public static readonly Guid Staff10 = Guid.NewGuid();
                 public static readonly Guid Customer1 = Guid.NewGuid();
                 public static readonly Guid Customer2 = Guid.NewGuid();
+                public static readonly Guid Tien = Guid.NewGuid();
             }
 
             public static class TableTypes
@@ -366,7 +381,7 @@ namespace Persistence.Data
                 new Bar
                 {
                     BarId = Constants.Ids.Bars.Bar3,
-                    Address = "264 Đ. Nam Kỳ Khởi Ngha, Phường 8, Qun 3",
+                    Address = "264 Đ. Nam Kỳ Khởi Ngha, Phường 8, Quận 3",
                     BarName = "Bar Buddy 3",
                     Description = "Nằm tại trung tâm quận 3, Bar Buddy 3 là một trong những bar lâu năm nổi tiếng hàng đầu Sài Gòn. Không gian sang trọng nhiều vị trí đẹp và có sân khấu lớn ngay trung tâm. Sử dụng chất nhạc Vinahouse cực kỳ mạnh mẽ \"on trend\" là điều luôn hấp dẫn các vị khách tới Bar Buddy 3. Hơn thế nữa các sự kiện luôn diễn ra vào cuối tuần với dàn khách mời ca sĩ hàng đầu Việt Nam: Ưng Hoàng Phúc, Duy Mnh, Trịnh Tuấn Vỹ… Với slogan \"Nơi thể hiện đẳng cấp của bạn\" hãy sẵn sàng thể hiện bản thân tại Bar Buddy 3 bar.",
                     Discount = 20,
@@ -496,7 +511,7 @@ namespace Persistence.Data
                     RoleId = Constants.Ids.Roles.Manager,
                     Email = "manager1@barbuddy1.com",
                     Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
-                    Fullname = "Manager 1",
+                    Fullname = "William",
                     Dob = new DateTime(1980, 1, 1),
                     Phone = "0901234577",
                     CreatedAt = DateTime.Now,
@@ -511,7 +526,7 @@ namespace Persistence.Data
                     RoleId = Constants.Ids.Roles.Manager,
                     Email = "manager2@barbuddy2.com",
                     Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
-                    Fullname = "Manager 2",
+                    Fullname = "Jack97",
                     Dob = new DateTime(1981, 2, 2),
                     Phone = "0901234578",
                     CreatedAt = DateTime.Now,
@@ -526,7 +541,7 @@ namespace Persistence.Data
                     RoleId = Constants.Ids.Roles.Manager,
                     Email = "manager3@barbuddy3.com",
                     Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
-                    Fullname = "Manager 3",
+                    Fullname = "Son tung",
                     Dob = new DateTime(1982, 3, 3),
                     Phone = "0901234579",
                     CreatedAt = DateTime.Now,
@@ -541,7 +556,97 @@ namespace Persistence.Data
                     RoleId = Constants.Ids.Roles.Manager,
                     Email = "manager4@barbuddy4.com",
                     Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
-                    Fullname = "Manager 4",
+                    Fullname = "Ten Hag",
+                    Dob = new DateTime(1983, 4, 4),
+                    Phone = "0901234580",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "default",
+                    Status = 1
+                },
+                new Account
+                {
+                    AccountId = Constants.Ids.Accounts.Manager5,
+                    BarId = Constants.Ids.Bars.Bar5,
+                    RoleId = Constants.Ids.Roles.Manager,
+                    Email = "manager5@barbuddy5.com",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "Poseidon",
+                    Dob = new DateTime(1983, 4, 4),
+                    Phone = "0901234580",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "default",
+                    Status = 1
+                },
+                new Account
+                {
+                    AccountId = Constants.Ids.Accounts.Manager6,
+                    BarId = Constants.Ids.Bars.Bar6,
+                    RoleId = Constants.Ids.Roles.Manager,
+                    Email = "manager6@barbuddy6.com",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "Zeus",
+                    Dob = new DateTime(1983, 4, 4),
+                    Phone = "0901234580",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "default",
+                    Status = 1
+                },
+                new Account
+                {
+                    AccountId = Constants.Ids.Accounts.Manager7,
+                    BarId = Constants.Ids.Bars.Bar7,
+                    RoleId = Constants.Ids.Roles.Manager,
+                    Email = "manager7@barbuddy7.com",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "7 Vap",
+                    Dob = new DateTime(1983, 4, 4),
+                    Phone = "0901234580",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "default",
+                    Status = 1
+                },
+                new Account
+                {
+                    AccountId = Constants.Ids.Accounts.Manager8,
+                    BarId = Constants.Ids.Bars.Bar8,
+                    RoleId = Constants.Ids.Roles.Manager,
+                    Email = "manager8@barbuddy8.com",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "Eric",
+                    Dob = new DateTime(1983, 4, 4),
+                    Phone = "0901234580",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "default",
+                    Status = 1
+                },
+                new Account
+                {
+                    AccountId = Constants.Ids.Accounts.Manager9,
+                    BarId = Constants.Ids.Bars.Bar9,
+                    RoleId = Constants.Ids.Roles.Manager,
+                    Email = "manager9@barbuddy9.com",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "Manchester",
+                    Dob = new DateTime(1983, 4, 4),
+                    Phone = "0901234580",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "default",
+                    Status = 1
+                },
+                new Account
+                {
+                    AccountId = Constants.Ids.Accounts.Manager10,
+                    BarId = Constants.Ids.Bars.Bar10,
+                    RoleId = Constants.Ids.Roles.Manager,
+                    Email = "manager10@barbuddy10.com",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "Chi Dan",
                     Dob = new DateTime(1983, 4, 4),
                     Phone = "0901234580",
                     CreatedAt = DateTime.Now,
@@ -552,9 +657,9 @@ namespace Persistence.Data
                 new Account
                 {
                     AccountId = Constants.Ids.Accounts.Staff1,
-                    BarId = Constants.Ids.Bars.Bar2,
+                    BarId = Constants.Ids.Bars.Bar1,
                     RoleId = Constants.Ids.Roles.Staff,
-                    Email = "staff1@barbuddy2.com",
+                    Email = "staff1@barbuddy1.com",
                     Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
                     Fullname = "Neymar Jr",
                     Dob = new DateTime(1992, 7, 15),
@@ -567,9 +672,9 @@ namespace Persistence.Data
                 new Account
                 {
                     AccountId = Constants.Ids.Accounts.Staff2,
-                    BarId = Constants.Ids.Bars.Bar3,
+                    BarId = Constants.Ids.Bars.Bar2,
                     RoleId = Constants.Ids.Roles.Staff,
-                    Email = "staff2@barbuddy3.com",
+                    Email = "staff2@barbuddy2.com",
                     Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
                     Fullname = "Foden",
                     Dob = new DateTime(1990, 3, 20),
@@ -577,6 +682,126 @@ namespace Persistence.Data
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
                     Image = "https://zumroad.com/images/upload/editor/source/sport/phil-foden-biography-01_1.jpg",
+                    Status = 1
+                },
+                new Account
+                {
+                    AccountId = Constants.Ids.Accounts.Staff3,
+                    BarId = Constants.Ids.Bars.Bar3,
+                    RoleId = Constants.Ids.Roles.Staff,
+                    Email = "staff3@barbuddy3.com",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "Antony",
+                    Dob = new DateTime(1990, 3, 20),
+                    Phone = "0901234569",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fm.youtube.com%2Fwatch%3Fv%3D_mPDAQm58i8&psig=AOvVaw0zud8SdC0L84Ao4FyvJ9VC&ust=1731386997368000&source=images&cd=vfe&opi=89978449&ved=0CBAQjRxqFwoTCOCq_bC904kDFQAAAAAdAAAAABAE",
+                    Status = 1
+                },
+                new Account
+                {
+                    AccountId = Constants.Ids.Accounts.Staff4,
+                    BarId = Constants.Ids.Bars.Bar4,
+                    RoleId = Constants.Ids.Roles.Staff,
+                    Email = "staff4@barbuddy4.com",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "Jesus",
+                    Dob = new DateTime(1990, 3, 20),
+                    Phone = "0901234569",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "https://www.google.com/url?sa=i&url=https%3A%2F%2Ftwitter.com%2Fthefootyarena%2Fstatus%2F1427172222720958467&psig=AOvVaw0Hz6eyBGjK10VPztHZDsxD&ust=1731387055116000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCIDv-cm904kDFQAAAAAdAAAAABAE",
+                    Status = 1
+                },
+                new Account
+                {
+                    AccountId = Constants.Ids.Accounts.Staff5,
+                    BarId = Constants.Ids.Bars.Bar5,
+                    RoleId = Constants.Ids.Roles.Staff,
+                    Email = "staff5@barbuddy5.com",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "Maguire",
+                    Dob = new DateTime(1990, 3, 20),
+                    Phone = "0901234569",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2Fharry-maguire-meme--394065036155577538%2F&psig=AOvVaw0r2-KTF3CHqD3MPpY5RsGF&ust=1731387310547000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCOjE8sC-04kDFQAAAAAdAAAAABAE",
+                    Status = 1
+                },
+                new Account
+                {
+                    AccountId = Constants.Ids.Accounts.Staff6,
+                    BarId = Constants.Ids.Bars.Bar6,
+                    RoleId = Constants.Ids.Roles.Staff,
+                    Email = "staff5@barbuddy5.com",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "Maguire",
+                    Dob = new DateTime(1990, 3, 20),
+                    Phone = "0901234569",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2Fharry-maguire-meme--394065036155577538%2F&psig=AOvVaw0r2-KTF3CHqD3MPpY5RsGF&ust=1731387310547000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCOjE8sC-04kDFQAAAAAdAAAAABAE",
+                    Status = 1
+                },
+                new Account
+                {
+                    AccountId = Constants.Ids.Accounts.Staff7,
+                    BarId = Constants.Ids.Bars.Bar7,
+                    RoleId = Constants.Ids.Roles.Staff,
+                    Email = "staff5@barbuddy5.com",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "Maguire",
+                    Dob = new DateTime(1990, 3, 20),
+                    Phone = "0901234569",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2Fharry-maguire-meme--394065036155577538%2F&psig=AOvVaw0r2-KTF3CHqD3MPpY5RsGF&ust=1731387310547000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCOjE8sC-04kDFQAAAAAdAAAAABAE",
+                    Status = 1
+                },
+                new Account
+                {
+                    AccountId = Constants.Ids.Accounts.Staff8,
+                    BarId = Constants.Ids.Bars.Bar8,
+                    RoleId = Constants.Ids.Roles.Staff,
+                    Email = "staff5@barbuddy5.com",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "Maguire",
+                    Dob = new DateTime(1990, 3, 20),
+                    Phone = "0901234569",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2Fharry-maguire-meme--394065036155577538%2F&psig=AOvVaw0r2-KTF3CHqD3MPpY5RsGF&ust=1731387310547000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCOjE8sC-04kDFQAAAAAdAAAAABAE",
+                    Status = 1
+                },
+                new Account
+                {
+                    AccountId = Constants.Ids.Accounts.Staff9,
+                    BarId = Constants.Ids.Bars.Bar9,
+                    RoleId = Constants.Ids.Roles.Staff,
+                    Email = "staff5@barbuddy5.com",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "Maguire",
+                    Dob = new DateTime(1990, 3, 20),
+                    Phone = "0901234569",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2Fharry-maguire-meme--394065036155577538%2F&psig=AOvVaw0r2-KTF3CHqD3MPpY5RsGF&ust=1731387310547000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCOjE8sC-04kDFQAAAAAdAAAAABAE",
+                    Status = 1
+                },
+                new Account
+                {
+                    AccountId = Constants.Ids.Accounts.Staff10,
+                    BarId = Constants.Ids.Bars.Bar10,
+                    RoleId = Constants.Ids.Roles.Staff,
+                    Email = "staff5@barbuddy5.com",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "Maguire",
+                    Dob = new DateTime(1990, 3, 20),
+                    Phone = "0901234569",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2Fharry-maguire-meme--394065036155577538%2F&psig=AOvVaw0r2-KTF3CHqD3MPpY5RsGF&ust=1731387310547000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCOjE8sC-04kDFQAAAAAdAAAAABAE",
                     Status = 1
                 },
                 new Account
@@ -607,6 +832,21 @@ namespace Persistence.Data
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now,
                     Image = "https://th.bing.com/th/id/OIP.SO1-rUp8nmpmQIHFf60hYgHaEK?rs=1&pid=ImgDetMain",
+                    Status = 1
+                },
+                new Account
+                {
+                    AccountId = Constants.Ids.Accounts.Tien,
+                    BarId = null,
+                    RoleId = Constants.Ids.Roles.Customer,
+                    Email = "tientn@email.com",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "Mr.Tien",
+                    Dob = new DateTime(2002, 12, 5),
+                    Phone = "0912345678",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "https://cdn-icons-png.flaticon.com/512/4862/4862440.png",
                     Status = 1
                 }
             };
