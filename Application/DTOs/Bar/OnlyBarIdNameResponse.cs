@@ -9,6 +9,8 @@ namespace Application.DTOs.Bar
     public class OnlyBarIdNameResponse
     {
         public Guid BarId { get; set; }
-        public string BarName { get; set; }
+        public string? BarName { get; set; }
+        public string? Address { get; set; }
+        public string? Images { get; set; }
     }
 }
