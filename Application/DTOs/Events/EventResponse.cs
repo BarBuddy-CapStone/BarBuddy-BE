@@ -7,7 +7,9 @@ namespace Application.DTOs.Events
     {
         public Guid EventId { get; set; }
         public Guid BarId { get; set; }
+        public string BarName { get; set; }
         public string EventName { get; set; }
+        public string Description { get; set; }
         public string Images { get; set; }
         public bool IsHide {  get; set; }
         public int? IsStill {  get; set; }
