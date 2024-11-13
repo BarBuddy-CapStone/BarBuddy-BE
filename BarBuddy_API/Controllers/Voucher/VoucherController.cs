@@ -2,6 +2,7 @@
 using CoreApiResponse;
 using Domain.CustomException;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace BarBuddy_API.Controllers.Voucher
 {
@@ -17,11 +18,11 @@ namespace BarBuddy_API.Controllers.Voucher
         }
 
         [HttpGet("getOneVocher")]
-        public async Task<IActionResult> GetVoucherByCode(string voucherCode)
+        public async Task<IActionResult> GetVoucherByCode([FromQuery][Required] DateTimeOffset bookingDate, [FromQuery][Required] TimeSpan bookingTime, [FromQuery][Required] string voucherCode)
         {
             try
             {
-                var response = await _eventVoucherService.GetVoucherByCode(voucherCode);
+                var response = await _eventVoucherService.GetVoucherByCode(bookingDate, bookingTime, voucherCode);
                 return CustomResult("Đã tải dữ liệu.", response);
             }
             catch (CustomException.InternalServerErrorException ex)
