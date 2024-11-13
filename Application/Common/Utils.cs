@@ -120,7 +120,7 @@ namespace Application.Common
         {
             var currentTimeOfDay = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.UtcNow).TimeOfDay;
 
-            if (requestDate == TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now.Date) && time < currentTimeOfDay)
+            if (requestDate == TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now.Date))
             {
                 throw new CustomException.InvalidDataException("Thời gian phải nằm trong giờ diễn ra sự kiện của quán Bar!");
             }

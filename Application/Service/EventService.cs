@@ -167,7 +167,8 @@ namespace Application.Service
             var getAll = (await _unitOfWork.EventRepository
                                             .GetAsync(filter: filter,
                                                  includeProperties: "Bar,TimeEvent,EventVoucher"))
-                                                 .Where(x => x.IsDeleted == PrefixKeyConstant.FALSE)
+                                                 .Where(x => x.IsDeleted == PrefixKeyConstant.FALSE &&
+                                                        x.IsHide == PrefixKeyConstant.FALSE)
                                                  .ToList();
             if (getAll.IsNullOrEmpty())
             {
@@ -235,7 +236,7 @@ namespace Application.Service
                     includeProperties: "Bar,TimeEvent,EventVoucher",
                     pageIndex: query.PageIndex,
                     pageSize: query.PageSize
-                    )).Where(x => x.IsDeleted == PrefixKeyConstant.FALSE);
+                    )).Where(x => x.IsDeleted == PrefixKeyConstant.FALSE && x.IsHide == PrefixKeyConstant.FALSE);
 
             if (!getAll.Any())
             {
@@ -264,7 +265,7 @@ namespace Application.Service
 
                 var getEventById = await _unitOfWork.EventRepository
                                             .GetAsync(filter: x => x.EventId.Equals(eventId) &&
-                                                        x.IsDeleted == PrefixKeyConstant.FALSE
+                                                        x.IsDeleted == PrefixKeyConstant.FALSE && x.IsHide == PrefixKeyConstant.FALSE
                                             , includeProperties: "Bar,TimeEvent,EventVoucher");
                 var getOne = getEventById.FirstOrDefault()
                             ?? throw new CustomException.DataNotFoundException("Không tìm thấy sự kiện bạn đang tìm!");

@@ -279,6 +279,8 @@ namespace Application.Service
                         throw new CustomException.DataNotFoundException("Không tìm thấy quán bar muốn thay đổi !");
                     }
 
+                    var getEventOfBar = _unitOfWork.EventRepository.Get(filter: x => x.Bar.BarId.Equals(getBarById.BarId));
+                    
                     var isBarName = _unitOfWork.BarRepository.Get(filter: x => x.BarName.Contains(request.BarName)).ToList();
 
                     if (isBarName.Count > 1)
@@ -328,8 +330,17 @@ namespace Application.Service
                     var allImg = string.IsNullOrEmpty(imgsAsString) ? imgsUploaed : $"{imgsUploaed},{imgsAsString}";
 
                     getBarById.Images = allImg;
+
+                    if (getEventOfBar != null && getEventOfBar.Any())
+                    {
+                        foreach (var eventItem in getEventOfBar)
+                        {
+                            eventItem.IsHide = !eventItem.IsHide;
+                            await _unitOfWork.EventRepository.UpdateAsync(eventItem);
+                        }
+                    }
                     await _unitOfWork.BarRepository.UpdateAsync(getBarById);
-                    await Task.Delay(200);
+                    await Task.Delay(20);
                     await _unitOfWork.SaveAsync();
 
                     transaction.Complete();

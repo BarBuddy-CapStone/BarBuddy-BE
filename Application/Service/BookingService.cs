@@ -650,7 +650,8 @@ namespace Application.Service
 
                     if (request.VoucherCode != null)
                     {
-                        var voucher = await _eventVoucherService.GetVoucherByCode(request.VoucherCode);
+                        var voucher = await _eventVoucherService
+                                                .GetVoucherByCode(booking.BookingDate, booking.BookingTime, request.VoucherCode);
                         discoutVoucher = voucher.Discount;
                         maxPriceVoucher = voucher.MaxPrice;
 
