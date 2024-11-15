@@ -17,7 +17,7 @@ namespace BarBuddy_API.Controllers.Voucher
             _eventVoucherService = eventVoucherService;
         }
 
-        [HttpGet("getOneVocher")]
+        [HttpGet("getOneVoucher")]
         public async Task<IActionResult> GetVoucherByCode([FromQuery][Required] DateTimeOffset bookingDate, [FromQuery][Required] TimeSpan bookingTime, [FromQuery][Required] string voucherCode)
         {
             try
