@@ -120,12 +120,10 @@ namespace Application.Common
         {
             var currentTimeOfDay = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.UtcNow).TimeOfDay;
 
-            if (requestDate == TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now.Date))
+            if (requestDate.Date >= TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now.Date))
             {
-                throw new CustomException.InvalidDataException("Thời gian phải nằm trong giờ diễn ra sự kiện của quán Bar!");
+                ValidateTimeWithinRangeEvent(time, eventTimes, "Thời gian");
             }
-
-            ValidateTimeWithinRangeEvent(time, eventTimes, "Thời gian");
         }
         private static void ValidateTimeWithinRange(TimeSpan time, List<BarTime> barTimes, string timeLabel)
         {
