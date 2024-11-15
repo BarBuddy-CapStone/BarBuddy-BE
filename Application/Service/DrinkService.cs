@@ -193,7 +193,7 @@ namespace Application.Service
             {
                 var getAllDrink = await _unitOfWork.DrinkRepository
                                         .GetAsync(filter: x => x.DrinkId.Equals(drinkId),
-                                                includeProperties: "DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory");
+                                                includeProperties: "Bar,DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory");
                 var getOne = getAllDrink.FirstOrDefault();
 
                 if (getOne == null)
@@ -441,7 +441,7 @@ namespace Application.Service
                                 continue;
                             }
                             var breakPoint = _unitOfWork.DrinkRepository.GetAll().Count();
-                            if (breakPoint > 100) throw new InvalidDataException("BreakPoint");
+                            if (breakPoint >= 300) throw new InvalidDataException("BreakPoint");
                         }
                     }
                     catch (InvalidDataException ix)
@@ -487,9 +487,16 @@ namespace Application.Service
                 string priceText = priceNode?.GetAttributeValue("content", "0") ?? "0";
                 string image = imgNode?.GetAttributeValue("src", "") ?? "";
 
-                string cleanedPrice = Regex.Replace(priceText, @"[^\d]", "");
-                double price = double.TryParse(cleanedPrice, out double p) ? p : 0;
+                string cleanedPrice = Regex.Replace(priceText, @"[^\d\.]", "");
 
+                if (cleanedPrice.EndsWith(".00"))
+                {
+                    cleanedPrice = cleanedPrice.Substring(0, cleanedPrice.Length - 3);
+                }
+
+                double price = double.TryParse(cleanedPrice, NumberStyles.Any, CultureInfo.InvariantCulture, out double parsedPrice)
+                    ? parsedPrice
+                    : 0;
                 return new Drink
                 {
                     DrinkName = name.Trim(),
@@ -510,12 +517,12 @@ namespace Application.Service
             }
         }
 
-        private List<DrinkEmotionalCategory> RandomDrinkEmotionalCategories(Guid drinkId, int count, 
+        private HashSet<DrinkEmotionalCategory> RandomDrinkEmotionalCategories(Guid drinkId, int count, 
             Random random)
         {
             var emotions = _unitOfWork.EmotionalDrinkCategoryRepository.GetAll().ToList();
 
-            var drinkEmotionalCategories = new List<DrinkEmotionalCategory>();
+            var drinkEmotionalCategories = new HashSet<DrinkEmotionalCategory>();
 
             count = Math.Min(count, emotions.Count);
 

@@ -20,7 +20,7 @@ namespace Application.DTOs.Payment.Vnpay
             vnp_CurrCode = currCode;
             vnp_CreateDate = createDate.ToString("yyyyMMddHHmmss");
             vnp_TmnCode = tmnCode;
-            vnp_Amount = (int)amount * 100;
+            vnp_Amount = amount * 100;
             vnp_Command = "pay";
             vnp_OrderType = orderType;
             vnp_OrderInfo = orderInfo;
