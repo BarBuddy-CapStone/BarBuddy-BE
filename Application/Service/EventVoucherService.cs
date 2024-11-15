@@ -135,6 +135,14 @@ namespace Application.Service
                 var response = _mapper.Map<EventVoucherResponse>(isExistVoucher);
                 return response;   
             }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                throw new CustomException.InvalidDataException(ex.Message);
+            }
             catch
             {
                 throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
