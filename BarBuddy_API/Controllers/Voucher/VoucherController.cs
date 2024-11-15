@@ -1,4 +1,5 @@
-﻿using Application.IService;
+﻿using Application.DTOs.Events.EventVoucher;
+using Application.IService;
 using CoreApiResponse;
 using Domain.CustomException;
 using Microsoft.AspNetCore.Mvc;
@@ -18,11 +19,11 @@ namespace BarBuddy_API.Controllers.Voucher
         }
 
         [HttpGet("getOneVoucher")]
-        public async Task<IActionResult> GetVoucherByCode([FromQuery][Required] DateTimeOffset bookingDate, [FromQuery][Required] TimeSpan bookingTime, [FromQuery][Required] string voucherCode)
+        public async Task<IActionResult> GetVoucherByCode([FromQuery] VoucherQueryRequest request)
         {
             try
             {
-                var response = await _eventVoucherService.GetVoucherByCode(bookingDate, bookingTime, voucherCode);
+                var response = await _eventVoucherService.GetVoucherByCode(request);
                 return CustomResult("Đã tải dữ liệu.", response);
             }
             catch (CustomException.DataNotFoundException e)

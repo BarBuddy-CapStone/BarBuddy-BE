@@ -114,14 +114,15 @@ namespace Application.Service
                 throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
             }
         }
-        public async Task<EventVoucherResponse> GetVoucherByCode(DateTimeOffset bookingDate, TimeSpan bookingTime, string voucherCode)
+        public async Task<EventVoucherResponse> GetVoucherByCode(VoucherQueryRequest request)
         {
             try
             {
                 var isExistVoucher = _unitOfWork.EventVoucherRepository
-                                                .Get(filter: x => x.VoucherCode.Equals(voucherCode) && 
+                                                .Get(filter: x => x.VoucherCode.Equals(request.voucherCode) && 
                                                             (x.Quantity > 0 || x.Quantity == null) && 
-                                                            x.Status == PrefixKeyConstant.TRUE,
+                                                            x.Status == PrefixKeyConstant.TRUE &&
+                                                            x.Event.Bar.BarId.Equals(request.barId),
                                                             includeProperties: "Event.Bar.BarTimes,Event.TimeEvent")
                                                 .FirstOrDefault();
 
@@ -130,7 +131,7 @@ namespace Application.Service
                     throw new CustomException.DataNotFoundException("Không tìm thấy voucher");
                 }
                 
-                Utils.ValidateTimeWithinEvent(bookingDate, bookingTime, isExistVoucher.Event.TimeEvent.ToList());
+                Utils.ValidateTimeWithinEvent(request.bookingDate, request.bookingTime, isExistVoucher.Event.TimeEvent.ToList());
 
                 var response = _mapper.Map<EventVoucherResponse>(isExistVoucher);
                 return response;   

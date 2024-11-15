@@ -2,6 +2,7 @@
 using Application.DTOs.Booking;
 using Application.DTOs.BookingDrink;
 using Application.DTOs.BookingTable;
+using Application.DTOs.Events.EventVoucher;
 using Application.DTOs.Notification;
 using Application.DTOs.Payment;
 using Application.Interfaces;
@@ -650,8 +651,17 @@ namespace Application.Service
 
                     if (request.VoucherCode != null)
                     {
+
+                        var voucherQuery = new VoucherQueryRequest
+                        {
+                            barId = request.BarId,
+                            bookingDate = booking.BookingDate,
+                            bookingTime = booking.BookingTime,
+                            voucherCode = request.VoucherCode
+                        };
+
                         var voucher = await _eventVoucherService
-                                                .GetVoucherByCode(booking.BookingDate, booking.BookingTime, request.VoucherCode);
+                                                .GetVoucherByCode(voucherQuery);
 
                         discoutVoucher = voucher.Discount;
                         maxPriceVoucher = voucher.MaxPrice;
