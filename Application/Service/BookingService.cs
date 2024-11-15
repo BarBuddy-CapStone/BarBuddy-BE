@@ -652,8 +652,6 @@ namespace Application.Service
                     {
                         var voucher = await _eventVoucherService
                                                 .GetVoucherByCode(booking.BookingDate, booking.BookingTime, request.VoucherCode);
-                        discoutVoucher = voucher.Discount;
-                        maxPriceVoucher = voucher.MaxPrice;
 
                         if (voucher?.Quantity != null)
                         {
@@ -662,18 +660,18 @@ namespace Application.Service
                             {
                                 voucher.Status = PrefixKeyConstant.FALSE;
                             }
-                            await _eventVoucherService.UpdateStatusVoucher(voucher.EventVoucherId);
+                            await _eventVoucherService.UpdateStatusNStsVoucher(voucher.EventVoucherId, voucher.Quantity, voucher.Status);
                         }
-                    }
 
-                    if (discoutVoucher > 0)
-                    {
-                        discountMount = totalPrice * (discoutVoucher / 100);
-                        if (discountMount > maxPriceVoucher)
+                        if (voucher?.Discount > 0)
                         {
-                            discountMount = maxPriceVoucher;
+                            discountMount = totalPrice * (discoutVoucher / 100);
+                            if (discountMount > voucher?.MaxPrice)
+                            {
+                                discountMount = voucher.MaxPrice;
+                            }
+                            totalPrice -= discountMount;
                         }
-                        totalPrice -= discountMount;
                     }
                 }
 

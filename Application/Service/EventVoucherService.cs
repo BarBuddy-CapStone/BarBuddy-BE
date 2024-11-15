@@ -150,7 +150,28 @@ namespace Application.Service
                     throw new CustomException.DataNotFoundException("Không tìm thấy voucher !");
                 }
 
-                getOneVoucher.Status = PrefixKeyConstant.FALSE;
+                await _unitOfWork.EventVoucherRepository.UpdateRangeAsync(getOneVoucher);
+                await Task.Delay(10);
+                await _unitOfWork.SaveAsync();
+            }
+            catch
+            {
+                throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
+            }
+        }
+
+        public async Task UpdateStatusNStsVoucher(Guid eventVoucherId, int quantityVoucher, bool sts)
+        {
+            try
+            {
+                var getOneVoucher = await _unitOfWork.EventVoucherRepository.GetByIdAsync(eventVoucherId);
+                if (getOneVoucher == null)
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy voucher !");
+                }
+
+                getOneVoucher.Status = sts;
+                getOneVoucher.Quantity = quantityVoucher;
 
                 await _unitOfWork.EventVoucherRepository.UpdateRangeAsync(getOneVoucher);
                 await Task.Delay(10);
