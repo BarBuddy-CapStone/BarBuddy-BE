@@ -653,6 +653,9 @@ namespace Application.Service
                         var voucher = await _eventVoucherService
                                                 .GetVoucherByCode(booking.BookingDate, booking.BookingTime, request.VoucherCode);
 
+                        discoutVoucher = voucher.Discount;
+                        maxPriceVoucher = voucher.MaxPrice;
+
                         if (voucher?.Quantity != null)
                         {
                             voucher.Quantity -= 1;
