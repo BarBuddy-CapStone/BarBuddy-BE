@@ -17,8 +17,8 @@ namespace Application.DTOs.Events
         public string EventName { get; set; }
         [Required]
         public string Description { get; set; }
-        public List<string> Images { get; set; }
-        public List<string> OldImages { get; set; }
+        public List<string>? Images { get; set; }
+        public List<string>? OldImages { get; set; }
         [Required]
         public bool IsEveryWeek { get; set; }
         [Required]
