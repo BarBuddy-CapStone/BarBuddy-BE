@@ -117,6 +117,7 @@ namespace Application.Service
 
             var getAllBar = await _unitOfWork.BarRepository
                                                 .GetAsync(filter: filter,
+                                                    orderBy: query => query.OrderBy(x => x.BarName),
                                                     pageIndex: query.PageIndex,
                                                     pageSize: query.PageSize,
                                                     includeProperties: "BarTimes");
@@ -148,6 +149,7 @@ namespace Application.Service
 
             var bars = await _unitOfWork.BarRepository
                                     .GetAsync(filter: filter,
+                                              orderBy: query => query.OrderBy(x => x.BarName),
                                               pageIndex: query.PageIndex,
                                               pageSize: query.PageSize,
                                               includeProperties: "Feedbacks,BarTimes");
@@ -364,6 +366,7 @@ namespace Application.Service
                 var bars = await _unitOfWork.BarRepository
                     .GetAsync(filter: x => x.BarTimes.Any(x => x.DayOfWeek == (int)dateTime.DayOfWeek)
                             && x.Status == true,
+                        orderBy: query => query.OrderBy(x => x.BarName),
                         includeProperties: "Feedbacks,BarTimes");
                 var currentDateTime = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now);
                 var response = new List<OnlyBarResponse>();
