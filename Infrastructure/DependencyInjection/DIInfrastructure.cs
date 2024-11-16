@@ -163,7 +163,7 @@ namespace Infrastructure.DependencyInjection
                     };
                 });
         }
-
+          
         public static void AddQuartz(this IServiceCollection services)
         {
             services.AddQuartz(options =>
