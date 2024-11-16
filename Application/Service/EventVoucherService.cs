@@ -119,14 +119,19 @@ namespace Application.Service
             try
             {
                 var isExistVoucher = _unitOfWork.EventVoucherRepository
-                                                .Get(filter: x => x.VoucherCode.Equals(request.voucherCode) && 
-                                                            (x.Quantity > 0 || x.Quantity == null) && 
-                                                            x.Status == PrefixKeyConstant.TRUE &&
-                                                            x.Event.Bar.BarId.Equals(request.barId),
-                                                            includeProperties: "Event.Bar.BarTimes,Event.TimeEvent")
+                                                .Get(filter: x =>
+                                                    x.VoucherCode.Equals(request.voucherCode) &&
+                                                    (x.Quantity > 0 || x.Quantity == null) &&
+                                                    x.Status == PrefixKeyConstant.TRUE &&
+                                                    x.Event.Bar.BarId.Equals(request.barId) &&
+                                                    x.Event.TimeEvent.Any(t =>
+                                                        (t.DayOfWeek != null && t.DayOfWeek == (int)request.bookingDate.DayOfWeek) ||
+                                                        (t.Date != null && t.Date.Value.Date == request.bookingDate.Date)
+                                                    ),
+                                                    includeProperties: "Event.Bar.BarTimes,Event.TimeEvent")
                                                 .FirstOrDefault();
 
-                if(isExistVoucher == null)
+                if (isExistVoucher == null)
                 {
                     throw new CustomException.DataNotFoundException("Không tìm thấy voucher");
                 }
