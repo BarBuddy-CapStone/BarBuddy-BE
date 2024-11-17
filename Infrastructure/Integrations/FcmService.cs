@@ -473,8 +473,8 @@ namespace Infrastructure.Integrations
 
                 if (accountId != Guid.Empty)
                 {
-                    unreadCount = (await _unitOfWork.NotificationDetailRepository
-                        .GetAsync(nd => nd.AccountId == accountId && !nd.IsRead)).Count();
+                    unreadCount = (await _unitOfWork.FcmNotificationCustomerRepository
+                        .GetAsync(nc => nc.CustomerId == accountId && nc.DeviceToken == deviceToken && !nc.IsRead)).Count();
                 }
                 else if (!string.IsNullOrEmpty(deviceToken))
                 {
