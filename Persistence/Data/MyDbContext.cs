@@ -38,6 +38,9 @@ namespace Persistence.Data
         public DbSet<TimeEvent> TimeEvents { get; set; }
         public DbSet<EventVoucher> EventVouchers { get; set; }
         public DbSet<BarTime> BarTimes { get; set; }
+        public DbSet<FcmNotification> FcmNotifications { get; set; }
+        public DbSet<FcmNotificationCustomer> FcmNotificationCustomers { get; set; }
+        public DbSet<FcmUserDevice> FcmUserDevices { get; set; }
         #endregion
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -68,6 +71,51 @@ namespace Persistence.Data
 
             // 3. Seed relationship entities
             SeedRelationshipEntities(modelBuilder);
+
+            // FCM Configurations
+            modelBuilder.Entity<FcmNotification>(entity =>
+            {
+                entity.ToTable("FcmNotifications");
+                
+                entity.HasIndex(e => new { e.Type, e.IsPublic });
+                entity.HasIndex(e => e.CreatedAt);
+                
+                entity.HasOne(e => e.Bar)
+                    .WithMany()
+                    .HasForeignKey(e => e.BarId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<FcmNotificationCustomer>(entity =>
+            {
+                entity.ToTable("FcmNotificationCustomers");
+                
+                entity.HasIndex(e => new { e.CustomerId, e.IsRead });
+                entity.HasIndex(e => e.CreatedAt);
+                
+                entity.HasOne(e => e.Notification)
+                    .WithMany(n => n.NotificationCustomers)
+                    .HasForeignKey(e => e.NotificationId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                    
+                entity.HasOne(e => e.Customer)
+                    .WithMany()
+                    .HasForeignKey(e => e.CustomerId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<FcmUserDevice>(entity =>
+            {
+                entity.ToTable("FcmUserDevices");
+                
+                entity.HasIndex(e => e.DeviceToken).IsUnique();
+                entity.HasIndex(e => new { e.AccountId, e.IsActive });
+                
+                entity.HasOne(e => e.Account)
+                    .WithMany()
+                    .HasForeignKey(e => e.AccountId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
         }
 
         #region Seed Data Methods
@@ -909,7 +957,7 @@ namespace Persistence.Data
                 {
                     DrinksCategoryId = Constants.Ids.DrinkCategories.Coffee,
                     DrinksCategoryName = "Cà phê",
-                    Description = "Đồ uống nóng hoặc lạnh đư��c pha từ hạt cà phê rang, bao gồm espresso, cappuccino, latte và nhiều loại khác.",
+                    Description = "Đồ uống nóng hoặc lạnh đưc pha từ hạt cà phê rang, bao gồm espresso, cappuccino, latte và nhiều loại khác.",
                     IsDeleted = false
                 },
                 new DrinkCategory
@@ -966,7 +1014,7 @@ namespace Persistence.Data
                 {
                     EmotionalDrinksCategoryId = Constants.Ids.EmotionalDrinkCategory.dangYeuId,
                     CategoryName = "Đang yêu",
-                    Description = "Các loại đồ uống lãng mạn cho những người đang yêu",
+                    Description = "Các loại đồ uống lãng mạn cho những người đang y��u",
                     IsDeleted = false,
                 }
             };
@@ -2497,7 +2545,7 @@ namespace Persistence.Data
                     BookingId = Constants.Ids.Bookings.Booking2,
                     BarId = Constants.Ids.Bars.Bar2,
                     Rating = 4,
-                    Comment = "Âm nhạc sôi động, không khí náo nhiệt. Phù hợp cho nhóm bạn đi chơi.",
+                    Comment = "Âm nh��c sôi động, không khí náo nhiệt. Phù hợp cho nhóm bạn đi chơi.",
                     CommentEmotionalForDrink = "Cocktail ở đây khá đặc biệt, phù hợp với tâm trạng vui vẻ.",
                     IsDeleted = false,
                     CreatedTime = DateTimeOffset.Now.AddDays(-6),
@@ -2693,7 +2741,7 @@ namespace Persistence.Data
                     IsRead = false
                 },
 
-                // Thông báo b��o trì cho Manager
+                // Thông báo bo trì cho Manager
                 new NotificationDetail
                 {
                     NotificationDetailId = Constants.Ids.NotificationDetails.Maintenance,

@@ -12,6 +12,7 @@ using Domain.Enums;
 using Domain.IRepository;
 using Domain.Utils;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using static Domain.CustomException.CustomException;
 
@@ -26,11 +27,14 @@ namespace Application.Service
         private readonly IOtpSender _otpSender;
         private readonly IGoogleAuthService _googleAuthService;
         private readonly IEmailSender _emailSender;
+        private readonly IConfiguration _configuration;
+        private readonly IFcmService _fcmService;
 
         public AuthenService(IUnitOfWork unitOfWork, IMapper mapper,
                             IAuthentication authentication, IMemoryCache cache,
                             IOtpSender otpSender, IGoogleAuthService googleAuthService,
-                            IEmailSender emailSender)
+                            IEmailSender emailSender, IConfiguration configuration,
+                            IFcmService fcmService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -39,6 +43,8 @@ namespace Application.Service
             _otpSender = otpSender;
             _googleAuthService = googleAuthService;
             _emailSender = emailSender;
+            _configuration = configuration;
+            _fcmService = fcmService;
         }
 
         public async Task<LoginResponse> Login(LoginRequest request)
@@ -61,6 +67,14 @@ namespace Application.Service
 
                 var response = _mapper.Map<LoginResponse>(getOne);
                 response.AccessToken = _authentication.GenerteDefaultToken(getOne);
+
+                if (!string.IsNullOrEmpty(request.DeviceToken))
+                {
+                    await _fcmService.SaveUserDeviceToken(
+                        getOne.AccountId,
+                        request.DeviceToken,
+                        request.Platform ?? "unknown");
+                }
 
                 return response;
             }

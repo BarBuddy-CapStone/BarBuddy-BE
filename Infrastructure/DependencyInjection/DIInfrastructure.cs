@@ -20,6 +20,11 @@ using Infrastructure.Momo.Config;
 using Quartz;
 using Infrastructure.QRService;
 using Infrastructure.Quartz;
+using FirebaseAdmin;
+using FirebaseAdmin.Messaging;
+using Google.Apis.Auth.OAuth2;
+using Infrastructure.Configurations;
+using System.IO;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -43,6 +48,41 @@ namespace Infrastructure.DependencyInjection
             services.Configure<ZalopayConfig>(configuration.GetSection(ZalopayConfig.ConfigName));
             services.Configure<VnpayConfig>(configuration.GetSection(VnpayConfig.ConfigName));
             services.Configure<MomoConfig>(configuration.GetSection(MomoConfig.ConfigName));
+
+            // Add Firebase Configuration
+            services.Configure<FirebaseConfig>(
+                configuration.GetSection("Firebase"));
+
+            // Initialize Firebase if not initialized
+            if (FirebaseApp.DefaultInstance == null)
+            {
+                try 
+                {
+                    var credentialPath = Path.Combine(
+                        AppDomain.CurrentDomain.BaseDirectory, 
+                        configuration["Firebase:CredentialFile"]);
+                    
+                    if (!File.Exists(credentialPath))
+                    {
+                        throw new FileNotFoundException(
+                            $"Firebase credential file not found at {credentialPath}");
+                    }
+
+                    FirebaseApp.Create(new AppOptions()
+                    {
+                        Credential = GoogleCredential.FromFile(credentialPath)
+                    });
+
+                    services.AddSingleton(FirebaseMessaging.DefaultInstance);
+
+                    Console.WriteLine("Firebase initialized successfully!");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error initializing Firebase: {ex.Message}");
+                    throw;
+                }
+            }
 
             // Services
             services.AddServices();
@@ -96,6 +136,9 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<IBarTimeService, BarTimeService>();
 
             services.AddScoped<IDrinkRecommendationService, DrinkRecommendationService>();
+
+            // Add FCM Service
+            services.AddScoped<IFcmService, FcmService>();
         }
 
         //public static void AddCORS(this IServiceCollection services)
