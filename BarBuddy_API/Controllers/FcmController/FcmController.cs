@@ -112,13 +112,19 @@ namespace BarBuddy_API.Controllers.FcmController
             return CustomResult("Đánh dấu tất cả thông báo đã đọc thành công");
         }
 
-        [HttpGet("unread-count")]
+        [HttpGet("notifications/unread-count")]
         public async Task<IActionResult> GetUnreadCount([FromQuery] string deviceToken)
         {
-            var accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
-            var unreadCount = await _fcmService.GetUnreadCount(deviceToken, accountId);
-            
-            return CustomResult("Lấy số lượng thông báo chưa đọc thành công", unreadCount);
+            try
+            {
+                var accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
+                var unreadCount = await _fcmService.GetUnreadCount(deviceToken, accountId);
+                return CustomResult("Lấy số lượng thông báo chưa đọc thành công", unreadCount);
+            }
+            catch (Exception ex) {
+                var unreadCount = await _fcmService.GetUnreadCount(deviceToken, null);
+                return CustomResult("Lấy số lượng thông báo chưa đọc thành công", unreadCount);
+            }
         }
     }
 }
