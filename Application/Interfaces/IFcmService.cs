@@ -22,6 +22,7 @@ namespace Application.Interfaces
         Task<List<NotificationResponse>> GetNotificationsForUser(Guid accountId, int page = 1, int pageSize = 20);
         Task<List<NotificationResponse>> GetPublicNotifications(string deviceToken, int page = 1, int pageSize = 20);
         Task MarkAsReadByDeviceToken(Guid notificationId, string deviceToken);
+        Task<int> GetUnreadCount(string deviceToken, Guid? accountId = null);
 
         // Mark as read
         Task MarkAsRead(Guid notificationId, Guid accountId);

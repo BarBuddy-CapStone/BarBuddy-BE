@@ -3,16 +3,19 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using System.Linq;
+using Domain.IRepository;
 
 namespace Infrastructure.SignalR
 {
     public class NotificationHub : Hub
     {
         private readonly IConnectionMapping _connectionMapping;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public NotificationHub(IConnectionMapping connectionMapping)
+        public NotificationHub(IConnectionMapping connectionMapping, IUnitOfWork unitOfWork)
         {
             _connectionMapping = connectionMapping;
+            _unitOfWork = unitOfWork;
         }
 
         public override async Task OnConnectedAsync()
@@ -43,6 +46,29 @@ namespace Infrastructure.SignalR
         public async Task SendBroadcast(string message)
         {
             await Clients.All.SendAsync("ReceiveBroadcast", message);
+        }
+
+        public async Task GetUnreadCount(string deviceToken, Guid? accountId = null)
+        {
+            int unreadCount = 0;
+            
+            if (accountId.HasValue)
+            {
+                unreadCount = (await _unitOfWork.NotificationDetailRepository
+                    .GetAsync(nd => nd.AccountId == accountId && !nd.IsRead)).Count();
+            }
+            else if (!string.IsNullOrEmpty(deviceToken))
+            {
+                var notifications = await _unitOfWork.FcmNotificationCustomerRepository
+                    .GetAsync(nc => nc.DeviceToken == deviceToken && !nc.IsRead);
+                unreadCount = notifications.Count();
+            }
+
+            var connectionIds = _connectionMapping.GetConnectionIds(deviceToken);
+            if (connectionIds.Any())
+            {
+                await Clients.Clients(connectionIds).SendAsync("ReceiveUnreadCount", unreadCount);
+            }
         }
     }
 } 
