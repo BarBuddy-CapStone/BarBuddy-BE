@@ -12,10 +12,13 @@ namespace Domain.Entities
         [Required]
         public Guid NotificationId { get; set; }
 
-        [Required]
-        public Guid CustomerId { get; set; }
+        public Guid? CustomerId { get; set; }
 
-        public bool IsRead { get; set; }
+        [Required]
+        [StringLength(500)]
+        public string DeviceToken { get; set; }
+
+        public bool IsRead { get; set; } = false;
 
         public DateTimeOffset? ReadAt { get; set; }
 

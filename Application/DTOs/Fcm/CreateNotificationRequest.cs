@@ -1,16 +1,12 @@
 using Domain.Enums;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.Collections.Generic;
 
-namespace Domain.Entities
+namespace Application.DTOs.Fcm
 {
-    public class FcmNotification
+    public class CreateNotificationRequest
     {
-        [Key]
-        public Guid Id { get; set; } = Guid.NewGuid();
-
         [Required]
         [StringLength(100)]
         public string Title { get; set; }
@@ -31,14 +27,6 @@ namespace Domain.Entities
         [Required]
         public bool IsPublic { get; set; } // True: guest + customer, False: customer only
 
-        [Required]
-        public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
-
-        public bool IsActive { get; set; } = true;
-
-        // Navigation properties
-        [ForeignKey("BarId")]
-        public virtual Bar? Bar { get; set; }
-        public virtual ICollection<FcmNotificationCustomer> NotificationCustomers { get; set; }
+        public Dictionary<string, string>? Data { get; set; }
     }
 } 

@@ -16,7 +16,5 @@ namespace Application.DTOs.Authen
         [Required(ErrorMessage = "Password không thể để trống")]
         [StringLength(20, MinimumLength = 6, ErrorMessage = "Password phải từ 6 đến 20 kí tự !")]
         public string Password { get; set; }
-        public string? Platform { get; set; }
-        public string? DeviceToken { get; set; }
     }
 }

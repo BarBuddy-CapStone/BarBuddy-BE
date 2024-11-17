@@ -9,22 +9,23 @@ namespace Domain.Entities
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
 
-        [Required]
-        public Guid AccountId { get; set; }
+        public Guid? AccountId { get; set; }
 
         [Required]
-        [StringLength(500)]
         public string DeviceToken { get; set; }
 
-        public string? Platform { get; set; } // iOS/Android
-
         [Required]
-        public DateTimeOffset LastLoginAt { get; set; } = DateTimeOffset.UtcNow;
+        public string Platform { get; set; }
+
+        public bool IsGuest { get; set; }
 
         public bool IsActive { get; set; } = true;
 
-        // Navigation properties
+        public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+
+        public DateTimeOffset? LastActiveAt { get; set; }
+
         [ForeignKey("AccountId")]
-        public virtual Account Account { get; set; }
+        public virtual Account? Account { get; set; }
     }
 } 

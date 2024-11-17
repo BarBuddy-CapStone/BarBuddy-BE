@@ -1,7 +1,18 @@
-public enum FcmNotificationType
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Domain.Enums
 {
-    Promotional = 0,    // Thông báo quảng bá (guest + customer)
-    Personal = 1,       // Thông báo cá nhân (customer only)
-    Booking = 2,        // Thông báo đặt bàn
-    Event = 3,          // Thông báo sự kiện
-} 
+    public enum FcmNotificationType
+    {
+        SYSTEM,             // Thông báo hệ thống
+        PROMOTIONAL,        // Thông báo quảng bá
+        BOOKING,           // Thông báo đặt bàn
+        EVENT,             // Thông báo sự kiện
+        PAYMENT            // Thông báo thanh toán
+    }
+}

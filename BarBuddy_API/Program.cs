@@ -68,6 +68,7 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapHub<BookingHub>("/bookingHub");
     endpoints.MapControllers();
+    endpoints.MapHub<NotificationHub>("/notificationHub");
 });
 
 app.MapControllers();

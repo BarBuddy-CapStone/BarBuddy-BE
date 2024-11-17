@@ -93,6 +93,8 @@ namespace Infrastructure.DependencyInjection
             //SignalR
             services.AddSignalR();
 
+            services.AddSingleton<IConnectionMapping, ConnectionMapping>();
+
             //Quartz
             services.AddQuartz();
 
@@ -137,7 +139,6 @@ namespace Infrastructure.DependencyInjection
 
             services.AddScoped<IDrinkRecommendationService, DrinkRecommendationService>();
 
-            // Add FCM Service
             services.AddScoped<IFcmService, FcmService>();
         }
 

@@ -90,31 +90,34 @@ namespace Persistence.Data
             {
                 entity.ToTable("FcmNotificationCustomers");
                 
-                entity.HasIndex(e => new { e.CustomerId, e.IsRead });
-                entity.HasIndex(e => e.CreatedAt);
+                entity.HasKey(e => e.Id);
                 
+                entity.HasIndex(e => new { e.NotificationId, e.DeviceToken })
+                     .IsUnique();
+                 
                 entity.HasOne(e => e.Notification)
-                    .WithMany(n => n.NotificationCustomers)
-                    .HasForeignKey(e => e.NotificationId)
-                    .OnDelete(DeleteBehavior.Cascade);
-                    
+                      .WithMany(n => n.NotificationCustomers)
+                      .HasForeignKey(e => e.NotificationId);
+                      
                 entity.HasOne(e => e.Customer)
-                    .WithMany()
-                    .HasForeignKey(e => e.CustomerId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                      .WithMany()
+                      .HasForeignKey(e => e.CustomerId)
+                      .IsRequired(false);
             });
 
             modelBuilder.Entity<FcmUserDevice>(entity =>
             {
                 entity.ToTable("FcmUserDevices");
                 
-                entity.HasIndex(e => e.DeviceToken).IsUnique();
-                entity.HasIndex(e => new { e.AccountId, e.IsActive });
+                entity.HasKey(e => e.Id);
                 
+                entity.HasIndex(e => e.DeviceToken)
+                     .IsUnique();
+                 
                 entity.HasOne(e => e.Account)
-                    .WithMany()
-                    .HasForeignKey(e => e.AccountId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                      .WithMany()
+                      .HasForeignKey(e => e.AccountId)
+                      .IsRequired(false);
             });
         }
 
@@ -1014,7 +1017,7 @@ namespace Persistence.Data
                 {
                     EmotionalDrinksCategoryId = Constants.Ids.EmotionalDrinkCategory.dangYeuId,
                     CategoryName = "Đang yêu",
-                    Description = "Các loại đồ uống lãng mạn cho những người đang y��u",
+                    Description = "Các loại đồ uống lãng mạn cho những người đang yu",
                     IsDeleted = false,
                 }
             };
@@ -2545,7 +2548,7 @@ namespace Persistence.Data
                     BookingId = Constants.Ids.Bookings.Booking2,
                     BarId = Constants.Ids.Bars.Bar2,
                     Rating = 4,
-                    Comment = "Âm nh��c sôi động, không khí náo nhiệt. Phù hợp cho nhóm bạn đi chơi.",
+                    Comment = "Âm nhc sôi động, không khí náo nhiệt. Phù hợp cho nhóm bạn đi chơi.",
                     CommentEmotionalForDrink = "Cocktail ở đây khá đặc biệt, phù hợp với tâm trạng vui vẻ.",
                     IsDeleted = false,
                     CreatedTime = DateTimeOffset.Now.AddDays(-6),
