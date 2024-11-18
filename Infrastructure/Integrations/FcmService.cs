@@ -133,9 +133,10 @@ namespace Infrastructure.Integrations
 
             foreach (var device in devices)
             {
-                try {
+                try
+                {
                     await SendPushNotification(device.DeviceToken, notification, request.Data);
-                    
+
                     // 3. Tạo notification customer record
                     await _unitOfWork.FcmNotificationCustomerRepository.InsertAsync(
                         new FcmNotificationCustomer
@@ -147,7 +148,8 @@ namespace Infrastructure.Integrations
                         }
                     );
                 }
-                catch (FirebaseMessagingException ex) {
+                catch (FirebaseMessagingException ex)
+                {
                     if (ex.MessagingErrorCode == MessagingErrorCode.Unregistered)
                     {
                         device.IsActive = false;
@@ -258,8 +260,8 @@ namespace Infrastructure.Integrations
 
             var notifications = await _unitOfWork.FcmNotificationRepository
                 .GetAsync(
-                    n => n.NotificationCustomers.Any(nc => 
-                        (nc.CustomerId == accountId) || 
+                    n => n.NotificationCustomers.Any(nc =>
+                        (nc.CustomerId == accountId) ||
                         (n.IsPublic && nc.DeviceToken == device.DeviceToken)),
                     includeProperties: "Bar,NotificationCustomers"
                 );
@@ -268,17 +270,18 @@ namespace Infrastructure.Integrations
                 .OrderByDescending(n => n.CreatedAt)
                 .Skip(skip)
                 .Take(pageSize)
-                .Select(n => {
+                .Select(n =>
+                {
                     var response = _mapper.Map<NotificationResponse>(n);
                     var customerNotification = n.NotificationCustomers
                         .FirstOrDefault(nc => nc.CustomerId == accountId || nc.DeviceToken == device.DeviceToken);
-                    
+
                     if (customerNotification != null)
                     {
                         response.IsRead = customerNotification.IsRead;
                         response.ReadAt = customerNotification.ReadAt;
                     }
-                    
+
                     return response;
                 })
                 .ToList();
@@ -298,17 +301,18 @@ namespace Infrastructure.Integrations
                 .OrderByDescending(n => n.CreatedAt)
                 .Skip(skip)
                 .Take(pageSize)
-                .Select(n => {
+                .Select(n =>
+                {
                     var response = _mapper.Map<NotificationResponse>(n);
                     var customerNotification = n.NotificationCustomers
                         .FirstOrDefault(nc => nc.DeviceToken == deviceToken);
-                    
+
                     if (customerNotification != null)
                     {
                         response.IsRead = customerNotification.IsRead;
                         response.ReadAt = customerNotification.ReadAt;
                     }
-                    
+
                     return response;
                 })
                 .ToList();
@@ -318,12 +322,12 @@ namespace Infrastructure.Integrations
         {
             var device = (await _unitOfWork.FcmUserDeviceRepository
                 .GetAsync(d => d.AccountId == accountId && !d.IsGuest)).FirstOrDefault();
-            
+
             if (device == null) return;
 
             var notificationCustomer = (await _unitOfWork.FcmNotificationCustomerRepository
-                .GetAsync(nc => 
-                    nc.NotificationId == notificationId && 
+                .GetAsync(nc =>
+                    nc.NotificationId == notificationId &&
                     nc.CustomerId == accountId)).FirstOrDefault();
 
             if (notificationCustomer != null && !notificationCustomer.IsRead)
@@ -345,7 +349,7 @@ namespace Infrastructure.Integrations
         {
             var device = (await _unitOfWork.FcmUserDeviceRepository
                 .GetAsync(d => d.AccountId == accountId && !d.IsGuest)).FirstOrDefault();
-            
+
             if (device == null) return;
 
             var unreadNotifications = await _unitOfWork.FcmNotificationCustomerRepository
@@ -398,8 +402,8 @@ namespace Infrastructure.Integrations
         public async Task MarkAsReadByDeviceToken(Guid notificationId, string deviceToken)
         {
             var notificationCustomer = (await _unitOfWork.FcmNotificationCustomerRepository
-                .GetAsync(nc => 
-                    nc.NotificationId == notificationId && 
+                .GetAsync(nc =>
+                    nc.NotificationId == notificationId &&
                     nc.DeviceToken == deviceToken)).FirstOrDefault();
 
             if (notificationCustomer != null && !notificationCustomer.IsRead)
@@ -412,7 +416,7 @@ namespace Infrastructure.Integrations
             var accountId = (await _unitOfWork.FcmUserDeviceRepository
                 .GetAsync(d => d.DeviceToken == deviceToken))
                 .FirstOrDefault()?.AccountId;
-            
+
             await _notificationHub.Clients.Group(deviceToken)
                 .SendAsync("GetUnreadCount", deviceToken, accountId);
         }
@@ -464,29 +468,49 @@ namespace Infrastructure.Integrations
                 .SendAsync("GetUnreadCount", deviceToken);
         }
 
-        public async Task<int> GetUnreadCount(string deviceToken, Guid? accountId = null)
-
+        public async Task<int> GetUnreadCount(string deviceToken, Guid? accountId)
         {
             try
             {
-                int unreadCount = 0;
+                if (string.IsNullOrEmpty(deviceToken))
+                    return 0;
 
-                if (accountId != Guid.Empty)
+                IEnumerable<FcmNotificationCustomer> query;
+
+                if (accountId.HasValue)
                 {
-                    unreadCount = (await _unitOfWork.FcmNotificationCustomerRepository
-                        .GetAsync(nc => nc.CustomerId == accountId && nc.DeviceToken == deviceToken && !nc.IsRead)).Count();
+                    // Lấy số lượng thông báo chưa đọc cho user đã đăng nhập
+                    query = await _unitOfWork.FcmNotificationCustomerRepository
+                        .GetAsync(nc => 
+                            nc.CustomerId == accountId && 
+                            nc.DeviceToken == deviceToken && 
+                            !nc.IsRead);
                 }
-                else if (!string.IsNullOrEmpty(deviceToken))
+                else
                 {
-                    var notifications = await _unitOfWork.FcmNotificationCustomerRepository
-                        .GetAsync(nc => nc.DeviceToken == deviceToken && !nc.IsRead);
-                    unreadCount = notifications.Count();
+                    // Lấy số lượng thông báo chưa đọc cho guest user
+                    query = await _unitOfWork.FcmNotificationCustomerRepository
+                        .GetAsync(nc => 
+                            nc.DeviceToken == deviceToken && 
+                            !nc.IsRead);
                 }
 
-                return unreadCount;
+                var count = query.Count();
+
+                // Gửi cập nhật qua SignalR
+                var connectionIds = _connectionMapping.GetConnectionIds(deviceToken);
+                if (connectionIds.Any())
+                {
+                    await _notificationHub.Clients.Clients(connectionIds)
+                        .SendAsync("ReceiveUnreadCount", count);
+                }
+
+                return count;
             }
-            catch (Exception ex) { 
-                throw new Exception(ex.Message);
+            catch (Exception ex)
+            {
+                // Log lỗi
+                throw new Exception("Lỗi khi lấy số lượng thông báo chưa đọc", ex);
             }
         }
     }

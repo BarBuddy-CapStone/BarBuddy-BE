@@ -4,18 +4,20 @@ using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using System.Linq;
 using Domain.IRepository;
+using Infrastructure.Integrations;
+using Application.Interfaces;
 
 namespace Infrastructure.SignalR
 {
     public class NotificationHub : Hub
     {
+        private readonly IFcmService _fcmService;
         private readonly IConnectionMapping _connectionMapping;
-        private readonly IUnitOfWork _unitOfWork;
 
-        public NotificationHub(IConnectionMapping connectionMapping, IUnitOfWork unitOfWork)
+        public NotificationHub(IFcmService fcmService, IConnectionMapping connectionMapping)
         {
+            _fcmService = fcmService;
             _connectionMapping = connectionMapping;
-            _unitOfWork = unitOfWork;
         }
 
         public override async Task OnConnectedAsync()
@@ -48,26 +50,26 @@ namespace Infrastructure.SignalR
             await Clients.All.SendAsync("ReceiveBroadcast", message);
         }
 
-        public async Task GetUnreadCount(string deviceToken, Guid? accountId = null)
+        public async Task<int> GetUnreadCount(string deviceToken)
         {
-            int unreadCount = 0;
-            
-            if (accountId.HasValue)
+            try
             {
-                unreadCount = (await _unitOfWork.FcmNotificationCustomerRepository
-                        .GetAsync(nc => nc.CustomerId == accountId && nc.DeviceToken == deviceToken && !nc.IsRead)).Count();
+                var unreadCount = await _fcmService.GetUnreadCount(deviceToken, null);
+                
+                // Gửi kết quả qua SignalR
+                var connectionIds = _connectionMapping.GetConnectionIds(deviceToken);
+                if (connectionIds.Any())
+                {
+                    await Clients.Clients(connectionIds)
+                        .SendAsync("ReceiveUnreadCount", unreadCount);
+                }
+                
+                return unreadCount;
             }
-            else if (!string.IsNullOrEmpty(deviceToken))
+            catch (Exception ex)
             {
-                var notifications = await _unitOfWork.FcmNotificationCustomerRepository
-                    .GetAsync(nc => nc.DeviceToken == deviceToken && !nc.IsRead);
-                unreadCount = notifications.Count();
-            }
-
-            var connectionIds = _connectionMapping.GetConnectionIds(deviceToken);
-            if (connectionIds.Any())
-            {
-                await Clients.Clients(connectionIds).SendAsync("ReceiveUnreadCount", unreadCount);
+                // Log lỗi
+                throw;
             }
         }
     }
