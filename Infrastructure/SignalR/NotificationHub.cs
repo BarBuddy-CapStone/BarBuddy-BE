@@ -23,17 +23,20 @@ namespace Infrastructure.SignalR
         public override async Task OnConnectedAsync()
         {
             var deviceToken = Context.GetHttpContext().Request.Query["deviceToken"].ToString();
-            var accountId = Context.GetHttpContext().Request.Query["accountId"].ToString();
+            var accountIdStr = Context.GetHttpContext().Request.Query["accountId"].ToString();
+            Guid? accountId = null;
 
             if (!string.IsNullOrEmpty(deviceToken))
             {
                 _connectionMapping.Add(deviceToken, Context.ConnectionId);
                 
-                if (!string.IsNullOrEmpty(accountId))
+                if (!string.IsNullOrEmpty(accountIdStr) && Guid.TryParse(accountIdStr, out Guid parsedId))
                 {
-                    // Thêm connection vào group của user
+                    accountId = parsedId;
                     await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{accountId}");
                 }
+
+                await GetUnreadCount(deviceToken, accountId);
             }
 
             await base.OnConnectedAsync();

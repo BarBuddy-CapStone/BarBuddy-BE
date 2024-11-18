@@ -174,20 +174,25 @@ namespace Infrastructure.Integrations
 
             if (request.IsPublic)
             {
-                // Gửi cho tất cả devices có trong danh sách
-                var connectionIds = devices
-                    .SelectMany(d => _connectionMapping.GetConnectionIds(d.DeviceToken))
-                    .Distinct();
-
-                if (connectionIds.Any())
+                // Gửi cho tất cả devices
+                foreach (var device in devices)
                 {
-                    await _notificationHub.Clients.Clients(connectionIds)
-                        .SendAsync("ReceiveNotification", notificationData);
+                    var connectionIds = _connectionMapping.GetConnectionIds(device.DeviceToken);
+                    if (connectionIds.Any())
+                    {
+                        await _notificationHub.Clients.Clients(connectionIds)
+                            .SendAsync("ReceiveNotification", notificationData);
+                        
+                        // Cập nhật số lượng thông báo chưa đọc
+                        var unreadCount = await GetUnreadCount(device.DeviceToken, device.AccountId);
+                        await _notificationHub.Clients.Clients(connectionIds)
+                            .SendAsync("ReceiveUnreadCount", unreadCount);
+                    }
                 }
             }
             else
             {
-                // Gửi cho specific users qua group
+                // Gửi cho specific users
                 foreach (var device in devices.Where(d => d.AccountId.HasValue))
                 {
                     await _notificationHub.Clients.Group($"user_{device.AccountId}")
@@ -475,27 +480,59 @@ namespace Infrastructure.Integrations
                 if (string.IsNullOrEmpty(deviceToken))
                     return 0;
 
-                IEnumerable<FcmNotificationCustomer> query;
+                int count = 0;
 
                 if (accountId.HasValue)
                 {
+                    IEnumerable<FcmNotificationCustomer> query;
+
                     query = await _unitOfWork.FcmNotificationCustomerRepository
-                        .GetAsync(nc => 
-                            (!nc.IsRead) && (
-                                nc.CustomerId == accountId ||
-                                (nc.DeviceToken == deviceToken && nc.Notification.IsPublic)
-                            )
-                        );
+                        .GetAsync(nc =>
+                            (nc.CustomerId == accountId || nc.DeviceToken == deviceToken) &&
+                            !nc.IsRead);
+
+                    List<FcmNotificationCustomer> notificationByDeviceToken = new List<FcmNotificationCustomer>();
+                    List<FcmNotificationCustomer> restNotification = new List<FcmNotificationCustomer>();
+
+                    foreach (var customer in query) { 
+                        if (customer.DeviceToken == deviceToken)
+                        {
+                            notificationByDeviceToken.Add(customer);
+                        } else
+                        {
+                            restNotification.Add(customer);
+                        }
+                    }
+                    
+                    List<int> dublicatedNotificationIndex = new List<int>();
+                    for (int i = restNotification.Count() - 1; i >= 0; i--)
+                    {
+                        foreach (var noti in notificationByDeviceToken)
+                        {
+                            if (restNotification[i].NotificationId == noti.NotificationId)
+                            {
+                                dublicatedNotificationIndex.Add(i);
+                                break;
+                            }
+                        }
+                    }
+
+                    foreach (var item in dublicatedNotificationIndex)
+                    {
+                        restNotification.RemoveAt(item);
+                    }
+
+                    count = notificationByDeviceToken.Count() + restNotification.Count();
                 }
                 else
                 {
+                    IEnumerable<FcmNotificationCustomer> query;
                     query = await _unitOfWork.FcmNotificationCustomerRepository
                         .GetAsync(nc => 
                             nc.DeviceToken == deviceToken && 
                             !nc.IsRead);
+                    count = query.Count();
                 }
-
-                var count = query.Count();
 
                 // Gửi cập nhật qua SignalR
                 var connectionIds = _connectionMapping.GetConnectionIds(deviceToken);
