@@ -28,6 +28,7 @@ namespace Persistence.Repository
         private IGenericRepository<TimeEvent> _timeEventRepository;
         private IGenericRepository<EventVoucher> _eventVoucherRepository;
         private IGenericRepository<BarTime> _barTimeRepository;
+        private IGenericRepository<Token> _tokenRepository;
         private IGenericRepository<FcmNotification> _fcmNotification;
         private IGenericRepository<FcmNotificationCustomer> _fcmNotificationCustomer;
         private IGenericRepository<FcmUserDevice> _fcmUserDevice;
@@ -293,6 +294,18 @@ namespace Persistence.Repository
                     _barTimeRepository = new GenericRepository<BarTime>(_context);
                 }
                 return _barTimeRepository;
+            }
+        }
+        public IGenericRepository<Token> TokenRepository
+        {
+            get
+            {
+
+                if (_tokenRepository == null)
+                {
+                    _tokenRepository = new GenericRepository<Token>(_context);
+                }
+                return _tokenRepository;
             }
         }
 

@@ -29,6 +29,7 @@ namespace Domain.IRepository
         public IGenericRepository<TimeEvent> TimeEventRepository { get; }
         public IGenericRepository<EventVoucher> EventVoucherRepository { get; }
         public IGenericRepository<BarTime> BarTimeRepository { get; }
+        public IGenericRepository<Token> TokenRepository { get; }
         public IGenericRepository<FcmNotification> FcmNotificationRepository { get; }
         public IGenericRepository<FcmNotificationCustomer> FcmNotificationCustomerRepository { get; }
 

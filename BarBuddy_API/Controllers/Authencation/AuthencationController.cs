@@ -18,12 +18,19 @@ namespace BarBuddy_API.Controllers.Authencation
         private readonly IAuthenService _authenService;
         private readonly IGoogleAuthService _googleAuthService;
         private readonly IOtpSender _otpSender;
-
-        public AuthencationController(IAuthenService authenService, IOtpSender otpSender, IGoogleAuthService googleAuthService)
+        private readonly ITokenService _tokenService;
+        private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IAuthentication _authentication;
+        public AuthencationController(IAuthenService authenService, IOtpSender otpSender, 
+                                        IGoogleAuthService googleAuthService, ITokenService tokenService, 
+                                        IHttpContextAccessor contextAccessor, IAuthentication authentication)
         {
             _authenService = authenService;
             _otpSender = otpSender;
             _googleAuthService = googleAuthService;
+            _tokenService = tokenService;
+            _contextAccessor = contextAccessor;
+            _authentication = authentication;
         }
 
         /// <summary>
@@ -125,6 +132,64 @@ namespace BarBuddy_API.Controllers.Authencation
             bool isValid = await _authenService.ConfirmAccountByOtp(request);
 
             return isValid ? CustomResult("OTP hợp lệ.") : CustomResult("OTP không hợp lệ hoặc đã hết hạn.", HttpStatusCode.BadRequest);
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody]string token)
+        {
+            try
+            {
+                if(!await _tokenService.IsValidRefreshToken(token))
+                {
+                    return CustomResult("Token không hợp lệ hoặc đã thu hồi !", HttpStatusCode.Unauthorized);
+                }
+
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+
+                await _tokenService.RevokeRefreshToken(token);
+                await Task.Delay(10);
+                var newToken = _tokenService.GenerteDefaultToken(accountId);
+                var response = await _tokenService.SaveRefreshToken(newToken, accountId);
+
+                return CustomResult("Đã refresh token thành công !", response);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.InternalServerError);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.NotFound);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.BadRequest);
+            }
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] string token) 
+        {
+            var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+
+            if(accountId == Guid.Empty)
+            {
+                return CustomResult("Bạn không có quyền !", HttpStatusCode.Unauthorized);
+            }
+
+            if (!await _tokenService.IsValidRefreshToken(token))
+            {
+                return CustomResult("Token không hợp lệ hoặc đã thu hồi !", HttpStatusCode.Unauthorized);
+            }
+
+            var result = await _tokenService.RevokeRefreshToken(token);
+
+            if(!result)
+            {
+                return CustomResult("Token không tồn tại hoặc đã hết hạn !", HttpStatusCode.BadRequest);
+            }
+
+            return CustomResult("Đã logout thành công !");
         }
     }
 }
