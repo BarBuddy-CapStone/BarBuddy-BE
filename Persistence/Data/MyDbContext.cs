@@ -38,6 +38,9 @@ namespace Persistence.Data
         public DbSet<TimeEvent> TimeEvents { get; set; }
         public DbSet<EventVoucher> EventVouchers { get; set; }
         public DbSet<BarTime> BarTimes { get; set; }
+        public DbSet<FcmNotification> FcmNotifications { get; set; }
+        public DbSet<FcmNotificationCustomer> FcmNotificationCustomers { get; set; }
+        public DbSet<FcmUserDevice> FcmUserDevices { get; set; }
         #endregion
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -68,6 +71,54 @@ namespace Persistence.Data
 
             // 3. Seed relationship entities
             SeedRelationshipEntities(modelBuilder);
+
+            // FCM Configurations
+            modelBuilder.Entity<FcmNotification>(entity =>
+            {
+                entity.ToTable("FcmNotifications");
+                
+                entity.HasIndex(e => new { e.Type, e.IsPublic });
+                entity.HasIndex(e => e.CreatedAt);
+                
+                entity.HasOne(e => e.Bar)
+                    .WithMany()
+                    .HasForeignKey(e => e.BarId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<FcmNotificationCustomer>(entity =>
+            {
+                entity.ToTable("FcmNotificationCustomers");
+                
+                entity.HasKey(e => e.Id);
+                
+                entity.HasIndex(e => new { e.NotificationId, e.DeviceToken })
+                     .IsUnique();
+                 
+                entity.HasOne(e => e.Notification)
+                      .WithMany(n => n.NotificationCustomers)
+                      .HasForeignKey(e => e.NotificationId);
+                      
+                entity.HasOne(e => e.Customer)
+                      .WithMany()
+                      .HasForeignKey(e => e.CustomerId)
+                      .IsRequired(false);
+            });
+
+            modelBuilder.Entity<FcmUserDevice>(entity =>
+            {
+                entity.ToTable("FcmUserDevices");
+                
+                entity.HasKey(e => e.Id);
+                
+                entity.HasIndex(e => e.DeviceToken)
+                     .IsUnique();
+                 
+                entity.HasOne(e => e.Account)
+                      .WithMany()
+                      .HasForeignKey(e => e.AccountId)
+                      .IsRequired(false);
+            });
         }
 
         #region Seed Data Methods
@@ -966,7 +1017,7 @@ namespace Persistence.Data
                 {
                     EmotionalDrinksCategoryId = Constants.Ids.EmotionalDrinkCategory.dangYeuId,
                     CategoryName = "Đang yêu",
-                    Description = "Các loại đồ uống lãng mạn cho những người đang yêu",
+                    Description = "Các loại đồ uống lãng mạn cho những người đang yu",
                     IsDeleted = false,
                 }
             };
@@ -2555,7 +2606,7 @@ namespace Persistence.Data
                     BookingId = Constants.Ids.Bookings.Booking2,
                     BarId = Constants.Ids.Bars.Bar2,
                     Rating = 4,
-                    Comment = "Âm nhạc sôi động, không khí náo nhiệt. Phù hợp cho nhóm bạn đi chơi.",
+                    Comment = "Âm nhc sôi động, không khí náo nhiệt. Phù hợp cho nhóm bạn đi chơi.",
                     CommentEmotionalForDrink = "Cocktail ở đây khá đặc biệt, phù hợp với tâm trạng vui vẻ.",
                     IsDeleted = false,
                     CreatedTime = DateTimeOffset.Now.AddDays(-6),

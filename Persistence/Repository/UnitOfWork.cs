@@ -28,7 +28,9 @@ namespace Persistence.Repository
         private IGenericRepository<TimeEvent> _timeEventRepository;
         private IGenericRepository<EventVoucher> _eventVoucherRepository;
         private IGenericRepository<BarTime> _barTimeRepository;
-
+        private IGenericRepository<FcmNotification> _fcmNotification;
+        private IGenericRepository<FcmNotificationCustomer> _fcmNotificationCustomer;
+        private IGenericRepository<FcmUserDevice> _fcmUserDevice;
 
         public UnitOfWork()
         {
@@ -293,6 +295,42 @@ namespace Persistence.Repository
                 return _barTimeRepository;
             }
         }
+
+        public IGenericRepository<FcmNotification> FcmNotificationRepository
+        {
+            get
+            {
+                if (_fcmNotification == null) {
+                    _fcmNotification = new GenericRepository<FcmNotification>(_context);
+                }
+                return _fcmNotification;
+            }
+        }
+
+        public IGenericRepository<FcmNotificationCustomer> FcmNotificationCustomerRepository
+        {
+            get
+            {
+                if (_fcmNotificationCustomer == null)
+                {
+                    _fcmNotificationCustomer = new GenericRepository<FcmNotificationCustomer>(_context);
+                }
+                return _fcmNotificationCustomer;
+            }
+        }
+
+        public IGenericRepository<FcmUserDevice> FcmUserDeviceRepository
+        {
+            get
+            {
+                if (_fcmUserDevice == null)
+                {
+                    _fcmUserDevice = new GenericRepository<FcmUserDevice>(_context);
+                }
+                return _fcmUserDevice;
+            }
+        }
+
         public async Task SaveAsync()
         {
             await _context.SaveChangesAsync();

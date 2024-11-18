@@ -22,12 +22,14 @@ namespace Infrastructure.Quartz
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMemoryCache _cache;
         private readonly ILogger<NotificationJob> _logger;
+        private readonly IFcmService _fcmService;
 
         public NotificationJob(INotificationService notificationService,
                     IBookingService bookingService,
                     IAuthentication authen, ILogger<NotificationJob> logger,
                     IHttpContextAccessor httpContextAccessor,
-                    IMemoryCache cache)
+                    IMemoryCache cache,
+                    IFcmService fcmService)
         {
             _notificationService = notificationService;
             _bookingService = bookingService;
@@ -35,6 +37,7 @@ namespace Infrastructure.Quartz
             _httpContextAccessor = httpContextAccessor;
             _cache = cache;
             _logger = logger;
+            _fcmService = fcmService;
         }
 
         public async Task Execute(IJobExecutionContext context)
@@ -74,6 +77,16 @@ namespace Infrastructure.Quartz
                             };
                             await _notificationService.CreateNotificationAllCustomer(booking.AccountId, creNotiRequest);
                             _logger.LogInformation("Đã hoàn thành đơn hàng đặt với đồ uống");
+                            await _fcmService.SendNotificationToUser(
+                                booking.AccountId,
+                                booking.BarName,
+                                messages,
+                                new Dictionary<string, string> 
+                                { 
+                                    { "type", "booking" },
+                                    { "bookingId", booking.BookingId.ToString() }
+                                }
+                            );
                         }
                         else if (booking.BookingDate.Date == now.Date &&
                            booking.BookingTime + TimeSpan.FromHours(1) == roundedTimeOfDay &&
@@ -90,6 +103,16 @@ namespace Infrastructure.Quartz
                             await _notificationService.CreateNotificationAllCustomer(booking.AccountId, creNotiRequest);
                             _cache.Remove(cacheKey);
                             _logger.LogInformation("Đã hoàn thành đơn hàng đặt với đồ uống");
+                            await _fcmService.SendNotificationToUser(
+                                booking.AccountId,
+                                booking.BarName,
+                                messages,
+                                new Dictionary<string, string> 
+                                { 
+                                    { "type", "booking" },
+                                    { "bookingId", booking.BookingId.ToString() }
+                                }
+                            );
                         }
                     }
                 }
@@ -112,6 +135,16 @@ namespace Infrastructure.Quartz
                         _cache.Set(cacheKey, true, TimeSpan.FromHours(2 + booking.TimeSlot));
 
                         _logger.LogInformation($"Đã gửi thông báo cho tài khoản {booking.AccountId} với {getListBooking.Count()} đơn đặt !");
+                        await _fcmService.SendNotificationToUser(
+                            booking.AccountId,
+                            booking.BarName,
+                            messages,
+                            new Dictionary<string, string> 
+                            { 
+                                { "type", "booking" },
+                                { "bookingId", booking.BookingId.ToString() }
+                            }
+                        );
                     }
                     else
                     {
@@ -130,6 +163,16 @@ namespace Infrastructure.Quartz
                         };
                         await _notificationService.CreateNotificationAllCustomer(booking.AccountId, creNotiRequest);
                         _logger.LogInformation($"Đã gửi thông báo cho tài khoản {booking.AccountId} với {getListBooking.Count()} đơn đặt !");
+                        await _fcmService.SendNotificationToUser(
+                            booking.AccountId,
+                            booking.BarName,
+                            messages,
+                            new Dictionary<string, string> 
+                            { 
+                                { "type", "booking" },
+                                { "bookingId", booking.BookingId.ToString() }
+                            }
+                        );
                     }
                 }
             }
