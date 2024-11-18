@@ -12,7 +12,7 @@ namespace Application.IService
         Task<IEnumerable<OnlyBarResponse>> GetAllBarWithFeedback(ObjectQuery query);
         Task<BarResponse> GetBarByIdWithFeedback(Guid barId);
         Task<BarResponse> GetBarByIdWithTable(Guid barId);
-        Task<IEnumerable<OnlyBarResponse>> GetAllAvailableBars(DateTime dateTime);
+        Task<IEnumerable<OnlyBarResponse>> GetAllAvailableBars(DateTime dateTime, ObjectQuery query);
         Task<RevenueResponse> GetRevenueOfBar(RevenueRequest request);
         Task<List<OnlyBarIdNameResponse>> GetBarNameId(ObjectQuery query);
         Task<RevenueBranchResponse> GetAllRevenueBranch();

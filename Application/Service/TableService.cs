@@ -135,6 +135,69 @@ namespace Application.Service
             }
         }
 
+        public async Task<(List<TableResponse> response, int TotalPage)> GetAllOfBar(Guid BarId, Guid? TableTypeId, string? TableName, int? Status, int PageIndex, int PageSize)
+        {
+            try
+            {
+                var responses = new List<TableResponse>();
+                int totalPage = 1;
+
+                // filter expression
+                Expression<Func<Table, bool>> filter = t =>
+                (Status == null || t.Status == Status) &&
+                (t.TableType.Bar.BarId == BarId) &&
+                (TableTypeId == null || t.TableTypeId == TableTypeId) &&
+                (TableName == null || t.TableName.Contains(TableName)) &&
+                t.IsDeleted == false;
+
+                var totalTable = (await _unitOfWork.TableRepository.GetAsync(filter: filter)).Count();
+
+                if (totalTable > 0)
+                {
+                    if (totalTable > PageSize)
+                    {
+                        if (PageSize == 1)
+                        {
+                            totalPage = (totalTable / PageSize);
+                        }
+                        else
+                        {
+                            totalPage = (totalTable / PageSize) + 1;
+                        }
+                    }
+
+                    var tablesWithPagination = await _unitOfWork.TableRepository.GetAsync(filter: filter, 
+                            orderBy: q => q.OrderBy(x => x.TableName),
+                            pageIndex: PageIndex, 
+                            pageSize: PageSize, 
+                            includeProperties: "TableType.Bar");
+
+                    foreach (var table in tablesWithPagination)
+                    {
+                        var tableResponse = new TableResponse
+                        {
+                            //BarId = table.BarId,
+                            TableTypeId = table.TableTypeId,
+                            MinimumGuest = table.TableType.MinimumGuest,
+                            MaximumGuest = table.TableType.MaximumGuest,
+                            MinimumPrice = table.TableType.MinimumPrice,
+                            Status = table.Status,
+                            TableName = table.TableName,
+                            TableTypeName = table.TableType.TypeName,
+                            TableId = table.TableId
+                        };
+                        responses.Add(tableResponse);
+                    }
+                }
+
+                return (responses, totalPage);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
+
         public async Task UpdateTable(Guid TableId, UpdateTableRequest request)
         {
             try

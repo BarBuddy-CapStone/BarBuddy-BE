@@ -411,7 +411,7 @@ namespace Persistence.Data
                     Description = "Tọa lạc trên tầng 14, tại 87A Hàm Nghi, quận 1, nằm ở khu vực trung tâm thành phố. Đến với Bar Buddy 1 để trải nghiệm sky bar \"HOT\" nhất Si Gòn hiện nay. Bar Buddy 1 được mệnh danh là địa điểm ăn chơi Sài Gòn xa hoa bậc nhất. Âm nhạc cuốn hút và vị ngon mê đắm của những đồ uống hảo hạng sẽ giúp bạn tận hưởng những phút giây thăng hoa. Những màn trình diễn đẳng cấp của các ca sĩ hàng đầu Việt Nam sẽ thổi bùng không khí khiến bạn không thể ngồi yên.",
                     Discount = 10,
                     Email = "contact@barbuddy1.com",
-                    Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/a0d4292c13b0cc51b2487f4c276cd7c0d96510872c4a855db190ff2db8e692d2?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
+                    Images = "https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2F878a5ef5-b291-4da1-97fa-59c8713e8979_pixelcut-export%20%282%29.jpeg?alt=media&token=8b06d065-1813-48a3-9675-96c2dff293c7, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2F08173efa-639f-476e-be98-d9b699df18eb_pixelcut-export%20%281%29.jpeg?alt=media&token=70c72a88-5b77-4a24-a94f-5ce512882dc0, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2Fbbcac23a-8f7e-45de-8303-f88276ece893_pixelcut-export.jpeg?alt=media&token=3867cf44-e8e3-4721-bd99-abf79f74a727, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2F200d05de-3f95-44da-8f2a-d0bc46b2df0c_1611797797-multi_product20-zionskyloungediningoverview3.jpg?alt=media&token=0d0441b6-8e30-42a4-9993-8b02def4955a, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2F54a116b1-16b3-4b49-a327-c537938a90e8_1611797797-multi_product20-zionskyloungediningoverview4.jpg?alt=media&token=b988dc2c-8b78-4c3c-8517-603c61d347ee, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2F10e39008-7fda-44cf-9ee1-f9f2b59b966c_1611797797-multi_product20-zionskyloungediningoverview10.jpg?alt=media&token=c632e2ca-39a3-495b-8fda-395904c45f40, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2F43d3bdc0-4fe7-4b52-850d-cfb442eef9e2_1611797797-multi_product20-zionskyloungediningoverview7.jpg?alt=media&token=2f90ce2e-4fbd-4caa-8074-b1a7a3f6690c",
                     PhoneNumber = "0901234567",
                     Status = true,
                     TimeSlot = 1
@@ -424,7 +424,7 @@ namespace Persistence.Data
                     Description = "Tọa lạc ngay giữa trung tâm thành phố Hồ Chí Minh, Bar Buddy 2 với thiết kế độc đáo, lạ mắt, mang nét thu hút riêng như lạc vào thế giới của bộ phim hành động kinh dị: Mad Max. Một không gian nổi loạn và cực ngầu mang lại cảm giác quái lạ đầy bí ẩn. Bar Buddy 2 với sự đầu tư hoành tráng bằng những thiết bị, âm thanh, ánh sáng hiện đại nhất bạn sẽ được các DJ hàng đầu chiêu đãi cùng dàn khách mời đặc biệt: Hồ Ngọc Hà, Sơn Tùng M-TP, Erik.... chắc chắn khách hàng của Atmos sẽ luôn được tiếp đón và phục v tận tình",
                     Discount = 15,
                     Email = "contact@barbuddy2.com",
-                    Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/7cbd7d84e2ff7b5156aa5241bd27de56fe00bcb6e309e2c77ff2c39bf3b0b236?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
+                    Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/b69dbfb49c5c170f20ffc7e6592051456cbda4eb9cd86a4b5f73eacc4b286c1e?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b, https://cdn.builder.io/api/v1/image/assets/TEMP/2350aab32db981749c1dc25aae1418c736f1981bd711c5873409bb784d8ebec7?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b, https://cdn.builder.io/api/v1/image/assets/TEMP/0a3f53c7a6e75e85b31a7a33f12ad995bc789ec829cdda52f1d18feadabb4e1b?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b, https://cdn.builder.io/api/v1/image/assets/TEMP/0f65d417da4ce5fcefc12ad2b8eea620c32984dc13f70f6384c69537cf5362bc?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b, https://cdn.builder.io/api/v1/image/assets/TEMP/970bd0ad11008346e6a73f68eef329ce940423ef3fc8425cca3ef156a9b33fe5?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
                     PhoneNumber = "0901234568",
                     Status = true,
                     TimeSlot = 1
@@ -437,7 +437,7 @@ namespace Persistence.Data
                     Description = "Nằm tại trung tâm quận 3, Bar Buddy 3 là một trong những bar lâu năm nổi tiếng hàng đầu Sài Gòn. Không gian sang trọng nhiều vị trí đẹp và có sân khấu lớn ngay trung tâm. Sử dụng chất nhạc Vinahouse cực kỳ mạnh mẽ \"on trend\" là điều luôn hấp dẫn các vị khách tới Bar Buddy 3. Hơn thế nữa các sự kiện luôn diễn ra vào cuối tuần với dàn khách mời ca sĩ hàng đầu Việt Nam: Ưng Hoàng Phúc, Duy Mnh, Trịnh Tuấn Vỹ… Với slogan \"Nơi thể hiện đẳng cấp của bạn\" hãy sẵn sàng thể hiện bản thân tại Bar Buddy 3 bar.",
                     Discount = 20,
                     Email = "contact@barbuddy3.com",
-                    Images = "https://vietnamnightlife.com/uploads/images/2020/02/1580805657-multi_product20-bambamoverview1.jpg.webp",
+                    Images = "https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2Fcafe615b-d5b6-442a-8c7c-484d73584863_1687155157-multi_product20-canalisclub9.jpg?alt=media&token=c6044e31-44f0-4441-86ce-bfb0153faa57, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2F423f4310-bfb1-443a-ba1b-a9e6846318e3_1687155156-multi_product20-canalisclub1.jpg?alt=media&token=9774bcea-e8b0-4abe-8f78-11d549e0d248, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2F41d7d7ad-669d-4fd2-a720-ae0d9d540904_1687155156-multi_product20-canalisclub2.jpg?alt=media&token=293977ac-56e4-4ac7-bc30-55b1cc711ee1, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2F4ed2355a-1b27-48a8-a3d2-ebc90b1ddde6_1687155157-multi_product20-canalisclub3.jpg?alt=media&token=d9a34aed-3cc9-4c17-9f44-b0009c4590d1, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2F3d8201c6-3b1a-45e8-b66e-c1a8b3825387_1687155157-multi_product20-canalisclub4.jpg?alt=media&token=464024d0-34af-4797-9f90-9fc666b6e230, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2Fe7e00e77-9b39-471b-bead-8cc1aa1e1cfe_1687155157-multi_product20-canalisclub5.jpg?alt=media&token=cf3dff10-2ff7-45ca-be7b-ef092d299cde",
                     PhoneNumber = "0901234569",
                     Status = true,
                     TimeSlot = 1
@@ -450,7 +450,7 @@ namespace Persistence.Data
                     Description = "Bar Buddy 4 sở hữu vị trí đắc địa trên tầng 2, khách sạn 5 sao Le Meridien trên đường Tôn Đức Thắng. Bar Buddy 4 sở hữu không gian \"dark bar\" không lẫn vào đâu được cùng phong cách Commas, với công nghệ laser light độc nhất vô nhị tại Hồ Chí Minh. Khách hàng sẽ có những giây phút bung xõa cùng những giai điệu Hip Hop tại Bar Buddy 4, tân binh mới nhất tại Nightlife Hồ Chí Minh.",
                     Discount = 25,
                     Email = "contact@barbuddy4.com",
-                    Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/4f4bc5cae670ae75847bb24a78027e45ce8487386c0a1043f999381ae9fa4831?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
+                    Images = "https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2F7eafab22-f11d-4e6d-b031-1e50844bc335_1673676803-multi_product20-boujeesaigonoverview6.jpg.webp?alt=media&token=81991d1a-289a-43c6-91d6-d8199fcdbe38, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2Fc3438817-7145-4f19-a87e-8723831581d3_1673676803-multi_product20-boujeesaigonoverview4.jpg.webp?alt=media&token=8af6376a-044c-4ef6-aaaf-47b69d94ffe3, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2F99c327bf-e08e-4d1f-b404-546c4de57262_1673676803-multi_product20-boujeesaigonoverview3.jpg.webp?alt=media&token=07e09342-53da-4d0a-b088-53400246eb2d, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2F343b5b07-0fec-4af9-80c8-f2755aa7b31b_1673676803-multi_product20-boujeesaigonoverview2.jpg.webp?alt=media&token=f7ea62f1-1da6-4c22-bd32-d27481cb6797, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2F07bbd577-9ec0-4a44-965f-b02ce7fe3d57_1673676803-multi_product20-boujeesaigonoverview1.jpg.webp?alt=media&token=4be7209e-93ce-40cf-b8ca-67b68137317b, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2F181f6a3c-dc43-4a37-9415-591d2c8c7fcc_pexels-pixabay-159291.jpg?alt=media&token=6b105d09-6b8f-40cd-bbe2-bc69a7c96d70",
                     PhoneNumber = "0901234570",
                     Status = true,
                     TimeSlot = 1
@@ -463,7 +463,7 @@ namespace Persistence.Data
                     Description = "Quán bar kết hợp giữa nhạc sống và DJ.",
                     Discount = 5,
                     Email = "contact@barbuddy5.com",
-                    Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/fc1f4652930fe4a25d46a46d1933e950912b6ceace8e777840ceccd123995783?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
+                    Images = "https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2F5e7b1e66-aff9-4e41-bebd-32cdee99efb2_1000000842_x4.png?alt=media&token=22bab908-654c-4ff1-a5bd-8d61cbd183d1, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2F56b4ae09-67e4-4b00-b047-5a6375dc8bf2_1000000844_x4.png?alt=media&token=6bd25454-6b06-4155-ae92-a7af21b3c9df, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2F033552c8-759d-40b0-a4eb-db33656b3a4b_1000000845_x4.png?alt=media&token=188f25c3-29bc-4f50-8840-ba16cb186f4b, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2Fdcc94305-8d8e-44f7-919c-3767ee81453e_1000000843_x4.png?alt=media&token=25d26056-752d-4080-b7ea-8296cd31040e, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2Fcda916e7-6ad5-4cea-9c13-4c406884f098_1000000846_x4.png?alt=media&token=d0ba9e55-72d6-49c7-9fda-4908e7d48ce3, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2F14439ef9-899e-4438-9234-d3df75d0e4d9_pexels-pixabay-63633.jpg?alt=media&token=898cf18e-a22e-461b-9c7c-fb4e04a8b9d0",
                     PhoneNumber = "0901234571",
                     Status = true,
                     TimeSlot = 1
@@ -476,7 +476,7 @@ namespace Persistence.Data
                     Description = "Không gian thoải mái với nhiều trò chơi giải trí.",
                     Discount = 10,
                     Email = "contact@barbuddy6.com",
-                    Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/677e2c38ccd2ea07e8a72aa6262c873572a4cfd3da719a1e25c2152169bb47c6?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
+                    Images = "https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2Fe069d8ab-2d19-4c73-95e6-487a269a5104_1580805657-multi_product20-bambamoverview3.jpg.webp?alt=media&token=295ab199-824c-426b-a6e4-701de996a783, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2Fa5c2b7b2-d52c-4f43-bc66-6c2e5fa37e4f_1580805657-multi_product20-bambamoverview4.jpg.webp?alt=media&token=66deb9dc-077c-4863-964c-834405652085",
                     PhoneNumber = "0901234572",
                     Status = true,
                     TimeSlot = 1
@@ -489,7 +489,7 @@ namespace Persistence.Data
                     Description = "Nơi hội tụ của những tâm hồn yêu thích âm nhạc.",
                     Discount = 30,
                     Email = "contact@barbuddy7.com",
-                    Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/2f3601dbe8c6d0a812bccaf7ecf02686ec5b99038e314c058a00a37c16840608?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
+                    Images = "https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2F8bfa6be1-66dc-42f6-b7ab-872d2c8cfd8c_1592203656-multi_product20-lushsaigonoverview5.jpg.webp?alt=media&token=b1e24062-a71b-4a87-b606-8f4434eebc15, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2Fac71e678-83c0-4e51-b6b6-feec37cecaae_1592203656-multi_product20-lushsaigonoverview4.jpg.webp?alt=media&token=609ca44c-2d54-4b30-b6fe-5e8f76a76b7d",
                     PhoneNumber = "0901234573",
                     Status = true,
                     TimeSlot = 1
@@ -502,7 +502,7 @@ namespace Persistence.Data
                     Description = "Quán bar rooftop với tầm nhìn đp.",
                     Discount = 20,
                     Email = "contact@barbuddy8.com",
-                    Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/7cbd7d84e2ff7b5156aa5241bd27de56fe00bcb6e309e2c77ff2c39bf3b0b236?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
+                    Images = "https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2Fdfe78a6c-d99d-45f5-8d39-4e5564474760_1592206636-multi_product20-khu13overview6.jpg.webp?alt=media&token=83337472-0840-4370-a116-1b9a281ecfbf, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2F6f8a9b89-23ac-4dea-8fa2-cd66080047e4_1592206636-multi_product20-khu13overview5.jpg.webp?alt=media&token=a3f302b2-2998-42fd-b3a0-de3c018e51c4",
                     PhoneNumber = "0901234574",
                     Status = true,
                     TimeSlot = 1
@@ -515,7 +515,7 @@ namespace Persistence.Data
                     Description = "Quán bar dành cho các tín đồ yêu thích craft beer.",
                     Discount = 15,
                     Email = "contact@barbuddy9.com",
-                    Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/7cbd7d84e2ff7b5156aa5241bd27de56fe00bcb6e309e2c77ff2c39bf3b0b236?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
+                    Images = "https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2Fcbf97b22-afbb-42d9-9c1e-374df168ec2f_1664637430-multi_product20-1111clubsaigonoverview2.jpg.webp?alt=media&token=d6ead89e-4d3f-45a8-ac6e-5725cee8dcb1, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2F842406ad-f821-44ec-aa15-7423bde20d98_1664637430-multi_product20-1111clubsaigonoverview1.jpg.webp?alt=media&token=e040cea7-11a6-4f48-ae94-a52729f0405c",
                     PhoneNumber = "0901234575",
                     Status = true,
                     TimeSlot = 1
@@ -528,7 +528,7 @@ namespace Persistence.Data
                     Description = "Không gian ấm cúng với các loại cocktail độc đáo.",
                     Discount = 10,
                     Email = "contact@barbuddy10.com",
-                    Images = "https://cdn.builder.io/api/v1/image/assets/TEMP/a0d4292c13b0cc51b2487f4c276cd7c0d96510872c4a855db190ff2db8e692d2?placeholderIfAbsent=true&apiKey=2f0fb41b041549e2a3975f3618160d3b",
+                    Images = "https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2F432a674c-1b16-47df-a0dc-396d81b3327b_1700112227-multi_product20-districtk2.jpg.webp?alt=media&token=6ae45a8c-84fe-40a0-943e-6bbcc7871925, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2F9b9395a9-becb-4d13-bad4-406b83edd888_1700112227-multi_product20-districtk1.jpg.webp?alt=media&token=472d0416-0c61-4f6c-bbcd-793b554f0604",
                     PhoneNumber = "0901234576",
                     Status = true,
                     TimeSlot = 1,
@@ -2152,36 +2152,94 @@ namespace Persistence.Data
                     Image = "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/8/14/2121767707dcce179f6866d132a2d6a384312f9-1723600454996-1723600455541950721311.jpg",
                     Status = true
                 },
+                
+                // Classic Cocktails
+                new Drink
+                {
+                    DrinkId = Guid.NewGuid(),
+                    BarId = Constants.Ids.Bars.Bar1,
+                    DrinkCode = "D0009",
+                    DrinkCategoryId = Constants.Ids.DrinkCategories.Cocktail,
+                    DrinkName = "Long Island Iced Tea",
+                    Description = "Cocktail mạnh mẽ pha trộn từ 5 loại rượu khác nhau với vị ngọt của coca cola",
+                    Price = 190000,
+                    CreatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.Now,
+                    Image = "https://food.fnr.sndimg.com/content/dam/images/food/fullset/2011/4/25/0/CCWM_Long-Island-Ice-Tea_s3x4.jpg.rend.hgtvcom.1280.960.suffix/1572356786983.webp",
+                    Status = true
+                },
+                new Drink
+                {
+                    DrinkId = Guid.NewGuid(),
+                    BarId = Constants.Ids.Bars.Bar2,
+                    DrinkCode = "D0010",
+                    DrinkCategoryId = Constants.Ids.DrinkCategories.Cocktail,
+                    DrinkName = "Bloody Mary",
+                    Description = "Cocktail cổ điển với nước ép cà chua và vodka, gia vị đặc trưng",
+                    Price = 170000,
+                    CreatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.Now,
+                    Image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-NIEW-vk7sDfhGEk23-RPqp7pGehRzfK3Fg&s",
+                    Status = true
+                },
 
-                // Thêm các đồ uống tương tự cho Bar 4
+                // Premium Cocktails
+                new Drink
+                {
+                    DrinkId = Guid.NewGuid(),
+                    BarId = Constants.Ids.Bars.Bar3,
+                    DrinkCode = "D0011",
+                    DrinkCategoryId = Constants.Ids.DrinkCategories.Cocktail,
+                    DrinkName = "Old Fashioned",
+                    Description = "Cocktail premium với whiskey cao cấp, đường nâu và bitter",
+                    Price = 250000,
+                    CreatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.Now,
+                    Image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTr3StQ4qUmPQpN89YjVKWOQ2LBgUF0slFHYw&s",
+                    Status = true
+                },
                 new Drink
                 {
                     DrinkId = Guid.NewGuid(),
                     BarId = Constants.Ids.Bars.Bar4,
-                    DrinkCode = "D0007",
+                    DrinkCode = "D0012",
                     DrinkCategoryId = Constants.Ids.DrinkCategories.Cocktail,
-                    DrinkName = "Mojito Classic",
-                    Description = "Phiên bản đặc biệt của Mojito tại Bar 4.",
-                    Price = 75000,
+                    DrinkName = "Manhattan",
+                    Description = "Cocktail thượng hạng pha từ whiskey rye, vermouth đỏ và bitter",
+                    Price = 230000,
                     CreatedDate = DateTime.Now,
                     UpdatedDate = DateTime.Now,
-                    Image = "https://example.com/mojito-classic.jpg",
+                    Image = "https://www.foodandwine.com/thmb/7A6wLrQRKdzFlNK6O_JtV-SMrKQ=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/manhattan-FT-RECIPE0724-94baa533ea654ce292ca2d2c483edb77.jpeg",
                     Status = true
                 },
 
-                // Thêm các đồ uống tương tự cho Bar 5
+                // Mocktails
                 new Drink
                 {
                     DrinkId = Guid.NewGuid(),
                     BarId = Constants.Ids.Bars.Bar5,
-                    DrinkCode = "D0008",
-                    DrinkCategoryId = Constants.Ids.DrinkCategories.Spirits,
-                    DrinkName = "Premium Whiskey",
-                    Description = "Whiskey cao cấp dành cho những buổi gặp gỡ đặc biệt.",
-                    Price = 150000,
+                    DrinkCode = "D0013",
+                    DrinkCategoryId = Constants.Ids.DrinkCategories.Cocktail,
+                    DrinkName = "Virgin Mojito",
+                    Description = "Phiên bản không cồn của Mojito với bạc hà tươi và chanh",
+                    Price = 120000,
                     CreatedDate = DateTime.Now,
                     UpdatedDate = DateTime.Now,
-                    Image = "https://example.com/premium-whiskey.jpg",
+                    Image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmzolqf49U34e2iDR3mDzslZ8ZmkL7g7baCA&s",
+                    Status = true
+                },
+                new Drink
+                {
+                    DrinkId = Guid.NewGuid(),
+                    BarId = Constants.Ids.Bars.Bar1,
+                    DrinkCode = "D0014",
+                    DrinkCategoryId = Constants.Ids.DrinkCategories.Cocktail,
+                    DrinkName = "Virgin Piña Colada",
+                    Description = "Mocktail nhiệt đới với nước dừa và nước ép dứa tươi",
+                    Price = 120000,
+                    CreatedDate = DateTime.Now,
+                    UpdatedDate = DateTime.Now,
+                    Image = "https://www.thespruceeats.com/thmb/hZgCGe6yaJLcyOgDHMv0H6-bN20=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/virgin-pina-colada-recipe-2097115-hero-images-5-25cd3a15f6204c1d87fdf8c60b6b144e.jpg",
                     Status = true
                 }
             };

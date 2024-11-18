@@ -29,9 +29,25 @@ namespace BarBuddy_API.Controllers.Table
         /// <param name="PageSize"></param>
         /// <returns></returns>
         [HttpGet("manage")]
-        public async Task<IActionResult> GetAllForBar([FromQuery] Guid? TableTypeId, [FromQuery] string? TableName, [FromQuery] int? Status,[FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
+        public async Task<IActionResult> GetAll([FromQuery] Guid? TableTypeId, [FromQuery] string? TableName, [FromQuery] int? Status,[FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
             var responses = await _tableService.GetAll(TableTypeId, TableName, Status, PageIndex, PageSize);
+            return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.response });
+        }
+
+        /// <summary>
+        /// Get All Table Of Bar For Managing by Manage/Staff
+        /// </summary>
+        /// <param name="BarId"></param>
+        /// <param name="TableTypeId"></param>
+        /// <param name="Status"></param>
+        /// <param name="PageIndex"></param>
+        /// <param name="PageSize"></param>
+        /// <returns></returns>
+        [HttpGet("tables-of-bar")]
+        public async Task<IActionResult> GetAllOfBar([FromQuery] Guid BarId, [FromQuery] Guid? TableTypeId, [FromQuery] string? TableName, [FromQuery] int? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
+        {
+            var responses = await _tableService.GetAllOfBar(BarId, TableTypeId, TableName, Status, PageIndex, PageSize);
             return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.response });
         }
 

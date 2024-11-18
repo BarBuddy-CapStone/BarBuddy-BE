@@ -1,4 +1,5 @@
 ﻿using Application.IService;
+using CoreApiResponse;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,7 +7,7 @@ namespace BarBuddy_API.Controllers.ML
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class DrinkRecommendationController : ControllerBase
+    public class DrinkRecommendationController : BaseController
     {
         private readonly IDrinkRecommendationService _recommendationService;
 
@@ -26,7 +27,12 @@ namespace BarBuddy_API.Controllers.ML
         public async Task<IActionResult> GetRecommendations([FromQuery] string emotion, [FromQuery] Guid barId)
         {
             var recommendations = await _recommendationService.GetDrinkRecommendations(emotion, barId);
-            return Ok(recommendations);
+            var response = new
+            {
+                drinkList = recommendations.Item1,
+                emotion = recommendations.Item2
+            };
+            return CustomResult("Data loaded", response);
         }
     }
 }
