@@ -136,7 +136,7 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<IEventService, EventService>();
             services.AddScoped<IEventTimeService, EventTimeService>();
             services.AddScoped<IBarTimeService, BarTimeService>();
-
+            services.AddScoped<ITokenService, TokenService>();
             services.AddScoped<IDrinkRecommendationService, DrinkRecommendationService>();
 
             services.AddScoped<IFcmService, FcmService>();

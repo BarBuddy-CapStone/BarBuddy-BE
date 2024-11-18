@@ -32,6 +32,7 @@ namespace Domain.Entities
         public virtual ICollection<Feedback> Feedbacks { get; set; }
         public virtual ICollection<PaymentHistory> PaymentHistories { get; set; }
         public virtual ICollection<NotificationDetail> NotificationDetails { get; set; }
+        public virtual ICollection<Token> Tokens { get; set; }
 
         [ForeignKey("RoleId")]
         public virtual Role Role { get; set; }

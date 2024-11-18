@@ -29,12 +29,12 @@ namespace Application.Service
         private readonly IEmailSender _emailSender;
         private readonly IConfiguration _configuration;
         private readonly IFcmService _fcmService;
-
+        private readonly ITokenService _tokenService;
         public AuthenService(IUnitOfWork unitOfWork, IMapper mapper,
                             IAuthentication authentication, IMemoryCache cache,
                             IOtpSender otpSender, IGoogleAuthService googleAuthService,
-                            IEmailSender emailSender, IConfiguration configuration,
-                            IFcmService fcmService)
+                            IEmailSender emailSender, ITokenService tokenService,
+                            IConfiguration configuration, IFcmService fcmService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -45,6 +45,7 @@ namespace Application.Service
             _emailSender = emailSender;
             _configuration = configuration;
             _fcmService = fcmService;
+            _tokenService = tokenService;
         }
 
         public async Task<LoginResponse> Login(LoginRequest request)
@@ -67,7 +68,7 @@ namespace Application.Service
 
                 var response = _mapper.Map<LoginResponse>(getOne);
                 response.AccessToken = _authentication.GenerteDefaultToken(getOne);
-
+                await _tokenService.SaveRefreshToken(response.AccessToken, getOne.AccountId);
                 return response;
             }
             catch (CustomException.InternalServerErrorException e)

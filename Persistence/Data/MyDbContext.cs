@@ -38,6 +38,7 @@ namespace Persistence.Data
         public DbSet<TimeEvent> TimeEvents { get; set; }
         public DbSet<EventVoucher> EventVouchers { get; set; }
         public DbSet<BarTime> BarTimes { get; set; }
+        public DbSet<Token> Tokens { get; set; }
         public DbSet<FcmNotification> FcmNotifications { get; set; }
         public DbSet<FcmNotificationCustomer> FcmNotificationCustomers { get; set; }
         public DbSet<FcmUserDevice> FcmUserDevices { get; set; }
