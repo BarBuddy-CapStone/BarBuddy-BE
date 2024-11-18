@@ -70,11 +70,11 @@ namespace BarBuddy_API.Controllers.Bar
         /// </summary>
         /// <returns></returns>
         [HttpGet("/api/v1/bars/{datePicker}")]
-        public async Task<IActionResult> GetAllBarByDate(DateTime datePicker)
+        public async Task<IActionResult> GetAllBarByDate(DateTime datePicker, [FromQuery] ObjectQuery query)
         {
             try
             {
-                var response = await _barService.GetAllAvailableBars(datePicker);
+                var response = await _barService.GetAllAvailableBars(datePicker, query);
                 return CustomResult("Data loaded", response);
             }
             catch (CustomException.DataNotFoundException e)

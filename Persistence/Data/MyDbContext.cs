@@ -2101,38 +2101,6 @@ namespace Persistence.Data
                     Image = "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/8/14/2121767707dcce179f6866d132a2d6a384312f9-1723600454996-1723600455541950721311.jpg",
                     Status = true
                 },
-
-                // Thêm các đồ uống tương tự cho Bar 4
-                new Drink
-                {
-                    DrinkId = Guid.NewGuid(),
-                    BarId = Constants.Ids.Bars.Bar4,
-                    DrinkCode = "D0007",
-                    DrinkCategoryId = Constants.Ids.DrinkCategories.Cocktail,
-                    DrinkName = "Mojito Classic",
-                    Description = "Phiên bản đặc biệt của Mojito tại Bar 4.",
-                    Price = 75000,
-                    CreatedDate = DateTime.Now,
-                    UpdatedDate = DateTime.Now,
-                    Image = "https://example.com/mojito-classic.jpg",
-                    Status = true
-                },
-
-                // Thêm các đồ uống tương tự cho Bar 5
-                new Drink
-                {
-                    DrinkId = Guid.NewGuid(),
-                    BarId = Constants.Ids.Bars.Bar5,
-                    DrinkCode = "D0008",
-                    DrinkCategoryId = Constants.Ids.DrinkCategories.Spirits,
-                    DrinkName = "Premium Whiskey",
-                    Description = "Whiskey cao cấp dành cho những buổi gặp gỡ đặc biệt.",
-                    Price = 150000,
-                    CreatedDate = DateTime.Now,
-                    UpdatedDate = DateTime.Now,
-                    Image = "https://example.com/premium-whiskey.jpg",
-                    Status = true
-                },
                 
                 // Classic Cocktails
                 new Drink
@@ -2146,7 +2114,7 @@ namespace Persistence.Data
                     Price = 190000,
                     CreatedDate = DateTime.Now,
                     UpdatedDate = DateTime.Now,
-                    Image = "https://example.com/long-island.jpg",
+                    Image = "https://food.fnr.sndimg.com/content/dam/images/food/fullset/2011/4/25/0/CCWM_Long-Island-Ice-Tea_s3x4.jpg.rend.hgtvcom.1280.960.suffix/1572356786983.webp",
                     Status = true
                 },
                 new Drink
@@ -2160,7 +2128,7 @@ namespace Persistence.Data
                     Price = 170000,
                     CreatedDate = DateTime.Now,
                     UpdatedDate = DateTime.Now,
-                    Image = "https://example.com/bloody-mary.jpg",
+                    Image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-NIEW-vk7sDfhGEk23-RPqp7pGehRzfK3Fg&s",
                     Status = true
                 },
 
@@ -2176,7 +2144,7 @@ namespace Persistence.Data
                     Price = 250000,
                     CreatedDate = DateTime.Now,
                     UpdatedDate = DateTime.Now,
-                    Image = "https://example.com/old-fashioned.jpg",
+                    Image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTr3StQ4qUmPQpN89YjVKWOQ2LBgUF0slFHYw&s",
                     Status = true
                 },
                 new Drink
@@ -2190,7 +2158,7 @@ namespace Persistence.Data
                     Price = 230000,
                     CreatedDate = DateTime.Now,
                     UpdatedDate = DateTime.Now,
-                    Image = "https://example.com/manhattan.jpg",
+                    Image = "https://www.foodandwine.com/thmb/7A6wLrQRKdzFlNK6O_JtV-SMrKQ=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/manhattan-FT-RECIPE0724-94baa533ea654ce292ca2d2c483edb77.jpeg",
                     Status = true
                 },
 
@@ -2206,7 +2174,7 @@ namespace Persistence.Data
                     Price = 120000,
                     CreatedDate = DateTime.Now,
                     UpdatedDate = DateTime.Now,
-                    Image = "https://example.com/virgin-mojito.jpg",
+                    Image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmzolqf49U34e2iDR3mDzslZ8ZmkL7g7baCA&s",
                     Status = true
                 },
                 new Drink
@@ -2220,7 +2188,7 @@ namespace Persistence.Data
                     Price = 120000,
                     CreatedDate = DateTime.Now,
                     UpdatedDate = DateTime.Now,
-                    Image = "https://example.com/virgin-pina-colada.jpg",
+                    Image = "https://www.thespruceeats.com/thmb/hZgCGe6yaJLcyOgDHMv0H6-bN20=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/virgin-pina-colada-recipe-2097115-hero-images-5-25cd3a15f6204c1d87fdf8c60b6b144e.jpg",
                     Status = true
                 }
             };

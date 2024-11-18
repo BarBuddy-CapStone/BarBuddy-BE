@@ -359,22 +359,28 @@ namespace Application.Service
             return response;
         }
 
-        public async Task<IEnumerable<OnlyBarResponse>> GetAllAvailableBars(DateTime dateTime)
+        public async Task<IEnumerable<OnlyBarResponse>> GetAllAvailableBars(DateTime dateTime, ObjectQuery query)
         {
             try
             {
+                Expression<Func<Bar, bool>> filter = x => x.BarTimes.Any(x => x.DayOfWeek == (int)dateTime.DayOfWeek) && x.Status == true;
+
+                if (!string.IsNullOrWhiteSpace(query.Search))
+                {
+                    filter = bar => bar.BarName.Contains(query.Search) 
+                        && bar.BarTimes.Any(x => x.DayOfWeek == (int)dateTime.DayOfWeek) 
+                        && bar.Status == true;
+                }
+
                 var bars = await _unitOfWork.BarRepository
-                    .GetAsync(filter: x => x.BarTimes.Any(x => x.DayOfWeek == (int)dateTime.DayOfWeek)
-                            && x.Status == true,
+                    .GetAsync(filter: filter,
                         orderBy: query => query.OrderBy(x => x.BarName),
-                        includeProperties: "Feedbacks,BarTimes");
+                        includeProperties: "Feedbacks,BarTimes",
+                        pageIndex: query.PageIndex,
+                        pageSize: query.PageSize
+                        );
                 var currentDateTime = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now);
                 var response = new List<OnlyBarResponse>();
-
-                if (bars.IsNullOrEmpty() || !bars.Any())
-                {
-                    throw new CustomException.DataNotFoundException("Danh sách đang trống !");
-                }
 
                 foreach (var bar in bars)
                 {
