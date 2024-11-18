@@ -5,6 +5,7 @@ using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Client;
 using System.Net.Http;
 
 namespace BarBuddy_API.Controllers.FcmController
@@ -110,21 +111,6 @@ namespace BarBuddy_API.Controllers.FcmController
         {
             await _fcmService.MarkAllAsReadByDeviceToken(deviceToken);
             return CustomResult("Đánh dấu tất cả thông báo đã đọc thành công");
-        }
-
-        [HttpGet("notifications/unread-count")]
-        public async Task<IActionResult> GetUnreadCount([FromQuery] string deviceToken)
-        {
-            try
-            {
-                var accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
-                var unreadCount = await _fcmService.GetUnreadCount(deviceToken, accountId);
-                return CustomResult("Lấy số lượng thông báo chưa đọc thành công", unreadCount);
-            }
-            catch (Exception ex) {
-                var unreadCount = await _fcmService.GetUnreadCount(deviceToken, null);
-                return CustomResult("Lấy số lượng thông báo chưa đọc thành công", unreadCount);
-            }
         }
     }
 }

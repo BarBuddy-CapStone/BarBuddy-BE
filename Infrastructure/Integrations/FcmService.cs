@@ -80,15 +80,6 @@ namespace Infrastructure.Integrations
             };
 
             await CreateAndSendNotification(request);
-
-            var devices = await _unitOfWork.FcmUserDeviceRepository
-                .GetAsync(d => d.AccountId == accountId);
-
-            foreach (var device in devices)
-            {
-                await _notificationHub.Clients.Group(device.DeviceToken)
-                    .SendAsync("GetUnreadCount", device.DeviceToken, accountId);
-            }
         }
 
         public async Task SendNotificationToTopic(string topic, string title, string message, Dictionary<string, string> data = null)
@@ -174,44 +165,28 @@ namespace Infrastructure.Integrations
 
             if (request.IsPublic)
             {
-                // Gửi cho tất cả devices có trong danh sách
-                var connectionIds = devices
-                    .SelectMany(d => _connectionMapping.GetConnectionIds(d.DeviceToken))
-                    .Distinct();
-
-                if (connectionIds.Any())
+                // Gửi cho tất cả devices
+                foreach (var device in devices)
                 {
-                    await _notificationHub.Clients.Clients(connectionIds)
-                        .SendAsync("ReceiveNotification", notificationData);
+                    var connectionIds = _connectionMapping.GetConnectionIds(device.DeviceToken);
+                    if (connectionIds.Any())
+                    {
+                        await _notificationHub.Clients.Clients(connectionIds)
+                            .SendAsync("ReceiveNotification", notificationData);
+                    }
                 }
             }
             else
             {
-                // Chỉ gửi cho specific users
-                var userConnections = devices
-                    .Where(d => d.AccountId.HasValue)
-                    .Select(d => d.AccountId.Value.ToString())
-                    .Distinct();
-
-                foreach (var userId in userConnections)
+                // Gửi cho specific users
+                foreach (var device in devices.Where(d => d.AccountId.HasValue))
                 {
-                    await _notificationHub.Clients.User(userId)
+                    await _notificationHub.Clients.Group($"user_{device.AccountId}")
                         .SendAsync("ReceiveNotification", notificationData);
                 }
             }
 
             await _unitOfWork.SaveAsync();
-
-            foreach (var device in devices)
-            {
-                var connectionIds = _connectionMapping.GetConnectionIds(device.DeviceToken);
-                if (connectionIds.Any())
-                {
-                    await _notificationHub.Clients.Clients(connectionIds)
-                        .SendAsync("GetUnreadCount", device.DeviceToken, device.AccountId);
-                }
-            }
-
             return notification.Id;
         }
 
@@ -412,13 +387,6 @@ namespace Infrastructure.Integrations
                 notificationCustomer.ReadAt = DateTimeOffset.UtcNow;
                 await _unitOfWork.SaveAsync();
             }
-
-            var accountId = (await _unitOfWork.FcmUserDeviceRepository
-                .GetAsync(d => d.DeviceToken == deviceToken))
-                .FirstOrDefault()?.AccountId;
-
-            await _notificationHub.Clients.Group(deviceToken)
-                .SendAsync("GetUnreadCount", deviceToken, accountId);
         }
 
         public async Task MarkAllAsReadByDeviceToken(string deviceToken)
@@ -448,69 +416,6 @@ namespace Infrastructure.Integrations
                             readAt = now
                         });
                 }
-            }
-        }
-
-        public async Task SendNotificationToDevice(string deviceToken, string title, string message, Dictionary<string, string> data = null)
-        {
-            var request = new CreateNotificationRequest
-            {
-                Title = title,
-                Message = message,
-                Type = FcmNotificationType.SYSTEM,
-                IsPublic = false,
-                Data = data ?? new Dictionary<string, string>()
-            };
-
-            await CreateAndSendNotification(request);
-
-            await _notificationHub.Clients.Group(deviceToken)
-                .SendAsync("GetUnreadCount", deviceToken);
-        }
-
-        public async Task<int> GetUnreadCount(string deviceToken, Guid? accountId)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(deviceToken))
-                    return 0;
-
-                IEnumerable<FcmNotificationCustomer> query;
-
-                if (accountId.HasValue)
-                {
-                    // Lấy số lượng thông báo chưa đọc cho user đã đăng nhập
-                    query = await _unitOfWork.FcmNotificationCustomerRepository
-                        .GetAsync(nc => 
-                            nc.CustomerId == accountId && 
-                            nc.DeviceToken == deviceToken && 
-                            !nc.IsRead);
-                }
-                else
-                {
-                    // Lấy số lượng thông báo chưa đọc cho guest user
-                    query = await _unitOfWork.FcmNotificationCustomerRepository
-                        .GetAsync(nc => 
-                            nc.DeviceToken == deviceToken && 
-                            !nc.IsRead);
-                }
-
-                var count = query.Count();
-
-                // Gửi cập nhật qua SignalR
-                var connectionIds = _connectionMapping.GetConnectionIds(deviceToken);
-                if (connectionIds.Any())
-                {
-                    await _notificationHub.Clients.Clients(connectionIds)
-                        .SendAsync("ReceiveUnreadCount", count);
-                }
-
-                return count;
-            }
-            catch (Exception ex)
-            {
-                // Log lỗi
-                throw new Exception("Lỗi khi lấy số lượng thông báo chưa đọc", ex);
             }
         }
     }

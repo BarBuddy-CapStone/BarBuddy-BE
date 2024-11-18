@@ -3,20 +3,15 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using System.Linq;
-using Domain.IRepository;
-using Infrastructure.Integrations;
-using Application.Interfaces;
 
 namespace Infrastructure.SignalR
 {
     public class NotificationHub : Hub
     {
-        private readonly IFcmService _fcmService;
         private readonly IConnectionMapping _connectionMapping;
 
-        public NotificationHub(IFcmService fcmService, IConnectionMapping connectionMapping)
+        public NotificationHub(IConnectionMapping connectionMapping)
         {
-            _fcmService = fcmService;
             _connectionMapping = connectionMapping;
         }
 
@@ -48,29 +43,6 @@ namespace Infrastructure.SignalR
         public async Task SendBroadcast(string message)
         {
             await Clients.All.SendAsync("ReceiveBroadcast", message);
-        }
-
-        public async Task<int> GetUnreadCount(string deviceToken)
-        {
-            try
-            {
-                var unreadCount = await _fcmService.GetUnreadCount(deviceToken, null);
-                
-                // Gửi kết quả qua SignalR
-                var connectionIds = _connectionMapping.GetConnectionIds(deviceToken);
-                if (connectionIds.Any())
-                {
-                    await Clients.Clients(connectionIds)
-                        .SendAsync("ReceiveUnreadCount", unreadCount);
-                }
-                
-                return unreadCount;
-            }
-            catch (Exception ex)
-            {
-                // Log lỗi
-                throw;
-            }
         }
     }
 } 
