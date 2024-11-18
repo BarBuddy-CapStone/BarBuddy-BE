@@ -59,21 +59,28 @@ namespace Infrastructure.SignalR
             await Clients.All.SendAsync("ReceiveBroadcast", message);
         }
 
-        public async Task<int> GetUnreadCount(string deviceToken)
+        public async Task GetUnreadCount(string deviceToken, Guid? accountId = null)
         {
             try
             {
-                var unreadCount = await _fcmService.GetUnreadCount(deviceToken, null);
+                var unreadCount = await _fcmService.GetUnreadCount(deviceToken, accountId);
                 
-                // Gửi kết quả qua SignalR
-                var connectionIds = _connectionMapping.GetConnectionIds(deviceToken);
-                if (connectionIds.Any())
+                if (accountId.HasValue)
                 {
-                    await Clients.Clients(connectionIds)
+                    // Gửi cho user đã đăng nhập qua group
+                    await Clients.Group($"user_{accountId}")
                         .SendAsync("ReceiveUnreadCount", unreadCount);
                 }
-                
-                return unreadCount;
+                else
+                {
+                    // Gửi cho guest user qua connectionId
+                    var connectionIds = _connectionMapping.GetConnectionIds(deviceToken);
+                    if (connectionIds.Any())
+                    {
+                        await Clients.Clients(connectionIds)
+                            .SendAsync("ReceiveUnreadCount", unreadCount);
+                    }
+                }
             }
             catch (Exception ex)
             {

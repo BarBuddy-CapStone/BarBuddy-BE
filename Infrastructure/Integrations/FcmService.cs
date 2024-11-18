@@ -479,16 +479,16 @@ namespace Infrastructure.Integrations
 
                 if (accountId.HasValue)
                 {
-                    // Lấy số lượng thông báo chưa đọc cho user đã đăng nhập
                     query = await _unitOfWork.FcmNotificationCustomerRepository
                         .GetAsync(nc => 
-                            (nc.CustomerId == accountId ||
-                            nc.DeviceToken == deviceToken) && 
-                            !nc.IsRead);
+                            (!nc.IsRead) && (
+                                nc.CustomerId == accountId ||
+                                (nc.DeviceToken == deviceToken && nc.Notification.IsPublic)
+                            )
+                        );
                 }
                 else
                 {
-                    // Lấy số lượng thông báo chưa đọc cho guest user
                     query = await _unitOfWork.FcmNotificationCustomerRepository
                         .GetAsync(nc => 
                             nc.DeviceToken == deviceToken && 
