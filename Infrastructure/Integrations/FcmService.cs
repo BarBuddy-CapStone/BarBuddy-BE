@@ -173,11 +173,6 @@ namespace Infrastructure.Integrations
                     {
                         await _notificationHub.Clients.Clients(connectionIds)
                             .SendAsync("ReceiveNotification", notificationData);
-                        
-                        // Cập nhật số lượng thông báo chưa đọc
-                        var unreadCount = await GetUnreadCount(device.DeviceToken, device.AccountId);
-                        await _notificationHub.Clients.Clients(connectionIds)
-                            .SendAsync("ReceiveUnreadCount", unreadCount);
                     }
                 }
             }
@@ -188,11 +183,6 @@ namespace Infrastructure.Integrations
                 {
                     await _notificationHub.Clients.Group($"user_{device.AccountId}")
                         .SendAsync("ReceiveNotification", notificationData);
-                    
-                    // Cập nhật số lượng thông báo chưa đọc
-                    var unreadCount = await GetUnreadCount(device.DeviceToken, device.AccountId);
-                    await _notificationHub.Clients.Group($"user_{device.AccountId}")
-                        .SendAsync("ReceiveUnreadCount", unreadCount);
                 }
             }
 
