@@ -187,16 +187,16 @@ namespace Infrastructure.Integrations
             }
             else
             {
-                // Chỉ gửi cho specific users
-                var userConnections = devices
-                    .Where(d => d.AccountId.HasValue)
-                    .Select(d => d.AccountId.Value.ToString())
-                    .Distinct();
-
-                foreach (var userId in userConnections)
+                // Gửi cho specific users qua group
+                foreach (var device in devices.Where(d => d.AccountId.HasValue))
                 {
-                    await _notificationHub.Clients.User(userId)
+                    await _notificationHub.Clients.Group($"user_{device.AccountId}")
                         .SendAsync("ReceiveNotification", notificationData);
+                    
+                    // Cập nhật số lượng thông báo chưa đọc
+                    var unreadCount = await GetUnreadCount(device.DeviceToken, device.AccountId);
+                    await _notificationHub.Clients.Group($"user_{device.AccountId}")
+                        .SendAsync("ReceiveUnreadCount", unreadCount);
                 }
             }
 
@@ -482,8 +482,8 @@ namespace Infrastructure.Integrations
                     // Lấy số lượng thông báo chưa đọc cho user đã đăng nhập
                     query = await _unitOfWork.FcmNotificationCustomerRepository
                         .GetAsync(nc => 
-                            nc.CustomerId == accountId && 
-                            nc.DeviceToken == deviceToken && 
+                            (nc.CustomerId == accountId ||
+                            nc.DeviceToken == deviceToken) && 
                             !nc.IsRead);
                 }
                 else
