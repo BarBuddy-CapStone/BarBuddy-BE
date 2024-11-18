@@ -5,6 +5,7 @@ using AutoMapper;
 using Domain.Entities;
 using Domain.IRepository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.ML;
 using Microsoft.ML.Data;
@@ -129,7 +130,7 @@ namespace Application.Service
             try 
             {
                 // Dự đoán cảm xúc từ input
-                var predictedEmotion = await PredictEmotion(emotion);
+                var predictedEmotion = PredictEmotion(emotion);
 
                 // Lấy danh sách category name hợp lệ từ EmotionalDrinkCategory
                 var validCategories = (await _unitOfWork.EmotionalDrinkCategoryRepository
@@ -171,7 +172,7 @@ namespace Application.Service
             }
         }
 
-        public async Task<List<DrinkResponse>> GetDrinkRecommendations(string emotion, Guid barId)
+        public async Task<(List<DrinkResponse>, string)> GetDrinkRecommendations(string emotion, Guid barId)
         {
             try
             {
@@ -187,10 +188,10 @@ namespace Application.Service
                     var drinks = await _unitOfWork.DrinkRepository.GetAsync(
                         filter: x => x.BarId.Equals(barId) && x.DrinkEmotionalCategories.Any(d => d.EmotionalDrinkCategory.CategoryName.ToUpper().Equals(emotionLabelUpper)),
                         includeProperties: "Bar,DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory");
-                    return _mapper.Map<List<DrinkResponse>>(drinks.ToList());
+                    return (_mapper.Map<List<DrinkResponse>>(drinks.ToList()), result.PredictedLabel);
                 }
 
-                return new List<DrinkResponse>();
+                return (new List<DrinkResponse>(), "Default");
             }
             catch (Exception ex)
             {
@@ -220,7 +221,7 @@ namespace Application.Service
             return d[s1.Length, s2.Length];
         }
 
-        private async Task<string> PredictEmotion(string input)
+        private string PredictEmotion(string input)
         {
             if (_model == null)
             {
@@ -230,8 +231,8 @@ namespace Application.Service
             var predictionEngine = _mlContext.Model
                 .CreatePredictionEngine<DrinkEmotionData, DrinkEmotionPrediction>(_model);
 
-            var prediction = predictionEngine.Predict(new DrinkEmotionData 
-            { 
+            var prediction = predictionEngine.Predict(new DrinkEmotionData
+            {
                 CommentEmotional = input,
                 Rating = 5,
                 Price = 0

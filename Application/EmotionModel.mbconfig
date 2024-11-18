@@ -42,11 +42,11 @@
       {
         "Version": 1,
         "Type": "Trial",
-        "TrainerName": "LbfgsLogisticRegressionOva",
-        "Score": 0.11254782442197926,
-        "RuntimeInSeconds": 7.47,
+        "TrainerName": "LightGbmMulti",
+        "Score": 0.143766387938209,
+        "RuntimeInSeconds": 276.929,
         "Parameter": {
-          "_SCHEMA_": "e0 * e1 * e2 * e6 * e10",
+          "_SCHEMA_": "e0 * e1 * e2 * e5 * e10",
           "e0": {
             "InputColumnName": "text",
             "OutputColumnName": "text"
@@ -66,9 +66,16 @@
             "InputColumnName": "label",
             "AddKeyValueAnnotationsAsText": false
           },
-          "e6": {
-            "L1Regularization": 0.03125,
-            "L2Regularization": 0.03125,
+          "e5": {
+            "NumberOfLeaves": 2518,
+            "MinimumExampleCountPerLeaf": 29,
+            "LearningRate": 0.23093667277566921,
+            "NumberOfTrees": 899,
+            "SubsampleFraction": 0.99999977667298645,
+            "MaximumBinCountPerFeature": 288,
+            "FeatureFraction": 0.98459594984590026,
+            "L1Regularization": 1.772197292686899E-09,
+            "L2Regularization": 0.99999977667298645,
             "LabelColumnName": "label",
             "FeatureColumnName": "Features"
           }
@@ -78,8 +85,8 @@
         "Version": 1,
         "Type": "Trial",
         "TrainerName": "LbfgsLogisticRegressionOva",
-        "Score": 0.11254804525914472,
-        "RuntimeInSeconds": 8.038,
+        "Score": 0.14403766508044077,
+        "RuntimeInSeconds": 7.887,
         "Parameter": {
           "_SCHEMA_": "e0 * e1 * e2 * e6 * e10",
           "e0": {
@@ -102,8 +109,85 @@
             "AddKeyValueAnnotationsAsText": false
           },
           "e6": {
-            "L1Regularization": 0.03125,
-            "L2Regularization": 0.03125,
+            "L1Regularization": 0.09293236,
+            "L2Regularization": 0.09781147,
+            "LabelColumnName": "label",
+            "FeatureColumnName": "Features"
+          }
+        }
+      },
+      {
+        "Version": 1,
+        "Type": "Trial",
+        "TrainerName": "LightGbmMulti",
+        "Score": 0.17635543830210446,
+        "RuntimeInSeconds": 183.437,
+        "Parameter": {
+          "_SCHEMA_": "e0 * e1 * e2 * e5 * e10",
+          "e0": {
+            "InputColumnName": "text",
+            "OutputColumnName": "text"
+          },
+          "e1": {
+            "InputColumnNames": [
+              "text"
+            ],
+            "OutputColumnName": "Features"
+          },
+          "e10": {
+            "OutputColumnName": "PredictedLabel",
+            "InputColumnName": "PredictedLabel"
+          },
+          "e2": {
+            "OutputColumnName": "label",
+            "InputColumnName": "label",
+            "AddKeyValueAnnotationsAsText": false
+          },
+          "e5": {
+            "NumberOfLeaves": 269,
+            "MinimumExampleCountPerLeaf": 24,
+            "LearningRate": 0.99999977667298645,
+            "NumberOfTrees": 816,
+            "SubsampleFraction": 0.99999977667298645,
+            "MaximumBinCountPerFeature": 269,
+            "FeatureFraction": 0.99032310598415774,
+            "L1Regularization": 3.6992572535550891E-10,
+            "L2Regularization": 0.99999977667298645,
+            "LabelColumnName": "label",
+            "FeatureColumnName": "Features"
+          }
+        }
+      },
+      {
+        "Version": 1,
+        "Type": "Trial",
+        "TrainerName": "LbfgsMaximumEntropyMulti",
+        "Score": 0.19933660368474271,
+        "RuntimeInSeconds": 29.782,
+        "Parameter": {
+          "_SCHEMA_": "e0 * e1 * e2 * e7 * e10",
+          "e0": {
+            "InputColumnName": "text",
+            "OutputColumnName": "text"
+          },
+          "e1": {
+            "InputColumnNames": [
+              "text"
+            ],
+            "OutputColumnName": "Features"
+          },
+          "e10": {
+            "OutputColumnName": "PredictedLabel",
+            "InputColumnName": "PredictedLabel"
+          },
+          "e2": {
+            "OutputColumnName": "label",
+            "InputColumnName": "label",
+            "AddKeyValueAnnotationsAsText": false
+          },
+          "e7": {
+            "L1Regularization": 0.7578441,
+            "L2Regularization": 0.03998929,
             "LabelColumnName": "label",
             "FeatureColumnName": "Features"
           }
@@ -113,8 +197,8 @@
         "Version": 1,
         "Type": "Trial",
         "TrainerName": "LbfgsLogisticRegressionOva",
-        "Score": 0.11254998452129358,
-        "RuntimeInSeconds": 7.634,
+        "Score": 0.25197240317208391,
+        "RuntimeInSeconds": 9.505,
         "Parameter": {
           "_SCHEMA_": "e0 * e1 * e2 * e6 * e10",
           "e0": {
@@ -137,78 +221,8 @@
             "AddKeyValueAnnotationsAsText": false
           },
           "e6": {
-            "L1Regularization": 0.03125,
-            "L2Regularization": 0.03125,
-            "LabelColumnName": "label",
-            "FeatureColumnName": "Features"
-          }
-        }
-      },
-      {
-        "Version": 1,
-        "Type": "Trial",
-        "TrainerName": "LbfgsLogisticRegressionOva",
-        "Score": 0.11255225966889415,
-        "RuntimeInSeconds": 10.804,
-        "Parameter": {
-          "_SCHEMA_": "e0 * e1 * e2 * e6 * e10",
-          "e0": {
-            "InputColumnName": "text",
-            "OutputColumnName": "text"
-          },
-          "e1": {
-            "InputColumnNames": [
-              "text"
-            ],
-            "OutputColumnName": "Features"
-          },
-          "e10": {
-            "OutputColumnName": "PredictedLabel",
-            "InputColumnName": "PredictedLabel"
-          },
-          "e2": {
-            "OutputColumnName": "label",
-            "InputColumnName": "label",
-            "AddKeyValueAnnotationsAsText": false
-          },
-          "e6": {
-            "L1Regularization": 0.03125,
-            "L2Regularization": 0.03125,
-            "LabelColumnName": "label",
-            "FeatureColumnName": "Features"
-          }
-        }
-      },
-      {
-        "Version": 1,
-        "Type": "Trial",
-        "TrainerName": "LbfgsLogisticRegressionOva",
-        "Score": 0.112552317571629,
-        "RuntimeInSeconds": 8.208,
-        "Parameter": {
-          "_SCHEMA_": "e0 * e1 * e2 * e6 * e10",
-          "e0": {
-            "InputColumnName": "text",
-            "OutputColumnName": "text"
-          },
-          "e1": {
-            "InputColumnNames": [
-              "text"
-            ],
-            "OutputColumnName": "Features"
-          },
-          "e10": {
-            "OutputColumnName": "PredictedLabel",
-            "InputColumnName": "PredictedLabel"
-          },
-          "e2": {
-            "OutputColumnName": "label",
-            "InputColumnName": "label",
-            "AddKeyValueAnnotationsAsText": false
-          },
-          "e6": {
-            "L1Regularization": 0.03125,
-            "L2Regularization": 0.03125,
+            "L1Regularization": 0.5520093,
+            "L2Regularization": 0.28579018,
             "LabelColumnName": "label",
             "FeatureColumnName": "Features"
           }
@@ -239,7 +253,7 @@
     "Subsampling": false,
     "Tuner": "eci-cfo",
     "Type": "ClassificationTrainingOption",
-    "TrainingTime": 7200,
+    "TrainingTime": 720,
     "OptimizeMetric": "LogLoss",
     "LabelColumn": "label",
     "AvailableTrainers": [
