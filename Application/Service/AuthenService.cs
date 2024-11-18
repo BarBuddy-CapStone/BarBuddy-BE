@@ -56,7 +56,7 @@ namespace Application.Service
                                         .GetAsync(filter: x => x.Email.Equals(request.Email)
                                         && x.Password.Equals(hashPass)
                                         && x.Status == (int)PrefixValueEnum.Active, 
-                                        includeProperties: "Role");
+                                        includeProperties: "Role,Bar");
 
                 var getOne = isExist.FirstOrDefault();
 
