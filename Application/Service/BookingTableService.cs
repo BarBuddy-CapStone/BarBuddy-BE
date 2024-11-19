@@ -74,7 +74,7 @@ namespace Application.Service
                     {
                         if (time.DayOfWeek != getDayOfWeek)
                         {
-                            timesToRemove.Add(time); 
+                            timesToRemove.Add(time);
                         }
                     }
                     foreach (var time in timesToRemove)
@@ -85,10 +85,12 @@ namespace Application.Service
                 }
                 else
                 {
-                    if (getTimeOfBar[0].StartTime > getTimeOfBar[0].EndTime && request.Time < getTimeOfBar[0].StartTime) {
+                    if (getTimeOfBar[0].StartTime > getTimeOfBar[0].EndTime && request.Time < getTimeOfBar[0].StartTime)
+                    {
                         requestDate = requestDate.AddDays(1);
                         request.Date = request.Date.AddDays(1);
-                    } else
+                    }
+                    else
                     {
                         Utils.ValidateOpenCloseTime(requestDate, request.Time, getTimeOfBar);
                     }
@@ -110,27 +112,29 @@ namespace Application.Service
 
                 var response = _mapper.Map<FilterTableTypeReponse>(getOne?.TableType);
 
-                response.BookingTables = new List<FilterBkTableResponse>
-                {
+                response.BookingTables = new List<FilterBkTableResponse> {
                     new FilterBkTableResponse
                     {
                         ReservationDate = request.Date,
                         ReservationTime = request.Time,
-                        Tables = data.Select(bt =>
+                        Tables = data.Select(table =>
                         {
-                            var matchingBooking = bt.BookingTables?
-                                .FirstOrDefault(x => x.Booking.BookingDate.Date == requestDate && x.Booking.BookingTime == request.Time);
+                            var bookingStatus = table.BookingTables?
+                                .Where(bt => bt.Booking != null)
+                                .FirstOrDefault(bt =>
+                                    bt.Booking.BookingDate.Date == requestDate.Date &&
+                                    bt.Booking.BookingTime == request.Time);
 
                             return new FilterTableResponse
                             {
-                                TableId = bt.TableId,
-                                TableName = bt.TableName,
-                                Status = matchingBooking?.Booking.Status ?? (int)PrefixValueEnum.Cancelled
+                                TableId = table.TableId,
+                                TableName = table.TableName,
+                                Status = (bookingStatus?.Booking.Status == 0 ||  bookingStatus?.Booking.Status == 2)
+                                                ? (int)PrefixValueEnum.PendingBooking : (int)PrefixValueEnum.Cancelled
                             };
                         }).ToList()
-                    }
-                };
-
+                        }
+                    };
                 return response;
             }
             catch (CustomException.InternalServerErrorException ex)
@@ -148,7 +152,7 @@ namespace Application.Service
                                                             && x.IsDeleted == PrefixKeyConstant.FALSE,
                                                             includeProperties: "TableType.Bar")
                                         .FirstOrDefault();
-            if(tableIsExist == null)
+            if (tableIsExist == null)
             {
                 throw new CustomException.DataNotFoundException("Không tìm thấy bàn trong quán Bar, vui lòng thử lại !");
             }
@@ -237,10 +241,11 @@ namespace Application.Service
 
                 return tableHoldInfo;
 
-            }catch(CustomException.InternalServerErrorException ex)
+            }
+            catch (CustomException.InternalServerErrorException ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
-            } 
+            }
 
         }
 
