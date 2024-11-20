@@ -8,13 +8,12 @@ using System.Threading.Tasks;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using Microsoft.ML.Trainers;
-using Microsoft.ML.Trainers.LightGbm;
 
 namespace Application
 {
     public partial class EmotionModel
     {
-        public const string RetrainFilePath =  @"D:\MachineLearningDocs\Dataseed\emotionDataset.tsv";
+        public const string RetrainFilePath =  @"D:\CapstoneProject\Back-End\BarBuddy-BE\Application\Dataset\emotionDataset.tsv";
         public const char RetrainSeparatorChar = ',';
         public const bool RetrainHasHeader =  true;
         public const bool RetrainAllowQuoting =  false;
@@ -93,7 +92,7 @@ namespace Application
             var pipeline = mlContext.Transforms.Text.FeaturizeText(inputColumnName:@"text",outputColumnName:@"text")      
                                     .Append(mlContext.Transforms.Concatenate(@"Features", new []{@"text"}))      
                                     .Append(mlContext.Transforms.Conversion.MapValueToKey(outputColumnName:@"label",inputColumnName:@"label",addKeyValueAnnotationsAsText:false))      
-                                    .Append(mlContext.MulticlassClassification.Trainers.LightGbm(new LightGbmMulticlassTrainer.Options(){NumberOfLeaves=2518,NumberOfIterations=899,MinimumExampleCountPerLeaf=29,LearningRate=0.2309366727756692,LabelColumnName=@"label",FeatureColumnName=@"Features",Booster=new GradientBooster.Options(){SubsampleFraction=0.9999997766729865,FeatureFraction=0.9845959498459003,L1Regularization=1.772197292686899E-09,L2Regularization=0.9999997766729865},MaximumBinCountPerFeature=288}))      
+                                    .Append(mlContext.MulticlassClassification.Trainers.LbfgsMaximumEntropy(new LbfgsMaximumEntropyMulticlassTrainer.Options(){L1Regularization=0.03125F,L2Regularization=0.03125F,LabelColumnName=@"label",FeatureColumnName=@"Features"}))      
                                     .Append(mlContext.Transforms.Conversion.MapKeyToValue(outputColumnName:@"PredictedLabel",inputColumnName:@"PredictedLabel"));
 
             return pipeline;
