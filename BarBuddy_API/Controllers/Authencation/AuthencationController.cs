@@ -135,22 +135,11 @@ namespace BarBuddy_API.Controllers.Authencation
         }
 
         [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken([FromBody]string token)
+        public async Task<IActionResult> RefreshToken([FromBody]string refreshToken)
         {
             try
             {
-                if(!await _tokenService.IsValidRefreshToken(token))
-                {
-                    return CustomResult("Token không hợp lệ hoặc đã thu hồi !", HttpStatusCode.Unauthorized);
-                }
-
-                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-
-                await _tokenService.RevokeRefreshToken(token);
-                await Task.Delay(10);
-                var newToken = _tokenService.GenerteDefaultToken(accountId);
-                var response = await _tokenService.SaveRefreshToken(newToken, accountId);
-
+                var response = await _tokenService.GenerteDefaultToken(refreshToken);
                 return CustomResult("Đã refresh token thành công !", response);
             }
             catch (CustomException.InternalServerErrorException ex)
@@ -170,26 +159,22 @@ namespace BarBuddy_API.Controllers.Authencation
         [HttpPost("logout")]
         public async Task<IActionResult> Logout([FromBody] string token) 
         {
-            var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-
-            if(accountId == Guid.Empty)
+            try
             {
-                return CustomResult("Bạn không có quyền !", HttpStatusCode.Unauthorized);
-            }
+                await _tokenService.IsValidRefreshToken(token);       
+                var result = await _tokenService.RevokeRefreshToken(token);
 
-            if (!await _tokenService.IsValidRefreshToken(token))
+                if (!result)
+                {
+                    return CustomResult("Token không tồn tại hoặc đã hết hạn !", HttpStatusCode.BadRequest);
+                }
+
+                return CustomResult("Đã logout thành công !");
+            }
+            catch (CustomException.UnAuthorizedException ex)
             {
-                return CustomResult("Token không hợp lệ hoặc đã thu hồi !", HttpStatusCode.Unauthorized);
+                return CustomResult(ex.Message, HttpStatusCode.Unauthorized);
             }
-
-            var result = await _tokenService.RevokeRefreshToken(token);
-
-            if(!result)
-            {
-                return CustomResult("Token không tồn tại hoặc đã hết hạn !", HttpStatusCode.BadRequest);
-            }
-
-            return CustomResult("Đã logout thành công !");
         }
     }
 }

@@ -14,6 +14,7 @@ namespace Application.DTOs.Authen
         public string Phone { get; set; }
         public string Image { get; set; }
         public string AccessToken { get; set; }
+        public string RefreshToken { get; set; }
         public Guid? IdentityId { get; set; }
         public string BarName { get; set; }
     }

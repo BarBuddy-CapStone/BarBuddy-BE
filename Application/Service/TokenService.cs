@@ -1,4 +1,5 @@
-﻿using Application.DTOs.Tokens;
+﻿using Application.DTOs.Authen;
+using Application.DTOs.Tokens;
 using Application.Interfaces;
 using Application.IService;
 using AutoMapper;
@@ -13,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Domain.CustomException.CustomException;
 
 namespace Application.Service
 {
@@ -32,28 +34,46 @@ namespace Application.Service
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public string GenerteDefaultToken(Guid accountId)
-        {
-            var getOneAccount = _unitOfWork.AccountRepository
-                                        .Get(filter: x => x.AccountId.Equals(accountId),
-                                        includeProperties: "Role")
-                                        .FirstOrDefault();
-            return _authenService.GenerteDefaultToken(getOneAccount);
-        }
-
-        public async Task<TokenResponse> GetValidRefreshToken(string token)
+        public async Task<LoginResponse> GenerteDefaultToken(string refreshToken)
         {
             var accountId = _authenService.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
+            await IsValidRefreshToken(refreshToken);
+            var isValidToken = await GetValidRefreshToken(accountId, refreshToken);
 
+            if (isValidToken == null)
+            {
+                throw new UnAuthorizedException("Refresh token không hợp lệ hoặc đã hết hạn!");
+            }
+
+            var account = _unitOfWork.AccountRepository
+                                        .Get(filter: x => x.AccountId.Equals(accountId), 
+                                        includeProperties: "Role")
+                                        .FirstOrDefault();
+            if (account == null)
+            {
+                throw new DataNotFoundException("Không tìm thấy tài khoản!");
+            }
+
+            var newAccessToken = _authenService.GenerteDefaultToken(account);
+
+            var response = _mapper.Map<LoginResponse>(account);
+            response.AccessToken = newAccessToken;
+            response.RefreshToken = refreshToken;
+
+            return response;
+        }
+
+        public async Task<TokenResponse> GetValidRefreshToken(Guid accountId, string refreshToken)
+        {
             var isExitToken = (await _unitOfWork.TokenRepository
-                                        .GetAsync(rt => rt.Tokens.Equals(token) &&
+                                        .GetAsync(rt => rt.Tokens.Equals(refreshToken) &&
                                                         rt.AccountId.Equals(accountId) &&
                                                         !rt.IsRevoked && !rt.IsUsed &&
                                                         rt.Expires > DateTime.UtcNow))
                                         .FirstOrDefault();
             if (isExitToken == null)
             {
-                throw new CustomException.DataNotFoundException("Không tìm thấy token !");
+                throw new DataNotFoundException("Không tìm thấy token !");
             }
 
             var response = _mapper.Map<TokenResponse>(isExitToken);
@@ -62,38 +82,49 @@ namespace Application.Service
 
         public async Task<bool> IsValidRefreshToken(string refreshToken)
         {
+            var accountId = _authenService.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
             var token = (await _unitOfWork.TokenRepository.GetAsync(rt => rt.Tokens == refreshToken)).FirstOrDefault();
+            if (token == null)
+                throw new UnAuthorizedException("Refresh token không tồn tại !");
+
+            if (token.IsUsed || token.IsRevoked)
+                throw new UnAuthorizedException("Refresh token đã hết hạn hoặc đã dùng, vui lòng đăng nhập lại !");
+
+            if (token.Expires < DateTime.Now)
+                throw new UnAuthorizedException("Refresh token đã hết hạn, vui lòng đăng nhập lại !");
 
             return token != null && !token.IsRevoked && token.Expires > DateTime.UtcNow;
         }
 
-        public async Task<bool> RevokeRefreshToken(string token)
+        public async Task<bool> RevokeRefreshToken(string refreshToken)
         {
             try
             {
-                var accountId = _authenService.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
+                await IsValidRefreshToken(refreshToken);
 
+                var accountId = _authenService.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
                 var isExistToken = _unitOfWork.TokenRepository
                                                 .Get(filter: x => x.AccountId.Equals(accountId) &&
-                                                        x.Tokens.Equals(token))
+                                                        x.Tokens.Equals(refreshToken))
                                                 .FirstOrDefault();
                 if (isExistToken == null)
                 {
-                    throw new CustomException.DataNotFoundException("Không tìm thấy tokens");
+                    throw new DataNotFoundException("Không tìm thấy tokens");
+                }
+                if (string.IsNullOrWhiteSpace(refreshToken))
+                {
+                    return false;
                 }
 
-                if (token != null)
-                {
-                    isExistToken.IsRevoked = true;
-                    await _unitOfWork.TokenRepository.UpdateRangeAsync(isExistToken);
-                    await Task.Delay(10);
-                    await _unitOfWork.SaveAsync();
-                }
+                isExistToken.IsRevoked = true;
+                await _unitOfWork.TokenRepository.UpdateRangeAsync(isExistToken);
+                await Task.Delay(10);
+                await _unitOfWork.SaveAsync();
                 return true;
             }
             catch
             {
-                throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
+                throw new InternalServerErrorException("Lỗi hệ thống !");
             }
         }
 
@@ -107,7 +138,7 @@ namespace Application.Service
                     AccountId = accountId,
                     Tokens = token,
                     Created = DateTime.UtcNow,
-                    Expires = DateTime.Now.AddMonths(1),
+                    Expires = DateTime.Now.AddDays(14),
                     IsRevoked = false,
                     IsUsed = false
                 };

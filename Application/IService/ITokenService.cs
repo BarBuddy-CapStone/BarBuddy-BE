@@ -1,4 +1,5 @@
 ﻿
+using Application.DTOs.Authen;
 using Application.DTOs.Tokens;
 using Domain.Entities;
 using System;
@@ -11,10 +12,10 @@ namespace Application.IService
 {
     public interface ITokenService
     {
-        Task<TokenResponse> SaveRefreshToken(string token, Guid accountId);
-        Task<TokenResponse> GetValidRefreshToken(string token);
-        Task<bool> RevokeRefreshToken(string token);
+        Task<TokenResponse> SaveRefreshToken(string refreshToken, Guid accountId);
+        Task<TokenResponse> GetValidRefreshToken(Guid accountId, string refreshToken);
+        Task<bool> RevokeRefreshToken(string refreshToken);
         Task<bool> IsValidRefreshToken(string refreshToken);
-        string GenerteDefaultToken(Guid accountId);
+        Task<LoginResponse> GenerteDefaultToken(string refreshToken);
     }
 }
