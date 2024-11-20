@@ -68,7 +68,7 @@ namespace Application.Service
                     throw new CustomException.DataNotFoundException("Bạn không thể hủy đặt bàn.");
                 }
 
-                DateTime BookingDateTime = booking.BookingDate.ToUniversalTime() + booking.BookingTime;
+                DateTime BookingDateTime = booking.BookingDate + booking.BookingTime;
                 if (BookingDateTime < DateTime.Now.AddHours(2))
                 {
                     return false;
