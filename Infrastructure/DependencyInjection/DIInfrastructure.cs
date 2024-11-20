@@ -216,6 +216,7 @@ namespace Infrastructure.DependencyInjection
                 //Add cac Job vao day 
                 AddJobWithTrigger<NotificationJob>(options, nameof(NotificationJob));
                 AddJobWithTrigger<EventJob>(options, nameof(EventJob));
+                AddJobWithTrigger<TokenJob>(options, nameof(TokenJob));
             });
 
             services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
