@@ -88,10 +88,10 @@ namespace Application.Service
                 throw new UnAuthorizedException("Refresh token không tồn tại !");
 
             if (token.IsUsed || token.IsRevoked)
-                throw new UnAuthorizedException("Refresh token đã hết hạn hoặc đã dùng");
+                throw new UnAuthorizedException("Refresh token đã hết hạn hoặc đã dùng, vui lòng đăng nhập lại !");
 
             if (token.Expires < DateTime.Now)
-                throw new UnAuthorizedException("Refresh token đã hết hạn");
+                throw new UnAuthorizedException("Refresh token đã hết hạn, vui lòng đăng nhập lại !");
 
             return token != null && !token.IsRevoked && token.Expires > DateTime.UtcNow;
         }

@@ -68,7 +68,8 @@ namespace Application.Service
 
                 var response = _mapper.Map<LoginResponse>(getOne);
                 response.AccessToken = _authentication.GenerteDefaultToken(getOne);
-                response.RefreshToken = Utils.GenerateRandomString(24);
+                var refreshToken = _authentication.GenerateRefreshToken(getOne);
+                response.RefreshToken = refreshToken;
                 await _tokenService.SaveRefreshToken(response.RefreshToken, getOne.AccountId);
                 return response;
             }
