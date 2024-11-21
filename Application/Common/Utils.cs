@@ -281,7 +281,7 @@ namespace Application.Common
                 _ => "Không xác định"
             };
         }
-        public static int DetermineEventStatus(List<EventTimeResponse> eventTimeResponses,List<TimeEvent> timeEvent,TimeSpan currentTime)
+        public static int DetermineEventStatus(List<EventTimeResponse> eventTimeResponses, List<TimeEvent> timeEvent, TimeSpan currentTime)
         {
             int? isStillDate = !eventTimeResponses.Any(t => t.Date.HasValue)
                 ? null
@@ -310,6 +310,20 @@ namespace Application.Common
             }
 
             return (int)PrefixValueEnum.Ended;
+        }
+        public static string GenerateRandomString(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var random = new Random();
+            var result = new StringBuilder(length);
+
+            for (int i = 0; i < length; i++)
+            {
+                result.Append(chars[random.Next(chars.Length)]);
+            }
+            string currentDate = DateTime.Now.ToString("yyyyMMdd");
+
+            return $"{currentDate}{result}";
         }
     }
 }

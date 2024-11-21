@@ -11,6 +11,7 @@ namespace Application.DTOs.Tokens
         public Guid TokenId { get; set; }
         public Guid AccountId { get; set; }
         public string Tokens { get; set; }
+        public string AccessToken { get; set; }
         public DateTime Created { get; set; }
         public DateTime Expires { get; set; }
         public bool IsRevoked { get; set; }

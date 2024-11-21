@@ -55,9 +55,9 @@ namespace Infrastructure.Quartz
                                                     );
 
                 var getListBooking = await _bookingService.GetAllBookingByStsPending();
-                var getBkOTWStsPending = await _bookingService.GetAllBookingByStsPendingCus();
+                var getBkStsPending = await _bookingService.GetAllBookingByStsPendingCus();
 
-                foreach (var booking in getBkOTWStsPending)
+                foreach (var booking in getBkStsPending)
                 {
                     var cacheKey = $"{booking.BarName}_{booking.BookingDate.Date}_{booking.BookingTime}_{booking.BookingId}";
                     if (_cache.TryGetValue(cacheKey, out _))
