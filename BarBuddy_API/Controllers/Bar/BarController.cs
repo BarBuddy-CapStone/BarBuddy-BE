@@ -4,6 +4,7 @@ using CoreApiResponse;
 using Domain.Common;
 using Domain.CustomException;
 using Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -23,6 +24,9 @@ namespace BarBuddy_API.Controllers.Bar
         /// Get All Bar
         /// </summary>
         /// <returns></returns>
+        ///
+
+        [Authorize(Roles ="ADMIN")]
         [HttpGet("admin/barmanager")]
         public async Task<IActionResult> GetAllBar([FromQuery] ObjectQuery query)
         {

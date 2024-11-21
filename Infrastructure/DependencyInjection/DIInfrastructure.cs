@@ -200,7 +200,9 @@ namespace Infrastructure.DependencyInjection
                     {
                         ValidateIssuer = true,
                         ValidateAudience = true,
-                        ValidateLifetime = true,
+                        ValidateLifetime = true, 
+                        RequireExpirationTime = true,
+                        ClockSkew = TimeSpan.Zero,
                         ValidIssuer = config["Jwt:Issuer"],
                         ValidAudience = config["Jwt:Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]))
