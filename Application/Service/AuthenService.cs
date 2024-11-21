@@ -294,6 +294,9 @@ namespace Application.Service
                     // Tạo và trả về token JWT
                     var response = _mapper.Map<LoginResponse>(newCustomer);
                     response.AccessToken = _authentication.GenerteDefaultToken(newCustomer);
+                    var refreshToken = _authentication.GenerateRefreshToken(newCustomer);
+                    response.RefreshToken = refreshToken;
+                    await _tokenService.SaveRefreshToken(response.RefreshToken, newCustomer.AccountId);
 
                     return response;
                 }
@@ -307,6 +310,9 @@ namespace Application.Service
                     // Tạo và trả về token JWT
                     var response = _mapper.Map<LoginResponse>(isExist);
                     response.AccessToken = _authentication.GenerteDefaultToken(isExist);
+                    var refreshToken = _authentication.GenerateRefreshToken(isExist);
+                    response.RefreshToken = refreshToken;
+                    await _tokenService.SaveRefreshToken(response.RefreshToken, isExist.AccountId);
 
                     return response;
                 }
