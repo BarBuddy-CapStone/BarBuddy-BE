@@ -11,6 +11,9 @@ using Persistence.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// route https
+builder.WebHost.UseUrls("https://0.0.0.0");
+
 // Add services to the container.
 builder.Services.AddControllers();
 
