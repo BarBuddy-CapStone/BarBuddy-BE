@@ -145,6 +145,7 @@ namespace BarBuddy_API.Controllers.Bar
         /// </summary>
         /// <param name="barId"></param>
         /// <returns></returns>
+        [Authorize(Roles = "ADMIN")]
         [HttpGet("admin/barProfile/{barId}")]
         public async Task<IActionResult> GetBarById(Guid barId)
         {
@@ -169,6 +170,7 @@ namespace BarBuddy_API.Controllers.Bar
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        [Authorize(Roles = "ADMIN")]
         [HttpPost("admin/addBar")]
         public async Task<IActionResult> CreateBar([FromBody] CreateBarRequest request)
         {
@@ -199,6 +201,7 @@ namespace BarBuddy_API.Controllers.Bar
         /// <param name="barId"></param>
         /// <param name="request"></param>
         /// <returns></returns>
+        [Authorize(Roles = "ADMIN")]
         [HttpPatch("admin/updateBar")]
         public async Task<IActionResult> UpdateBar([FromBody] UpdateBarRequest request)
         {
@@ -222,7 +225,12 @@ namespace BarBuddy_API.Controllers.Bar
                 return CustomResult(e.Message, HttpStatusCode.InternalServerError);
             }
         }
-
+        /// <summary>
+        /// Get Revenue Of Bar
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "ADMIN")]
         [HttpGet("admin/dashboard/revenueChart")]
         public async Task<IActionResult> GetRevenueOfBar([FromQuery] RevenueRequest request)
         {
@@ -246,6 +254,12 @@ namespace BarBuddy_API.Controllers.Bar
             }
         }
 
+        /// <summary>
+        /// Get Bar Name Id
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "ADMIN")]
         [HttpGet("admin/dashboard/getBar")]
         public async Task<IActionResult> GetBarNameId([FromQuery] ObjectQuery query)
         {
@@ -264,6 +278,11 @@ namespace BarBuddy_API.Controllers.Bar
             }
         }
 
+        /// <summary>
+        /// Get All Revenue
+        /// </summary>
+        /// <returns></returns>
+        [Authorize(Roles = "ADMIN")]
         [HttpGet("admin/dashboard/getAllRevenue")]
         public async Task<IActionResult> GetAllRevenue()
         {
@@ -286,7 +305,11 @@ namespace BarBuddy_API.Controllers.Bar
                 return CustomResult(e.Message, HttpStatusCode.InternalServerError);
             }
         }
-
+        /// <summary>
+        /// Get Bar Name Id Customer
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         [HttpGet("customer/getBar")]
         public async Task<IActionResult> GetBarNameIdCustomer([FromQuery] ObjectQuery query)
         {

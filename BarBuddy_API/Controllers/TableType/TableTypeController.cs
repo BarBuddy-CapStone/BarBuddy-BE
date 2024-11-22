@@ -2,6 +2,7 @@
 using Application.IService;
 using CoreApiResponse;
 using Domain.CustomException;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -21,6 +22,7 @@ namespace BarBuddy_API.Controllers.TableType
         /// Get All TableType
         /// </summary>
         /// <returns></returns>
+        [Authorize(Roles = "MANAGER")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -45,6 +47,7 @@ namespace BarBuddy_API.Controllers.TableType
         /// </summary>
         /// <param name="TableTypeId"></param>
         /// <returns></returns>
+        [Authorize(Roles = "MANAGER")]
         [HttpGet("{TableTypeId}")]
         public async Task<IActionResult> GetById(Guid TableTypeId)
         {
@@ -57,6 +60,7 @@ namespace BarBuddy_API.Controllers.TableType
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        [Authorize(Roles = "MANAGER")]
         [HttpPost]
         public async Task<IActionResult> Post(TableTypeRequest request)
         {
@@ -70,6 +74,7 @@ namespace BarBuddy_API.Controllers.TableType
         /// <param name="request"></param>
         /// <param name="TableTypeId"></param>
         /// <returns></returns>
+        [Authorize(Roles = "MANAGER")]
         [HttpPatch("{TableTypeId}")]
         public async Task<IActionResult> Put([FromBody] TableTypeRequest request, Guid TableTypeId)
         {
@@ -82,6 +87,7 @@ namespace BarBuddy_API.Controllers.TableType
         /// </summary>
         /// <param name="TableTypeId"></param>
         /// <returns></returns>
+        [Authorize(Roles = "MANAGER")]
         [HttpDelete("{TableTypeId}")]
         public async Task<IActionResult> Delete(Guid TableTypeId)
         {
@@ -92,6 +98,13 @@ namespace BarBuddy_API.Controllers.TableType
             }
             return CustomResult("Cập nhật thành công");
         }
+
+        /// <summary>
+        /// Get All TT Of Bar
+        /// </summary>
+        /// <param name="barId"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "MANAGER,STAFF")]
         [HttpGet("getTTOfBar/{barId}")]
         public async Task<IActionResult> GetAllTTOfBar(Guid barId)
         {

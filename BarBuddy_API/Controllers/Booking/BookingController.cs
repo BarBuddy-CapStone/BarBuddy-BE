@@ -3,6 +3,7 @@ using Application.IService;
 using Azure;
 using CoreApiResponse;
 using Domain.CustomException;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -27,23 +28,27 @@ namespace BarBuddy_API.Controllers.Booking
         /// <param name="PageIndex"></param>
         /// <param name="PageSize"></param>
         /// <returns></returns>
+        [Authorize(Roles = "CUSTOMER")]
         [HttpGet("{CustomerId}")]
         public async Task<IActionResult> GetAllBookingByCustomerId(Guid CustomerId, [FromQuery] int? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
             var responses = await _bookingService.GetAllCustomerBooking(CustomerId, Status, PageIndex, PageSize);
             return CustomResult(new { TotalPage = responses.TotalPage, response = responses.responses });
         }
+
         /// <summary>
         /// Get Booking By Id
         /// </summary>
         /// <param name="BookingId"></param>
         /// <returns></returns>
+        [Authorize(Roles = "CUSTOMER")]
         [HttpGet("detail/{BookingId}")]
         public async Task<IActionResult> GetBookingById(Guid BookingId)
         {
             var response = await _bookingService.GetBookingById(BookingId);
             return CustomResult(response);
         }
+        
         /// <summary>
         /// Get Top Booking By Customer
         /// </summary>
@@ -56,6 +61,7 @@ namespace BarBuddy_API.Controllers.Booking
             var responses = await _bookingService.GetTopBookingByCustomer(CustomerId, NumOfBookings);
             return CustomResult(responses);
         }
+        
         /// <summary>
         /// Get List Booking By Staff
         /// </summary>
@@ -69,6 +75,7 @@ namespace BarBuddy_API.Controllers.Booking
         /// <param name="PageIndex"></param>
         /// <param name="PageSize"></param>
         /// <returns></returns>
+        [Authorize(Roles = "STAFF")]
         [HttpGet("staff")]
         public async Task<IActionResult> GetListBookingByStaff([FromQuery] string? qrTicket, [FromQuery][Required] Guid BarId, [FromQuery] string? CustomerName, [FromQuery] string? Phone, [FromQuery] string? Email,
             [FromQuery] DateTimeOffset? bookingDate, [FromQuery] TimeSpan? bookingTime, [FromQuery] int? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
@@ -76,11 +83,13 @@ namespace BarBuddy_API.Controllers.Booking
             var responses = await _bookingService.GetListBookingAuthorized(qrTicket, BarId, CustomerName, Phone, Email, bookingDate, bookingTime, Status, PageIndex, PageSize);
             return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.responses });
         }
+        
         /// <summary>
         /// Get Booking Detail By Manager
         /// </summary>
         /// <param name="bookingId"></param>
         /// <returns></returns>
+        [Authorize(Roles = "STAFF")]
         [HttpGet("staff/{bookingId}")]
         public async Task<IActionResult> GetBookingDetailByStaff(Guid bookingId)
         {
@@ -88,6 +97,7 @@ namespace BarBuddy_API.Controllers.Booking
             return CustomResult("Tải dữ liệu thành công", responses);
         }
 
+        [Authorize(Roles = "MANAGER")]
         [HttpGet("manager")]
         public async Task<IActionResult> GetListBookingByManager([FromQuery] string? qrTicket, [FromQuery][Required] Guid BarId, [FromQuery] string? CustomerName, [FromQuery] string? Phone, [FromQuery] string? Email,
             [FromQuery] DateTimeOffset? bookingDate, [FromQuery] TimeSpan? bookingTime, [FromQuery] int? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
@@ -95,11 +105,13 @@ namespace BarBuddy_API.Controllers.Booking
             var responses = await _bookingService.GetListBookingAuthorized(qrTicket, BarId, CustomerName, Phone, Email, bookingDate, bookingTime, Status, PageIndex, PageSize);
             return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.responses });
         }
+
         /// <summary>
         /// Get Booking Detail By Manager
         /// </summary>
         /// <param name="bookingId"></param>
-        /// <returns></returns>
+        /// <returns></returns>ssss
+        [Authorize(Roles = "MANAGER")]
         [HttpGet("manager/{bookingId}")]
         public async Task<IActionResult> GetBookingDetailByManager(Guid bookingId)
         {
@@ -114,6 +126,7 @@ namespace BarBuddy_API.Controllers.Booking
         /// <param name="Status"></param>
         /// <param name="AdditionalFee"></param>
         /// <returns></returns>
+        [Authorize(Roles = "STAFF")]
         [HttpPatch("status")]
         public async Task<IActionResult> UpdateBookingByStaff([FromQuery][Required] Guid BookingId, [FromQuery][Required] int Status, [FromQuery] double? AdditionalFee)
         {
@@ -141,6 +154,7 @@ namespace BarBuddy_API.Controllers.Booking
         /// </summary>
         /// <param name="BookingId"></param>
         /// <returns></returns>
+        [Authorize(Roles = "CUSTOMER")]
         [HttpPatch("cancel/{BookingId}")]
         public async Task<IActionResult> CancelBooking(Guid BookingId)
         {
@@ -157,6 +171,7 @@ namespace BarBuddy_API.Controllers.Booking
         /// </summary>
         /// <param name="request">BookingTableRequest</param>
         /// <returns>Return Custom Result</returns>
+        [Authorize(Roles = "CUSTOMER")]
         [HttpPost("booking-table")]
         public async Task<IActionResult> CreateBookingTableOnly([FromBody] BookingTableRequest request)
         {
@@ -174,6 +189,7 @@ namespace BarBuddy_API.Controllers.Booking
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        [Authorize(Roles = "CUSTOMER")]
         [HttpPost("booking-drink")]
         public async Task<IActionResult> CreateBookingTableWithDrinks([FromBody] BookingDrinkRequest request)
         {
@@ -191,6 +207,7 @@ namespace BarBuddy_API.Controllers.Booking
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        [Authorize(Roles = "CUSTOMER")]
         [HttpPost("booking-drink/mobile")]
         public async Task<IActionResult> CreateBookingTableWithDrinksForMobile([FromBody] BookingDrinkRequest request)
         {

@@ -22,7 +22,7 @@ namespace BarBuddy_API.Controllers.Drink
         /// Get All Drink By Admin
         /// </summary>
         /// <returns></returns>
-        //[Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "MANAGER")]
         [HttpGet]
         public async Task<IActionResult> GetAllDrink()
         {
@@ -88,6 +88,7 @@ namespace BarBuddy_API.Controllers.Drink
         /// </summary>
         /// <param name="drinkId"></param>
         /// <returns></returns>
+        [Authorize(Roles = "MANAGER")]
         [HttpGet("{drinkId}")]
         public async Task<IActionResult> GetDrink(Guid drinkId)
         {
@@ -111,6 +112,7 @@ namespace BarBuddy_API.Controllers.Drink
         /// </summary>
         /// <param name="cateId"></param>
         /// <returns></returns>
+        [Authorize(Roles = "MANAGER")]
         [HttpGet("getDrinkBaedCate/{cateId}")]
         public async Task<IActionResult> GetAllDrinkBasedCateId(Guid cateId)
         {
@@ -157,6 +159,7 @@ namespace BarBuddy_API.Controllers.Drink
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        [Authorize(Roles = "MANAGER")]
         [HttpPost("/addDrink")]
         public async Task<IActionResult> CreateDrink([FromForm] DrinkRequest request)
         {
@@ -177,6 +180,7 @@ namespace BarBuddy_API.Controllers.Drink
         /// <param name="drinkId"></param>
         /// <param name="request"></param>
         /// <returns></returns>
+        [Authorize(Roles = "MANAGER")]
         [HttpPatch("/updateDrink/{drinkId}")]
         public async Task<IActionResult> UpdateDrink(Guid drinkId, [FromForm] DrinkRequest request)
         {

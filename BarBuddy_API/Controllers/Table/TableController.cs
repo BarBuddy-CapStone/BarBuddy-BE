@@ -3,6 +3,7 @@ using Application.IService;
 using Azure;
 using CoreApiResponse;
 using Domain.CustomException;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -28,6 +29,7 @@ namespace BarBuddy_API.Controllers.Table
         /// <param name="PageIndex"></param>
         /// <param name="PageSize"></param>
         /// <returns></returns>
+        [Authorize(Roles = "MANAGER,STAFF")]
         [HttpGet("manage")]
         public async Task<IActionResult> GetAll([FromQuery] Guid? TableTypeId, [FromQuery] string? TableName, [FromQuery] int? Status,[FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
@@ -104,6 +106,7 @@ namespace BarBuddy_API.Controllers.Table
         /// <param name="TableId"></param>
         /// <param name="Status"></param>
         /// <returns></returns>
+        [Authorize(Roles = "STAFF")]
         [HttpPatch("status")]
         public async Task<IActionResult> UpdateStatus([FromQuery][Required] Guid TableId ,[FromQuery][Required] int Status)
         {

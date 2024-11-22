@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.Request.FeedBackRequest;
 using Application.IService;
 using CoreApiResponse;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
@@ -51,6 +52,7 @@ namespace BarBuddy_API.Controllers.FeedBack
         /// <param name="PageIndex"></param>
         /// <param name="PageSize"></param>
         /// <returns></returns>
+        [Authorize(Roles = "MANAGER")]
         [HttpGet("manager")]
         public async Task<IActionResult> GetFeedBackManager([FromQuery][Required] Guid BarId, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
@@ -87,6 +89,7 @@ namespace BarBuddy_API.Controllers.FeedBack
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        [Authorize(Roles = "CUSTOMER")]
         [HttpPost("createFeedBack")]
         public async Task<IActionResult> CreateFeedBack(CreateFeedBackRequest request)
         {

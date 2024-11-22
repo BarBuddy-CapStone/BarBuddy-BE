@@ -3,6 +3,7 @@ using Application.DTOs.Payment.Vnpay;
 using Application.Interfaces;
 using CoreApiResponse;
 using Domain.CustomException;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BarBuddy_API.Controllers.Payment
@@ -33,6 +34,7 @@ namespace BarBuddy_API.Controllers.Payment
         /// <param name="vnpayReturn"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
+        [Authorize(Roles = "CUSTOMER")]
         [HttpGet("vnpay-return")]
         public async Task<IActionResult> GetVnpayReturn([FromQuery] VnpayResponse vnpayReturn)
         {
@@ -59,6 +61,7 @@ namespace BarBuddy_API.Controllers.Payment
         /// <param name="vnpayReturn"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
+        [Authorize(Roles = "CUSTOMER")]
         [HttpGet("vnpay-return/mobile")]
         public async Task<IActionResult> GetVnpayReturnForMobile([FromQuery] VnpayResponse vnpayReturn)
         {
@@ -79,12 +82,14 @@ namespace BarBuddy_API.Controllers.Payment
             Console.WriteLine($"{redirectUrl}/{result}");
             return Redirect($"{redirectUrl}/{result}");
         }
+        
         /// <summary>
         /// Get Momo Return
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
+        [Authorize(Roles = "CUSTOMER")]
         [HttpGet("momo-return")]
         public async Task<IActionResult> GetMomoReturn([FromQuery] MomoOneTimePaymentResultRequest request)
         {
@@ -110,6 +115,7 @@ namespace BarBuddy_API.Controllers.Payment
         /// </summary>
         /// <param name="paymentHistoryId"></param>
         /// <returns></returns>
+        [Authorize(Roles = "CUSTOMER")]
         [HttpGet("payment-detail/{paymentHistoryId}")]
         public async Task<IActionResult> GetPaymentDetail(Guid paymentHistoryId)
         {

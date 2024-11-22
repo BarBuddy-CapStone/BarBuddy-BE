@@ -5,6 +5,7 @@ using CoreApiResponse;
 using Domain.CustomException;
 using Firebase.Auth;
 using Infrastructure.Integrations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
@@ -38,6 +39,7 @@ namespace BarBuddy_API.Controllers.Authencation
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
@@ -56,6 +58,7 @@ namespace BarBuddy_API.Controllers.Authencation
         /// </summary>
         /// <param name="idToken"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpPost("google-login")]
         public async Task<IActionResult> GoogleLogin([FromBody][Required] GoogleLoginRequest request)
         {
@@ -75,6 +78,7 @@ namespace BarBuddy_API.Controllers.Authencation
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
@@ -96,6 +100,7 @@ namespace BarBuddy_API.Controllers.Authencation
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] string email)
         {
@@ -114,6 +119,7 @@ namespace BarBuddy_API.Controllers.Authencation
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpPost("send")]
         public async Task<IActionResult> SendOtp([FromBody] string email)
         {
@@ -126,6 +132,7 @@ namespace BarBuddy_API.Controllers.Authencation
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpPost("verify")]
         public async Task<IActionResult> VerifyOtp([FromBody] OtpVerificationRequest request)
         {
@@ -133,7 +140,8 @@ namespace BarBuddy_API.Controllers.Authencation
 
             return isValid ? CustomResult("OTP hợp lệ.") : CustomResult("OTP không hợp lệ hoặc đã hết hạn.", HttpStatusCode.BadRequest);
         }
-
+        
+        [Authorize]
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody]string refreshToken)
         {
@@ -155,7 +163,7 @@ namespace BarBuddy_API.Controllers.Authencation
                 return CustomResult(ex.Message, HttpStatusCode.BadRequest);
             }
         }
-
+        [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout([FromBody] string token) 
         {

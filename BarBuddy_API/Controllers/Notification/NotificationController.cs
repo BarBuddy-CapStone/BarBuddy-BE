@@ -2,6 +2,7 @@
 using Application.IService;
 using CoreApiResponse;
 using Domain.CustomException;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BarBuddy_API.Controllers.Notification
@@ -16,7 +17,7 @@ namespace BarBuddy_API.Controllers.Notification
         {
             _notificationService = notificationService;
         }
-
+        [Authorize(Roles = "CUSTOMER")]
         [HttpGet("getAllNoti/{accountId}")]
         public async Task<IActionResult> GetNotiOfCusById(Guid accountId)
         {
@@ -29,7 +30,7 @@ namespace BarBuddy_API.Controllers.Notification
                 throw new CustomException.InternalServerErrorException(ex.Message, ex);
             }
         }
-
+        [Authorize(Roles = "CUSTOMER")]
         [HttpPatch("isRead")]
         public async Task<IActionResult> UpdateIsReadNoti([FromBody] UpdateNotiRequest request)
         {

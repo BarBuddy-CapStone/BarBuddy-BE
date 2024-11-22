@@ -4,6 +4,7 @@ using Application.IService;
 using CoreApiResponse;
 using Domain.Common;
 using Domain.CustomException;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
@@ -20,7 +21,11 @@ namespace BarBuddy_API.Controllers.Event
         {
             _eventService = eventService;
         }
-
+        /// <summary>
+        /// Get All Event
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> GetAllEvent([FromQuery] EventQuery query)
         {
@@ -38,7 +43,12 @@ namespace BarBuddy_API.Controllers.Event
                 return CustomResult(ex.Message, HttpStatusCode.InternalServerError);
             }
         }
-
+        /// <summary>
+        /// Get Event By Bar Id
+        /// </summary>
+        /// <param name="barId"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
         [HttpGet("{barId}")]
         public async Task<IActionResult> GetEventByBarId(Guid barId, [FromQuery] ObjectQuery query)
         {
@@ -57,6 +67,11 @@ namespace BarBuddy_API.Controllers.Event
             }
         }
 
+        /// <summary>
+        /// Get One Event
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <returns></returns>
         [HttpGet("getOne/{eventId}")]
         public async Task<IActionResult> GetOneEvent(Guid eventId)
         {
@@ -75,7 +90,14 @@ namespace BarBuddy_API.Controllers.Event
             }
         }
 
+        /// <summary>
+        /// Create Event
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        
         [HttpPost("createEvent")]
+        [Authorize(Roles = "MANAGER")]
         public async Task<IActionResult> CreateEvent([FromBody] EventRequest request)
         {
             try
@@ -97,6 +119,13 @@ namespace BarBuddy_API.Controllers.Event
             }
         }
 
+        /// <summary>
+        /// Update Event
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "MANAGER")]
         [HttpPatch("updateEvent")]
         public async Task<IActionResult> UpdateEvent([FromQuery][Required] Guid eventId, [FromBody] UpdateEventRequest request)
         {
@@ -119,6 +148,12 @@ namespace BarBuddy_API.Controllers.Event
             }
         }
 
+        /// <summary>
+        /// Delete Event
+        /// </summary>
+        /// <param name="eventId"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "MANAGER")]
         [HttpDelete("deleteEvent")]
         public async Task<IActionResult> DeleteEvent([FromQuery][Required] Guid eventId)
         {
