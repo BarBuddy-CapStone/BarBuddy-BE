@@ -77,6 +77,7 @@ namespace BarBuddy_API.Controllers.FeedBack
         /// </summary>
         /// <param name="bookingId"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet("booking/{bookingId}")]
         public async Task<IActionResult> GetFeedBackByBookingID(Guid bookingId)
         {

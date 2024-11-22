@@ -21,11 +21,13 @@ namespace BarBuddy_API.Controllers.Event
         {
             _eventService = eventService;
         }
+        
         /// <summary>
         /// Get All Event
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAllEvent([FromQuery] EventQuery query)
         {
@@ -49,6 +51,7 @@ namespace BarBuddy_API.Controllers.Event
         /// <param name="barId"></param>
         /// <param name="query"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet("{barId}")]
         public async Task<IActionResult> GetEventByBarId(Guid barId, [FromQuery] ObjectQuery query)
         {
@@ -72,6 +75,7 @@ namespace BarBuddy_API.Controllers.Event
         /// </summary>
         /// <param name="eventId"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet("getOne/{eventId}")]
         public async Task<IActionResult> GetOneEvent(Guid eventId)
         {

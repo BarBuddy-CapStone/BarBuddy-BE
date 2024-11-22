@@ -28,7 +28,7 @@ namespace BarBuddy_API.Controllers.Account
         /// <param name="pageSize"></param>
         /// <param name="pageIndex"></param>
         /// <returns></returns>
-        [Authorize(Roles ="ADMIN")] // Đổi khi có JWT
+        [Authorize(Roles ="ADMIN")]
         [HttpGet("/api/v1/customer-accounts")]
         public async Task<IActionResult> GetCustomerAccounts([FromQuery] int pageSize, [FromQuery] int pageIndex)
         {
@@ -85,7 +85,7 @@ namespace BarBuddy_API.Controllers.Account
         /// <param name="pageSize"></param>
         /// <param name="pageIndex"></param>
         /// <returns></returns>
-        [AllowAnonymous]
+        [Authorize(Roles = "ADMIN")]
         [HttpGet("/api/v1/staff-accounts")]
         public async Task<IActionResult> GetStaffAccounts([FromQuery] int pageSize, [FromQuery] int pageIndex)
         {
@@ -165,6 +165,7 @@ namespace BarBuddy_API.Controllers.Account
         /// </summary>
         /// <param name="accountId"></param>
         /// <returns></returns>
+        [Authorize(Roles = "CUSTOMER")]
         [HttpGet("/api/v1/customer/{accountId}")]
         public async Task<IActionResult> GetCustomerAccountById(Guid accountId)
         {
@@ -265,7 +266,7 @@ namespace BarBuddy_API.Controllers.Account
         /// <param name="accountId"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "ADMIN,CUSTOMER")]
         [HttpPatch("/api/v1/customer-account")]
         public async Task<IActionResult> UpdateCustomerAccount([FromQuery] Guid accountId, [FromBody] CustomerAccountRequest request)
         {
@@ -283,7 +284,7 @@ namespace BarBuddy_API.Controllers.Account
         /// <param name="accountId"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        [AllowAnonymous]
+        [Authorize(Roles = "CUSTOMER")]
         [HttpPatch("/api/v1/customer/{accountId}")]
         public async Task<IActionResult> UpdateCustomerAccountByCustomer(Guid accountId, [FromBody] CustomerInfoRequest request)
         {
@@ -301,7 +302,7 @@ namespace BarBuddy_API.Controllers.Account
         /// <param name="accountId"></param>
         /// <param name="Image"></param>
         /// <returns></returns>
-        [AllowAnonymous]
+        [Authorize(Roles = "CUSTOMER")]
         [HttpPatch("/api/v1/customer/avatar/{accountId}")]
         public async Task<IActionResult> UpdateCustomerAvatar(Guid accountId, [FromForm] IFormFile Image)
         {

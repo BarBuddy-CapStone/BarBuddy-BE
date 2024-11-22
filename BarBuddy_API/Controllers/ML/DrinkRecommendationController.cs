@@ -1,5 +1,6 @@
 ﻿using Application.IService;
 using CoreApiResponse;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,6 +24,7 @@ namespace BarBuddy_API.Controllers.ML
             return Ok("Model đã được huấn luyện thành công");
         }
 
+        [Authorize(Roles = "CUSTOMER")]
         [HttpGet("drink-recommendation")]
         public async Task<IActionResult> GetRecommendations([FromQuery] string emotion, [FromQuery] Guid barId)
         {
