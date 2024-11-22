@@ -140,8 +140,8 @@ namespace BarBuddy_API.Controllers.Authencation
 
             return isValid ? CustomResult("OTP hợp lệ.") : CustomResult("OTP không hợp lệ hoặc đã hết hạn.", HttpStatusCode.BadRequest);
         }
-        
-        [Authorize]
+
+        [AllowAnonymous]
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody]string refreshToken)
         {
