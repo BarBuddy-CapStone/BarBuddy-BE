@@ -64,7 +64,6 @@ namespace BarBuddy_API.Controllers.FcmController
         }
 
         [HttpPatch("update-account-device-token")]
-        [Authorize]
         public async Task<IActionResult> UpdateDeviceToken([FromBody] UpdateDeviceTokenRequest request)
         {
             try
@@ -80,7 +79,6 @@ namespace BarBuddy_API.Controllers.FcmController
         }
 
         [HttpPost("notifications/{notificationId}/read")]
-        [Authorize]
         public async Task<IActionResult> MarkNotificationAsRead(Guid notificationId)
         {
             var accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
@@ -89,7 +87,6 @@ namespace BarBuddy_API.Controllers.FcmController
         }
 
         [HttpPost("notifications/mark-all-read")]
-        [Authorize]
         public async Task<IActionResult> MarkAllNotificationsAsRead()
         {
             var accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
