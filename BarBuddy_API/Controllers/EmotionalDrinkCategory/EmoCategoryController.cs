@@ -24,7 +24,7 @@ namespace BarBuddy_API.Controllers.EmotionalDrinkCategory
         /// </summary>
         /// <returns></returns>
         [HttpGet("get")]
-        public async Task<IActionResult> GetEmotionCategory([FromQuery] ObjectQuery query)
+        public async Task<IActionResult> GetEmotionCategory([FromQuery] ObjectQueryCustom query)
         {
             var emotional = await _emotionalDrinkCategory.GetEmotionCategory(query);
             return CustomResult("Tải dữ liệu thành công", emotional);

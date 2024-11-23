@@ -28,7 +28,7 @@ namespace BarBuddy_API.Controllers.Bar
 
         [Authorize(Roles ="ADMIN")]
         [HttpGet("admin/barmanager")]
-        public async Task<IActionResult> GetAllBar([FromQuery] ObjectQuery query)
+        public async Task<IActionResult> GetAllBar([FromQuery] ObjectQueryCustom query)
         {
             try
             {

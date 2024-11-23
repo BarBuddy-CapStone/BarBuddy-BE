@@ -107,7 +107,7 @@ namespace Application.Service
             }
         }
 
-        public async Task<IEnumerable<BarResponse>> GetAllBar(ObjectQuery query)
+        public async Task<PagingBarResponse> GetAllBar(ObjectQueryCustom query)
         {
             Expression<Func<Bar, bool>> filter = null;
             if (!string.IsNullOrWhiteSpace(query.Search))
@@ -116,25 +116,40 @@ namespace Application.Service
             }
 
             var getAllBar = await _unitOfWork.BarRepository
-                                                .GetAsync(filter: filter,
-                                                    orderBy: query => query.OrderBy(x => x.BarName),
-                                                    pageIndex: query.PageIndex,
-                                                    pageSize: query.PageSize,
-                                                    includeProperties: "BarTimes");
+                                            .GetAsync(filter: filter,
+                                                orderBy: query => query.OrderBy(x => x.BarName),
+                                                includeProperties: "BarTimes");
 
             if (getAllBar.IsNullOrEmpty() || !getAllBar.Any())
             {
                 throw new CustomException.DataNotFoundException("Danh sách đang trống !");
             }
-            var response = _mapper.Map<IEnumerable<BarResponse>>(getAllBar);
 
+            var response = _mapper.Map<List<BarResponse>>(getAllBar);
             foreach (var barTime in response)
             {
                 var getOneBar = getAllBar.Where(x => x.BarId.Equals(barTime.BarId)).FirstOrDefault();
                 barTime.BarTimeResponses = _mapper.Map<List<BarTimeResponse>>(getOneBar?.BarTimes);
-            };
+            }
 
-            return response;
+            var pageIndex = query.PageIndex ?? 1;
+            var pageSize = query.PageSize ?? 6;
+
+            var totalItems = response.Count;
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            var paginatedBars = response.Skip((pageIndex - 1) * pageSize)
+                                       .Take(pageSize)
+                                       .ToList();
+
+            return new PagingBarResponse
+            {
+                BarResponses = paginatedBars,
+                TotalPages = totalPages,
+                CurrentPage = pageIndex,
+                PageSize = pageSize,
+                TotalItems = totalItems
+            };
         }
 
         public async Task<IEnumerable<OnlyBarResponse>> GetAllBarWithFeedback(ObjectQuery query)
