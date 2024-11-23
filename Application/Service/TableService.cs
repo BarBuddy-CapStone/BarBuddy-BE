@@ -1,9 +1,13 @@
 ﻿using Application.DTOs.Table;
+using Application.Interfaces;
 using Application.IService;
 using Azure.Core;
+using Domain.Constants;
 using Domain.CustomException;
 using Domain.Entities;
 using Domain.IRepository;
+using MediatR;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,20 +20,45 @@ namespace Application.Service
     public class TableService : ITableService
     {
         private readonly IUnitOfWork _unitOfWork;
-
-        public TableService(IUnitOfWork unitOfWork)
+        private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IAuthentication _authentication;
+        public TableService(IUnitOfWork unitOfWork, IAuthentication authentication,
+                            IHttpContextAccessor contextAccessor)
         {
             _unitOfWork = unitOfWork;
+            _authentication = authentication;
+            _contextAccessor = contextAccessor;
         }
 
         public async Task CreateTable(CreateTableRequest request)
         {
             try
             {
+                var isExistTT = _unitOfWork.TableTypeRepository.GetByID(request.TableTypeId);
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+
+                if (isExistTT == null)
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy loại bàn !");
+                }
+
                 var existedName = (await _unitOfWork.TableRepository.GetAsync(filter: t => t.TableName == request.TableName && t.TableTypeId == request.TableTypeId)).FirstOrDefault();
-                if(existedName != null)
+                if (existedName != null)
                 {
                     throw new CustomException.DataExistException("Trùng tên bàn");
+                }
+                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(isExistTT.BarId) &&
+                                                   x.Status == PrefixKeyConstant.TRUE)
+                                      .FirstOrDefault();
+                if (getBar == null)
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy quán Bar");
+                }
+
+                if (getAccount.BarId != isExistTT.BarId)
+                {
+                    throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
                 }
 
                 var Table = new Table
@@ -43,7 +72,8 @@ namespace Application.Service
                 await _unitOfWork.TableRepository.InsertAsync(Table);
                 await _unitOfWork.SaveAsync();
             }
-            catch (CustomException.InternalServerErrorException ex) {
+            catch (CustomException.InternalServerErrorException ex)
+            {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
@@ -72,7 +102,8 @@ namespace Application.Service
                 await _unitOfWork.SaveAsync();
                 return true;
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
@@ -91,10 +122,10 @@ namespace Application.Service
                 (TableTypeId == null || t.TableTypeId == TableTypeId) &&
                 (TableName == null || t.TableName.Contains(TableName)) &&
                 t.IsDeleted == false;
-                
+
                 var totalTable = (await _unitOfWork.TableRepository.GetAsync(filter: filter)).Count();
 
-                if(totalTable > 0)
+                if (totalTable > 0)
                 {
                     if (totalTable > PageSize)
                     {
@@ -129,7 +160,8 @@ namespace Application.Service
                 }
 
                 return (responses, totalPage);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
@@ -166,10 +198,10 @@ namespace Application.Service
                         }
                     }
 
-                    var tablesWithPagination = await _unitOfWork.TableRepository.GetAsync(filter: filter, 
+                    var tablesWithPagination = await _unitOfWork.TableRepository.GetAsync(filter: filter,
                             orderBy: q => q.OrderBy(x => x.TableName),
-                            pageIndex: PageIndex, 
-                            pageSize: PageSize, 
+                            pageIndex: PageIndex,
+                            pageSize: PageSize,
                             includeProperties: "TableType.Bar");
 
                     foreach (var table in tablesWithPagination)
@@ -202,11 +234,31 @@ namespace Application.Service
         {
             try
             {
+                var isExistTT = _unitOfWork.TableTypeRepository.GetByID(request.TableTypeId);
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+
+                if (isExistTT == null)
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy loại bàn !");
+                }
+
                 var existedTable = await _unitOfWork.TableRepository.GetByIdAsync(TableId);
-                if(existedTable == null)
+                if (existedTable == null)
                 {
                     throw new CustomException.DataNotFoundException("Table Id không tồn tại");
                 }
+
+                if(existedTable.TableTypeId != isExistTT.TableTypeId)
+                {
+                    throw new CustomException.InvalidDataException("Loại bàn không hợp lệ với bàn muốn cập nhật !");
+                }
+
+                if(!isExistTT.BarId.Equals(getAccount.BarId))
+                {
+                    throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
+                }
+
                 if (existedTable.IsDeleted)
                 {
                     throw new CustomException.DataNotFoundException("Table Id không tồn tại");
@@ -214,14 +266,15 @@ namespace Application.Service
                 var existedName = (await _unitOfWork.TableRepository.GetAsync(t => t.TableName == request.TableName)).Count();
                 if (existedTable.TableName.Equals(request.TableName))
                 {
-                    if(existedName > 1)
+                    if (existedName > 1)
                     {
                         throw new CustomException.DataExistException("Trùng tên bàn đã có trong hệ thống");
                     }
                 }
                 else
                 {
-                    if (existedName > 0) { 
+                    if (existedName > 0)
+                    {
                         throw new CustomException.DataExistException("Trùng tên bàn đã có trong hệ thống");
                     }
                 }
@@ -241,11 +294,23 @@ namespace Application.Service
         {
             try
             {
-                var existedTable = await _unitOfWork.TableRepository.GetByIdAsync(TableId);
+
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+
+                var existedTable = _unitOfWork.TableRepository
+                                            .Get(filter: x => x.TableId.Equals(TableId),
+                                                includeProperties: "TableType").FirstOrDefault();
                 if (existedTable == null)
                 {
                     throw new CustomException.DataNotFoundException("Table Id không tồn tại");
                 }
+
+                if (!existedTable.TableType.BarId.Equals(getAccount.BarId))
+                {
+                    throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
+                }
+
                 if (existedTable.IsDeleted)
                 {
                     throw new CustomException.DataNotFoundException("Table Id không tồn tại");

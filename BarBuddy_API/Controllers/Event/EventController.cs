@@ -113,6 +113,10 @@ namespace BarBuddy_API.Controllers.Event
             {
                 return CustomResult(ex.Message, HttpStatusCode.NotFound);
             }
+            catch (CustomException.UnAuthorizedException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
             catch (CustomException.InvalidDataException ex)
             {
                 return CustomResult(ex.Message, HttpStatusCode.BadRequest);

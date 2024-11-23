@@ -96,6 +96,11 @@ namespace Application.Service
                 foreach (var eventTime in updateEventTime)
                 {
                     var getOne = _unitOfWork.TimeEventRepository.GetByID(eventTime.TimeEventId);
+                    
+                    if(!getOne.EventId.Equals(eventId))
+                    {
+                        throw new CustomException.InvalidDataException("Không tìm thấy thời gian diễn ra của sự kiện !");
+                    }
                     var mapper = _mapper.Map(eventTime, getOne);
 
                     await _unitOfWork.TimeEventRepository.UpdateRangeAsync(getOne);

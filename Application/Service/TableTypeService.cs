@@ -1,10 +1,14 @@
 ﻿using Application.DTOs.TableType;
+using Application.Interfaces;
 using Application.IService;
 using AutoMapper;
 using Azure.Core;
+using Domain.Constants;
 using Domain.CustomException;
 using Domain.Entities;
 using Domain.IRepository;
+using MediatR;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,17 +21,37 @@ namespace Application.Service
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IAuthentication _authentication;
 
-        public TableTypeService(IUnitOfWork unitOfWork, IMapper mapper)
+        public TableTypeService(IUnitOfWork unitOfWork, IMapper mapper,
+                                IAuthentication authentication, IHttpContextAccessor contextAccessor)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _authentication = authentication;
+            _contextAccessor = contextAccessor;
         }
 
         public async Task CreateTableType(TableTypeRequest request)
         {
             try
             {
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId) &&
+                                                                   x.Status == PrefixKeyConstant.TRUE)
+                                                      .FirstOrDefault();
+                if (getBar == null)
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy quán Bar");
+                }
+
+                if (getAccount.BarId != request.BarId)
+                {
+                    throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
+                }
+
                 if (request.MaximumGuest < request.MinimumGuest)
                 {
                     throw new CustomException.InvalidDataException("Số lượng đa tối thiểu phải bé hơn số lượng khách tối đa");
@@ -46,7 +70,8 @@ namespace Application.Service
                 await _unitOfWork.TableTypeRepository.InsertAsync(tableType);
                 await _unitOfWork.SaveAsync();
             }
-            catch (Exception ex) {
+            catch (CustomException.InternalServerErrorException ex)
+            {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
@@ -55,11 +80,29 @@ namespace Application.Service
         {
             try
             {
-                var existedTableType = (await _unitOfWork.TableTypeRepository.GetAsync(filter: t => t.TableTypeId == TableTypeId && t.IsDeleted == false)).FirstOrDefault();
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                
+                var existedTableType = (await _unitOfWork.TableTypeRepository
+                                                            .GetAsync(filter: t => t.TableTypeId == TableTypeId && 
+                                                            t.IsDeleted == PrefixKeyConstant.FALSE)).FirstOrDefault();
                 if (existedTableType == null)
                 {
                     throw new CustomException.DataNotFoundException("Loại bàn không tồn tại");
                 }
+                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(existedTableType.BarId) &&
+                                                                   x.Status == PrefixKeyConstant.TRUE)
+                                                      .FirstOrDefault();
+                if (getBar == null)
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy quán Bar");
+                }
+
+                if (getAccount.BarId != existedTableType.BarId)
+                {
+                    throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
+                }
+
                 var tables = await _unitOfWork.TableRepository.GetAsync(t => t.TableTypeId == TableTypeId && t.IsDeleted == false);
                 if (tables.Any())
                 {
@@ -70,7 +113,7 @@ namespace Application.Service
                 await _unitOfWork.SaveAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch (CustomException.InternalServerErrorException ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
@@ -179,15 +222,38 @@ namespace Application.Service
         {
             try
             {
-                if (request.MaximumGuest < request.MinimumGuest)
-                {
-                    throw new CustomException.InvalidDataException("Số lượng đa tối thiểu phải bé hơn số lượng khách tối đa");
-                }
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId) &&
+                                                                   x.Status == PrefixKeyConstant.TRUE)
+                                                      .FirstOrDefault();
                 var existedTableType = await _unitOfWork.TableTypeRepository.GetByIdAsync(TableTypeId);
+
                 if (existedTableType == null)
                 {
                     throw new CustomException.DataNotFoundException("Loại bàn không tồn tại");
                 }
+
+                if (getBar == null)
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy quán Bar");
+                }
+
+                if (getAccount.BarId != request.BarId || getAccount.BarId != existedTableType.BarId)
+                {
+                    throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
+                }
+
+                if (request.BarId != existedTableType.BarId)
+                {
+                    throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
+                }
+
+                if (request.MaximumGuest < request.MinimumGuest)
+                {
+                    throw new CustomException.InvalidDataException("Số lượng đa tối thiểu phải bé hơn số lượng khách tối đa");
+                }
+
                 existedTableType.MinimumPrice = request.MinimumPrice;
                 existedTableType.MinimumGuest = request.MinimumGuest;
                 existedTableType.MaximumGuest = request.MaximumGuest;
@@ -196,7 +262,7 @@ namespace Application.Service
                 await _unitOfWork.TableTypeRepository.UpdateAsync(existedTableType);
                 await _unitOfWork.SaveAsync();
             }
-            catch (Exception ex)
+            catch (CustomException.InternalServerErrorException ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }

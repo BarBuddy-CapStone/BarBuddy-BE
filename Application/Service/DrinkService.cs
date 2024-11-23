@@ -20,6 +20,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using Application.DTOs.ML;
 using CsvHelper.Configuration;
 using CsvHelper;
+using Application.DTOs.DrinkCategory;
 
 namespace Application.Service
 {
@@ -28,12 +29,18 @@ namespace Application.Service
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IFirebase _firebase;
+        private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IAuthentication _authentication;
 
-        public DrinkService(IUnitOfWork unitOfWork, IMapper mapper, IFirebase firebase)
+        public DrinkService(IUnitOfWork unitOfWork, IMapper mapper, 
+                            IFirebase firebase, IAuthentication authentication, 
+                            IHttpContextAccessor contextAccessor)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _firebase = firebase;
+            _authentication = authentication;
+            _contextAccessor = contextAccessor;
         }
 
         public async Task<DrinkResponse> CreateDrink(DrinkRequest request)
@@ -53,10 +60,35 @@ namespace Application.Service
                         throw new CustomException.InvalidDataException("Invalid data !");
                     }
 
+                    var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                    var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                    var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId) &&
+                                                                       x.Status == PrefixKeyConstant.TRUE)
+                                                          .FirstOrDefault();
+                    if (getBar == null)
+                    {
+                        throw new CustomException.DataNotFoundException("Không tìm thấy quán Bar");
+                    }
+
+                    if (getAccount.BarId != request.BarId)
+                    {
+                        throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
+                    }
+
+                    var getDrinkCate = _unitOfWork.DrinkCategoryRepository
+                                                    .Get(filter: x => x.DrinksCategoryId.Equals(request.DrinkCategoryId) &&
+                                                                      x.IsDeleted == PrefixKeyConstant.FALSE)
+                                                    .FirstOrDefault();
+
+                    if(getDrinkCate == null)
+                    {
+                        throw new CustomException.DataNotFoundException("Không tìm thấy loại đồ uống !");
+                    }
+
                     imgsFile = Utils.CheckValidateImageFile(request.Images);
 
                     var mapper = _mapper.Map<Drink>(request);
-
+                    mapper.BarId = getBar.BarId;
                     mapper.DrinkCode = PrefixKeyConstant.DRINK;
                     mapper.Image = "";
                     mapper.Status = PrefixKeyConstant.TRUE;
@@ -67,14 +99,16 @@ namespace Application.Service
                     await Task.Delay(200);
                     await _unitOfWork.SaveAsync();
 
+
                     foreach (var emotion in request.DrinkBaseEmo)
                     {
                         var emotionid = _unitOfWork.EmotionalDrinkCategoryRepository
-                            .Get(e => e.EmotionalDrinksCategoryId.Equals(emotion))
+                            .Get(e => e.EmotionalDrinksCategoryId.Equals(emotion) && 
+                                      e.IsDeleted == PrefixKeyConstant.FALSE)
                             .FirstOrDefault();
                         if (emotionid == null)
                         {
-                            throw new CustomException.DataNotFoundException("Data not found");
+                            throw new CustomException.DataNotFoundException("Không tìm thấy cảm xúc !");
                         }
 
                         var drinkEmotionalCategory = new DrinkEmoCateRequest
@@ -91,7 +125,7 @@ namespace Application.Service
                     }
 
                     foreach (var image in imgsFile)
-                    {
+                    {   
                         var uploadImg = await _firebase.UploadImageAsync(image);
                         imgsString.Add(uploadImg);
                     }
@@ -105,6 +139,7 @@ namespace Application.Service
 
                     transaction.Complete();
                     response = _mapper.Map<DrinkResponse>(mapper);
+                    response.DrinkCategoryResponse = _mapper.Map<DrinkCategoryResponse>(getDrinkCate);
                 }
                 catch (CustomException.InvalidDataException e)
                 {
@@ -229,11 +264,34 @@ namespace Application.Service
             {
                 try
                 {
+                    var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                    var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                    var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId) &&
+                                                                       x.Status == PrefixKeyConstant.TRUE)
+                                                          .FirstOrDefault();
+                    var getDrinkCate = _unitOfWork.DrinkCategoryRepository
+                                                    .Get(filter: x => x.DrinksCategoryId.Equals(request.DrinkCategoryId) && 
+                                                                      x.IsDeleted == PrefixKeyConstant.FALSE)
+                                                    .FirstOrDefault();
+                    
+                    if (getBar == null)
+                    {
+                        throw new CustomException.DataNotFoundException("Không tìm thấy quán Bar");
+                    }
+
+                    if (getAccount.BarId != request.BarId)
+                    {
+                        throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
+                    }
+
                     if (!request.Images.IsNullOrEmpty())
                     {
                         imgsFile = Utils.CheckValidateImageFile(request.Images);
                     }
-                    var getOneDrink = await _unitOfWork.DrinkRepository.GetByIdAsync(drinkId);
+                    var getOneDrink = (await _unitOfWork.DrinkRepository
+                                                        .GetAsync(filter: x => x.DrinkId.Equals(drinkId) && 
+                                                                               x.BarId.Equals(getBar.BarId)))
+                                                        .FirstOrDefault();
 
                     if (getOneDrink == null)
                     {
@@ -245,6 +303,10 @@ namespace Application.Service
                         throw new CustomException.InvalidDataException("Invalid data");
                     }
 
+                    if (getDrinkCate == null)
+                    {
+                        throw new CustomException.DataNotFoundException("Không tìm thấy loại đồ uống !");
+                    }
 
                     var mapper = _mapper.Map(request, getOneDrink);
                     mapper.Image = "";
@@ -270,6 +332,13 @@ namespace Application.Service
 
                     foreach (var emotionToAdd in emotionsToAdd)
                     {
+                        var isExistEmo = _unitOfWork.EmotionalDrinkCategoryRepository
+                                                    .Get(filter: x => x.EmotionalDrinksCategoryId.Equals(emotionToAdd) &&
+                                                                      x.IsDeleted == PrefixKeyConstant.FALSE).FirstOrDefault();
+                        if (isExistEmo == null)
+                        {
+                            throw new CustomException.DataNotFoundException("Không tìm thấy cảm xúc đồ uống !");
+                        }
                         var newEmotion = new DrinkEmotionalCategory
                         {
                             DrinkId = mapper.DrinkId,

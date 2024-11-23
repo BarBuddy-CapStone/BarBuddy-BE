@@ -57,7 +57,7 @@ namespace Infrastructure
                 new Claim("id", account.AccountId.ToString()),
             };
 
-            var expired = DateTime.Now.AddSeconds(30);
+            var expired = DateTime.Now.AddMinutes(30);
 
             var token = new JwtSecurityToken(issuer, audience, claims, notBefore: DateTime.UtcNow, expired, credentials);
             return jwtSecurityTokenHandler.WriteToken(token);
