@@ -29,7 +29,7 @@ namespace Application.Service
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<EmotionCategoryResponse>> GetEmotionCategory(ObjectQuery query)
+        public async Task<IEnumerable<EmotionCategoryResponse>> GetEmotionCategory(ObjectQueryCustom query)
         {
             Expression<Func<EmotionalDrinkCategory, bool>> filter = null;
             if (!string.IsNullOrWhiteSpace(query.Search))

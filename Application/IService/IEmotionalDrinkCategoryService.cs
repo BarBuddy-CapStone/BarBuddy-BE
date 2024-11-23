@@ -13,7 +13,7 @@ namespace Application.IService
 {
     public interface IEmotionalDrinkCategoryService
     {
-        Task<IEnumerable<EmotionCategoryResponse>> GetEmotionCategory(ObjectQuery query);
+        Task<IEnumerable<EmotionCategoryResponse>> GetEmotionCategory(ObjectQueryCustom query);
         Task<EmotionCategoryResponse> GetEmotionCategoryByID(Guid id);
         Task<EmotionCategoryResponse> CreateEmotionCategory(CreateEmotionCategoryRequest request);
         Task<EmotionCategoryResponse> UpdateEmotionCategory(Guid id , UpdateEmotionCategoryRequest request);

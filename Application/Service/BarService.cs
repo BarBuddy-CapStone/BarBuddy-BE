@@ -107,7 +107,7 @@ namespace Application.Service
             }
         }
 
-        public async Task<IEnumerable<BarResponse>> GetAllBar(ObjectQuery query)
+        public async Task<IEnumerable<BarResponse>> GetAllBar(ObjectQueryCustom query)
         {
             Expression<Func<Bar, bool>> filter = null;
             if (!string.IsNullOrWhiteSpace(query.Search))

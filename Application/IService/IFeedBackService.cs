@@ -2,6 +2,7 @@
 using Application.DTOs.Request.FeedBackRequest;
 using Application.DTOs.Response.EmotionCategory;
 using Application.DTOs.Response.FeedBack;
+using Domain.Common;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace Application.IService
     public interface IFeedBackService
     {
         Task<IEnumerable<FeedBackResponse>> GetFeedBack();
-        Task<(List<AdminFeedbackResponse> responses, int TotalPage)> GetFeedBackAdmin(Guid? BarId, bool? Status, int PageIndex, int PageSize);
+        Task<List<AdminFeedbackResponse>> GetFeedBackAdmin(Guid? BarId, bool? Status, ObjectQueryCustom query);
         Task<(List<ManagerFeedbackResponse> responses, int TotalPage)> GetFeedBackManager(Guid BarId, int PageIndex, int PageSize);
         Task<FeedBackResponse> GetFeedBackByID(Guid id);
         Task<CustomerFeedbackResponse> GetFeedBackByBookingId(Guid BookingId);

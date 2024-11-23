@@ -93,7 +93,7 @@ namespace Application.Service
             }
         }
 
-        public async Task<IEnumerable<DrinkCategoryResponse>> GetAllDrinkCategory(ObjectQuery query)
+        public async Task<IEnumerable<DrinkCategoryResponse>> GetAllDrinkCategory(ObjectQueryCustom query)
         {
             try
             {

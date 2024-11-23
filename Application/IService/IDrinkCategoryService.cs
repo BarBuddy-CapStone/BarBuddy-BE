@@ -10,7 +10,7 @@ namespace Application.IService
 {
     public interface IDrinkCategoryService
     {
-        Task<IEnumerable<DrinkCategoryResponse>> GetAllDrinkCategory(ObjectQuery query);
+        Task<IEnumerable<DrinkCategoryResponse>> GetAllDrinkCategory(ObjectQueryCustom query);
         Task<IEnumerable<DrinkCategoryResponse>> GetAllDrinkCateOfBar(Guid barId);
         Task<DrinkCategoryResponse> GetDrinkCategoryById(Guid drinkCateId);
         Task<DrinkCategoryResponse> CreateDrinkCategory(DrinkCategoryRequest request);

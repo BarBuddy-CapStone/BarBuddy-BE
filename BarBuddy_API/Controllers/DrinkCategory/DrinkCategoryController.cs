@@ -23,7 +23,7 @@ namespace BarBuddy_API.Controllers.DrinkCategory
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<IActionResult> GetAllDrinkCate([FromQuery] ObjectQuery query)
+        public async Task<IActionResult> GetAllDrinkCate([FromQuery] ObjectQueryCustom query)
         {
             try
             {
