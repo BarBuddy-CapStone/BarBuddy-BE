@@ -584,6 +584,14 @@ namespace Application.Service
                 var response = _mapper.Map<CustomerInfoResponse>(account);
                 return response;
             }
+            catch (DataNotFoundException ex)
+            {
+                throw new DataNotFoundException(ex.Message);
+            }
+            catch (ForbbidenException ex)
+            {
+                throw new ForbbidenException(ex.Message);
+            }
             catch (Exception ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);

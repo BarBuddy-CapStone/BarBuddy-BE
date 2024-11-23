@@ -402,7 +402,7 @@ namespace Application.Service
                                             if (drink != null)
                                             {
                                                 drink.DrinkEmotionalCategories = RandomDrinkEmotionalCategories(
-                                                    drink.DrinkId, random.Next(6), random);
+                                                    drink.DrinkId, random.Next(5), random);
                                                 pageDrinks.Add(drink);
                                                 totalCrawled++;
                                                 j++;
