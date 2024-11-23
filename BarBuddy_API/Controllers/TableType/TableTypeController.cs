@@ -104,7 +104,7 @@ namespace BarBuddy_API.Controllers.TableType
         /// </summary>
         /// <param name="barId"></param>
         /// <returns></returns>
-        [Authorize(Roles = "MANAGER,STAFF")]
+        [Authorize(Roles = "CUSTOMER,MANAGER,STAFF")]
         [HttpGet("getTTOfBar/{barId}")]
         public async Task<IActionResult> GetAllTTOfBar(Guid barId)
         {
