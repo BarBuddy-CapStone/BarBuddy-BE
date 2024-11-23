@@ -48,13 +48,14 @@ namespace BarBuddy_API.Controllers.Booking
             var response = await _bookingService.GetBookingById(BookingId);
             return CustomResult(response);
         }
-        
+
         /// <summary>
         /// Get Top Booking By Customer
         /// </summary>
         /// <param name="CustomerId"></param>
         /// <param name="NumOfBookings"></param>
         /// <returns></returns>
+        [Authorize(Roles = "CUSTOMER")]
         [HttpGet("top-booking")]
         public async Task<IActionResult> GetTopBookingByCustomer([FromQuery][Required] Guid CustomerId, [FromQuery] int NumOfBookings = 4)
         {

@@ -50,6 +50,7 @@ namespace BarBuddy_API.Controllers.Bar
         /// Get All Bar With Feedback
         /// </summary>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet("/api/v1/bars")]
         public async Task<IActionResult> GetAllBarWithFeedback([FromQuery] ObjectQuery query)
         {
@@ -97,6 +98,7 @@ namespace BarBuddy_API.Controllers.Bar
         /// </summary>
         /// <param name="barId"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet("/api/v1/bar-detail/{barId}")]
         public async Task<IActionResult> GetBarWithFeedbackById(Guid barId)
         {
@@ -310,6 +312,7 @@ namespace BarBuddy_API.Controllers.Bar
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpGet("customer/getBar")]
         public async Task<IActionResult> GetBarNameIdCustomer([FromQuery] ObjectQuery query)
         {

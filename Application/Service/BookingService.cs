@@ -68,7 +68,7 @@ namespace Application.Service
                     throw new CustomException.DataNotFoundException("Bạn không thể hủy đặt bàn.");
                 }
 
-                DateTime BookingDateTime = booking.BookingDate + booking.BookingTime;
+                DateTime BookingDateTime = booking.BookingDate.Date + booking.BookingTime;
                 if (BookingDateTime < DateTime.Now.AddHours(2))
                 {
                     return false;
@@ -89,6 +89,10 @@ namespace Application.Service
                 await _unitOfWork.SaveAsync();
                 _unitOfWork.CommitTransaction();
                 return true;
+            }
+            catch(DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
             }
             catch (Exception ex)
             {
@@ -418,8 +422,10 @@ namespace Application.Service
             try
             {
                 var booking = _mapper.Map<Booking>(request);
-                booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext)) ?? throw new DataNotFoundException("account not found");
-                booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId) ?? throw new DataNotFoundException("Bar not found");
+                booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext)) 
+                    ?? throw new DataNotFoundException("account not found");
+                booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId) 
+                    ?? throw new DataNotFoundException("Bar not found");
 
                 var barTimes = await _unitOfWork.BarTimeRepository.GetAsync(x => x.BarId == request.BarId);
                 if (barTimes == null || !barTimes.Any())
@@ -488,6 +494,10 @@ namespace Application.Service
                     _unitOfWork.Dispose();
                 }
                 return _mapper.Map<BookingResponse>(booking);
+            }
+            catch (DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
             }
             catch (CustomException.InvalidDataException ex)
             {
@@ -572,8 +582,10 @@ namespace Application.Service
             try
             {
                 var booking = _mapper.Map<Booking>(request);
-                booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext)) ?? throw new DataNotFoundException("account not found");
-                booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId) ?? throw new DataNotFoundException("Bar not found");
+                booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext)) 
+                    ?? throw new DataNotFoundException("Account not found");
+                booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId) 
+                    ?? throw new DataNotFoundException("Bar not found");
 
                 var barTimes = await _unitOfWork.BarTimeRepository.GetAsync(x => x.BarId == request.BarId);
                 if (barTimes == null || !barTimes.Any())
@@ -711,6 +723,10 @@ namespace Application.Service
                 }
                 return _paymentService.GetPaymentLink(booking.BookingId, booking.AccountId,
                             request.PaymentDestination, totalPrice, isMobile);
+            }
+            catch (DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
             }
             catch (CustomException.InvalidDataException ex)
             {

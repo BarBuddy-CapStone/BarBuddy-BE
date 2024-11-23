@@ -4,6 +4,7 @@ using AutoMapper;
 using CoreApiResponse;
 using Domain.CustomException;
 using Domain.IRepository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -25,6 +26,7 @@ namespace BarBuddy_API.Controllers.BookingTable
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        [Authorize(Roles = "CUSTOMER")]
         [HttpGet("filter")]
         public async Task<IActionResult> FilterDateTime([FromQuery] FilterTableDateTimeRequest request)
         {
