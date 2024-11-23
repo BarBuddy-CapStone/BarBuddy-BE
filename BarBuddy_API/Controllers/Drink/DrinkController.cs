@@ -64,6 +64,8 @@ namespace BarBuddy_API.Controllers.Drink
                 return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
             }
         }
+        
+        [AllowAnonymous]
         [HttpGet("customer/{barId}")]
         public async Task<IActionResult> GetDrinkCustomer(Guid barId)
         {
@@ -88,7 +90,7 @@ namespace BarBuddy_API.Controllers.Drink
         /// </summary>
         /// <param name="drinkId"></param>
         /// <returns></returns>
-        [Authorize(Roles = "MANAGER")]
+        //[Authorize(Roles = "MANAGER")]
         [HttpGet("{drinkId}")]
         public async Task<IActionResult> GetDrink(Guid drinkId)
         {

@@ -1,6 +1,7 @@
 ﻿using Application.IService;
 using Azure;
 using CoreApiResponse;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -30,6 +31,7 @@ namespace BarBuddy_API.Controllers.PaymentHistory
         /// <param name="PageIndex"></param>
         /// <param name="PageSize"></param>
         /// <returns></returns>
+        [Authorize(Roles = "ADMIN,MANAGER,STAFF")]
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] [Required] int Status, [FromQuery] string? CustomerName, [FromQuery] string? PhoneNumber, [FromQuery] string? Email, [FromQuery] Guid? BarId, [FromQuery] DateTime? PaymentDate, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10) {
             var response = await _service.Get(Status, CustomerName, PhoneNumber, Email, BarId, PaymentDate, PageIndex, PageSize);
@@ -44,6 +46,7 @@ namespace BarBuddy_API.Controllers.PaymentHistory
         /// <param name="PageIndex"></param>
         /// <param name="PageSize"></param>
         /// <returns></returns>
+        [Authorize(Roles = "CUSTOMER")]
         [HttpGet("{CustomerId}")]
         public async Task<IActionResult> Get(Guid CustomerId, [FromQuery] int? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {

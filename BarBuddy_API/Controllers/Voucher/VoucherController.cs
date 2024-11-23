@@ -2,6 +2,7 @@
 using Application.IService;
 using CoreApiResponse;
 using Domain.CustomException;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
@@ -17,7 +18,7 @@ namespace BarBuddy_API.Controllers.Voucher
         {
             _eventVoucherService = eventVoucherService;
         }
-
+        [Authorize(Roles = "CUSTOMER")]
         [HttpGet("getOneVoucher")]
         public async Task<IActionResult> GetVoucherByCode([FromQuery] VoucherQueryRequest request)
         {
