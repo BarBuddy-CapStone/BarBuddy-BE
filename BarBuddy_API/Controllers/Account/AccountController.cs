@@ -126,7 +126,7 @@ namespace BarBuddy_API.Controllers.Account
         /// </summary>
         /// <param name="accountId"></param>
         /// <returns></returns>
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "ADMIN,MANAGER")]
         [HttpGet("/api/v1/staff-account/detail")]
         public async Task<IActionResult> GetStaffAccountById([FromQuery] Guid accountId)
         {
@@ -178,7 +178,7 @@ namespace BarBuddy_API.Controllers.Account
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "ADMIN,MANAGER")]
         [HttpPost("/api/v1/staff-account")]
         public async Task<IActionResult> CreateStaffAccount([FromBody] StaffAccountRequest request)
         {
@@ -230,7 +230,7 @@ namespace BarBuddy_API.Controllers.Account
         /// <param name="accountId"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "ADMIN,MANAGER")]
         [HttpPatch("/api/v1/staff-account")]
         public async Task<IActionResult> UpdateStaffAccount([FromQuery] Guid accountId, [FromBody] StaffAccountRequest request)
         {
