@@ -85,7 +85,7 @@ namespace BarBuddy_API.Controllers.Account
         /// <param name="pageSize"></param>
         /// <param name="pageIndex"></param>
         /// <returns></returns>
-        [Authorize(Roles = "ADMIN")]
+        [Authorize(Roles = "ADMIN,MANAGER")]
         [HttpGet("/api/v1/staff-accounts")]
         public async Task<IActionResult> GetStaffAccounts([FromQuery] int pageSize, [FromQuery] int pageIndex)
         {

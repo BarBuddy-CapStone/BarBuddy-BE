@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.TableType;
 using Application.IService;
 using CoreApiResponse;
+using Domain.Common;
 using Domain.CustomException;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -148,14 +149,15 @@ namespace BarBuddy_API.Controllers.TableType
         /// Get All TT Of Bar
         /// </summary>
         /// <param name="barId"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
         [Authorize(Roles = "CUSTOMER,MANAGER,STAFF")]
         [HttpGet("getTTOfBar/{barId}")]
-        public async Task<IActionResult> GetAllTTOfBar(Guid barId)
+        public async Task<IActionResult> GetAllTTOfBar(Guid barId,[FromQuery] ObjectQuery query)
         {
             try
             {
-                var response = await _tableTypeService.GetAllTTOfBar(barId);
+                var response = await _tableTypeService.GetAllTTOfBar(barId, query);
                 return CustomResult("Đã tải dữ liệu thành công.", response);
             }
             catch (CustomException.InternalServerErrorException ex)
