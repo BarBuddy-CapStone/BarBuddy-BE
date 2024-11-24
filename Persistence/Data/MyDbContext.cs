@@ -54,7 +54,7 @@ namespace Persistence.Data
                     .Build();
 
                 optionsBuilder.UseMySql(
-                    configuration.GetConnectionString("MyDB"), 
+                    configuration.GetConnectionString("AzureDB"), 
                     new MySqlServerVersion(new Version(8, 0, 23))
                 );
             }
