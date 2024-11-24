@@ -109,7 +109,7 @@ namespace Application.Service
                 mapper.UpdatedAt = mapper.CreatedAt;
                 mapper.RoleId = role.RoleId;
                 mapper.Status = (int)PrefixValueEnum.Active;
-                mapper.Image = "https://th.bing.com/th/id/R.c2d58313dad3a99231d27d38bc77e9bb?rik=G%2bdXJz91ZlvDaw&pid=ImgRaw&r=0";
+                mapper.Image = "https://icons.veryicon.com/png/o/miscellaneous/customer-service-icon-library/customer-9.png";
 
                 await _unitOfWork.AccountRepository.InsertAsync(mapper);
                 await Task.Delay(200);
