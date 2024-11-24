@@ -34,6 +34,7 @@ namespace Domain.Constants
         public static string ADMIN = "ADMIN";
         public static string STAFF = "STAFF";
         public static string CUSTOMER = "CUSTOMER";
+        public static string MANAGER = "MANAGER";
         #endregion
 
         #region Notification

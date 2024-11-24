@@ -166,34 +166,48 @@ namespace Application.Service
             }
         }
 
-        public async Task<List<AdminFeedbackResponse>> GetFeedBackAdmin(Guid? BarId, bool? Status, ObjectQueryCustom query)
+        public async Task<PagingAdminFeedbackResponse> GetFeedBackAdmin(Guid? BarId, bool? Status, ObjectQueryCustom query)
         {
             try
             {
-                var responses = new List<AdminFeedbackResponse>();
-
                 Expression<Func<Feedback, bool>> filter = null;
                 if (!string.IsNullOrWhiteSpace(query.Search))
                 {
                     filter = bar => bar.Comment.Contains(query.Search);
                 }
-                //var feedbacks = await _unitOfWork.FeedbackRepository.GetAsync(f => (BarId == null || f.BarId == BarId) && (Status == null || f.IsDeleted == Status));
-                var feedbacksWithPagination = await _unitOfWork.FeedbackRepository
-                                                                .GetAsync(filter: f => (BarId == null || f.BarId == BarId) && 
-                                                                                       (Status == null || f.IsDeleted == Status), 
-                                                                            pageIndex: query.PageIndex, 
-                                                                            pageSize: query.PageSize, 
-                                                                          includeProperties: "Account,Bar", 
-                                                                          orderBy: o => o.OrderByDescending(f => f.CreatedTime)
-                                                                                            .ThenByDescending(f => f.LastUpdatedTime));
 
-                foreach (var feedback in feedbacksWithPagination)
+                var feedbacks = await _unitOfWork.FeedbackRepository
+                                        .GetAsync(filter: f => (BarId == null || f.BarId == BarId) &&
+                                                             (Status == null || f.IsDeleted == Status),
+                                                includeProperties: "Account,Bar",
+                                                orderBy: o => o.OrderByDescending(f => f.CreatedTime)
+                                                             .ThenByDescending(f => f.LastUpdatedTime));
+
+                if (!feedbacks.Any())
                 {
-                    var response = _mapper.Map<AdminFeedbackResponse>(feedback);
-                    responses.Add(response);
+                    throw new CustomException.DataNotFoundException("Không tìm thấy phản hồi nào!");
                 }
 
-                return (responses);
+                var response = _mapper.Map<List<AdminFeedbackResponse>>(feedbacks);
+
+                var pageIndex = query.PageIndex ?? 1;
+                var pageSize = query.PageSize ?? 6;
+
+                var totalItems = response.Count;
+                var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+                var paginatedFeedbacks = response.Skip((pageIndex - 1) * pageSize)
+                                               .Take(pageSize)
+                                               .ToList();
+
+                return new PagingAdminFeedbackResponse
+                {
+                    AdminFeedbackResponses = paginatedFeedbacks,
+                    TotalPages = totalPages,
+                    CurrentPage = pageIndex,
+                    PageSize = pageSize,
+                    TotalItems = totalItems
+                };
             }
             catch (CustomException.InternalServerErrorException ex)
             {

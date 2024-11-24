@@ -44,7 +44,7 @@ namespace BarBuddy_API.Controllers.FeedBack
         public async Task<IActionResult> GetFeedBackAdmin([FromQuery] Guid? BarId, [FromQuery] bool? Status, [FromQuery] ObjectQueryCustom query)
         {
             var responses = await _feedBackService.GetFeedBackAdmin(BarId, Status, query);
-            return Ok(new { response = responses});
+            return CustomResult(new { response = responses});
         }
 
         /// <summary>
