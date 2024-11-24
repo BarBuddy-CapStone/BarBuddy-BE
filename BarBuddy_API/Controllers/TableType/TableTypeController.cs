@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.TableType;
 using Application.IService;
 using CoreApiResponse;
+using Domain.Common;
 using Domain.CustomException;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -64,8 +65,23 @@ namespace BarBuddy_API.Controllers.TableType
         [HttpPost]
         public async Task<IActionResult> Post(TableTypeRequest request)
         {
-            await _tableTypeService.CreateTableType(request);
-            return CustomResult("Tạo thành công");
+            try
+            {
+                await _tableTypeService.CreateTableType(request);
+                return CustomResult("Tạo thành công");
+            }
+            catch (CustomException.UnAuthorizedException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.DataNotFoundException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.NotFound);
+            }
+            catch (CustomException.InternalServerErrorException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -78,8 +94,23 @@ namespace BarBuddy_API.Controllers.TableType
         [HttpPatch("{TableTypeId}")]
         public async Task<IActionResult> Put([FromBody] TableTypeRequest request, Guid TableTypeId)
         {
-            await _tableTypeService.UpdateTableType(request, TableTypeId);
-            return CustomResult("Cập nhật thành công");
+            try
+            {
+                await _tableTypeService.UpdateTableType(request, TableTypeId);
+                return CustomResult("Cập nhật thành công");
+            }
+            catch (CustomException.UnAuthorizedException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.DataNotFoundException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.NotFound);
+            }
+            catch (CustomException.InternalServerErrorException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -91,28 +122,45 @@ namespace BarBuddy_API.Controllers.TableType
         [HttpDelete("{TableTypeId}")]
         public async Task<IActionResult> Delete(Guid TableTypeId)
         {
-            var failedNum = await _tableTypeService.DeleteTableType(TableTypeId);
-            if (!failedNum)
+            try
             {
-                return StatusCode(202, "Vẫn còn bàn đang hoạt động thuộc loại bàn này, vui lòng cập nhật lại tất cả bàn của các chi nhánh trước khi xóa loại bàn này");
+                var failedNum = await _tableTypeService.DeleteTableType(TableTypeId);
+                if (!failedNum)
+                {
+                    return StatusCode(202, "Vẫn còn bàn đang hoạt động thuộc loại bàn này, vui lòng cập nhật lại tất cả bàn của các chi nhánh trước khi xóa loại bàn này");
+                }
+                return CustomResult("Cập nhật thành công");
             }
-            return CustomResult("Cập nhật thành công");
+            catch (CustomException.UnAuthorizedException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.DataNotFoundException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.NotFound);
+            }
+            catch (CustomException.InternalServerErrorException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
         /// Get All TT Of Bar
         /// </summary>
         /// <param name="barId"></param>
+        /// <param name="query"></param>
         /// <returns></returns>
         [Authorize(Roles = "CUSTOMER,MANAGER,STAFF")]
         [HttpGet("getTTOfBar/{barId}")]
-        public async Task<IActionResult> GetAllTTOfBar(Guid barId)
+        public async Task<IActionResult> GetAllTTOfBar(Guid barId,[FromQuery] ObjectQuery query)
         {
             try
             {
-                var response  = await _tableTypeService.GetAllTTOfBar(barId);
+                var response = await _tableTypeService.GetAllTTOfBar(barId, query);
                 return CustomResult("Đã tải dữ liệu thành công.", response);
-            }catch(CustomException.InternalServerErrorException ex)
+            }
+            catch (CustomException.InternalServerErrorException ex)
             {
                 return CustomResult($"{ex.Message}", System.Net.HttpStatusCode.InternalServerError);
             }

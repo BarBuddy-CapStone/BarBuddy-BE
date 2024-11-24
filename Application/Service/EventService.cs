@@ -6,12 +6,14 @@ using Application.DTOs.Events.EventVoucher;
 using Application.Interfaces;
 using Application.IService;
 using AutoMapper;
+using Azure.Core;
 using Domain.Common;
 using Domain.Constants;
 using Domain.CustomException;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.IRepository;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -29,9 +31,12 @@ namespace Application.Service
         private readonly IFirebase _fireBase;
         private readonly ILogger<EventService> _logger;
         private readonly IEventVoucherService _eventVoucherService;
-
+        private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IAuthentication _authentication;
         public EventService(IMapper mapper, IUnitOfWork unitOfWork, IFirebase fireBase,
-                            IEventTimeService eventTimeService, ILogger<EventService> logger, IEventVoucherService eventVoucherService)
+                            IEventTimeService eventTimeService, ILogger<EventService> logger, 
+                            IEventVoucherService eventVoucherService, IHttpContextAccessor contextAccessor,
+                            IAuthentication authentication)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -39,6 +44,8 @@ namespace Application.Service
             _fireBase = fireBase;
             _logger = logger;
             _eventVoucherService = eventVoucherService;
+            _contextAccessor = contextAccessor;
+            _authentication = authentication;
         }
 
         public async Task CreateEvent(EventRequest request)
@@ -49,6 +56,21 @@ namespace Application.Service
                 List<string> imgStr = new List<string>();
                 List<IFormFile> images = new List<IFormFile>();
                 var mapper = _mapper.Map<Event>(request);
+
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId) &&
+                                                                   x.Status == PrefixKeyConstant.TRUE)
+                                                      .FirstOrDefault();
+                if (getBar == null)
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy quán Bar");
+                }
+
+                if (getAccount.BarId != request.BarId)
+                {
+                    throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
+                }
 
                 if (request.Images.IsNullOrEmpty())
                 {
@@ -121,6 +143,9 @@ namespace Application.Service
         {
             try
             {
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+
                 var isExistEvent = _unitOfWork.EventRepository
                                                 .Get(filter: x => x.EventId.Equals(eventId) &&
                                                 x.IsDeleted == PrefixKeyConstant.FALSE).FirstOrDefault();
@@ -128,6 +153,11 @@ namespace Application.Service
                 if (isExistEvent == null)
                 {
                     throw new CustomException.DataNotFoundException("Không tìm thấy event !");
+                }
+
+                if (getAccount.BarId != isExistEvent.BarId)
+                {
+                    throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
                 }
 
                 isExistEvent.IsDeleted = PrefixKeyConstant.TRUE;
@@ -298,6 +328,21 @@ namespace Application.Service
                 string imgsAsString = string.Empty;
                 string oldImgsUploaded = string.Empty;
 
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId) && 
+                                                                   x.Status == PrefixKeyConstant.TRUE)
+                                                      .FirstOrDefault();
+                if(getBar == null)
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy quán Bar");
+                }
+
+                if (getAccount.BarId != request.BarId)
+                {
+                    throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
+                }
+
                 if (request.Images.IsNullOrEmpty() && request.OldImages.IsNullOrEmpty())
                 {
                     throw new CustomException.InvalidDataException("Không thể thiếu hình ảnh !");
@@ -322,6 +367,11 @@ namespace Application.Service
                 if (isExistEvent == null)
                 {
                     throw new CustomException.DataNotFoundException("Không tìm thấy Event !");
+                }
+                
+                if(!isExistEvent.EventVoucher.EventVoucherId.Equals(request?.UpdateEventVoucherRequests?.EventVoucherId))
+                {
+                    throw new CustomException.InvalidDataException("Không tìm thấy Event Voucher, Không hợp lệ !");
                 }
 
                 var mapper = _mapper.Map(request, isExistEvent);
@@ -356,10 +406,12 @@ namespace Application.Service
                     }
                 }
 
-                if (mapper.EventVoucher.EventVoucherId.Equals(request.UpdateEventVoucherRequests.EventVoucherId))
+                if (!mapper.EventVoucher.EventVoucherId.Equals(request.UpdateEventVoucherRequests.EventVoucherId))
                 {
-                    await _eventVoucherService.UpdateEventVoucher(mapper.EventId, request.UpdateEventVoucherRequests);
+                    throw new CustomException.InvalidDataException("Voucher của sự kiện không hợp lệ !");
                 }
+
+                await _eventVoucherService.UpdateEventVoucher(mapper.EventId, request.UpdateEventVoucherRequests);
                 await _eventTimeService.UpdateEventTime(mapper.EventId, mapper.IsEveryWeek, request.UpdateEventTimeRequests);
 
                 await _unitOfWork.SaveAsync();

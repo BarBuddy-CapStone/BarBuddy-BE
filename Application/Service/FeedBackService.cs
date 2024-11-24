@@ -5,10 +5,12 @@ using Application.DTOs.Response.FeedBack;
 using Application.Interfaces;
 using Application.IService;
 using AutoMapper;
+using Domain.Common;
 using Domain.CustomException;
 using Domain.Entities;
 using Domain.IRepository;
 using Microsoft.AspNetCore.Http;
+using System.Linq.Expressions;
 
 namespace Application.Service
 {
@@ -164,45 +166,50 @@ namespace Application.Service
             }
         }
 
-        public async Task<(List<AdminFeedbackResponse> responses, int TotalPage)> GetFeedBackAdmin(Guid? BarId, bool? Status, int PageIndex, int PageSize)
+        public async Task<PagingAdminFeedbackResponse> GetFeedBackAdmin(Guid? BarId, bool? Status, ObjectQueryCustom query)
         {
             try
             {
-                var responses = new List<AdminFeedbackResponse>();
-
-                var feedbacks = await _unitOfWork.FeedbackRepository.GetAsync(f => (BarId == null || f.BarId == BarId) && (Status == null || f.IsDeleted == Status));
-
-                int totalPage = 1;
-                if (feedbacks.Count() > PageSize)
+                Expression<Func<Feedback, bool>> filter = null;
+                if (!string.IsNullOrWhiteSpace(query.Search))
                 {
-                    if (PageSize == 1)
-                    {
-                        totalPage = (feedbacks.Count() / PageSize);
-                    }
-                    else
-                    {
-                        if(feedbacks.Count() % PageSize != 0)
-                        {
-                            totalPage = (feedbacks.Count() / PageSize) + 1;
-                        }
-                        else
-                        {
-                            totalPage = (feedbacks.Count() / PageSize);
-                        }
-                    }
+                    filter = bar => bar.Comment.Contains(query.Search);
                 }
 
-                var feedbacksWithPagination = await _unitOfWork.FeedbackRepository.GetAsync(f => (BarId == null || f.BarId == BarId) && (Status == null || f.IsDeleted == Status), pageIndex: PageIndex, pageSize: PageSize, includeProperties: "Account,Bar", orderBy: o => o.OrderByDescending(f => f.CreatedTime).ThenByDescending(f => f.LastUpdatedTime));
+                var feedbacks = await _unitOfWork.FeedbackRepository
+                                        .GetAsync(filter: f => (BarId == null || f.BarId == BarId) &&
+                                                             (Status == null || f.IsDeleted == Status),
+                                                includeProperties: "Account,Bar",
+                                                orderBy: o => o.OrderByDescending(f => f.CreatedTime)
+                                                             .ThenByDescending(f => f.LastUpdatedTime));
 
-                foreach (var feedback in feedbacksWithPagination)
+                if (!feedbacks.Any())
                 {
-                    var response = _mapper.Map<AdminFeedbackResponse>(feedback);
-                    responses.Add(response);
+                    throw new CustomException.DataNotFoundException("Không tìm thấy phản hồi nào!");
                 }
 
-                return (responses, totalPage);
+                var response = _mapper.Map<List<AdminFeedbackResponse>>(feedbacks);
+
+                var pageIndex = query.PageIndex ?? 1;
+                var pageSize = query.PageSize ?? 6;
+
+                var totalItems = response.Count;
+                var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+                var paginatedFeedbacks = response.Skip((pageIndex - 1) * pageSize)
+                                               .Take(pageSize)
+                                               .ToList();
+
+                return new PagingAdminFeedbackResponse
+                {
+                    AdminFeedbackResponses = paginatedFeedbacks,
+                    TotalPages = totalPages,
+                    CurrentPage = pageIndex,
+                    PageSize = pageSize,
+                    TotalItems = totalItems
+                };
             }
-            catch (Exception ex)
+            catch (CustomException.InternalServerErrorException ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }

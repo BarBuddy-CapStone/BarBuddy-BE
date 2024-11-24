@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.Request.FeedBackRequest;
 using Application.IService;
 using CoreApiResponse;
+using Domain.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -38,11 +39,12 @@ namespace BarBuddy_API.Controllers.FeedBack
         /// <param name="PageIndex"></param>
         /// <param name="PageSize"></param>
         /// <returns></returns>
+        [Authorize(Roles = "ADMIN")]
         [HttpGet("admin")]
-        public async Task<IActionResult> GetFeedBackAdmin([FromQuery] Guid? BarId, [FromQuery] bool? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
+        public async Task<IActionResult> GetFeedBackAdmin([FromQuery] Guid? BarId, [FromQuery] bool? Status, [FromQuery] ObjectQueryCustom query)
         {
-            var responses = await _feedBackService.GetFeedBackAdmin(BarId, Status, PageIndex, PageSize);
-            return Ok(new { totalPage = responses.TotalPage, response = responses.responses});
+            var responses = await _feedBackService.GetFeedBackAdmin(BarId, Status, query);
+            return CustomResult(new { response = responses});
         }
 
         /// <summary>

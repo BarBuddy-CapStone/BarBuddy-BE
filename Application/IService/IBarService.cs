@@ -5,7 +5,7 @@ namespace Application.IService
 {
     public interface IBarService
     {
-        Task<IEnumerable<BarResponse>> GetAllBar(ObjectQuery query);
+        Task<PagingBarResponse> GetAllBar(ObjectQueryCustom query);
         Task CreateBar(CreateBarRequest request);
         Task<BarResponse> GetBarById(Guid barId);
         Task<OnlyBarResponse> UpdateBarById(UpdateBarRequest request);
@@ -16,5 +16,6 @@ namespace Application.IService
         Task<RevenueResponse> GetRevenueOfBar(RevenueRequest request);
         Task<List<OnlyBarIdNameResponse>> GetBarNameId(ObjectQuery query);
         Task<RevenueBranchResponse> GetAllRevenueBranch();
+        Task<PagingOnlyBarIdNameResponse> GetBarNameIdAdMa(ObjectQuery query);
     }
 }

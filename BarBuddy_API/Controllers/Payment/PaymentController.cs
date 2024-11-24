@@ -34,7 +34,7 @@ namespace BarBuddy_API.Controllers.Payment
         /// <param name="vnpayReturn"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        [Authorize(Roles = "CUSTOMER")]
+        [AllowAnonymous]
         [HttpGet("vnpay-return")]
         public async Task<IActionResult> GetVnpayReturn([FromQuery] VnpayResponse vnpayReturn)
         {
@@ -61,7 +61,7 @@ namespace BarBuddy_API.Controllers.Payment
         /// <param name="vnpayReturn"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        [Authorize(Roles = "CUSTOMER")]
+        [AllowAnonymous]
         [HttpGet("vnpay-return/mobile")]
         public async Task<IActionResult> GetVnpayReturnForMobile([FromQuery] VnpayResponse vnpayReturn)
         {
@@ -82,14 +82,14 @@ namespace BarBuddy_API.Controllers.Payment
             Console.WriteLine($"{redirectUrl}/{result}");
             return Redirect($"{redirectUrl}/{result}");
         }
-        
+
         /// <summary>
         /// Get Momo Return
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        [Authorize(Roles = "CUSTOMER")]
+        [AllowAnonymous]
         [HttpGet("momo-return")]
         public async Task<IActionResult> GetMomoReturn([FromQuery] MomoOneTimePaymentResultRequest request)
         {

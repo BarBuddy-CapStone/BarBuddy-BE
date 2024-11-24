@@ -18,10 +18,10 @@ namespace Infrastructure.Email
         public async Task SendOtpAsync(string email)
         {
             string otp = GenerateOtp();
+            TimeSpan expireTime = TimeSpan.FromMinutes(3);
+            _cache.Set(email, otp, expireTime);
 
-            _cache.Set(email, otp, TimeSpan.FromSeconds(120));
-
-            await _emailSender.SendEmail(email, "OTP Code", $"Your OTP code is {otp}. It will expire in 60 seconds.");
+            await _emailSender.SendEmail(email, "OTP Code", $"Your OTP code is {otp}. It will expire in {expireTime.Minutes} minutes.");
         }
 
         public bool VerifyOtp(OtpVerificationRequest request)

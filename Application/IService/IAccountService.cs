@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Account;
+using Domain.Common;
 using Microsoft.AspNetCore.Http;
 
 namespace Application.IService
@@ -12,8 +13,8 @@ namespace Application.IService
         Task<CustomerAccountResponse> GetCustomerAccountById(Guid accountId);
         Task<ManagerAccountResponse> GetManagerAccountById(Guid accountId);
         Task<CustomerInfoResponse> GetCustomerInfoById(Guid accountId);
-        Task<PaginationList<CustomerAccountResponse>> GetPaginationCustomerAccount(int pageSize, int pageIndex);
-        Task<PaginationList<ManagerAccountResponse>> GetPaginationManagerAccount(int pageSize, int pageIndex);
+        Task<PaginationList<CustomerAccountResponse>> GetPaginationCustomerAccount(ObjectQuery query);
+        Task<PaginationList<ManagerAccountResponse>> GetPaginationManagerAccount(ObjectQuery query);
         Task<PaginationList<StaffAccountResponse>> GetPaginationStaffAccount(int pageSize, int pageIndex, Guid? barId);
         Task<StaffAccountResponse> GetStaffAccountById(Guid accountId);
         Task<CustomerAccountResponse> UpdateCustomerAccount(Guid accountId, CustomerAccountRequest request);

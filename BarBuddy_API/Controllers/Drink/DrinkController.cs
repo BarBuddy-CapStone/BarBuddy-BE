@@ -170,6 +170,14 @@ namespace BarBuddy_API.Controllers.Drink
                 var response = await _drinkService.CreateDrink(request);
                 return CustomResult("Created Successfully", response);
             }
+            catch (CustomException.UnAuthorizedException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InvalidDataException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.BadRequest);
+            }
             catch (CustomException.InternalServerErrorException e)
             {
                 return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
@@ -194,6 +202,10 @@ namespace BarBuddy_API.Controllers.Drink
             catch (CustomException.DataNotFoundException e)
             {
                 return CustomResult(e.Message, System.Net.HttpStatusCode.NotFound);
+            }
+            catch (CustomException.UnAuthorizedException e)
+            {
+                return CustomResult(e.Message, System.Net.HttpStatusCode.Unauthorized);
             }
             catch (CustomException.InternalServerErrorException e)
             {

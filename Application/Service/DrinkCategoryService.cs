@@ -93,7 +93,7 @@ namespace Application.Service
             }
         }
 
-        public async Task<IEnumerable<DrinkCategoryResponse>> GetAllDrinkCategory(ObjectQuery query)
+        public async Task<PagingDrinkCategoryResponse> GetAllDrinkCategory(ObjectQueryCustom query)
         {
             try
             {
@@ -104,18 +104,35 @@ namespace Application.Service
                 }
 
                 var getAllDrinkCate = (await _unitOfWork.DrinkCategoryRepository
-                                                            .GetAsync(filter: filter,
-                                                            pageIndex: query.PageIndex,
-                                                            pageSize: query.PageSize))
-                                                            .Where(x => x.IsDeleted == PrefixKeyConstant.FALSE);
+                                                        .GetAsync(filter: filter))
+                                                        .Where(x => x.IsDeleted == PrefixKeyConstant.FALSE)
+                                                        .ToList();
 
                 if (getAllDrinkCate.IsNullOrEmpty())
                 {
                     throw new CustomException.DataNotFoundException("Không tìm thấy thể loại đồ uống nào !");
                 }
 
-                var response = _mapper.Map<IEnumerable<DrinkCategoryResponse>>(getAllDrinkCate);
-                return response;
+                var response = _mapper.Map<List<DrinkCategoryResponse>>(getAllDrinkCate);
+
+                var pageIndex = query.PageIndex ?? 1;
+                var pageSize = query.PageSize ?? 6;
+
+                var totalItems = response.Count;
+                var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+                var paginatedDrinkCategories = response.Skip((pageIndex - 1) * pageSize)
+                                                     .Take(pageSize)
+                                                     .ToList();
+
+                return new PagingDrinkCategoryResponse
+                {
+                    DrinkCategoryResponses = paginatedDrinkCategories,
+                    TotalPages = totalPages,
+                    CurrentPage = pageIndex,
+                    PageSize = pageSize,
+                    TotalItems = totalItems
+                };
             }
             catch (CustomException.InternalServerErrorException e)
             {

@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Bar;
+using Application.DTOs.EmotionCategory;
 using Application.DTOs.Request.EmotionCategoryRequest;
 using Application.DTOs.Response.EmotionCategory;
 using Application.IService;
@@ -29,28 +30,51 @@ namespace Application.Service
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<EmotionCategoryResponse>> GetEmotionCategory(ObjectQuery query)
+        public async Task<PagingEmotionCategoryResponse> GetEmotionCategory(ObjectQueryCustom query)
         {
-            Expression<Func<EmotionalDrinkCategory, bool>> filter = null;
-            if (!string.IsNullOrWhiteSpace(query.Search))
+            try
             {
-                filter = bar => bar.CategoryName.Contains(query.Search);
+                Expression<Func<EmotionalDrinkCategory, bool>> filter = null;
+                if (!string.IsNullOrWhiteSpace(query.Search))
+                {
+                    filter = bar => bar.CategoryName.Contains(query.Search);
+                }
+
+                var emotionCategory = _unitOfWork.EmotionalDrinkCategoryRepository
+                                                .Get(filter: filter)
+                                                .Where(e => e.IsDeleted == PrefixKeyConstant.FALSE)
+                                                .ToList();
+
+                if (!emotionCategory.Any())
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy danh mục cảm xúc !");
+                }
+
+                var response = _mapper.Map<List<EmotionCategoryResponse>>(emotionCategory);
+
+                var pageIndex = query.PageIndex ?? 1;
+                var pageSize = query.PageSize ?? 6;
+
+                var totalItems = response.Count;
+                var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+                var paginatedEmotionCategories = response.Skip((pageIndex - 1) * pageSize)
+                                                       .Take(pageSize)
+                                                       .ToList();
+
+                return new PagingEmotionCategoryResponse
+                {
+                    EmotionCategoryResponses = paginatedEmotionCategories,
+                    TotalPages = totalPages,
+                    CurrentPage = pageIndex,
+                    PageSize = pageSize,
+                    TotalItems = totalItems
+                };
             }
-
-            var emotionCategory = _unitOfWork.EmotionalDrinkCategoryRepository
-                                                .Get(filter: filter,
-                                                    pageIndex: query.PageIndex,
-                                                    pageSize: query.PageSize)
-                                                .Where(e => e.IsDeleted == PrefixKeyConstant.FALSE);
-
-            if (!emotionCategory.Any())
+            catch (CustomException.InternalServerErrorException ex)
             {
-                throw new CustomException.DataNotFoundException("Không tìm thấy danh mục cảm xúc !");
+                throw new CustomException.InternalServerErrorException("Lỗi hệ thống!");
             }
-
-            var myemotionCategory = _mapper.Map<IEnumerable<EmotionCategoryResponse>>(emotionCategory);
-
-            return myemotionCategory;
         }
 
         public async Task<EmotionCategoryResponse> GetEmotionCategoryByID(Guid id)
