@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.TableType;
+using Domain.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,6 @@ namespace Application.IService
         Task CreateTableType(TableTypeRequest request);
         Task UpdateTableType(TableTypeRequest request, Guid TableTypeId);
         Task<bool> DeleteTableType(Guid TableTypeId);
-        Task<List<TableTypeResponse>> GetAllTTOfBar(Guid barId);
+        Task<PaginationTableTypeResponse> GetAllTTOfBar(Guid barId, ObjectQuery query);
     }
 }

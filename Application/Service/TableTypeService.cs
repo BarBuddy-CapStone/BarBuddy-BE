@@ -3,6 +3,7 @@ using Application.Interfaces;
 using Application.IService;
 using AutoMapper;
 using Azure.Core;
+using Domain.Common;
 using Domain.Constants;
 using Domain.CustomException;
 using Domain.Entities;
@@ -14,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Application.Service
 {
@@ -268,19 +270,34 @@ namespace Application.Service
             }
         }
 
-        public async Task<List<TableTypeResponse>> GetAllTTOfBar(Guid barId)
+        public async Task<PaginationTableTypeResponse> GetAllTTOfBar(Guid barId, ObjectQuery query)
         {
             try
             {
+                var pageIndex = query.PageIndex ?? 1;
+                var pageSize = query.PageSize ?? 6;
+
                 var tableTypes = (await _unitOfWork.TableTypeRepository
                                                         .GetAsync(filter: t => t.IsDeleted == false 
                                                                             && t.BarId.Equals(barId),
                                                         orderBy: o => o.OrderByDescending(t => t.MinimumPrice)))
                                                         .ToList();
 
-                var response = _mapper.Map<List<TableTypeResponse>>(tableTypes);
+                var totalItems = tableTypes.Count;
+                var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-                return response;
+                var dataResponse = _mapper.Map<List<TableTypeResponse>>(tableTypes.Skip((pageIndex - 1) * pageSize)
+                                                .Take(pageSize)
+                                                .ToList());
+
+                return new PaginationTableTypeResponse
+                {
+                    TableTypeResponses = dataResponse,
+                    TotalPages = totalPages,
+                    PageIndex = pageIndex,
+                    PageSize = pageSize,
+                    TotalItems = totalItems
+                };
             }
             catch (Exception ex)
             {
