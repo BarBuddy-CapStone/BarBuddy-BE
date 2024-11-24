@@ -6,6 +6,7 @@ using Application.IService;
 using AutoMapper;
 using Azure;
 using Azure.Core;
+using Domain.Common;
 using Domain.Constants;
 using Domain.CustomException;
 using Domain.Entities;
@@ -16,6 +17,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
@@ -198,7 +200,8 @@ namespace Application.Service
             if (existedAccount == null)
             {
                 throw new DataNotFoundException("Tài khoản không tìm thấy");
-            } else if (existedAccount.Email != request.Email)
+            }
+            else if (existedAccount.Email != request.Email)
             {
                 throw new DataNotFoundException("Tài khoản bị sai");
             }
@@ -354,14 +357,14 @@ namespace Application.Service
                     accountIEnumerable = await _accountRepository.GetAsync(
                     filter: a => a.RoleId.Equals(roleIdGuid) && a.BarId.Equals(barId),
                     includeProperties: "Bar");
-                } 
+                }
                 else
                 {
                     accountIEnumerable = await _accountRepository.GetAsync(
                     filter: a => a.RoleId.Equals(roleIdGuid),
                     includeProperties: "Bar");
                 }
-                
+
                 var total = accountIEnumerable.Count();
 
                 int validPageIndex = pageIndex > 0 ? pageIndex - 1 : 0;
@@ -392,7 +395,7 @@ namespace Application.Service
             }
         }
 
-        public async Task<PaginationList<ManagerAccountResponse>> GetPaginationManagerAccount(int pageSize, int pageIndex)
+        public async Task<PaginationList<ManagerAccountResponse>> GetPaginationManagerAccount(ObjectQuery query)
         {
             try
             {
@@ -402,25 +405,47 @@ namespace Application.Service
                 {
                     throw new DataNotFoundException("Thất bại khi phân quyền !");
                 }
-                var roleIdGuid = role.RoleId;
-                var accountIEnumerable = await _accountRepository.GetAsync(
-                    filter: a => a.RoleId.Equals(roleIdGuid),
-                    includeProperties: "Bar");
-                var total = accountIEnumerable.Count();
 
-                int validPageIndex = pageIndex > 0 ? pageIndex - 1 : 0;
-                int validPageSize = pageSize > 0 ? pageSize : 10;
-                accountIEnumerable = accountIEnumerable.Skip(validPageIndex * validPageSize).Take(validPageSize);
+                Expression<Func<Account, bool>> filter = null;
+                if (!string.IsNullOrWhiteSpace(query.Search))
+                {
+                    filter = account => account.RoleId.Equals(role.RoleId) &&
+                                      account.Fullname.Contains(query.Search);
+                }
+                else
+                {
+                    filter = account => account.RoleId.Equals(role.RoleId);
+                }
 
-                var items = _mapper.Map<IEnumerable<ManagerAccountResponse>>(accountIEnumerable);
-                if (items == null || !items.Any())
+                var accounts = (await _accountRepository.GetAsync(
+                    filter: filter,
+                    includeProperties: "Bar"))
+                    .ToList();
+
+                if (!accounts.Any())
                 {
                     throw new DataNotFoundException("Danh sách nhân viên đang trống");
                 }
+
+                var response = _mapper.Map<List<ManagerAccountResponse>>(accounts);
+
+                var pageIndex = query.PageIndex ?? 1;
+                var pageSize = query.PageSize ?? 6;
+
+                // Validate page parameters
+                int validPageIndex = pageIndex > 0 ? pageIndex - 1 : 0;
+                int validPageSize = pageSize > 0 ? pageSize : 10;
+                
+                var totalItems = response.Count;
+                var totalPages = (int)Math.Ceiling(totalItems / (double)validPageSize);
+
+                var paginatedAccounts = response.Skip(validPageIndex * validPageSize)
+                                              .Take(validPageSize)
+                                              .ToList();
                 var result = new PaginationList<ManagerAccountResponse>
                 {
-                    items = items,
-                    total = items.Count(),
+                    items = paginatedAccounts,
+                    total = totalPages,
                     //pageIndex = pageIndex,
                     //pageSize = pageSize
                 };
@@ -436,30 +461,58 @@ namespace Application.Service
             }
         }
 
-        public async Task<PaginationList<CustomerAccountResponse>> GetPaginationCustomerAccount(int pageSize, int pageIndex)
+        public async Task<PaginationList<CustomerAccountResponse>> GetPaginationCustomerAccount(ObjectQuery query)
         {
             try
             {
                 //Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440202");
+
                 var role = (await _unitOfWork.RoleRepository.GetAsync(r => r.RoleName == "CUSTOMER")).FirstOrDefault();
                 if (role == null)
                 {
                     throw new DataNotFoundException("Thất bại khi phân quyền !");
                 }
-                var roleIdGuid = role.RoleId;
-                var accountIEnumerable = await _accountRepository.GetAsync(
-                    filter: a => a.RoleId.Equals(roleIdGuid));
-                var total = accountIEnumerable.Count();
 
+                Expression<Func<Account, bool>> filter = null;
+                if (!string.IsNullOrWhiteSpace(query.Search))
+                {
+                    filter = account => account.RoleId.Equals(role.RoleId) &&
+                                      account.Fullname.Contains(query.Search);
+                }
+                else
+                {
+                    filter = account => account.RoleId.Equals(role.RoleId);
+                }
+
+                var accounts = (await _accountRepository.GetAsync(filter: filter))
+                                .ToList();
+
+                if (!accounts.Any())
+                {
+                    throw new DataNotFoundException("Không tìm thấy tài khoản khách hàng nào!");
+                }
+
+                var response = _mapper.Map<List<CustomerAccountResponse>>(accounts);
+
+                var pageIndex = query.PageIndex ?? 1;
+                var pageSize = query.PageSize ?? 6;
+
+                // Validate page parameters
                 int validPageIndex = pageIndex > 0 ? pageIndex - 1 : 0;
                 int validPageSize = pageSize > 0 ? pageSize : 10;
-                accountIEnumerable = accountIEnumerable.Skip(validPageIndex * validPageSize).Take(validPageSize);
 
-                var items = _mapper.Map<IEnumerable<CustomerAccountResponse>>(accountIEnumerable);
+                var totalItems = response.Count;
+                var totalPages = (int)Math.Ceiling(totalItems / (double)validPageSize);
+
+                var paginatedAccounts = response.Skip(validPageIndex * validPageSize)
+                                              .Take(validPageSize)
+                                              .ToList();
+
+                var items = _mapper.Map<IEnumerable<CustomerAccountResponse>>(accounts);
                 var result = new PaginationList<CustomerAccountResponse>
                 {
                     items = items,
-                    total = total,
+                    total = totalPages,
                     //pageIndex = pageIndex,
                     //pageSize = pageSize
                 };
@@ -656,13 +709,13 @@ namespace Application.Service
             try
             {
                 var getOneCustomer = (await _accountRepository
-                                                .GetAsync(filter: x => x.AccountId.Equals(request.AccountId) 
+                                                .GetAsync(filter: x => x.AccountId.Equals(request.AccountId)
                                                                     && !x.BarId.HasValue
                                                                     && x.Role.RoleName.Equals(PrefixKeyConstant.CUSTOMER),
                                                                     includeProperties: "Role"))
                                                                     .FirstOrDefault();
 
-                if(getOneCustomer == null)
+                if (getOneCustomer == null)
                 {
                     throw new DataNotFoundException("Không tìm thấy khách hàng !");
                 }

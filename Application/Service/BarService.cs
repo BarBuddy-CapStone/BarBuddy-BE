@@ -19,6 +19,7 @@ using System.Reflection.Metadata;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using Application.DTOs.Booking;
 using Azure.Core;
+using MediatR;
 
 namespace Application.Service
 {
@@ -28,13 +29,19 @@ namespace Application.Service
         private readonly IMapper _mapper;
         private readonly IFirebase _fireBase;
         private readonly IBarTimeService _barTimeService;
+        private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IAuthentication _authentication;
         public BarService(IUnitOfWork unitOfWork, IMapper mapper,
-                            IFirebase fireBase, IBarTimeService barTimeService)
+                            IFirebase fireBase, IBarTimeService barTimeService,
+                            IAuthentication authentication,
+                            IHttpContextAccessor contextAccessor)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _fireBase = fireBase;
             _barTimeService = barTimeService;
+            _authentication = authentication;
+            _contextAccessor = contextAccessor;
         }
 
         public async Task CreateBar(CreateBarRequest request)
@@ -544,6 +551,67 @@ namespace Application.Service
             {
                 throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
             }
+        }
+
+        public async Task<PagingOnlyBarIdNameResponse> GetBarNameIdAdMa(ObjectQuery query)
+        {
+            var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+            var getAccount = _unitOfWork.AccountRepository
+                                        .Get(filter: x => x.AccountId.Equals(accountId),
+                                             includeProperties: "Role").FirstOrDefault();
+
+            Expression<Func<Bar, bool>> filter = null;
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                if (getAccount.Role.RoleName.Equals(PrefixKeyConstant.MANAGER))
+                {
+                    filter = bar => bar.BarId.Equals(getAccount.BarId) &&
+                                   bar.BarName.Contains(query.Search);
+                }
+                else
+                {
+                    filter = bar => bar.BarName.Contains(query.Search);
+                }
+            }
+            else
+            {
+                if (getAccount.Role.RoleName.Equals(PrefixKeyConstant.MANAGER))
+                {
+                    filter = bar => bar.BarId.Equals(getAccount.BarId);
+                }
+            }
+
+            var bars = (await _unitOfWork.BarRepository.GetAsync(filter: filter))
+                        .ToList();
+
+            if (!bars.Any())
+            {
+                throw new CustomException.DataNotFoundException("Danh sách đang trống !");
+            }
+
+            var response = _mapper.Map<List<OnlyBarNameIdResponse>>(bars);
+
+            var pageIndex = query.PageIndex ?? 1;
+            var pageSize = query.PageSize ?? 6;
+
+            int validPageIndex = pageIndex > 0 ? pageIndex - 1 : 0;
+            int validPageSize = pageSize > 0 ? pageSize : 10;
+
+            var totalItems = response.Count;
+            var totalPages = (int)Math.Ceiling(totalItems / (double)validPageSize);
+
+            var paginatedBars = response.Skip(validPageIndex * validPageSize)
+                                      .Take(validPageSize)
+                                      .ToList();
+
+            return new PagingOnlyBarIdNameResponse
+            {
+                OnlyBarIdNameResponses = paginatedBars,
+                TotalPages = totalPages,
+                CurrentPage = pageIndex,
+                PageSize = validPageSize,
+                TotalItems = totalItems
+            };
         }
     }
 }

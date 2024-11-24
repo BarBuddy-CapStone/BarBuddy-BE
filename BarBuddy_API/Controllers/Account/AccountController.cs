@@ -2,6 +2,7 @@
 using Application.IService;
 using Azure.Core;
 using CoreApiResponse;
+using Domain.Common;
 using Domain.CustomException;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -30,16 +31,16 @@ namespace BarBuddy_API.Controllers.Account
         /// <returns></returns>
         [Authorize(Roles ="ADMIN")]
         [HttpGet("/api/v1/customer-accounts")]
-        public async Task<IActionResult> GetCustomerAccounts([FromQuery] int pageSize, [FromQuery] int pageIndex)
+        public async Task<IActionResult> GetCustomerAccounts([FromQuery] ObjectQuery query)
         {
-            var accountList = await _accountService.GetPaginationCustomerAccount(pageSize, pageIndex);
+            var accountList = await _accountService.GetPaginationCustomerAccount(query);
 
             var result = new
             {
                 items = accountList.items,
                 total = accountList.total,
-                pageIndex = pageIndex,
-                pageSize = pageSize
+                pageIndex = query.PageIndex,
+                pageSize = query.PageSize
             };
             return CustomResult(result);
         }
@@ -108,15 +109,15 @@ namespace BarBuddy_API.Controllers.Account
         /// <returns></returns>
         [Authorize(Roles = "ADMIN")]
         [HttpGet("/api/v1/manager-accounts")]
-        public async Task<IActionResult> GetManagerAccounts([FromQuery] int pageSize, [FromQuery] int pageIndex)
+        public async Task<IActionResult> GetManagerAccounts([FromQuery] ObjectQuery query)
         {
-            var accountList = await _accountService.GetPaginationManagerAccount(pageSize, pageIndex);
+            var accountList = await _accountService.GetPaginationManagerAccount(query);
             var result = new
             {
                 items = accountList.items,
                 total = accountList.total,
-                pageIndex = pageIndex,
-                pageSize = pageSize
+                pageIndex = query.PageIndex,
+                pageSize = query.PageSize
             };
             return CustomResult(result);
         }
