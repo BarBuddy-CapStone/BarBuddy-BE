@@ -11,6 +11,7 @@ using Domain.Entities;
 using Domain.IRepository;
 using Microsoft.AspNetCore.Http;
 using System.Linq.Expressions;
+using static Domain.CustomException.CustomException;
 
 namespace Application.Service
 {
@@ -233,43 +234,45 @@ namespace Application.Service
             }
         }
 
-        public async Task<(List<ManagerFeedbackResponse> responses, int TotalPage)> GetFeedBackManager(Guid BarId, int PageIndex, int PageSize)
+        public async Task<PagingManagerFeedbackResponse> GetFeedBackManager(Guid BarId, ObjectQueryCustom query)
         {
             try
             {
-                var responses = new List<ManagerFeedbackResponse>();
+                var pageIndex = query.PageIndex ?? 1;
+                var pageSize = query.PageSize ?? 6;
 
-                var feedbacks = await _unitOfWork.FeedbackRepository.GetAsync(f => f.BarId == BarId && f.IsDeleted == false);
+                var feedbacks = await _unitOfWork.FeedbackRepository.GetAsync(
+                    f => f.BarId.Equals(BarId) && f.IsDeleted == false);
 
-                int totalPage = 1;
-                if (feedbacks.Count() > PageSize)
+                if (!feedbacks.Any())
                 {
-                    if (PageSize == 1)
-                    {
-                        totalPage = (feedbacks.Count() / PageSize);
-                    }
-                    else
-                    {
-                        if (feedbacks.Count() % PageSize != 0)
-                        {
-                            totalPage = (feedbacks.Count() / PageSize) + 1;
-                        }
-                        else
-                        {
-                            totalPage = (feedbacks.Count() / PageSize);
-                        }
-                    }
+                    throw new DataNotFoundException("Không tìm thấy phản hồi nào!");
                 }
 
-                var feedbacksWithPagination = await _unitOfWork.FeedbackRepository.GetAsync(f => f.BarId == BarId && f.IsDeleted == false, pageIndex: PageIndex, pageSize: PageSize, includeProperties: "Account,Bar", orderBy: o => o.OrderByDescending(f => f.CreatedTime).ThenByDescending(f => f.LastUpdatedTime));
+                var totalItems = feedbacks.Count();
+                var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-                foreach (var feedback in feedbacksWithPagination)
+                var feedbacksWithPagination = await _unitOfWork.FeedbackRepository.GetAsync(
+                    f => f.BarId.Equals(BarId) && f.IsDeleted == false &&
+                        (string.IsNullOrEmpty(query.Search) ||
+                        (f.Comment != null && f.Comment.Contains(query.Search))),
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    includeProperties: "Account,Bar",
+                    orderBy: o => o.OrderByDescending(f => f.CreatedTime)
+                                  .ThenByDescending(f => f.LastUpdatedTime));
+
+                var responses = feedbacksWithPagination.Select(feedback =>
+                    _mapper.Map<ManagerFeedbackResponse>(feedback)).ToList();
+
+                return new PagingManagerFeedbackResponse
                 {
-                    var response = _mapper.Map<ManagerFeedbackResponse>(feedback);
-                    responses.Add(response);
-                }
-
-                return (responses, totalPage);
+                    ManagerFeedbackResponses = responses,
+                    TotalPages = totalPages,
+                    CurrentPage = pageIndex,
+                    PageSize = pageSize,
+                    TotalItems = totalItems
+                };
             }
             catch (Exception ex)
             {

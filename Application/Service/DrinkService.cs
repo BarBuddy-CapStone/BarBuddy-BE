@@ -21,6 +21,7 @@ using Application.DTOs.ML;
 using CsvHelper.Configuration;
 using CsvHelper;
 using Application.DTOs.DrinkCategory;
+using Domain.Common;
 
 namespace Application.Service
 {
@@ -83,6 +84,14 @@ namespace Application.Service
                     if(getDrinkCate == null)
                     {
                         throw new CustomException.DataNotFoundException("Không tìm thấy loại đồ uống !");
+                    }
+
+                    var isExistDrinkName = _unitOfWork.DrinkRepository
+                                                        .Get(filter: x => x.DrinkName.Equals(request.DrinkName))
+                                                        .FirstOrDefault();
+                    if(isExistDrinkName != null)
+                    {
+                        throw new CustomException.DataExistException("Tên thức uống đã tồn tại ! Vui lòng thử lại.");
                     }
 
                     imgsFile = Utils.CheckValidateImageFile(request.Images);
@@ -201,20 +210,40 @@ namespace Application.Service
                 throw new CustomException.InternalServerErrorException(e.Message);
             }
         }
-        public async Task<IEnumerable<DrinkResponse>> GetAllDrinkBasedCateId(Guid cateId)
+        public async Task<PagingDrinkResponse> GetAllDrinkBasedCateId(Guid cateId, ObjectQueryCustom query)
         {
             try
             {
+                var pageIndex = query.PageIndex ?? 1;
+                var pageSize = query.PageSize ?? 6;
+
                 var getAllDrink = await _unitOfWork.DrinkRepository
-                                    .GetAsync(filter: x => x.DrinkCategory.DrinksCategoryId.Equals(cateId)
-                                    , includeProperties: "DrinkCategory");
+                                    .GetAsync(filter: x => (string.IsNullOrWhiteSpace(query.Search) || query.Search.Contains(x.DrinkName)) && 
+                                                            x.DrinkCategory.DrinksCategoryId.Equals(cateId)
+                                    , includeProperties: "DrinkCategory,Bar");
 
                 if (getAllDrink.IsNullOrEmpty())
                 {
                     throw new CustomException.DataNotFoundException("Data not found !");
                 }
-                var response = _mapper.Map<IEnumerable<DrinkResponse>>(getAllDrink);
-                return response;
+
+                var response = _mapper.Map<List<DrinkResponse>>(getAllDrink);
+
+                var totalItems = response.Count;
+                var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+                var paginatedDrinks = response.Skip((pageIndex - 1) * pageSize)
+                                            .Take(pageSize)
+                                            .ToList();
+
+                return new PagingDrinkResponse
+                {
+                    DrinkResponses = paginatedDrinks,
+                    TotalPages = totalPages,
+                    CurrentPage = pageIndex,
+                    PageSize = pageSize,
+                    TotalItems = totalItems
+                };
             }
             catch (CustomException.InternalServerErrorException e)
             {

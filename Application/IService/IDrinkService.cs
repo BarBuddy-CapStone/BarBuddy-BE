@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Drink;
+using Domain.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace Application.IService
         Task<DrinkResponse> GetDrink(Guid drinkId);
         Task<DrinkResponse> CreateDrink(DrinkRequest request);
         Task<DrinkResponse> UpdateDrink(Guid drinkId,DrinkRequest request);
-        Task<IEnumerable<DrinkResponse>> GetAllDrinkBasedCateId(Guid cateId);
+        Task<PagingDrinkResponse> GetAllDrinkBasedCateId(Guid cateId, ObjectQueryCustom query);
         Task<IEnumerable<DrinkResponse>> GetAllDrinkBasedEmoId(Guid emoId);
 
         Task<string> CrawlDrink();

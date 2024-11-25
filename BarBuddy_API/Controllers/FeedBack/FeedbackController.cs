@@ -56,10 +56,10 @@ namespace BarBuddy_API.Controllers.FeedBack
         /// <returns></returns>
         [Authorize(Roles = "MANAGER")]
         [HttpGet("manager")]
-        public async Task<IActionResult> GetFeedBackManager([FromQuery][Required] Guid BarId, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
+        public async Task<IActionResult> GetFeedBackManager([FromQuery][Required] Guid BarId, [FromQuery] ObjectQueryCustom query)
         {
-            var responses = await _feedBackService.GetFeedBackManager(BarId, PageIndex, PageSize);
-            return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.responses });
+            var responses = await _feedBackService.GetFeedBackManager(BarId, query);
+            return CustomResult("Tải dữ liệu thành công", responses);
         }
 
         /// <summary>

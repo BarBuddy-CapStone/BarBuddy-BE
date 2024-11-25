@@ -13,8 +13,8 @@ namespace Application.IService
         Task<CustomerAccountResponse> GetCustomerAccountById(Guid accountId);
         Task<ManagerAccountResponse> GetManagerAccountById(Guid accountId);
         Task<CustomerInfoResponse> GetCustomerInfoById(Guid accountId);
-        Task<PaginationList<CustomerAccountResponse>> GetPaginationCustomerAccount(ObjectQuery query);
-        Task<PaginationList<ManagerAccountResponse>> GetPaginationManagerAccount(ObjectQuery query);
+        Task<PagingCustomerAccountResponse> GetPaginationCustomerAccount(ObjectQuery query);
+        Task<PagingManagerAccountResponse> GetPaginationManagerAccount(ObjectQuery query);
         Task<PaginationList<StaffAccountResponse>> GetPaginationStaffAccount(int pageSize, int pageIndex, Guid? barId);
         Task<StaffAccountResponse> GetStaffAccountById(Guid accountId);
         Task<CustomerAccountResponse> UpdateCustomerAccount(Guid accountId, CustomerAccountRequest request);
