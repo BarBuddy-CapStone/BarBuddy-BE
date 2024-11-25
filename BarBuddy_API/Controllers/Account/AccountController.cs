@@ -34,15 +34,7 @@ namespace BarBuddy_API.Controllers.Account
         public async Task<IActionResult> GetCustomerAccounts([FromQuery] ObjectQuery query)
         {
             var accountList = await _accountService.GetPaginationCustomerAccount(query);
-
-            var result = new
-            {
-                items = accountList.items,
-                total = accountList.total,
-                pageIndex = query.PageIndex,
-                pageSize = query.PageSize
-            };
-            return CustomResult(result);
+            return CustomResult(accountList);
         }
 
         /// <summary>
@@ -112,14 +104,7 @@ namespace BarBuddy_API.Controllers.Account
         public async Task<IActionResult> GetManagerAccounts([FromQuery] ObjectQuery query)
         {
             var accountList = await _accountService.GetPaginationManagerAccount(query);
-            var result = new
-            {
-                items = accountList.items,
-                total = accountList.total,
-                pageIndex = query.PageIndex,
-                pageSize = query.PageSize
-            };
-            return CustomResult(result);
+            return CustomResult(accountList);
         }
 
         /// <summary>

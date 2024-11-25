@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.Drink;
 using Application.IService;
 using CoreApiResponse;
+using Domain.Common;
 using Domain.CustomException;
 using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -116,11 +117,11 @@ namespace BarBuddy_API.Controllers.Drink
         /// <returns></returns>
         [Authorize(Roles = "MANAGER")]
         [HttpGet("getDrinkBaedCate/{cateId}")]
-        public async Task<IActionResult> GetAllDrinkBasedCateId(Guid cateId)
+        public async Task<IActionResult> GetAllDrinkBasedCateId(Guid cateId, [FromQuery] ObjectQueryCustom query)
         {
             try
             {
-                var response = await _drinkService.GetAllDrinkBasedCateId(cateId);
+                var response = await _drinkService.GetAllDrinkBasedCateId(cateId, query);
                 return CustomResult("Data loaded", response);
             }
             catch (CustomException.DataNotFoundException e)

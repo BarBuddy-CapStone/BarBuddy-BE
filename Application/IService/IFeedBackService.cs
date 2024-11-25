@@ -17,7 +17,7 @@ namespace Application.IService
     {
         Task<IEnumerable<FeedBackResponse>> GetFeedBack();
         Task<PagingAdminFeedbackResponse> GetFeedBackAdmin(Guid? BarId, bool? Status, ObjectQueryCustom query);
-        Task<(List<ManagerFeedbackResponse> responses, int TotalPage)> GetFeedBackManager(Guid BarId, int PageIndex, int PageSize);
+        Task<PagingManagerFeedbackResponse> GetFeedBackManager(Guid BarId, ObjectQueryCustom query);
         Task<FeedBackResponse> GetFeedBackByID(Guid id);
         Task<CustomerFeedbackResponse> GetFeedBackByBookingId(Guid BookingId);
         Task<FeedBackResponse> CreateFeedBack(CreateFeedBackRequest request);

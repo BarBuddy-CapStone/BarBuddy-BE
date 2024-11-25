@@ -28,6 +28,8 @@ namespace UnitTests.Application.Services
         private readonly Mock<IBarTimeService> _barTimeServiceMock;
         private readonly Mock<IGenericRepository<Bar>> _barRepoMock;
         private readonly BarService _barService;
+        private readonly Mock<IAuthentication> _authenticationMock;
+        private readonly Mock<IHttpContextAccessor> _contextAccessorMock;
 
         public BarServiceTests()
         {
@@ -36,12 +38,15 @@ namespace UnitTests.Application.Services
             _firebaseMock = new Mock<IFirebase>();
             _barTimeServiceMock = new Mock<IBarTimeService>();
             _barRepoMock = new Mock<IGenericRepository<Bar>>();
-
+            _authenticationMock = new Mock<IAuthentication>();
+            _contextAccessorMock = new Mock<IHttpContextAccessor>();
             _barService = new BarService(
                 _unitOfWorkMock.Object,
                 _mapperMock.Object,
                 _firebaseMock.Object,
-                _barTimeServiceMock.Object
+                _barTimeServiceMock.Object,
+                _authenticationMock.Object,
+                _contextAccessorMock.Object
             );
 
             _unitOfWorkMock.Setup(x => x.BarRepository).Returns(_barRepoMock.Object);
@@ -122,7 +127,7 @@ namespace UnitTests.Application.Services
         public async Task GetAllBar_WhenBarsExist_ShouldReturnBarResponses()
         {
             // Arrange
-            var query = new ObjectQuery { Search = "Test" };
+            var query = new ObjectQueryCustom { Search = "Test" };
             var bars = new List<Bar>
         {
             new Bar { BarId = Guid.NewGuid(), BarName = "Test Bar 1" },
@@ -146,14 +151,14 @@ namespace UnitTests.Application.Services
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(bars.Count, result.Count());
+            Assert.Equal(bars.Count, result.BarResponses.Count());
         }
 
         [Fact]
         public async Task GetAllBar_WhenNoBarsExist_ShouldThrowException()
         {
             // Arrange
-            var query = new ObjectQuery();
+            var query = new ObjectQueryCustom();
 
             _barRepoMock.Setup(x => x.GetAsync(
                 It.IsAny<Expression<Func<Bar, bool>>>(),

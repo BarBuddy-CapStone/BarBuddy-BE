@@ -395,11 +395,10 @@ namespace Application.Service
             }
         }
 
-        public async Task<PaginationList<ManagerAccountResponse>> GetPaginationManagerAccount(ObjectQuery query)
+        public async Task<PagingManagerAccountResponse> GetPaginationManagerAccount(ObjectQuery query)
         {
             try
             {
-                //Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440201");
                 var role = (await _unitOfWork.RoleRepository.GetAsync(r => r.RoleName == "MANAGER")).FirstOrDefault();
                 if (role == null)
                 {
@@ -432,24 +431,21 @@ namespace Application.Service
                 var pageIndex = query.PageIndex ?? 1;
                 var pageSize = query.PageSize ?? 6;
 
-                // Validate page parameters
-                int validPageIndex = pageIndex > 0 ? pageIndex - 1 : 0;
-                int validPageSize = pageSize > 0 ? pageSize : 10;
-                
                 var totalItems = response.Count;
-                var totalPages = (int)Math.Ceiling(totalItems / (double)validPageSize);
+                var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-                var paginatedAccounts = response.Skip(validPageIndex * validPageSize)
-                                              .Take(validPageSize)
+                var paginatedAccounts = response.Skip((pageIndex - 1) * pageSize)
+                                              .Take(pageSize)
                                               .ToList();
-                var result = new PaginationList<ManagerAccountResponse>
+
+                return new PagingManagerAccountResponse
                 {
-                    items = paginatedAccounts,
-                    total = totalPages,
-                    //pageIndex = pageIndex,
-                    //pageSize = pageSize
+                    ManagerAccountResponses = paginatedAccounts,
+                    TotalPages = totalPages,
+                    CurrentPage = pageIndex,
+                    PageSize = pageSize,
+                    TotalItems = totalItems
                 };
-                return result;
             }
             catch (Exception ex)
             {
@@ -461,12 +457,10 @@ namespace Application.Service
             }
         }
 
-        public async Task<PaginationList<CustomerAccountResponse>> GetPaginationCustomerAccount(ObjectQuery query)
+        public async Task<PagingCustomerAccountResponse> GetPaginationCustomerAccount(ObjectQuery query)
         {
             try
             {
-                //Guid roleIdGuid = Guid.Parse("550e8400-e29b-41d4-a716-446655440202");
-
                 var role = (await _unitOfWork.RoleRepository.GetAsync(r => r.RoleName == "CUSTOMER")).FirstOrDefault();
                 if (role == null)
                 {
@@ -497,26 +491,21 @@ namespace Application.Service
                 var pageIndex = query.PageIndex ?? 1;
                 var pageSize = query.PageSize ?? 6;
 
-                // Validate page parameters
-                int validPageIndex = pageIndex > 0 ? pageIndex - 1 : 0;
-                int validPageSize = pageSize > 0 ? pageSize : 10;
-
                 var totalItems = response.Count;
-                var totalPages = (int)Math.Ceiling(totalItems / (double)validPageSize);
+                var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-                var paginatedAccounts = response.Skip(validPageIndex * validPageSize)
-                                              .Take(validPageSize)
+                var paginatedAccounts = response.Skip((pageIndex - 1) * pageSize)
+                                              .Take(pageSize)
                                               .ToList();
 
-                var items = _mapper.Map<IEnumerable<CustomerAccountResponse>>(accounts);
-                var result = new PaginationList<CustomerAccountResponse>
+                return new PagingCustomerAccountResponse
                 {
-                    items = items,
-                    total = totalPages,
-                    //pageIndex = pageIndex,
-                    //pageSize = pageSize
+                    CustomerAccounts = paginatedAccounts,
+                    TotalPages = totalPages,
+                    CurrentPage = pageIndex,
+                    PageSize = pageSize,
+                    TotalItems = totalItems
                 };
-                return result;
             }
             catch (Exception ex)
             {

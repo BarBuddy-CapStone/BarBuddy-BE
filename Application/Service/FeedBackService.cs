@@ -11,6 +11,7 @@ using Domain.Entities;
 using Domain.IRepository;
 using Microsoft.AspNetCore.Http;
 using System.Linq.Expressions;
+using static Domain.CustomException.CustomException;
 
 namespace Application.Service
 {
@@ -166,6 +167,7 @@ namespace Application.Service
             }
         }
 
+
         public async Task<PagingAdminFeedbackResponse> GetFeedBackAdmin(Guid? BarId, bool? Status, ObjectQueryCustom query)
         {
             try
@@ -173,15 +175,21 @@ namespace Application.Service
                 Expression<Func<Feedback, bool>> filter = null;
                 if (!string.IsNullOrWhiteSpace(query.Search))
                 {
-                    filter = bar => bar.Comment.Contains(query.Search);
+                    filter = feedback => feedback.Account != null &&
+                                       feedback.Account.Fullname != null &&
+                                       feedback.Account.Fullname.Contains(query.Search);
                 }
 
                 var feedbacks = await _unitOfWork.FeedbackRepository
-                                        .GetAsync(filter: f => (BarId == null || f.BarId == BarId) &&
-                                                             (Status == null || f.IsDeleted == Status),
-                                                includeProperties: "Account,Bar",
-                                                orderBy: o => o.OrderByDescending(f => f.CreatedTime)
-                                                             .ThenByDescending(f => f.LastUpdatedTime));
+                                .GetAsync(filter: f => (BarId == null || f.BarId == BarId) &&
+                                                     (Status == null || f.IsDeleted == Status) &&
+                                                     (string.IsNullOrEmpty(query.Search) ||
+                                                      (f.Account != null &&
+                                                       f.Account.Fullname != null &&
+                                                       f.Account.Fullname.Contains(query.Search))),
+                                        includeProperties: "Account,Bar",
+                                        orderBy: o => o.OrderByDescending(f => f.CreatedTime)
+                                                     .ThenByDescending(f => f.LastUpdatedTime));
 
                 if (!feedbacks.Any())
                 {
@@ -233,43 +241,41 @@ namespace Application.Service
             }
         }
 
-        public async Task<(List<ManagerFeedbackResponse> responses, int TotalPage)> GetFeedBackManager(Guid BarId, int PageIndex, int PageSize)
+        public async Task<PagingManagerFeedbackResponse> GetFeedBackManager(Guid BarId, ObjectQueryCustom query)
         {
             try
             {
-                var responses = new List<ManagerFeedbackResponse>();
-
-                var feedbacks = await _unitOfWork.FeedbackRepository.GetAsync(f => f.BarId == BarId && f.IsDeleted == false);
-
-                int totalPage = 1;
-                if (feedbacks.Count() > PageSize)
+                var pageIndex = query.PageIndex ?? 1;
+                var pageSize = query.PageSize ?? 6;
+                var feedbacks = await _unitOfWork.FeedbackRepository.GetAsync(
+                   f => f.BarId.Equals(BarId) && f.IsDeleted == false);
+                if (!feedbacks.Any())
                 {
-                    if (PageSize == 1)
-                    {
-                        totalPage = (feedbacks.Count() / PageSize);
-                    }
-                    else
-                    {
-                        if (feedbacks.Count() % PageSize != 0)
-                        {
-                            totalPage = (feedbacks.Count() / PageSize) + 1;
-                        }
-                        else
-                        {
-                            totalPage = (feedbacks.Count() / PageSize);
-                        }
-                    }
+                    throw new DataNotFoundException("Không tìm thấy phản hồi nào!");
                 }
-
-                var feedbacksWithPagination = await _unitOfWork.FeedbackRepository.GetAsync(f => f.BarId == BarId && f.IsDeleted == false, pageIndex: PageIndex, pageSize: PageSize, includeProperties: "Account,Bar", orderBy: o => o.OrderByDescending(f => f.CreatedTime).ThenByDescending(f => f.LastUpdatedTime));
-
-                foreach (var feedback in feedbacksWithPagination)
+                var totalItems = feedbacks.Count();
+                var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+                var feedbacksWithPagination = await _unitOfWork.FeedbackRepository.GetAsync(
+                   f => f.BarId.Equals(BarId) && f.IsDeleted == false &&
+                       (string.IsNullOrEmpty(query.Search) ||
+                       (f.Account != null &&
+                        f.Account.Fullname != null &&
+                        f.Account.Fullname.Contains(query.Search))),
+                   pageIndex: pageIndex,
+                   pageSize: pageSize,
+                   includeProperties: "Account,Bar",
+                   orderBy: o => o.OrderByDescending(f => f.CreatedTime)
+                                 .ThenByDescending(f => f.LastUpdatedTime));
+                var responses = feedbacksWithPagination.Select(feedback =>
+                   _mapper.Map<ManagerFeedbackResponse>(feedback)).ToList();
+                return new PagingManagerFeedbackResponse
                 {
-                    var response = _mapper.Map<ManagerFeedbackResponse>(feedback);
-                    responses.Add(response);
-                }
-
-                return (responses, totalPage);
+                    ManagerFeedbackResponses = responses,
+                    TotalPages = totalPages,
+                    CurrentPage = pageIndex,
+                    PageSize = pageSize,
+                    TotalItems = totalItems
+                };
             }
             catch (Exception ex)
             {
