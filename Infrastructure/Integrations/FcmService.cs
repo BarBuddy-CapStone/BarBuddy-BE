@@ -304,44 +304,46 @@ namespace Infrastructure.Integrations
 
         public async Task<int> GetUnreadNotificationCount(string deviceToken, Guid? accountId = null)
         {
-            // Nếu người dùng chưa đăng nhập (chỉ lấy thông báo public theo deviceToken)
-            if (!accountId.HasValue)
+            try
             {
-                var publicNotifications = await _unitOfWork.FcmNotificationRepository
-                    .GetAsync(
-                        n => n.IsPublic && n.NotificationCustomers.Any(nc => nc.DeviceToken == deviceToken),
-                        includeProperties: "NotificationCustomers"
-                    );
+                // Nếu người dùng chưa đăng nhập (chỉ lấy thông báo public theo deviceToken)
+                if (!accountId.HasValue)
+                {
+                    var publicNotifications = await _unitOfWork.FcmNotificationRepository
+                        .GetAsync(
+                            n => n.IsPublic && n.NotificationCustomers.Any(nc => nc.DeviceToken == deviceToken),
+                            includeProperties: "NotificationCustomers"
+                        );
 
-                return publicNotifications
-                    .Select(n =>
+                    return publicNotifications.Count(n => 
                     {
                         var customerNotification = n.NotificationCustomers
                             .FirstOrDefault(nc => nc.DeviceToken == deviceToken);
-                        return !customerNotification?.IsRead ?? true;
-                    })
-                    .Count(isUnread => isUnread);
-            }
+                        return customerNotification == null || !customerNotification.IsRead;
+                    });
+                }
 
-            // Nếu người dùng đã đăng nhập (lấy cả thông báo public và private)
-            var allNotifications = await _unitOfWork.FcmNotificationRepository
-                .GetAsync(
-                    n => (n.IsPublic && n.NotificationCustomers.Any(nc => nc.DeviceToken == deviceToken)) || 
-                         n.NotificationCustomers.Any(nc => nc.CustomerId == accountId),
-                    includeProperties: "NotificationCustomers"
-                );
+                // Nếu người dùng đã đăng nhập (lấy cả thông báo public và private)
+                var allNotifications = await _unitOfWork.FcmNotificationRepository
+                    .GetAsync(
+                        n => (n.IsPublic && n.NotificationCustomers.Any(nc => nc.DeviceToken == deviceToken)) || 
+                             n.NotificationCustomers.Any(nc => nc.CustomerId == accountId),
+                        includeProperties: "NotificationCustomers"
+                    );
 
-            // Loại bỏ các thông báo trùng lặp và đếm số lượng chưa đọc
-            return allNotifications
-                .GroupBy(n => n.Id)
-                .Select(g => g.First())
-                .Select(n =>
+                // Đếm số lượng thông báo chưa đọc (không cần group)
+                return allNotifications.Count(n => 
                 {
                     var customerNotification = n.NotificationCustomers
                         .FirstOrDefault(nc => nc.CustomerId == accountId || nc.DeviceToken == deviceToken);
-                    return !customerNotification?.IsRead ?? true;
-                })
-                .Count(isUnread => isUnread);
+                    return customerNotification == null || !customerNotification.IsRead;
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetUnreadNotificationCount: {ex.Message}");
+                throw;
+            }
         }
     }
 }
