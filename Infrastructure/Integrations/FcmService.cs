@@ -136,6 +136,7 @@ namespace Infrastructure.Integrations
                 }
             }
 
+            // Tạo notification data để gửi qua SignalR
             var notificationData = new
             {
                 id = notification.Id,
@@ -151,33 +152,54 @@ namespace Infrastructure.Integrations
                 readAt = (DateTimeOffset?)null
             };
 
-            if (request.IsPublic)
+            // Lấy tất cả device đang kết nối
+            var connections = _connectionMapping.GetAllConnections();
+            
+            foreach (var connection in connections)
             {
-                foreach (var device in devices)
+                var deviceToken = connection.Value.DeviceToken;
+                var accountId = connection.Value.AccountId;
+
+                // Nếu là thông báo public hoặc user đã đăng nhập
+                if (request.IsPublic || !string.IsNullOrEmpty(accountId))
                 {
-                    if (device.AccountId.HasValue)
+                    // 1. Gửi notification
+                    if (!string.IsNullOrEmpty(accountId))
                     {
-                        await _notificationHub.Clients.Group($"user_{device.AccountId}")
+                        // Gửi cho user đã đăng nhập qua group
+                        await _notificationHub.Clients.Group($"user_{accountId}")
                             .SendAsync("ReceiveNotification", notificationData);
                     }
-                    else
+                    else if (request.IsPublic)
                     {
-                        var connectionIds = _connectionMapping.GetConnectionIds(device.DeviceToken);
+                        // Gửi cho guest qua deviceToken
+                        var connectionIds = _connectionMapping.GetConnectionIds(deviceToken);
                         if (connectionIds.Any())
                         {
                             await _notificationHub.Clients.Clients(connectionIds)
                                 .SendAsync("ReceiveNotification", notificationData);
                         }
                     }
-                }
-            }
-            else
-            {
-                var userDevices = devices.Where(d => d.AccountId.HasValue);
-                foreach (var device in userDevices)
-                {
-                    await _notificationHub.Clients.Group($"user_{device.AccountId}")
-                        .SendAsync("ReceiveNotification", notificationData);
+
+                    // 2. Gửi unread count mới
+                    var unreadCount = await GetUnreadNotificationCount(
+                        deviceToken,
+                        !string.IsNullOrEmpty(accountId) ? Guid.Parse(accountId) : null);
+
+                    if (!string.IsNullOrEmpty(accountId))
+                    {
+                        await _notificationHub.Clients.Group($"user_{accountId}")
+                            .SendAsync("ReceiveUnreadCount", unreadCount);
+                    }
+                    else
+                    {
+                        var connectionIds = _connectionMapping.GetConnectionIds(deviceToken);
+                        if (connectionIds.Any())
+                        {
+                            await _notificationHub.Clients.Clients(connectionIds)
+                                .SendAsync("ReceiveUnreadCount", unreadCount);
+                        }
+                    }
                 }
             }
 
@@ -278,6 +300,48 @@ namespace Infrastructure.Integrations
                     return response;
                 })
                 .ToList();
+        }
+
+        public async Task<int> GetUnreadNotificationCount(string deviceToken, Guid? accountId = null)
+        {
+            // Nếu người dùng chưa đăng nhập (chỉ lấy thông báo public theo deviceToken)
+            if (!accountId.HasValue)
+            {
+                var publicNotifications = await _unitOfWork.FcmNotificationRepository
+                    .GetAsync(
+                        n => n.IsPublic && n.NotificationCustomers.Any(nc => nc.DeviceToken == deviceToken),
+                        includeProperties: "NotificationCustomers"
+                    );
+
+                return publicNotifications
+                    .Select(n =>
+                    {
+                        var customerNotification = n.NotificationCustomers
+                            .FirstOrDefault(nc => nc.DeviceToken == deviceToken);
+                        return !customerNotification?.IsRead ?? true;
+                    })
+                    .Count(isUnread => isUnread);
+            }
+
+            // Nếu người dùng đã đăng nhập (lấy cả thông báo public và private)
+            var allNotifications = await _unitOfWork.FcmNotificationRepository
+                .GetAsync(
+                    n => (n.IsPublic && n.NotificationCustomers.Any(nc => nc.DeviceToken == deviceToken)) || 
+                         n.NotificationCustomers.Any(nc => nc.CustomerId == accountId),
+                    includeProperties: "NotificationCustomers"
+                );
+
+            // Loại bỏ các thông báo trùng lặp và đếm số lượng chưa đọc
+            return allNotifications
+                .GroupBy(n => n.Id)
+                .Select(g => g.First())
+                .Select(n =>
+                {
+                    var customerNotification = n.NotificationCustomers
+                        .FirstOrDefault(nc => nc.CustomerId == accountId || nc.DeviceToken == deviceToken);
+                    return !customerNotification?.IsRead ?? true;
+                })
+                .Count(isUnread => isUnread);
         }
     }
 }

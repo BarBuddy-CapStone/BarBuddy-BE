@@ -27,6 +27,26 @@ namespace Infrastructure.SignalR
             _connectionMapping = connectionMapping;
         }
 
+        public async Task SendUnreadCount(string deviceToken, string accountId, int count)
+        {
+            if (!string.IsNullOrEmpty(accountId))
+            {
+                // Gửi cho user đã đăng nhập qua group
+                await _hubContext.Clients.Group($"user_{accountId}")
+                    .SendAsync("ReceiveUnreadCount", count);
+            }
+            else
+            {
+                // Gửi cho guest qua deviceToken
+                var connectionIds = _connectionMapping.GetConnectionIds(deviceToken);
+                if (connectionIds.Any())
+                {
+                    await _hubContext.Clients.Clients(connectionIds)
+                        .SendAsync("ReceiveUnreadCount", count);
+                }
+            }
+        }
+
         public async Task SendNotification(FcmNotification notification, bool isPublic)
         {
             var notificationData = new
@@ -78,6 +98,14 @@ namespace Infrastructure.SignalR
                     await _hubContext.Clients.Group($"user_{accountId}")
                         .SendAsync("ReceiveNotification", notificationData);
                 }
+
+                // Lấy số lượng thông báo chưa đọc mới
+                var unreadCount = await _fcmService.GetUnreadNotificationCount(
+                    deviceToken, 
+                    !string.IsNullOrEmpty(accountId) ? Guid.Parse(accountId) : null);
+
+                // Gửi update unread count
+                await SendUnreadCount(deviceToken, accountId, unreadCount);
             }
         }
     }

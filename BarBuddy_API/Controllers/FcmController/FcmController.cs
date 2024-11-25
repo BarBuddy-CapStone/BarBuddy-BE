@@ -83,5 +83,25 @@ namespace BarBuddy_API.Controllers.FcmController
                 return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
             }
         }
+
+        [HttpGet("unread-count")]
+        public async Task<IActionResult> GetUnreadNotificationCount([FromQuery] string deviceToken)
+        {
+            try
+            {
+                Guid? accountId = null;
+                if (User.Identity.IsAuthenticated)
+                {
+                    accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
+                }
+
+                var count = await _fcmService.GetUnreadNotificationCount(deviceToken, accountId);
+                return CustomResult("Lấy số lượng thông báo chưa đọc thành công", count);
+            }
+            catch (Exception ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }

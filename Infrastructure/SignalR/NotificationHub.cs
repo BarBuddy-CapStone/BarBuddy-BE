@@ -3,16 +3,21 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using System.Linq;
+using Application.Interfaces;
 
 namespace Infrastructure.SignalR
 {
     public class NotificationHub : Hub
     {
         private readonly IConnectionMapping _connectionMapping;
+        private readonly IFcmService _fcmService;
 
-        public NotificationHub(IConnectionMapping connectionMapping)
+        public NotificationHub(
+            IConnectionMapping connectionMapping,
+            IFcmService fcmService)
         {
             _connectionMapping = connectionMapping;
+            _fcmService = fcmService;
         }
 
         public override async Task OnConnectedAsync()
@@ -61,6 +66,29 @@ namespace Infrastructure.SignalR
         public async Task SendBroadcast(string message)
         {
             await Clients.All.SendAsync("ReceiveBroadcast", message);
+        }
+
+        public async Task RequestUnreadCount()
+        {
+            var deviceToken = _connectionMapping.GetDeviceToken(Context.ConnectionId);
+            var accountId = _connectionMapping.GetAccountId(Context.ConnectionId);
+
+            if (!string.IsNullOrEmpty(deviceToken))
+            {
+                var unreadCount = await _fcmService.GetUnreadNotificationCount(
+                    deviceToken,
+                    !string.IsNullOrEmpty(accountId) ? Guid.Parse(accountId) : null);
+
+                if (!string.IsNullOrEmpty(accountId))
+                {
+                    await Clients.Group($"user_{accountId}")
+                        .SendAsync("ReceiveUnreadCount", unreadCount);
+                }
+                else
+                {
+                    await Clients.Caller.SendAsync("ReceiveUnreadCount", unreadCount);
+                }
+            }
         }
     }
 } 
