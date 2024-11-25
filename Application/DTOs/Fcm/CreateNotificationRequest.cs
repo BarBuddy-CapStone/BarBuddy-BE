@@ -25,8 +25,6 @@ namespace Application.DTOs.Fcm
         public Guid? BarId { get; set; }
 
         [Required]
-        public bool IsPublic { get; set; } // True: guest + customer, False: customer only
-
-        public Dictionary<string, string>? Data { get; set; }
+        public bool IsPublic { get; set; }
     }
 } 

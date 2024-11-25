@@ -33,7 +33,7 @@ namespace Infrastructure.Integrations
             _connectionMapping = connectionMapping;
         }
 
-        private async Task SendPushNotification(string deviceToken, FcmNotification notification, Dictionary<string, string>? additionalData = null)
+        private async Task SendPushNotification(string deviceToken, FcmNotification notification)
         {
             var data = new Dictionary<string, string>
             {
@@ -42,14 +42,6 @@ namespace Infrastructure.Integrations
                 { "deepLink", notification.DeepLink ?? "" },
                 { "barId", notification.BarId?.ToString() ?? "" }
             };
-
-            if (additionalData != null)
-            {
-                foreach (var item in additionalData)
-                {
-                    data[item.Key] = item.Value;
-                }
-            }
 
             var message = new Message()
             {
@@ -66,6 +58,7 @@ namespace Infrastructure.Integrations
             await _firebaseMessaging.SendAsync(message);
         }
 
+        // Save guest device token
         public async Task SaveGuestDeviceToken(string deviceToken, string platform)
         {
             var existingDevice = (await _unitOfWork.FcmUserDeviceRepository
@@ -87,6 +80,7 @@ namespace Infrastructure.Integrations
             }
         }
 
+        // Update device token for user
         public async Task UpdateDeviceTokenForUser(Guid accountId, UpdateDeviceTokenRequest request)
         {
             var device = (await _unitOfWork.FcmUserDeviceRepository
@@ -109,6 +103,7 @@ namespace Infrastructure.Integrations
             }
         }
 
+        // Create and send notification 
         public async Task<Guid> CreateAndSendNotification(CreateNotificationRequest request)
         {
             var notification = _mapper.Map<FcmNotification>(request);
@@ -121,7 +116,7 @@ namespace Infrastructure.Integrations
             {
                 try
                 {
-                    await SendPushNotification(device.DeviceToken, notification, request.Data);
+                    await SendPushNotification(device.DeviceToken, notification);
                     await _unitOfWork.FcmNotificationCustomerRepository.InsertAsync(
                         new FcmNotificationCustomer
                         {
@@ -148,7 +143,8 @@ namespace Infrastructure.Integrations
                 message = notification.Message,
                 type = notification.Type,
                 timestamp = notification.CreatedAt,
-                data = request.Data,
+                deepLink = notification.DeepLink,
+                imageUrl = notification.ImageUrl,
                 isRead = false,
                 barId = notification.BarId,
                 isPublic = request.IsPublic,
@@ -189,6 +185,7 @@ namespace Infrastructure.Integrations
             return notification.Id;
         }
 
+        // Send notification to user    
         public async Task SendNotificationToUser(Guid accountId, string title, string message, Dictionary<string, string> data = null)
         {
             var request = new CreateNotificationRequest
@@ -196,13 +193,13 @@ namespace Infrastructure.Integrations
                 Title = title,
                 Message = message,
                 Type = FcmNotificationType.SYSTEM,
-                IsPublic = false,
-                Data = data ?? new Dictionary<string, string>()
+                IsPublic = false
             };
 
             await CreateAndSendNotification(request);
         }
 
+        // Send broadcast notification
         public async Task SendBroadcastNotification(string title, string message, Dictionary<string, string> data = null)
         {
             var request = new CreateNotificationRequest
@@ -210,61 +207,59 @@ namespace Infrastructure.Integrations
                 Title = title,
                 Message = message,
                 Type = FcmNotificationType.SYSTEM,
-                IsPublic = true,
-                Data = data
+                IsPublic = true
             };
 
             await CreateAndSendNotification(request);
         }
 
-        public async Task<List<NotificationResponse>> GetNotificationsForUser(Guid accountId, int page = 1, int pageSize = 20)
+        // Get notifications for user
+        public async Task<List<NotificationResponse>> GetNotifications(string deviceToken, Guid? accountId = null, int page = 1, int pageSize = 20)
         {
             var skip = (page - 1) * pageSize;
-            var device = (await _unitOfWork.FcmUserDeviceRepository
-                .GetAsync(d => d.AccountId == accountId)).FirstOrDefault();
 
-            if (device == null) return new List<NotificationResponse>();
+            // Nếu người dùng chưa đăng nhập (chỉ lấy thông báo public theo deviceToken)
+            if (!accountId.HasValue)
+            {
+                var publicNotifications = await _unitOfWork.FcmNotificationRepository
+                    .GetAsync(
+                        n => n.IsPublic && n.NotificationCustomers.Any(nc => nc.DeviceToken == deviceToken),
+                        includeProperties: "Bar,NotificationCustomers"
+                    );
 
-            var notifications = await _unitOfWork.FcmNotificationRepository
-                .GetAsync(
-                    n => n.NotificationCustomers.Any(nc =>
-                        (nc.CustomerId == accountId) ||
-                        (n.IsPublic && nc.DeviceToken == device.DeviceToken)),
-                    includeProperties: "Bar,NotificationCustomers"
-                );
-
-            return notifications
-                .OrderByDescending(n => n.CreatedAt)
-                .Skip(skip)
-                .Take(pageSize)
-                .Select(n =>
-                {
-                    var response = _mapper.Map<NotificationResponse>(n);
-                    var customerNotification = n.NotificationCustomers
-                        .FirstOrDefault(nc => nc.CustomerId == accountId || nc.DeviceToken == device.DeviceToken);
-
-                    if (customerNotification != null)
+                return publicNotifications
+                    .OrderByDescending(n => n.CreatedAt)
+                    .Skip(skip)
+                    .Take(pageSize)
+                    .Select(n =>
                     {
-                        response.IsRead = customerNotification.IsRead;
-                        response.ReadAt = customerNotification.ReadAt;
-                    }
+                        var response = _mapper.Map<NotificationResponse>(n);
+                        var customerNotification = n.NotificationCustomers
+                            .FirstOrDefault(nc => nc.DeviceToken == deviceToken);
 
-                    return response;
-                })
-                .ToList();
-        }
+                        if (customerNotification != null)
+                        {
+                            response.IsRead = customerNotification.IsRead;
+                            response.ReadAt = customerNotification.ReadAt;
+                        }
 
-        public async Task<List<NotificationResponse>> GetPublicNotifications(string deviceToken, int page = 1, int pageSize = 20)
-        {
-            var skip = (page - 1) * pageSize;
+                        return response;
+                    })
+                    .ToList();
+            }
 
-            var notifications = await _unitOfWork.FcmNotificationRepository
+            // Nếu người dùng đã đăng nhập (lấy cả thông báo public và private)
+            var allNotifications = await _unitOfWork.FcmNotificationRepository
                 .GetAsync(
-                    n => n.IsPublic && n.NotificationCustomers.Any(nc => nc.DeviceToken == deviceToken),
+                    n => (n.IsPublic && n.NotificationCustomers.Any(nc => nc.DeviceToken == deviceToken)) || 
+                         n.NotificationCustomers.Any(nc => nc.CustomerId == accountId),
                     includeProperties: "Bar,NotificationCustomers"
                 );
 
-            return notifications
+            // Loại bỏ các thông báo trùng lặp bằng cách group theo Id
+            return allNotifications
+                .GroupBy(n => n.Id)
+                .Select(g => g.First())
                 .OrderByDescending(n => n.CreatedAt)
                 .Skip(skip)
                 .Take(pageSize)
@@ -272,7 +267,7 @@ namespace Infrastructure.Integrations
                 {
                     var response = _mapper.Map<NotificationResponse>(n);
                     var customerNotification = n.NotificationCustomers
-                        .FirstOrDefault(nc => nc.DeviceToken == deviceToken);
+                        .FirstOrDefault(nc => nc.CustomerId == accountId || nc.DeviceToken == deviceToken);
 
                     if (customerNotification != null)
                     {

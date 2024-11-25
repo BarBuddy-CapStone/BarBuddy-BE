@@ -14,6 +14,7 @@ namespace Infrastructure.SignalR
         IEnumerable<string> GetConnectionIds(string deviceToken);
         string GetDeviceToken(string connectionId);
         string GetAccountId(string connectionId);
+        IReadOnlyDictionary<string, (string DeviceToken, string AccountId)> GetAllConnections();
     }
 
     public class ConnectionMapping : IConnectionMapping
@@ -46,6 +47,11 @@ namespace Infrastructure.SignalR
         public string GetAccountId(string connectionId)
         {
             return _connections.TryGetValue(connectionId, out var value) ? value.AccountId : null;
+        }
+
+        public IReadOnlyDictionary<string, (string DeviceToken, string AccountId)> GetAllConnections()
+        {
+            return _connections;
         }
     }
 }

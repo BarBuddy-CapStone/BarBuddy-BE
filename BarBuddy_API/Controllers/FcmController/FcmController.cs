@@ -31,19 +31,25 @@ namespace BarBuddy_API.Controllers.FcmController
         }
 
         [HttpGet("notifications")]
-        [Authorize]
-        public async Task<IActionResult> GetNotifications([FromQuery] int page = 1)
+        public async Task<IActionResult> GetNotifications(
+            [FromQuery] string deviceToken,
+            [FromQuery] int page = 1)
         {
-            var accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
-            var notifications = await _fcmService.GetNotificationsForUser(accountId, page);
-            return CustomResult("Lấy danh sách thông báo thành công", notifications);
-        }
+            try 
+            {
+                Guid? accountId = null;
+                if (User.Identity.IsAuthenticated)
+                {
+                    accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
+                }
 
-        [HttpGet("notifications/public")]
-        public async Task<IActionResult> GetPublicNotifications([FromQuery] string deviceToken, [FromQuery] int page = 1)
-        {
-            var notifications = await _fcmService.GetPublicNotifications(deviceToken, page);
-            return CustomResult("Lấy danh sách thông báo công khai thành công", notifications);
+                var notifications = await _fcmService.GetNotifications(deviceToken, accountId, page);
+                return CustomResult("Lấy danh sách thông báo thành công", notifications);
+            }
+            catch (Exception ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
         [HttpPost("sign-device-token")]
