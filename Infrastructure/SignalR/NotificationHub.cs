@@ -17,10 +17,28 @@ namespace Infrastructure.SignalR
 
         public override async Task OnConnectedAsync()
         {
-            var deviceToken = Context.GetHttpContext()?.Request.Query["deviceToken"].ToString();
-            if (!string.IsNullOrEmpty(deviceToken))
+            var httpContext = Context.GetHttpContext();
+            if (httpContext != null)
             {
-                _connectionMapping.Add(Context.ConnectionId, deviceToken);
+                var deviceToken = httpContext.Request.Query["deviceToken"].ToString();
+                var accountId = httpContext.Request.Query["accountId"].ToString();
+
+                if (string.IsNullOrEmpty(deviceToken))
+                {
+                    throw new HubException("DeviceToken is required");
+                }
+
+                if (!string.IsNullOrEmpty(accountId))
+                {
+                    _connectionMapping.Add(Context.ConnectionId, deviceToken, accountId);
+                    await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{accountId}");
+                    Console.WriteLine($"User {accountId} connected with device {deviceToken}");
+                }
+                else
+                {
+                    _connectionMapping.Add(Context.ConnectionId, deviceToken);
+                    Console.WriteLine($"Guest connected with device {deviceToken}");
+                }
             }
             await base.OnConnectedAsync();
         }

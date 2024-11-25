@@ -77,37 +77,5 @@ namespace BarBuddy_API.Controllers.FcmController
                 return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
             }
         }
-
-        [HttpPost("notifications/{notificationId}/read")]
-        public async Task<IActionResult> MarkNotificationAsRead(Guid notificationId)
-        {
-            var accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
-            await _fcmService.MarkAsRead(notificationId, accountId);
-            return CustomResult("Đánh dấu thông báo đã đọc thành công");
-        }
-
-        [HttpPost("notifications/mark-all-read")]
-        public async Task<IActionResult> MarkAllNotificationsAsRead()
-        {
-            var accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
-            await _fcmService.MarkAllAsRead(accountId);
-            return CustomResult("Đánh dấu tất cả thông báo đã đọc thành công");
-        }
-
-        [HttpPost("notifications/{notificationId}/read-by-device")]
-        public async Task<IActionResult> MarkNotificationAsReadByDevice(
-            Guid notificationId, 
-            [FromBody] string deviceToken)
-        {
-            await _fcmService.MarkAsReadByDeviceToken(notificationId, deviceToken);
-            return CustomResult("Đánh dấu thông báo đã đọc thành công");
-        }
-
-        [HttpPost("notifications/mark-all-read-by-device")]
-        public async Task<IActionResult> MarkAllNotificationsAsReadByDevice([FromBody] string deviceToken)
-        {
-            await _fcmService.MarkAllAsReadByDeviceToken(deviceToken);
-            return CustomResult("Đánh dấu tất cả thông báo đã đọc thành công");
-        }
     }
 }
