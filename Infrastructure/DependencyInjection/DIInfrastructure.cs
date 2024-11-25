@@ -166,7 +166,7 @@ namespace Infrastructure.DependencyInjection
                 options.AddPolicy("AllowReactBarBuddy",
                     builder =>
                     {
-                        builder.WithOrigins("http://localhost:5173") // Thay đổi URL này thành URL của frontend của bạn
+                        builder.WithOrigins("https://barbuddy.vercel.app/") // Thay đổi URL này thành URL của frontend của bạn
                                .AllowAnyHeader()
                                .AllowAnyMethod()
                                .AllowCredentials();
