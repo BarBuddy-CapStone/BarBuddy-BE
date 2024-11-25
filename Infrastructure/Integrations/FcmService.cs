@@ -136,6 +136,9 @@ namespace Infrastructure.Integrations
                 }
             }
 
+            // Lưu thay đổi vào database TRƯỚC KHI gửi SignalR
+            await _unitOfWork.SaveAsync();
+
             // Tạo notification data để gửi qua SignalR
             var notificationData = new
             {
@@ -166,13 +169,11 @@ namespace Infrastructure.Integrations
                     // 1. Gửi notification
                     if (!string.IsNullOrEmpty(accountId))
                     {
-                        // Gửi cho user đã đăng nhập qua group
                         await _notificationHub.Clients.Group($"user_{accountId}")
                             .SendAsync("ReceiveNotification", notificationData);
                     }
                     else if (request.IsPublic)
                     {
-                        // Gửi cho guest qua deviceToken
                         var connectionIds = _connectionMapping.GetConnectionIds(deviceToken);
                         if (connectionIds.Any())
                         {
@@ -181,7 +182,7 @@ namespace Infrastructure.Integrations
                         }
                     }
 
-                    // 2. Gửi unread count mới
+                    // 2. Gửi unread count mới (sau khi đã lưu vào database)
                     var unreadCount = await GetUnreadNotificationCount(
                         deviceToken,
                         !string.IsNullOrEmpty(accountId) ? Guid.Parse(accountId) : null);
@@ -203,7 +204,6 @@ namespace Infrastructure.Integrations
                 }
             }
 
-            await _unitOfWork.SaveAsync();
             return notification.Id;
         }
 
