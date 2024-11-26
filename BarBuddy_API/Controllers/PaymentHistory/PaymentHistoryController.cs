@@ -1,6 +1,7 @@
 ﻿using Application.IService;
 using Azure;
 using CoreApiResponse;
+using Domain.CustomException;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -33,9 +34,25 @@ namespace BarBuddy_API.Controllers.PaymentHistory
         /// <returns></returns>
         [Authorize(Roles = "ADMIN,MANAGER,STAFF")]
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] [Required] int Status, [FromQuery] string? CustomerName, [FromQuery] string? PhoneNumber, [FromQuery] string? Email, [FromQuery] Guid? BarId, [FromQuery] DateTime? PaymentDate, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10) {
-            var response = await _service.Get(Status, CustomerName, PhoneNumber, Email, BarId, PaymentDate, PageIndex, PageSize);
-            return Ok(new { totalPage = response.totalPage, response = response.response });
+        public async Task<IActionResult> Get([FromQuery][Required] int Status, [FromQuery] string? CustomerName, [FromQuery] string? PhoneNumber, [FromQuery] string? Email, [FromQuery] Guid? BarId, [FromQuery] DateTime? PaymentDate, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
+        {
+            try
+            {
+                var response = await _service.Get(Status, CustomerName, PhoneNumber, Email, BarId, PaymentDate, PageIndex, PageSize);
+                return Ok(new { totalPage = response.totalPage, response = response.response });
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.NotFound);
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -50,8 +67,19 @@ namespace BarBuddy_API.Controllers.PaymentHistory
         [HttpGet("{CustomerId}")]
         public async Task<IActionResult> Get(Guid CustomerId, [FromQuery] int? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
-            var response = await _service.GetByCustomerId(CustomerId, Status, PageIndex, PageSize);
-            return Ok(new { totalPage = response.totalPage, response = response.response });
+            try
+            {
+                var response = await _service.GetByCustomerId(CustomerId, Status, PageIndex, PageSize);
+                return Ok(new { totalPage = response.totalPage, response = response.response });
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -59,11 +87,12 @@ namespace BarBuddy_API.Controllers.PaymentHistory
         /// </summary>
         /// <param name="barId"></param>
         /// <returns></returns>
-        [HttpGet("/manager/{barId}")]
-        public async Task<IActionResult> GetAllHistoryPaymentByBarId(Guid barId, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
-        {
-            var response = await _service.GetByBarId(barId, PageIndex, PageSize);
-            return CustomResult("Data Loaded", new { response = response.response, totalPage = response.totalPage});
-        }
+        //[Authorize(Roles = "MANAGER,STAFF")]
+        //[HttpGet("/manager/{barId}")]
+        //public async Task<IActionResult> GetAllHistoryPaymentByBarId(Guid barId, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
+        //{
+        //    var response = await _service.GetByBarId(barId, PageIndex, PageSize);
+        //    return CustomResult("Data Loaded", new { response = response.response, totalPage = response.totalPage });
+        //}
     }
 }

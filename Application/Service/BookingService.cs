@@ -35,11 +35,12 @@ namespace Application.Service
         private readonly IFirebase _firebase;
         private readonly ILogger<BookingService> _logger;
         private readonly IEventVoucherService _eventVoucherService;
+        private readonly IHttpContextAccessor _contextAccessor;
 
         public BookingService(IUnitOfWork unitOfWork, IMapper mapper, IAuthentication authentication,
             IPaymentService paymentService, IEmailSender emailSender,
             INotificationService notificationService, IQRCodeService qrCodeService, IFirebase firebase,
-            IEventVoucherService eventVoucherService)
+            IEventVoucherService eventVoucherService, IHttpContextAccessor contextAccessor)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -50,13 +51,27 @@ namespace Application.Service
             _qrCodeService = qrCodeService;
             _firebase = firebase;
             _eventVoucherService = eventVoucherService;
+            _contextAccessor = contextAccessor;
         }
 
         public async Task<bool> CancelBooking(Guid BookingId)
         {
             try
             {
-                var booking = (await _unitOfWork.BookingRepository.GetAsync(b => b.BookingId == BookingId, includeProperties: "Account,Bar")).FirstOrDefault();
+
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+
+                var booking = (await _unitOfWork.BookingRepository
+                                                .GetAsync(b => b.BookingId == BookingId && 
+                                                               b.AccountId.Equals(accountId), 
+                                                               includeProperties: "Account,Bar"))
+                                                .FirstOrDefault();
+
+                if (!getAccount.AccountId.Equals(booking?.AccountId))
+                {
+                    throw new UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
+                }
 
                 if (booking == null)
                 {
@@ -104,6 +119,12 @@ namespace Application.Service
         {
             try
             {
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+
+                if(!accountId.Equals(CustomerId))
+                {
+                    throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào tài khoản này !");
+                }
                 var responses = new List<TopBookingResponse>();
                 int TotalPage = 1;
 
@@ -155,7 +176,7 @@ namespace Application.Service
 
                 return (responses, TotalPage);
             }
-            catch (Exception ex)
+            catch (InternalServerErrorException ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
@@ -165,13 +186,19 @@ namespace Application.Service
         {
             try
             {
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+
                 var response = new BookingByIdResponse();
 
-                var booking = (await _unitOfWork.BookingRepository.GetAsync(b => b.BookingId == BookingId, includeProperties: "Account,Bar")).FirstOrDefault();
+                var booking = (await _unitOfWork.BookingRepository
+                                                .GetAsync(b => b.BookingId == BookingId &&
+                                                               b.AccountId.Equals(accountId),
+                                                          includeProperties: "Account,Bar"))
+                                                .FirstOrDefault();
 
                 if (booking == null)
                 {
-                    throw new CustomException.DataNotFoundException("Không tìm thấy Id Đặt bàn");
+                    throw new CustomException.DataNotFoundException("Không tìm thấy đơn đặt bàn");
                 }
 
                 bool? isRated = null;
@@ -242,14 +269,27 @@ namespace Application.Service
         {
             try
             {
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+
                 var response = new BookingDetailByStaff();
 
-                var booking = (await _unitOfWork.BookingRepository.GetAsync(b => b.BookingId == BookingId, includeProperties: "Account,Bar")).FirstOrDefault();
+                var booking = (await _unitOfWork.BookingRepository
+                                                .GetAsync(b => b.BookingId == BookingId &&
+                                                               b.BarId.Equals(getAccount.BarId), 
+                                                          includeProperties: "Account,Bar"))
+                                                .FirstOrDefault();
+                
+                if (!getAccount.BarId.Equals(booking?.BarId))
+                {
+                    throw new UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
+                }
 
                 if (booking == null)
                 {
                     throw new CustomException.DataNotFoundException("Không tìm thấy Id Đặt bàn");
                 }
+
 
                 response.BookingId = booking.BookingId;
                 response.BookingTime = booking.BookingTime;
@@ -308,6 +348,14 @@ namespace Application.Service
         {
             try
             {
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+
+                if(!getAccount.BarId.Equals(BarId))
+                {
+                    throw new UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
+                }
+
                 var responses = new List<StaffBookingReponse>();
 
                 var Bar = await _unitOfWork.BarRepository.GetByIdAsync(BarId);
@@ -373,9 +421,14 @@ namespace Application.Service
         {
             try
             {
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                if(!accountId.Equals(CustomerId))
+                {
+                    throw new UnAuthorizedException("Bạn không có quyền truy cập vào tài khoản này !");
+                }
                 var responses = new List<TopBookingResponse>();
 
-                var bookings = await _unitOfWork.BookingRepository.GetAsync(b => b.AccountId == CustomerId,
+                var bookings = await _unitOfWork.BookingRepository.GetAsync(b => b.AccountId == accountId,
                     pageIndex: 1, pageSize: NumOfBookings,
                     orderBy: o => o.OrderByDescending(b => b.CreateAt).ThenByDescending(b => b.BookingDate),
                     includeProperties: "Bar");
@@ -411,7 +464,7 @@ namespace Application.Service
 
                 return responses;
             }
-            catch (Exception ex)
+            catch (InternalServerErrorException ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
@@ -423,9 +476,9 @@ namespace Application.Service
             {
                 var booking = _mapper.Map<Booking>(request);
                 booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext)) 
-                    ?? throw new DataNotFoundException("account not found");
+                    ?? throw new DataNotFoundException("Không tìm thấy tài khoản !");
                 booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId) 
-                    ?? throw new DataNotFoundException("Bar not found");
+                    ?? throw new DataNotFoundException("Không tìm thấy quán bar !");
 
                 var barTimes = await _unitOfWork.BarTimeRepository.GetAsync(x => x.BarId == request.BarId);
                 if (barTimes == null || !barTimes.Any())
@@ -447,11 +500,14 @@ namespace Application.Service
 
                 if (request.TableIds != null && request.TableIds.Count > 0)
                 {
-                    var existingTables = _unitOfWork.TableRepository.Get(t => request.TableIds.Contains(t.TableId) /*&& t.BarId == request.BarId*/,
-                        includeProperties: "TableType");
+                    var existingTables = _unitOfWork.TableRepository
+                                                    .Get(t => request.TableIds.Contains(t.TableId) &&
+                                                              t.TableType.BarId.Equals(request.BarId),
+                                                              includeProperties: "TableType");
+
                     if (existingTables.Count() != request.TableIds.Count)
                     {
-                        throw new CustomException.InvalidDataException("Some TableIds do not exist.");
+                        throw new CustomException.InvalidDataException("Vài bàn không tồn tại, vui lòng kiểm tra lại !");
                     }
                     foreach (var tableId in request.TableIds)
                     {
@@ -513,13 +569,22 @@ namespace Application.Service
         {
             try
             {
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+
                 var booking = _unitOfWork.BookingRepository.Get(b => b.BookingId == BookingId).FirstOrDefault();
                 _unitOfWork.BeginTransaction();
 
+                if (!getAccount.BarId.Equals(booking?.BarId))
+                {
+                    throw new UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
+                }
+
                 if (booking == null)
                 {
-                    throw new CustomException.DataNotFoundException("Không tìm thấy Id Đặt bàn.");
+                    throw new DataNotFoundException("Không tìm thấy đơn Đặt bàn.");
                 }
+
                 if (booking.Status == 1 && (Status == 2 || Status == 3))
                 {
                     throw new CustomException.InvalidDataException("Không thể thực hiện check-in: Lịch đặt chỗ đã bị hủy");
@@ -583,9 +648,9 @@ namespace Application.Service
             {
                 var booking = _mapper.Map<Booking>(request);
                 booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext)) 
-                    ?? throw new DataNotFoundException("Account not found");
+                    ?? throw new DataNotFoundException("Không tìm thấy tài khoản !");
                 booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId) 
-                    ?? throw new DataNotFoundException("Bar not found");
+                    ?? throw new DataNotFoundException("Không tìm thấy quán bar !");
 
                 var barTimes = await _unitOfWork.BarTimeRepository.GetAsync(x => x.BarId == request.BarId);
                 if (barTimes == null || !barTimes.Any())
@@ -612,8 +677,10 @@ namespace Application.Service
 
                 if (request.TableIds != null && request.TableIds.Count > 0)
                 {
-                    var existingTables = _unitOfWork.TableRepository.Get(t => request.TableIds.Contains(t.TableId),
-                        includeProperties: "TableType");
+                    var existingTables = _unitOfWork.TableRepository
+                                                        .Get(t => request.TableIds.Contains(t.TableId) &&
+                                                                  t.TableType.BarId.Equals(request.BarId),
+                                                        includeProperties: "TableType");
                     if (existingTables.Count() != request.TableIds.Count)
                     {
                         throw new CustomException.InvalidDataException("Some TableIds do not exist.");
@@ -637,8 +704,10 @@ namespace Application.Service
                 if (request.Drinks != null && request.Drinks.Count > 0)
                 {
                     var drinkIds = request.Drinks.Select(drink => drink.DrinkId).ToList();
-                    var existingDrinks = _unitOfWork.DrinkRepository.Get(d => drinkIds.Contains(d.DrinkId),
-                            includeProperties: "DrinkCategory");
+                    var existingDrinks = _unitOfWork.DrinkRepository
+                                                    .Get(d => drinkIds.Contains(d.DrinkId) &&
+                                                              d.BarId.Equals(request.BarId),
+                                                        includeProperties: "DrinkCategory");
                     double discoutVoucher = 0;
                     double maxPriceVoucher = 0;
                     double discountMount = 0;
@@ -652,7 +721,8 @@ namespace Application.Service
                         {
                             BookingId = booking.BookingId,
                             DrinkId = drink.DrinkId,
-                            ActualPrice = existingDrinks.FirstOrDefault(e => e.DrinkId == drink.DrinkId).Price,
+                            ActualPrice = existingDrinks.FirstOrDefault(e => e.DrinkId == drink.DrinkId &&
+                                                              e.BarId.Equals(request.BarId)).Price,
                             Quantity = drink.Quantity
                         };
                         totalPrice += bookingDrink.ActualPrice * bookingDrink.Quantity;

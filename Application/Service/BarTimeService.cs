@@ -60,6 +60,13 @@ namespace Application.Service
         {
             try
             {
+                var dayOfWeekList = request.Select(x => x.DayOfWeek).ToList();
+
+                if (dayOfWeekList.Distinct().Count() != dayOfWeekList.Count())
+                {
+                    throw new CustomException.InvalidDataException("Giá trị DayOfWeek trong danh sách không thể trùng lặp, vui lòng thử lại.");
+                }
+
                 var getBarTimeOfBar = _unitOfWork.BarTimeRepository.Get(filter: x => x.BarId.Equals(barId)).ToList();
 
                 if (getBarTimeOfBar.IsNullOrEmpty())

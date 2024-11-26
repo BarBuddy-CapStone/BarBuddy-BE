@@ -32,8 +32,19 @@ namespace BarBuddy_API.Controllers.Booking
         [HttpGet("{CustomerId}")]
         public async Task<IActionResult> GetAllBookingByCustomerId(Guid CustomerId, [FromQuery] int? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
-            var responses = await _bookingService.GetAllCustomerBooking(CustomerId, Status, PageIndex, PageSize);
-            return CustomResult(new { TotalPage = responses.TotalPage, response = responses.responses });
+            try
+            {
+                var responses = await _bookingService.GetAllCustomerBooking(CustomerId, Status, PageIndex, PageSize);
+                return CustomResult(new { TotalPage = responses.TotalPage, response = responses.responses });
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -45,8 +56,19 @@ namespace BarBuddy_API.Controllers.Booking
         [HttpGet("detail/{BookingId}")]
         public async Task<IActionResult> GetBookingById(Guid BookingId)
         {
-            var response = await _bookingService.GetBookingById(BookingId);
-            return CustomResult(response);
+            try
+            {
+                var response = await _bookingService.GetBookingById(BookingId);
+                return CustomResult(response);
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -59,10 +81,21 @@ namespace BarBuddy_API.Controllers.Booking
         [HttpGet("top-booking")]
         public async Task<IActionResult> GetTopBookingByCustomer([FromQuery][Required] Guid CustomerId, [FromQuery] int NumOfBookings = 4)
         {
-            var responses = await _bookingService.GetTopBookingByCustomer(CustomerId, NumOfBookings);
-            return CustomResult(responses);
+            try
+            {
+                var responses = await _bookingService.GetTopBookingByCustomer(CustomerId, NumOfBookings);
+                return CustomResult(responses);
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
-        
+
         /// <summary>
         /// Get List Booking By Staff
         /// </summary>
@@ -81,10 +114,21 @@ namespace BarBuddy_API.Controllers.Booking
         public async Task<IActionResult> GetListBookingByStaff([FromQuery] string? qrTicket, [FromQuery][Required] Guid BarId, [FromQuery] string? CustomerName, [FromQuery] string? Phone, [FromQuery] string? Email,
             [FromQuery] DateTimeOffset? bookingDate, [FromQuery] TimeSpan? bookingTime, [FromQuery] int? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
-            var responses = await _bookingService.GetListBookingAuthorized(qrTicket, BarId, CustomerName, Phone, Email, bookingDate, bookingTime, Status, PageIndex, PageSize);
-            return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.responses });
+            try
+            {
+                var responses = await _bookingService.GetListBookingAuthorized(qrTicket, BarId, CustomerName, Phone, Email, bookingDate, bookingTime, Status, PageIndex, PageSize);
+                return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.responses });
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
-        
+
         /// <summary>
         /// Get Booking Detail By Manager
         /// </summary>
@@ -103,8 +147,19 @@ namespace BarBuddy_API.Controllers.Booking
         public async Task<IActionResult> GetListBookingByManager([FromQuery] string? qrTicket, [FromQuery][Required] Guid BarId, [FromQuery] string? CustomerName, [FromQuery] string? Phone, [FromQuery] string? Email,
             [FromQuery] DateTimeOffset? bookingDate, [FromQuery] TimeSpan? bookingTime, [FromQuery] int? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
-            var responses = await _bookingService.GetListBookingAuthorized(qrTicket, BarId, CustomerName, Phone, Email, bookingDate, bookingTime, Status, PageIndex, PageSize);
-            return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.responses });
+            try
+            {
+                var responses = await _bookingService.GetListBookingAuthorized(qrTicket, BarId, CustomerName, Phone, Email, bookingDate, bookingTime, Status, PageIndex, PageSize);
+                return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.responses });
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -116,8 +171,19 @@ namespace BarBuddy_API.Controllers.Booking
         [HttpGet("manager/{bookingId}")]
         public async Task<IActionResult> GetBookingDetailByManager(Guid bookingId)
         {
-            var responses = await _bookingService.GetBookingDetailAuthorized(bookingId);
-            return CustomResult("Tải dữ liệu thành công", responses);
+            try
+            {
+                var responses = await _bookingService.GetBookingDetailAuthorized(bookingId);
+                return CustomResult("Tải dữ liệu thành công", responses);
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -144,9 +210,13 @@ namespace BarBuddy_API.Controllers.Booking
             {
                 return CustomResult(e.Message, System.Net.HttpStatusCode.BadRequest);
             }
-            catch (CustomException.InternalServerErrorException e)
+            catch (CustomException.UnAuthorizedException ex)
             {
-                return CustomResult(e.Message, System.Net.HttpStatusCode.InternalServerError);
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
             }
         }
 
@@ -159,12 +229,23 @@ namespace BarBuddy_API.Controllers.Booking
         [HttpPatch("cancel/{BookingId}")]
         public async Task<IActionResult> CancelBooking(Guid BookingId)
         {
-            var response = await _bookingService.CancelBooking(BookingId);
-            if (!response)
+            try
             {
-                return StatusCode(202, "Bạn chỉ có thể hủy bàn trước 2 giờ đồng hồ đến giờ phục vụ.");
+                var response = await _bookingService.CancelBooking(BookingId);
+                if (!response)
+                {
+                    return StatusCode(202, "Bạn chỉ có thể hủy bàn trước 2 giờ đồng hồ đến giờ phục vụ.");
+                }
+                return CustomResult("Hủy đặt bàn thành công");
             }
-            return CustomResult("Hủy đặt bàn thành công");
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -176,13 +257,32 @@ namespace BarBuddy_API.Controllers.Booking
         [HttpPost("booking-table")]
         public async Task<IActionResult> CreateBookingTableOnly([FromBody] BookingTableRequest request)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
 
-            var response = await _bookingService.CreateBookingTableOnly(request, HttpContext);
-            return CustomResult("Đặt bàn thành công", response);
+                var response = await _bookingService.CreateBookingTableOnly(request, HttpContext);
+                return CustomResult("Đặt bàn thành công", response);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.NotFound);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.BadRequest);
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -194,13 +294,32 @@ namespace BarBuddy_API.Controllers.Booking
         [HttpPost("booking-drink")]
         public async Task<IActionResult> CreateBookingTableWithDrinks([FromBody] BookingDrinkRequest request)
         {
-            if(!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
 
-            var response = await _bookingService.CreateBookingTableWithDrinks(request, HttpContext);
-            return CustomResult("Đặt bàn kèm đồ uống thành công", response);
+                var response = await _bookingService.CreateBookingTableWithDrinks(request, HttpContext);
+                return CustomResult("Đặt bàn kèm đồ uống thành công", response);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.NotFound);
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.BadRequest);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -212,13 +331,32 @@ namespace BarBuddy_API.Controllers.Booking
         [HttpPost("booking-drink/mobile")]
         public async Task<IActionResult> CreateBookingTableWithDrinksForMobile([FromBody] BookingDrinkRequest request)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
 
-            var response = await _bookingService.CreateBookingTableWithDrinks(request, HttpContext, true);
-            return CustomResult("Đặt bàn kèm đồ uống thành công", response);
+                var response = await _bookingService.CreateBookingTableWithDrinks(request, HttpContext, true);
+                return CustomResult("Đặt bàn kèm đồ uống thành công", response);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.NotFound);
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.BadRequest);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
     }
 }
