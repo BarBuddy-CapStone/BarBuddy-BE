@@ -169,7 +169,7 @@ namespace BarBuddy_API.Controllers.Drink
             try
             {
                 var response = await _drinkService.CreateDrink(request);
-                return CustomResult("Created Successfully", response);
+                return CustomResult("Đã tạo đồ uống thành công !", response);
             }
             catch (CustomException.UnAuthorizedException e)
             {
@@ -198,7 +198,7 @@ namespace BarBuddy_API.Controllers.Drink
             try
             {
                 var response = await _drinkService.UpdateDrink(drinkId, request);
-                return CustomResult("Updated Successfully", response);
+                return CustomResult("Cập nhật đồ uống thành công !", response);
             }
             catch (CustomException.DataNotFoundException e)
             {

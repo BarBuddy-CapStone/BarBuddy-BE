@@ -74,7 +74,7 @@ namespace Application.Service
             {
                 var listNoti = new List<NotificationDetail>();
                 var userId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                _ = userId.Equals(request.AccountId) ? true : throw new CustomException.InvalidDataException("Bạn không có quyền!");
+                _ = userId.Equals(request.AccountId) ? true : throw new CustomException.UnAuthorizedException("Bạn không có quyền!");
 
                 var isExist = _unitOfWork.NotificationDetailRepository
                                             .Get(filter: x => x.AccountId.Equals(userId)
@@ -112,6 +112,13 @@ namespace Application.Service
 
             try
             {
+                var userId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+
+                if(!accountId.Equals(userId))
+                {
+                    throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào tài khoản này !");
+                }
+
                 var response = new NotificationDetailResponse();
                 var getNotiOfCusById = await _unitOfWork.NotificationRepository
                     .GetAsync(

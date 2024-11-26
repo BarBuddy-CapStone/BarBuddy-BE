@@ -57,22 +57,21 @@ namespace Application.Service
 
         public async Task<FeedBackResponse> CreateFeedBack(CreateFeedBackRequest request)
         {
-            //var userId = _authentication.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
+            var userId = _authentication.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
 
-            //var user = _unitOfWork.AccountRepository.Get(u => u.AccountId == userId).FirstOrDefault();
+            var user = _unitOfWork.AccountRepository.Get(u => u.AccountId == userId).FirstOrDefault();
 
-            //var feedbackRequest = _mapper.Map<EmotionalDrinkCategory>(request);
-            //_unitOfWork.EmotionalDrinkCategoryRepository.Insert(feedbackRequest);
-            //await _unitOfWork.SaveAsync();
-
-            var booking = (await _unitOfWork.BookingRepository.GetAsync(b => b.BookingId == request.BookingId)).FirstOrDefault();
+            var booking = (await _unitOfWork.BookingRepository
+                                            .GetAsync(b => b.BookingId == request.BookingId &&
+                                                           b.AccountId.Equals(userId)))
+                                            .FirstOrDefault();
 
             if (booking == null)
             {
                 throw new CustomException.DataNotFoundException("Không tìm thấy booking");
             } else if(booking.Status != 3)
             {
-                throw new CustomException.InvalidDataException("Không thể feedback, lịch đặt bàn chưa hoàn thành");
+                throw new CustomException.InvalidDataException("Không thể đánh giá, lịch đặt bàn chưa hoàn thành");
             }
 
             var createTime = DateTimeOffset.Now;
@@ -98,10 +97,6 @@ namespace Application.Service
 
         public async Task<FeedBackResponse> UpdateFeedBack(Guid id, UpdateFeedBackRequest request)
         {
-            //var userId = _authentication.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
-
-            //var user = _unitOfWork.UserRepository.Get(u => u.Id == userId).FirstOrDefault();
-
             var feedbackID = _unitOfWork.FeedbackRepository.GetByID(id);
 
             if (feedbackID == null)
@@ -140,7 +135,14 @@ namespace Application.Service
         {
             try
             {
-                var feedback = (await _unitOfWork.FeedbackRepository.GetAsync(f => f.BookingId == BookingId, includeProperties: "Account,Bar")).FirstOrDefault();
+                var accountId = _authentication.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+
+                var feedback = (await _unitOfWork.FeedbackRepository
+                                                 .GetAsync(f => f.BookingId == BookingId && 
+                                                                f.Booking.AccountId.Equals(accountId), 
+                                                                includeProperties: "Account,Bar,Booking"))
+                                                 .FirstOrDefault();
                 if (feedback == null)
                 {
                     throw new CustomException.DataNotFoundException("Đã có lỗi xảy ra, đánh giá không tồn tại");
@@ -245,6 +247,14 @@ namespace Application.Service
         {
             try
             {
+                var accountId = _authentication.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+
+                if (!getAccount.BarId.Equals(BarId))
+                {
+                    throw new UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
+                }
+
                 var pageIndex = query.PageIndex ?? 1;
                 var pageSize = query.PageSize ?? 6;
                 var feedbacks = await _unitOfWork.FeedbackRepository.GetAsync(

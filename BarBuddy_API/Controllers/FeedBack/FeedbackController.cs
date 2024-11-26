@@ -2,6 +2,7 @@
 using Application.IService;
 using CoreApiResponse;
 using Domain.Common;
+using Domain.CustomException;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -24,12 +25,13 @@ namespace BarBuddy_API.Controllers.FeedBack
         /// Get All FeedBack By Admin
         /// </summary>
         /// <returns></returns>
-        [HttpGet("get")]
-        public async Task<IActionResult> GetFeedBack()
-        {
-            var feedback = await _feedBackService.GetFeedBack();
-            return CustomResult("Tải dữ liệu thành công", feedback);
-        }
+        //[Authorize]
+        //[HttpGet("get")]
+        //public async Task<IActionResult> GetFeedBack()
+        //{
+        //    var feedback = await _feedBackService.GetFeedBack();
+        //    return CustomResult("Tải dữ liệu thành công", feedback);
+        //}
 
         /// <summary>
         /// Get FeedBack Of Bar by Admin
@@ -44,7 +46,7 @@ namespace BarBuddy_API.Controllers.FeedBack
         public async Task<IActionResult> GetFeedBackAdmin([FromQuery] Guid? BarId, [FromQuery] bool? Status, [FromQuery] ObjectQueryCustom query)
         {
             var responses = await _feedBackService.GetFeedBackAdmin(BarId, Status, query);
-            return CustomResult(new { response = responses});
+            return CustomResult(new { response = responses });
         }
 
         /// <summary>
@@ -58,8 +60,19 @@ namespace BarBuddy_API.Controllers.FeedBack
         [HttpGet("manager")]
         public async Task<IActionResult> GetFeedBackManager([FromQuery][Required] Guid BarId, [FromQuery] ObjectQueryCustom query)
         {
-            var responses = await _feedBackService.GetFeedBackManager(BarId, query);
-            return CustomResult("Tải dữ liệu thành công", responses);
+            try
+            {
+                var responses = await _feedBackService.GetFeedBackManager(BarId, query);
+                return CustomResult("Tải dữ liệu thành công", responses);
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -79,7 +92,7 @@ namespace BarBuddy_API.Controllers.FeedBack
         /// </summary>
         /// <param name="bookingId"></param>
         /// <returns></returns>
-        [AllowAnonymous]
+        [Authorize(Roles = "CUSTOMER")]
         [HttpGet("booking/{bookingId}")]
         public async Task<IActionResult> GetFeedBackByBookingID(Guid bookingId)
         {
@@ -96,8 +109,19 @@ namespace BarBuddy_API.Controllers.FeedBack
         [HttpPost("createFeedBack")]
         public async Task<IActionResult> CreateFeedBack(CreateFeedBackRequest request)
         {
-            var feedback = await _feedBackService.CreateFeedBack(request);
-            return CustomResult("Tạo Feedback thành công.", feedback);
+            try
+            {
+                var feedback = await _feedBackService.CreateFeedBack(request);
+                return CustomResult("Tạo Feedback thành công.", feedback);
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
         /// <summary>
@@ -106,12 +130,13 @@ namespace BarBuddy_API.Controllers.FeedBack
         /// <param name="id"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        [HttpPatch("{id}")]
-        public async Task<IActionResult> UpdateFeedBack(Guid id, UpdateFeedBackRequest request)
-        {
-            var feedback = await _feedBackService.UpdateFeedBack(id, request);
-            return CustomResult("Cập Nhật Feedback thành công.", feedback);
-        }
+        //[Authorize(Roles ="ADMIN")]
+        //[HttpPatch("{id}")]
+        //public async Task<IActionResult> UpdateFeedBack(Guid id, UpdateFeedBackRequest request)
+        //{
+        //    var feedback = await _feedBackService.UpdateFeedBack(id, request);
+        //    return CustomResult("Cập Nhật Feedback thành công.", feedback);
+        //}
 
         /// <summary>
         /// Update FeedBack based FeedbackId
@@ -119,6 +144,7 @@ namespace BarBuddy_API.Controllers.FeedBack
         /// <param name="FeedbackId"></param>
         /// <param name="Status"></param>
         /// <returns></returns>
+        [Authorize(Roles = "ADMIN")]
         [HttpPatch("status")]
         public async Task<IActionResult> UpdateFeedBack([FromQuery] Guid FeedbackId, [FromQuery] bool Status)
         {
@@ -131,11 +157,11 @@ namespace BarBuddy_API.Controllers.FeedBack
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpPatch("deleteEmotionCategory/{id}")]
-        public async Task<IActionResult> DeleteUpdateFeedBack(Guid id)
-        {
-            var feedback = await _feedBackService.DeleteUpdateFeedBack(id);
-            return CustomResult("Xóa Feedback thành công.", feedback);
-        }
+        //[HttpPatch("deleteEmotionCategory/{id}")]
+        //public async Task<IActionResult> DeleteUpdateFeedBack(Guid id)
+        //{
+        //    var feedback = await _feedBackService.DeleteUpdateFeedBack(id);
+        //    return CustomResult("Xóa Feedback thành công.", feedback);
+        //}
     }
 }

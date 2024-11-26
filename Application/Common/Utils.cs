@@ -160,7 +160,7 @@ namespace Application.Common
 
             if (!isValidTime)
             {
-                throw new CustomException.InvalidDataException("Thời gian phải nằm trong giờ mở cửa và giờ đóng cửa của quán Bar!");
+                throw new CustomException.InvalidDataException("Voucher chỉ được áp dụng trước và trong thời gian diễn ra sự kiện !");
             }
 
             return isValidTime;

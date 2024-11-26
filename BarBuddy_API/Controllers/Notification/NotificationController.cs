@@ -4,6 +4,7 @@ using CoreApiResponse;
 using Domain.CustomException;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace BarBuddy_API.Controllers.Notification
 {
@@ -25,9 +26,14 @@ namespace BarBuddy_API.Controllers.Notification
             {
                 var response = await _notificationService.GetAllNotiOfCus(accountId);
                 return CustomResult("Data đã tải lên", response);
-            }catch (CustomException.InternalServerErrorException ex)
+            }
+            catch (CustomException.UnAuthorizedException ex)
             {
-                throw new CustomException.InternalServerErrorException(ex.Message, ex);
+                return CustomResult(ex.Message, HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.InternalServerError);
             }
         }
         [Authorize(Roles = "CUSTOMER")]
@@ -39,9 +45,13 @@ namespace BarBuddy_API.Controllers.Notification
                 var response = await _notificationService.UpdateIsReadNoti(request);
                 return CustomResult("Đã đọc hết thông báo", response);
             }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, HttpStatusCode.Unauthorized);
+            }
             catch (CustomException.InternalServerErrorException ex)
             {
-                throw new CustomException.InternalServerErrorException(ex.Message, ex);
+                return CustomResult(ex.Message, HttpStatusCode.InternalServerError);
             }
         }
     }
