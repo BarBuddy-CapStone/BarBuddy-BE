@@ -558,6 +558,21 @@ namespace Application.Service
                     await _notificationService.CreateNotification(creNoti);
                     _unitOfWork.CommitTransaction();
                     await _emailSender.SendBookingInfo(booking);
+
+                    var bar = await _unitOfWork.BarRepository.GetByIdAsync(booking.BarId);
+
+                    var fcmNotification = new CreateNotificationRequest
+                    {
+                        BarId = booking.Bar.BarId,
+                        DeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
+                        ImageUrl = bar == null ? null : bar.Images.Split(',')[0],
+                        IsPublic = false,
+                        Message = $"Đặt bàn thành công tại {bar.BarName} với mã đặt chỗ {booking.BookingCode}, quý khách hãy dùng mã đặt chỗ hoặc mã QR để thực hiện check-in khi đến quán.",
+                        Title = $"Đặt bàn thành công tại {bar.BarName}!",
+                        Type = FcmNotificationType.BOOKING
+                    };
+
+                    await _fcmService.CreateAndSendNotificationToCustomer(fcmNotification, booking.AccountId);
                 }
                 catch (Exception ex)
                 {
@@ -568,22 +583,6 @@ namespace Application.Service
                 {
                     _unitOfWork.Dispose();
                 }
-
-                var bar = await _unitOfWork.BarRepository.GetByIdAsync(booking.BarId);
-
-                var fcmNotification = new CreateNotificationRequest
-                {
-                    BarId = booking.Bar.BarId,
-                    DeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
-                    ImageUrl = bar == null ? null : bar.Images.Split(',')[0],
-                    IsPublic = false,
-                    Message = $"Đặt bàn thành công tại {bar.BarName} với mã đặt chỗ {booking.BookingCode}, quý khách hãy dùng mã đặt chỗ hoặc mã QR để thực hiện check-in khi đến quán.",
-                    Title = $"Đặt bàn thành công tại {bar.BarName}!",
-                    Type = FcmNotificationType.BOOKING
-                };
-
-                await _fcmService.CreateAndSendNotificationToCustomer(fcmNotification, booking.AccountId);
-
                 return _mapper.Map<BookingResponse>(booking);
             }
             catch (DataNotFoundException ex)
@@ -820,30 +819,30 @@ namespace Application.Service
                     await _notificationService.CreateNotification(creNoti);
                     _unitOfWork.CommitTransaction();
                     await _emailSender.SendBookingInfo(booking, totalPrice);
+
+                    var bar = await _unitOfWork.BarRepository.GetByIdAsync(booking.BarId);
+
+                    var fcmNotification = new CreateNotificationRequest
+                    {
+                        BarId = booking.Bar.BarId,
+                        DeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
+                        ImageUrl = bar == null ? null : bar.Images.Split(',')[0],
+                        IsPublic = false,
+                        Message = $"Đặt bàn thành công tại {bar.BarName} với mã đặt chỗ {booking.BookingCode}, quý khách hãy dùng mã đặt chỗ hoặc mã QR để thực hiện check-in khi đến quán.",
+                        Title = $"Đặt bàn thành công tại {bar.BarName}!",
+                        Type = FcmNotificationType.BOOKING
+                    };
+
+                    await _fcmService.CreateAndSendNotificationToCustomer(fcmNotification, booking.AccountId);
+
+                    return _paymentService.GetPaymentLink(booking.BookingId, booking.AccountId,
+                                request.PaymentDestination, totalPrice, isMobile);
                 }
                 catch (Exception ex)
                 {
                     _unitOfWork.RollBack();
                     throw new InternalServerErrorException($"An Internal error occurred: {ex.Message}");
-                }
-
-                var bar = await _unitOfWork.BarRepository.GetByIdAsync(booking.BarId);
-
-                var fcmNotification = new CreateNotificationRequest
-                {
-                    BarId = booking.Bar.BarId,
-                    DeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
-                    ImageUrl = bar == null ? null : bar.Images.Split(',')[0],
-                    IsPublic = false,
-                    Message = $"Đặt bàn thành công tại {bar.BarName} với mã đặt chỗ {booking.BookingCode}, quý khách hãy dùng mã đặt chỗ hoặc mã QR để thực hiện check-in khi đến quán.",
-                    Title = $"Đặt bàn thành công tại {bar.BarName}!",
-                    Type = FcmNotificationType.BOOKING
-                };
-
-                await _fcmService.CreateAndSendNotificationToCustomer(fcmNotification, booking.AccountId);
-
-                return _paymentService.GetPaymentLink(booking.BookingId, booking.AccountId,
-                            request.PaymentDestination, totalPrice, isMobile);
+                }  
             }
             catch (DataNotFoundException ex)
             {

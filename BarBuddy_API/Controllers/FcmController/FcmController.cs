@@ -37,11 +37,7 @@ namespace BarBuddy_API.Controllers.FcmController
         {
             try 
             {
-                Guid? accountId = null;
-                if (User.Identity.IsAuthenticated)
-                {
-                    accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
-                }
+                Guid? accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
 
                 var notifications = await _fcmService.GetNotifications(deviceToken, accountId, page);
                 return CustomResult("Lấy danh sách thông báo thành công", notifications);
@@ -89,11 +85,7 @@ namespace BarBuddy_API.Controllers.FcmController
         {
             try
             {
-                Guid? accountId = null;
-                if (User.Identity.IsAuthenticated)
-                {
-                    accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
-                }
+                Guid? accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
 
                 var count = await _fcmService.GetUnreadNotificationCount(deviceToken, accountId);
                 return CustomResult("Lấy số lượng thông báo chưa đọc thành công", count);
