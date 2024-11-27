@@ -63,8 +63,8 @@ namespace Application.Service
                 var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
 
                 var booking = (await _unitOfWork.BookingRepository
-                                                .GetAsync(b => b.BookingId == BookingId && 
-                                                               b.AccountId.Equals(accountId), 
+                                                .GetAsync(b => b.BookingId == BookingId &&
+                                                               b.AccountId.Equals(accountId),
                                                                includeProperties: "Account,Bar"))
                                                 .FirstOrDefault();
 
@@ -105,7 +105,7 @@ namespace Application.Service
                 _unitOfWork.CommitTransaction();
                 return true;
             }
-            catch(DataNotFoundException ex)
+            catch (DataNotFoundException ex)
             {
                 throw new CustomException.DataNotFoundException(ex.Message);
             }
@@ -121,7 +121,7 @@ namespace Application.Service
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
 
-                if(!accountId.Equals(CustomerId))
+                if (!accountId.Equals(CustomerId))
                 {
                     throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào tài khoản này !");
                 }
@@ -276,10 +276,10 @@ namespace Application.Service
 
                 var booking = (await _unitOfWork.BookingRepository
                                                 .GetAsync(b => b.BookingId == BookingId &&
-                                                               b.BarId.Equals(getAccount.BarId), 
+                                                               b.BarId.Equals(getAccount.BarId),
                                                           includeProperties: "Account,Bar"))
                                                 .FirstOrDefault();
-                
+
                 if (!getAccount.BarId.Equals(booking?.BarId))
                 {
                     throw new UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
@@ -351,7 +351,7 @@ namespace Application.Service
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
                 var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
 
-                if(!getAccount.BarId.Equals(BarId))
+                if (!getAccount.BarId.Equals(BarId))
                 {
                     throw new UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
                 }
@@ -422,7 +422,7 @@ namespace Application.Service
             try
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                if(!accountId.Equals(CustomerId))
+                if (!accountId.Equals(CustomerId))
                 {
                     throw new UnAuthorizedException("Bạn không có quyền truy cập vào tài khoản này !");
                 }
@@ -475,9 +475,9 @@ namespace Application.Service
             try
             {
                 var booking = _mapper.Map<Booking>(request);
-                booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext)) 
+                booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext))
                     ?? throw new DataNotFoundException("Không tìm thấy tài khoản !");
-                booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId) 
+                booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId)
                     ?? throw new DataNotFoundException("Không tìm thấy quán bar !");
 
                 var barTimes = await _unitOfWork.BarTimeRepository.GetAsync(x => x.BarId == request.BarId);
@@ -647,9 +647,9 @@ namespace Application.Service
             try
             {
                 var booking = _mapper.Map<Booking>(request);
-                booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext)) 
+                booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext))
                     ?? throw new DataNotFoundException("Không tìm thấy tài khoản !");
-                booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId) 
+                booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId)
                     ?? throw new DataNotFoundException("Không tìm thấy quán bar !");
 
                 var barTimes = await _unitOfWork.BarTimeRepository.GetAsync(x => x.BarId == request.BarId);
@@ -877,6 +877,46 @@ namespace Application.Service
             catch (InternalServerErrorException ex)
             {
                 throw new InternalServerErrorException("Lỗi hệ thống !");
+            }
+        }
+
+        public async Task UpdateStsBookingServing(Guid bookingId)
+        {
+            try
+            {
+                var timeNow = DateTimeOffset.Now.AddMinutes(45).TimeOfDay;
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getBooking = _unitOfWork.BookingRepository.GetByID(bookingId);
+
+                if (!getAccount.BarId.Equals(getBooking.BarId))
+                {
+                    throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
+                }
+
+                if(getBooking.BookingDate.Date != DateTime.Now.Date)
+                {
+                    throw new CustomException.InvalidDataException("Đơn booking này chưa tới ngày check-in !");
+                }
+
+                if(getBooking.BookingTime > DateTimeOffset.Now.AddMinutes(45).TimeOfDay)
+                {
+                    throw new CustomException.InvalidDataException("Chưa tới giờ check-in !");
+                }
+
+                if(getBooking.Status != (int)PrefixValueEnum.PendingBooking)
+                {
+                    throw new CustomException.InvalidDataException("Đơn này phải ở trạng thái đang chờ !");
+                }
+
+                getBooking.Status = (int)PrefixValueEnum.Serving;
+                await _unitOfWork.BookingRepository.UpdateRangeAsync(getBooking);
+                await Task.Delay(10);
+                await _unitOfWork.SaveAsync();
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
             }
         }
     }

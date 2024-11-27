@@ -24,5 +24,6 @@ namespace Application.IService
         Task<PaymentLink> CreateBookingTableWithDrinks(BookingDrinkRequest request, HttpContext httpContext, bool isMobile = false);
         Task<List<BookingCustomResponse>> GetAllBookingByStsPending();
         Task<List<BookingCustomResponse>> GetAllBookingByStsPendingCus();
+        Task UpdateStsBookingServing(Guid bookingId);
     }
 }
