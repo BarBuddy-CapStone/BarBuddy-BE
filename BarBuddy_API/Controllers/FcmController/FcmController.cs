@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.Fcm;
 using Application.Interfaces;
 using CoreApiResponse;
+using Domain.CustomException;
 using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -37,7 +38,13 @@ namespace BarBuddy_API.Controllers.FcmController
         {
             try 
             {
-                Guid? accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
+                Guid? accountId = null;
+                var flag = HttpContext.Request.Headers.ContainsKey("Authorization");
+
+                if (flag)
+                {
+                    accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
+                }
 
                 var notifications = await _fcmService.GetNotifications(deviceToken, accountId, page);
                 return CustomResult("Lấy danh sách thông báo thành công", notifications);
@@ -85,7 +92,13 @@ namespace BarBuddy_API.Controllers.FcmController
         {
             try
             {
-                Guid? accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
+                Guid? accountId = null;
+                var flag = HttpContext.Request.Headers.ContainsKey("Authorization");
+
+                if (flag)
+                {
+                    accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
+                }
 
                 var count = await _fcmService.GetUnreadNotificationCount(deviceToken, accountId);
                 return CustomResult("Lấy số lượng thông báo chưa đọc thành công", count);
