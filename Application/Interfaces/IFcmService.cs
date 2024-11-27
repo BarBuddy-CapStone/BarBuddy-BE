@@ -14,5 +14,6 @@ namespace Application.Interfaces
         Task SendBroadcastNotification(string title, string message, Dictionary<string, string> data = null);
         Task<List<NotificationResponse>> GetNotifications(string deviceToken, Guid? accountId = null, int page = 1, int pageSize = 20);
         Task<int> GetUnreadNotificationCount(string deviceToken, Guid? accountId = null);
+        Task<Guid> CreateAndSendNotificationToCustomer(CreateNotificationRequest request, Guid customerId);
     }
 }

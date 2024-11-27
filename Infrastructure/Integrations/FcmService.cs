@@ -345,5 +345,82 @@ namespace Infrastructure.Integrations
                 throw;
             }
         }
+
+        public async Task<Guid> CreateAndSendNotificationToCustomer(CreateNotificationRequest request, Guid customerId)
+        {
+            var notification = _mapper.Map<FcmNotification>(request);
+            await _unitOfWork.FcmNotificationRepository.InsertAsync(notification);
+
+            // Lấy device của customer cụ thể
+            var customerDevices = await _unitOfWork.FcmUserDeviceRepository
+                .GetAsync(d => d.IsActive && d.AccountId == customerId);
+
+            foreach (var device in customerDevices)
+            {
+                try
+                {
+                    await SendPushNotification(device.DeviceToken, notification);
+                    await _unitOfWork.FcmNotificationCustomerRepository.InsertAsync(
+                        new FcmNotificationCustomer
+                        {
+                            NotificationId = notification.Id,
+                            CustomerId = customerId,
+                            DeviceToken = device.DeviceToken,
+                            CreatedAt = DateTimeOffset.UtcNow
+                        }
+                    );
+                }
+                catch (FirebaseMessagingException ex)
+                {
+                    if (ex.MessagingErrorCode == MessagingErrorCode.Unregistered)
+                    {
+                        device.IsActive = false;
+                    }
+                }
+            }
+
+            // Lưu thay đổi vào database TRƯỚC KHI gửi SignalR
+            await _unitOfWork.SaveAsync();
+
+            // Tạo notification data để gửi qua SignalR
+            var notificationData = new
+            {
+                id = notification.Id,
+                title = notification.Title,
+                message = notification.Message,
+                type = notification.Type,
+                timestamp = notification.CreatedAt,
+                deepLink = notification.DeepLink,
+                imageUrl = notification.ImageUrl,
+                isRead = false,
+                barId = notification.BarId,
+                isPublic = false,
+                readAt = (DateTimeOffset?)null
+            };
+
+            // Lấy tất cả device đang kết nối của customer này
+            var connections = _connectionMapping.GetAllConnections()
+                .Where(c => c.Value.AccountId == customerId.ToString());
+            
+            foreach (var connection in connections)
+            {
+                var deviceToken = connection.Value.DeviceToken;
+                var accountId = connection.Value.AccountId;
+
+                // 1. Gửi notification
+                await _notificationHub.Clients.Group($"user_{accountId}")
+                    .SendAsync("ReceiveNotification", notificationData);
+
+                // 2. Gửi unread count mới
+                var unreadCount = await GetUnreadNotificationCount(
+                    deviceToken,
+                    customerId);
+
+                await _notificationHub.Clients.Group($"user_{accountId}")
+                    .SendAsync("ReceiveUnreadCount", unreadCount);
+            }
+
+            return notification.Id;
+        }
     }
 }

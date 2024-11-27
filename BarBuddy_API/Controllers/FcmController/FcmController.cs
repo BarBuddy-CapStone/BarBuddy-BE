@@ -103,5 +103,21 @@ namespace BarBuddy_API.Controllers.FcmController
                 return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
             }
         }
+
+        [HttpPost("notification/customer/{customerId}")]
+        public async Task<IActionResult> CreateNotificationForCustomer(
+            [FromBody] CreateNotificationRequest request,
+            [FromRoute] Guid customerId)
+        {
+            try 
+            {
+                var notificationId = await _fcmService.CreateAndSendNotificationToCustomer(request, customerId);
+                return CustomResult("Gửi thông báo thành công", notificationId);
+            }
+            catch (Exception ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }

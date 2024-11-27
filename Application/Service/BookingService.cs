@@ -3,6 +3,7 @@ using Application.DTOs.Booking;
 using Application.DTOs.BookingDrink;
 using Application.DTOs.BookingTable;
 using Application.DTOs.Events.EventVoucher;
+using Application.DTOs.Fcm;
 using Application.DTOs.Notification;
 using Application.DTOs.Payment;
 using Application.Interfaces;
@@ -36,11 +37,12 @@ namespace Application.Service
         private readonly ILogger<BookingService> _logger;
         private readonly IEventVoucherService _eventVoucherService;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IFcmService _fcmService;
 
         public BookingService(IUnitOfWork unitOfWork, IMapper mapper, IAuthentication authentication,
             IPaymentService paymentService, IEmailSender emailSender,
             INotificationService notificationService, IQRCodeService qrCodeService, IFirebase firebase,
-            IEventVoucherService eventVoucherService, IHttpContextAccessor contextAccessor)
+            IEventVoucherService eventVoucherService, IHttpContextAccessor contextAccessor, IFcmService fcmService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -52,6 +54,7 @@ namespace Application.Service
             _firebase = firebase;
             _eventVoucherService = eventVoucherService;
             _contextAccessor = contextAccessor;
+            _fcmService = fcmService;
         }
 
         public async Task<bool> CancelBooking(Guid BookingId)
@@ -103,6 +106,22 @@ namespace Application.Service
                 await _notificationService.CreateNotification(creNoti);
                 await _unitOfWork.SaveAsync();
                 _unitOfWork.CommitTransaction();
+
+                var bar = await _unitOfWork.BarRepository.GetByIdAsync(booking.BarId);
+
+                var fcmNotification = new CreateNotificationRequest
+                {
+                    BarId = booking.Bar.BarId,
+                    DeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
+                    ImageUrl = bar == null ? null : bar.Images.Split(',')[0],
+                    IsPublic = false,
+                    Message = $"Đơn đặt chỗ tại {bar.BarName} với mã đặt chỗ {booking.BookingCode} vào lúc {booking.BookingTime} - {booking.BookingDate.ToString("yyyy/mm/dd")} đã được hủy thành công.",
+                    Title = $"Hủy đặt chỗ tại {bar.BarName} thành công!",
+                    Type = FcmNotificationType.BOOKING
+                };
+
+                await _fcmService.CreateAndSendNotificationToCustomer(fcmNotification, booking.AccountId);
+
                 return true;
             }
             catch(DataNotFoundException ex)
@@ -549,6 +568,22 @@ namespace Application.Service
                 {
                     _unitOfWork.Dispose();
                 }
+
+                var bar = await _unitOfWork.BarRepository.GetByIdAsync(booking.BarId);
+
+                var fcmNotification = new CreateNotificationRequest
+                {
+                    BarId = booking.Bar.BarId,
+                    DeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
+                    ImageUrl = bar == null ? null : bar.Images.Split(',')[0],
+                    IsPublic = false,
+                    Message = $"Đặt bàn thành công tại {bar.BarName} với mã đặt chỗ {booking.BookingCode}, quý khách hãy dùng mã đặt chỗ hoặc mã QR để thực hiện check-in khi đến quán.",
+                    Title = $"Đặt bàn thành công tại {bar.BarName}!",
+                    Type = FcmNotificationType.BOOKING
+                };
+
+                await _fcmService.CreateAndSendNotificationToCustomer(fcmNotification, booking.AccountId);
+
                 return _mapper.Map<BookingResponse>(booking);
             }
             catch (DataNotFoundException ex)
@@ -791,6 +826,22 @@ namespace Application.Service
                     _unitOfWork.RollBack();
                     throw new InternalServerErrorException($"An Internal error occurred: {ex.Message}");
                 }
+
+                var bar = await _unitOfWork.BarRepository.GetByIdAsync(booking.BarId);
+
+                var fcmNotification = new CreateNotificationRequest
+                {
+                    BarId = booking.Bar.BarId,
+                    DeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
+                    ImageUrl = bar == null ? null : bar.Images.Split(',')[0],
+                    IsPublic = false,
+                    Message = $"Đặt bàn thành công tại {bar.BarName} với mã đặt chỗ {booking.BookingCode}, quý khách hãy dùng mã đặt chỗ hoặc mã QR để thực hiện check-in khi đến quán.",
+                    Title = $"Đặt bàn thành công tại {bar.BarName}!",
+                    Type = FcmNotificationType.BOOKING
+                };
+
+                await _fcmService.CreateAndSendNotificationToCustomer(fcmNotification, booking.AccountId);
+
                 return _paymentService.GetPaymentLink(booking.BookingId, booking.AccountId,
                             request.PaymentDestination, totalPrice, isMobile);
             }
