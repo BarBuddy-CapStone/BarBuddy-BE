@@ -358,5 +358,28 @@ namespace BarBuddy_API.Controllers.Booking
                 return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
             }
         }
+
+        [Authorize(Roles ="STAFF")]
+        [HttpPatch("update-serving/{bookingId}")]
+        public async Task<IActionResult> UpdateStsBookingServing(Guid bookingId)
+        {
+            try
+            {
+                await _bookingService.UpdateStsBookingServing(bookingId);
+                return CustomResult("Đã cập nhật đơn booking với trạng thái đang phục vụ !");
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.BadRequest);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }
