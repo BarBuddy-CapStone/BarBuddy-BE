@@ -331,7 +331,7 @@ namespace BarBuddy_API.Controllers.Bar
             }
         }
 
-        [Authorize(Roles = "ADMIN,MANAGER")]
+        [Authorize(Roles = "ADMIN,MANAGER,STAFF")]
         [HttpGet("customer/getBarByAdminManager")]
         public async Task<IActionResult> GetBarNameIdAdMana([FromQuery] ObjectQuery query)
         {
