@@ -1,6 +1,7 @@
 ﻿using Application.DTOs.Fcm;
 using Application.Interfaces;
 using CoreApiResponse;
+using Domain.CustomException;
 using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -31,19 +32,27 @@ namespace BarBuddy_API.Controllers.FcmController
         }
 
         [HttpGet("notifications")]
-        [Authorize]
-        public async Task<IActionResult> GetNotifications([FromQuery] int page = 1)
+        public async Task<IActionResult> GetNotifications(
+            [FromQuery] string deviceToken,
+            [FromQuery] int page = 1)
         {
-            var accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
-            var notifications = await _fcmService.GetNotificationsForUser(accountId, page);
-            return CustomResult("Lấy danh sách thông báo thành công", notifications);
-        }
+            try 
+            {
+                Guid? accountId = null;
+                var flag = HttpContext.Request.Headers.ContainsKey("Authorization");
 
-        [HttpGet("notifications/public")]
-        public async Task<IActionResult> GetPublicNotifications([FromQuery] string deviceToken, [FromQuery] int page = 1)
-        {
-            var notifications = await _fcmService.GetPublicNotifications(deviceToken, page);
-            return CustomResult("Lấy danh sách thông báo công khai thành công", notifications);
+                if (flag)
+                {
+                    accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
+                }
+
+                var notifications = await _fcmService.GetNotifications(deviceToken, accountId, page);
+                return CustomResult("Lấy danh sách thông báo thành công", notifications);
+            }
+            catch (Exception ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
         [HttpPost("sign-device-token")]
@@ -78,36 +87,42 @@ namespace BarBuddy_API.Controllers.FcmController
             }
         }
 
-        [HttpPost("notifications/{notificationId}/read")]
-        public async Task<IActionResult> MarkNotificationAsRead(Guid notificationId)
+        [HttpGet("unread-count")]
+        public async Task<IActionResult> GetUnreadNotificationCount([FromQuery] string deviceToken)
         {
-            var accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
-            await _fcmService.MarkAsRead(notificationId, accountId);
-            return CustomResult("Đánh dấu thông báo đã đọc thành công");
+            try
+            {
+                Guid? accountId = null;
+                var flag = HttpContext.Request.Headers.ContainsKey("Authorization");
+
+                if (flag)
+                {
+                    accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
+                }
+
+                var count = await _fcmService.GetUnreadNotificationCount(deviceToken, accountId);
+                return CustomResult("Lấy số lượng thông báo chưa đọc thành công", count);
+            }
+            catch (Exception ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
 
-        [HttpPost("notifications/mark-all-read")]
-        public async Task<IActionResult> MarkAllNotificationsAsRead()
+        [HttpPost("notification/customer/{customerId}")]
+        public async Task<IActionResult> CreateNotificationForCustomer(
+            [FromBody] CreateNotificationRequest request,
+            [FromRoute] Guid customerId)
         {
-            var accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
-            await _fcmService.MarkAllAsRead(accountId);
-            return CustomResult("Đánh dấu tất cả thông báo đã đọc thành công");
-        }
-
-        [HttpPost("notifications/{notificationId}/read-by-device")]
-        public async Task<IActionResult> MarkNotificationAsReadByDevice(
-            Guid notificationId, 
-            [FromBody] string deviceToken)
-        {
-            await _fcmService.MarkAsReadByDeviceToken(notificationId, deviceToken);
-            return CustomResult("Đánh dấu thông báo đã đọc thành công");
-        }
-
-        [HttpPost("notifications/mark-all-read-by-device")]
-        public async Task<IActionResult> MarkAllNotificationsAsReadByDevice([FromBody] string deviceToken)
-        {
-            await _fcmService.MarkAllAsReadByDeviceToken(deviceToken);
-            return CustomResult("Đánh dấu tất cả thông báo đã đọc thành công");
+            try 
+            {
+                var notificationId = await _fcmService.CreateAndSendNotificationToCustomer(request, customerId);
+                return CustomResult("Gửi thông báo thành công", notificationId);
+            }
+            catch (Exception ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
         }
     }
 }

@@ -25,7 +25,7 @@ namespace Persistence.DependencyInjection
             var serverVersion = new MySqlServerVersion(new Version(8, 0, 0));
             services.AddDbContext<MyDbContext>(options =>
             {
-                var connectionString = configuration.GetConnectionString("MyDB");
+                var connectionString = configuration.GetConnectionString("AwsDB");
                 options.UseMySql(connectionString, serverVersion, options => options.MigrationsAssembly("Persistence"));
             });
         }
