@@ -224,6 +224,11 @@ AppPackages/
 # Firebase
 firebase-adminsdk.json
 
+#
+appsettings.json
+appsettings.Development.json
+
 #####
 # End of core ignore list, below put you custom 'per project' settings (patterns or path)
 #####
+BarBuddy_API/appsettings.json

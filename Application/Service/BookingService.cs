@@ -180,6 +180,7 @@ namespace Application.Service
                     var response = new TopBookingResponse
                     {
                         BarName = booking.Bar.BarName,
+                        BarId = booking.BarId,
                         BookingDate = booking.BookingDate,
                         BookingId = booking.BookingId,
                         BookingTime = booking.BookingTime,
@@ -187,7 +188,8 @@ namespace Application.Service
                         Status = booking.Status,
                         Image = booking.Bar.Images.Split(',')[0],
                         IsRated = checkIsRated,
-                        BookingCode = booking.BookingCode
+                        BookingCode = booking.BookingCode,
+                        Note = booking.Note
                     };
                     responses.Add(response);
                 }
@@ -236,6 +238,7 @@ namespace Application.Service
 
                 response.BookingId = booking.BookingId;
                 response.BookingTime = booking.BookingTime;
+                response.BarId = booking.BarId;
                 response.Status = booking.Status;
                 response.CreateAt = booking.CreateAt;
                 response.BookingDate = booking.BookingDate;
@@ -424,6 +427,7 @@ namespace Application.Service
                         AdditionalFee = booking.AdditionalFee,
                         TotalPrice = booking.TotalPrice,
                         QRTicket = booking.QRTicket,
+                        Note = booking.Note
                     };
                     responses.Add(response);
                 }
@@ -483,7 +487,8 @@ namespace Application.Service
                         Status = booking.Status,
                         Image = booking.Bar.Images.Split(',')[0],
                         IsRated = checkIsRated,
-                        BookingCode = booking.BookingCode
+                        BookingCode = booking.BookingCode,
+                        Note = booking.Note
                     };
                     responses.Add(response);
                 }
@@ -1042,6 +1047,7 @@ namespace Application.Service
                         AdditionalFee = booking.AdditionalFee,
                         TotalPrice = booking.TotalPrice,
                         QRTicket = booking.QRTicket,
+                        Note = booking.Note,
                     };
                     responses.Add(response);
                 }

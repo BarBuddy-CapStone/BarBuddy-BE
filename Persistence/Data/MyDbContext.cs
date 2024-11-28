@@ -54,7 +54,7 @@ namespace Persistence.Data
                     .Build();
 
                 optionsBuilder.UseMySql(
-                    configuration.GetConnectionString("AwsDB"), 
+                    configuration.GetConnectionString("MyDB"), 
                     new MySqlServerVersion(new Version(8, 0, 23))
                 );
             }

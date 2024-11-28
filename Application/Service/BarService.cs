@@ -563,7 +563,8 @@ namespace Application.Service
             Expression<Func<Bar, bool>> filter = null;
             if (!string.IsNullOrWhiteSpace(query.Search))
             {
-                if (getAccount.Role.RoleName.Equals(PrefixKeyConstant.MANAGER))
+                if (getAccount.Role.RoleName.Equals(PrefixKeyConstant.MANAGER) || 
+                    getAccount.Role.RoleName.Equals(PrefixKeyConstant.STAFF))
                 {
                     filter = bar => bar.BarId.Equals(getAccount.BarId) &&
                                    bar.BarName.Contains(query.Search);
