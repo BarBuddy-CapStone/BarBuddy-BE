@@ -956,17 +956,17 @@ namespace Application.Service
                     throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
                 }
 
-                if(getBooking.BookingDate.Date != DateTime.Now.Date)
+                if (getBooking.BookingDate.Date != DateTime.Now.Date)
                 {
                     throw new CustomException.InvalidDataException("Đơn booking này chưa tới ngày check-in !");
                 }
 
-                if(getBooking.BookingTime > DateTimeOffset.Now.AddMinutes(45).TimeOfDay)
+                if (getBooking.BookingTime > DateTimeOffset.Now.AddMinutes(45).TimeOfDay)
                 {
                     throw new CustomException.InvalidDataException("Chưa tới giờ check-in !");
                 }
 
-                if(getBooking.Status != (int)PrefixValueEnum.PendingBooking)
+                if (getBooking.Status != (int)PrefixValueEnum.PendingBooking)
                 {
                     throw new CustomException.InvalidDataException("Đơn này phải ở trạng thái đang chờ !");
                 }
@@ -979,6 +979,148 @@ namespace Application.Service
             catch (CustomException.InternalServerErrorException ex)
             {
                 throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
+            }
+        }
+
+        public async Task<(List<StaffBookingReponse> responses, int TotalPage)> GetListBookingAuthorizedAdmin(string qrTicket, Guid? BarId, string? CustomerName, string? Phone, string? Email, DateTimeOffset? bookingDate, TimeSpan? bookingTime, int? Status, int PageIndex, int PageSize)
+        {
+            try
+            {
+                var responses = new List<StaffBookingReponse>();
+
+
+                if (BarId != Guid.Empty)
+                {
+                    var Bar = await _unitOfWork.BarRepository.GetByIdAsync(BarId);
+                    if (Bar == null)
+                    {
+                        throw new CustomException.DataNotFoundException("Không có thông tin của Bar");
+                    }
+                }
+
+                Expression<Func<Booking, bool>> filter = b =>
+                (BarId == Guid.Empty || BarId.HasValue && b.BarId == BarId) &&
+                (string.IsNullOrEmpty(CustomerName) || b.Account.Fullname.Contains(CustomerName)) &&
+                (string.IsNullOrEmpty(Phone) || b.Account.Phone.Contains(Phone)) &&
+                (string.IsNullOrEmpty(Email) || b.Account.Email.Contains(Email)) &&
+                (!bookingDate.HasValue || b.BookingDate.Date.Day == bookingDate.Value.Date.Day) &&
+                (!bookingTime.HasValue || b.BookingTime == bookingTime.Value) &&
+                (!Status.HasValue || b.Status == Status.Value) &&
+                (string.IsNullOrEmpty(qrTicket) || b.BookingId.Equals(Guid.Parse(qrTicket)));
+
+                var bookings = await _unitOfWork.BookingRepository.GetAsync(filter);
+
+                int totalPage = 1;
+                if (bookings.Count() > PageSize)
+                {
+                    if (PageSize == 1)
+                    {
+                        totalPage = (bookings.Count() / PageSize);
+                    }
+                    else
+                    {
+                        totalPage = (bookings.Count() / PageSize) + 1;
+                    }
+                }
+
+                var bookingsWithPagination = await _unitOfWork.BookingRepository.GetAsync(filter: filter, includeProperties: "Account,Bar", pageIndex: PageIndex, pageSize: PageSize, orderBy: o => o.OrderByDescending(b => b.BookingDate).ThenByDescending(b => b.BookingTime));
+
+                foreach (var booking in bookingsWithPagination)
+                {
+                    var response = new StaffBookingReponse
+                    {
+                        BookingDate = booking.BookingDate,
+                        BookingId = booking.BookingId,
+                        BookingTime = booking.BookingTime,
+                        CustomerName = booking.Account.Fullname,
+                        Email = booking.Account.Email,
+                        Phone = booking.Account.Phone,
+                        Status = booking.Status,
+                        BookingCode = booking.BookingCode,
+                        AdditionalFee = booking.AdditionalFee,
+                        TotalPrice = booking.TotalPrice,
+                        QRTicket = booking.QRTicket,
+                    };
+                    responses.Add(response);
+                }
+                return (responses, totalPage);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
+
+        public async Task<BookingDetailByStaff> GetBookingDetailAuthorizedAdmin(Guid BookingId)
+        {
+            try
+            {
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+
+                var response = new BookingDetailByStaff();
+
+                var booking = (await _unitOfWork.BookingRepository
+                                                .GetAsync(b => b.BookingId == BookingId,
+                                                          includeProperties: "Account,Bar"))
+                                                .FirstOrDefault();
+
+                if (booking == null)
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy Id Đặt bàn");
+                }
+
+
+                response.BookingId = booking.BookingId;
+                response.BookingTime = booking.BookingTime;
+                response.Status = booking.Status;
+                response.CreateAt = booking.CreateAt;
+                response.BookingDate = booking.BookingDate;
+                response.BarName = booking.Bar.BarName;
+                response.BarAddress = booking.Bar.Address;
+                response.CustomerPhone = booking.Account.Phone;
+                response.CustomerName = booking.Account.Fullname;
+                response.CustomerEmail = booking.Account.Email;
+                response.BookingCode = booking.BookingCode;
+                response.AdditionalFee = booking.AdditionalFee;
+                response.TotalPrice = booking.TotalPrice;
+                response.Note = booking.Note;
+                response.QRTicket = booking.QRTicket;
+
+                if (booking.TotalPrice >= 0)
+                {
+                    var bookingDrinks = await _unitOfWork.BookingDrinkRepository.GetAsync(bd => bd.BookingId == booking.BookingId, includeProperties: "Drink");
+                    foreach (var drink in bookingDrinks)
+                    {
+                        var drinkResponse = new BookingDrinkDetailResponse
+                        {
+                            ActualPrice = drink.ActualPrice,
+                            DrinkId = drink.DrinkId,
+                            DrinkName = drink.Drink.DrinkName,
+                            Quantity = drink.Quantity,
+                            Image = drink.Drink.Image.Split(',')[0]
+                        };
+                        response.bookingDrinksList.Add(drinkResponse);
+                    }
+                }
+
+                var bookingTables = await _unitOfWork.BookingTableRepository.GetAsync(bt => bt.BookingId == BookingId);
+                foreach (var table in bookingTables)
+                {
+                    var Tables = (await _unitOfWork.TableRepository.GetAsync(t => t.TableId == table.TableId, includeProperties: "TableType")).FirstOrDefault();
+                    var BookingTable = new BookingTableResponseByStaff
+                    {
+                        TableName = Tables.TableName,
+                        TableTypeName = Tables.TableType.TypeName
+                    };
+                    response.bookingTableList.Add(BookingTable);
+                }
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
     }

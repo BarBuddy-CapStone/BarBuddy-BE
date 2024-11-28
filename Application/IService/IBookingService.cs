@@ -25,5 +25,7 @@ namespace Application.IService
         Task<List<BookingCustomResponse>> GetAllBookingByStsPending();
         Task<List<BookingCustomResponse>> GetAllBookingByStsPendingCus();
         Task UpdateStsBookingServing(Guid bookingId);
+        Task<(List<StaffBookingReponse> responses, int TotalPage)> GetListBookingAuthorizedAdmin(string qrTicket, Guid? BarId, string? CustomerName, string? Phone, string? Email, DateTimeOffset? bookingDate, TimeSpan? bookingTime, int? Status, int PageIndex, int PageSize);
+        Task<BookingDetailByStaff> GetBookingDetailAuthorizedAdmin(Guid BookingId);
     }
 }
