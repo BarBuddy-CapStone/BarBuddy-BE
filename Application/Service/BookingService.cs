@@ -58,7 +58,6 @@ namespace Application.Service
         {
             try
             {
-
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
                 var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
 
@@ -68,14 +67,14 @@ namespace Application.Service
                                                                includeProperties: "Account,Bar"))
                                                 .FirstOrDefault();
 
-                if (!getAccount.AccountId.Equals(booking?.AccountId))
-                {
-                    throw new UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
-                }
-
                 if (booking == null)
                 {
                     throw new CustomException.DataNotFoundException("Không tìm thấy Id Đặt bàn.");
+                }
+
+                if (!getAccount.AccountId.Equals(booking.AccountId))
+                {
+                    throw new UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
                 }
 
                 if (booking.Status != 0)
@@ -411,6 +410,14 @@ namespace Application.Service
                 }
                 return (responses, totalPage);
             }
+            catch (DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
+            catch (UnAuthorizedException ex)
+            {
+                throw new CustomException.UnAuthorizedException(ex.Message);
+            }
             catch (Exception ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
@@ -575,14 +582,14 @@ namespace Application.Service
                 var booking = _unitOfWork.BookingRepository.Get(b => b.BookingId == BookingId).FirstOrDefault();
                 _unitOfWork.BeginTransaction();
 
-                if (!getAccount.BarId.Equals(booking?.BarId))
-                {
-                    throw new UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
-                }
-
                 if (booking == null)
                 {
                     throw new DataNotFoundException("Không tìm thấy đơn Đặt bàn.");
+                }
+
+                if (!getAccount.BarId.Equals(booking?.BarId))
+                {
+                    throw new UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
                 }
 
                 if (booking.Status == 1 && (Status == 2 || Status == 3))
@@ -624,6 +631,11 @@ namespace Application.Service
                     }
                 }
                 _unitOfWork.CommitTransaction();
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                _unitOfWork.RollBack();
+                throw new CustomException.UnAuthorizedException(ex.Message);
             }
             catch (CustomException.DataNotFoundException ex)
             {

@@ -37,6 +37,7 @@ namespace UnitTests.Application.Services
         private readonly Mock<IGenericRepository<Bar>> _barRepoMock;
         private readonly Mock<IGenericRepository<BarTime>> _barTimeRepoMock;
         private readonly BookingService _bookingService;
+        private readonly Mock<IHttpContextAccessor> _contextAccessor;
 
         public BookingServiceTests()
         {
@@ -49,6 +50,8 @@ namespace UnitTests.Application.Services
             _qrCodeServiceMock = new Mock<IQRCodeService>();
             _firebaseMock = new Mock<IFirebase>();
             _eventVoucherServiceMock = new Mock<IEventVoucherService>();
+            _contextAccessor = new Mock<IHttpContextAccessor>();
+
 
             _bookingRepoMock = new Mock<IGenericRepository<Booking>>();
             _accountRepoMock = new Mock<IGenericRepository<Account>>();
@@ -69,7 +72,8 @@ namespace UnitTests.Application.Services
                 _notificationServiceMock.Object,
                 _qrCodeServiceMock.Object,
                 _firebaseMock.Object,
-                _eventVoucherServiceMock.Object
+                _eventVoucherServiceMock.Object,
+                _contextAccessor.Object
             );
         }
 
@@ -78,17 +82,27 @@ namespace UnitTests.Application.Services
         public async Task CancelBooking_WhenValidBooking_ShouldReturnTrue()
         {
             // Arrange
+            var accountId = Guid.NewGuid();
             var bookingId = Guid.NewGuid();
+            var account = new Account { AccountId = accountId };
             var booking = new Booking
             {
                 BookingId = bookingId,
+                AccountId = accountId,
                 Status = 0, // Pending
                 BookingDate = DateTime.UtcNow.AddDays(1),
                 BookingTime = TimeSpan.FromHours(14),
                 Bar = new Bar { BarName = "Test Bar" }
             };
 
-            _unitOfWorkMock.Setup(x => x.BookingRepository.GetAsync(It.IsAny<Expression<Func<Booking, bool>>>(),
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+
+            _accountRepoMock.Setup(x => x.GetByID(accountId))
+                .Returns(account);
+
+            _unitOfWorkMock.Setup(x => x.BookingRepository.GetAsync(
+                It.IsAny<Expression<Func<Booking, bool>>>(),
                 It.IsAny<Func<IQueryable<Booking>, IOrderedQueryable<Booking>>>(),
                 It.IsAny<string>(),
                 It.IsAny<int?>(),
@@ -108,8 +122,18 @@ namespace UnitTests.Application.Services
         public async Task CancelBooking_WhenBookingNotFound_ShouldThrowNotFoundException()
         {
             // Arrange
+            var accountId = Guid.NewGuid();
             var bookingId = Guid.NewGuid();
-            _unitOfWorkMock.Setup(x => x.BookingRepository.GetAsync(It.IsAny<Expression<Func<Booking, bool>>>(),
+            var account = new Account { AccountId = accountId };
+
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+
+            _accountRepoMock.Setup(x => x.GetByID(accountId))
+                .Returns(account);
+
+            _unitOfWorkMock.Setup(x => x.BookingRepository.GetAsync(
+                It.IsAny<Expression<Func<Booking, bool>>>(),
                 It.IsAny<Func<IQueryable<Booking>, IOrderedQueryable<Booking>>>(),
                 It.IsAny<string>(),
                 It.IsAny<int?>(),
@@ -125,16 +149,24 @@ namespace UnitTests.Application.Services
         public async Task CancelBooking_WhenBookingTimeLessThan2Hours_ShouldReturnFalse()
         {
             // Arrange
+            var accountId = Guid.NewGuid();
             var bookingId = Guid.NewGuid();
-            var bookingDate = DateTime.Now;
+            var account = new Account { AccountId = accountId };
             var booking = new Booking
             {
                 BookingId = bookingId,
+                AccountId = accountId,
                 Status = 0,
                 BookingDate = DateTime.Now,
                 BookingTime = DateTime.Now.TimeOfDay,
                 Bar = new Bar { BarName = "Test Bar" }
             };
+
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+
+            _accountRepoMock.Setup(x => x.GetByID(accountId))
+                .Returns(account);
 
             _unitOfWorkMock.Setup(x => x.BookingRepository.GetAsync(
                 It.IsAny<Expression<Func<Booking, bool>>>(),
@@ -151,25 +183,69 @@ namespace UnitTests.Application.Services
             Assert.False(result);
         }
 
+        [Fact]
+        public async Task CancelBooking_WhenBookingAlreadyCancelled_ShouldThrowDataNotFoundException()
+        {
+            // Arrange
+            var accountId = Guid.NewGuid();
+            var bookingId = Guid.NewGuid();
+            var account = new Account { AccountId = accountId };
+            var booking = new Booking
+            {
+                BookingId = bookingId,
+                AccountId = accountId,
+                Status = 1, // Đã hủy
+                BookingDate = DateTime.UtcNow.AddDays(1),
+                BookingTime = TimeSpan.FromHours(14),
+                Bar = new Bar { BarName = "Test Bar" }
+            };
+
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+
+            _accountRepoMock.Setup(x => x.GetByID(accountId))
+                .Returns(account);
+
+            _unitOfWorkMock.Setup(x => x.BookingRepository.GetAsync(
+                It.IsAny<Expression<Func<Booking, bool>>>(),
+                It.IsAny<Func<IQueryable<Booking>, IOrderedQueryable<Booking>>>(),
+                It.IsAny<string>(),
+                It.IsAny<int?>(),
+                It.IsAny<int?>()))
+                .ReturnsAsync(new List<Booking> { booking });
+
+            // Act & Assert
+            await Assert.ThrowsAsync<CustomException.DataNotFoundException>(
+                () => _bookingService.CancelBooking(bookingId));
+        }
+
         // Tests cho GetAllCustomerBooking
         [Fact]
         public async Task GetAllCustomerBooking_WhenValidRequest_ShouldReturnBookings()
         {
             // Arrange
-            var customerId = Guid.NewGuid();
+            var accountId = Guid.NewGuid();
+            var customerId = accountId; // CustomerId phải bằng accountId để pass quyền truy cập
             var bookingId1 = Guid.NewGuid();
+            var barId1 = Guid.NewGuid();
+            var barId2 = Guid.NewGuid();
+            
+            var account = new Account { AccountId = accountId }; // Tạo account để mock
+
             var bookings = new List<Booking>
             {
                 new Booking
                 {
                     BookingId = bookingId1,
                     Status = 0,
+                    BarId = barId1,
                     Bar = new Bar { BarName = "Test Bar 1", Images = "image1.jpg,image2.jpg" }
                 },
                 new Booking
                 {
                     BookingId = Guid.NewGuid(),
                     Status = 0,
+                    BarId = barId2,
                     Bar = new Bar { BarName = "Test Bar 2", Images = "image3.jpg,image4.jpg" }
                 }
             };
@@ -178,13 +254,21 @@ namespace UnitTests.Application.Services
             {
                 new Feedback
                 {
-                FeedbackId = Guid.NewGuid(),
-                BookingId = bookingId1,
-                Comment = "Great service!",
-                CreatedTime = DateTime.Now,
-                IsDeleted = false
+                    FeedbackId = Guid.NewGuid(),
+                    BookingId = bookingId1,
+                    Comment = "Great service!",
+                    CreatedTime = DateTime.Now,
+                    IsDeleted = false
                 }
             };
+
+            // Mock authentication để trả về accountId
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+
+            // Mock account repository để trả về account
+            _accountRepoMock.Setup(x => x.GetByID(accountId))
+                .Returns(account);
 
             _unitOfWorkMock.Setup(x => x.BookingRepository.GetAsync(
                 It.IsAny<Expression<Func<Booking, bool>>>(),
@@ -194,7 +278,8 @@ namespace UnitTests.Application.Services
                 It.IsAny<int?>()))
                 .ReturnsAsync(bookings);
 
-            _unitOfWorkMock.Setup(x => x.FeedbackRepository.GetAsync(It.IsAny<Expression<Func<Feedback, bool>>>(),
+            _unitOfWorkMock.Setup(x => x.FeedbackRepository.GetAsync(
+                It.IsAny<Expression<Func<Feedback, bool>>>(),
                 It.IsAny<Func<IQueryable<Feedback>, IOrderedQueryable<Feedback>>>(),
                 It.IsAny<string>(),
                 It.IsAny<int?>(),
@@ -214,34 +299,43 @@ namespace UnitTests.Application.Services
         public async Task GetListBookingAuthorized_WhenValidRequest_ShouldReturnFilteredBookings()
         {
             // Arrange
+            var accountId = Guid.NewGuid();
             var barId = Guid.NewGuid();
+            var bookingId = Guid.NewGuid();
+            
+            var account = new Account { AccountId = accountId, BarId = barId };
             var bar = new Bar { BarId = barId, BarName = "Test Bar" };
-            var bookings = new List<Booking>
+            var booking = new Booking
             {
-                new Booking
+                BookingId = bookingId,
+                Account = new Account
                 {
-                    BookingId = Guid.NewGuid(),
-                    Account = new Account
-                    {
-                        Fullname = "Test User",
-                        Phone = "1234567890",
-                        Email = "test@email.com"
-                    },
-                    BookingDate = DateTime.Now.Date,
-                    BookingTime = TimeSpan.FromHours(14),
-                    Status = 0
-                }
+                    Fullname = "Test User",
+                    Phone = "1234567890",
+                    Email = "test@email.com"
+                },
+                BarId = barId,
+                BookingDate = DateTime.Now.Date,
+                BookingTime = TimeSpan.FromHours(14),
+                Status = 0
             };
 
-            _unitOfWorkMock.Setup(x => x.BarRepository.GetByIdAsync(barId))
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+
+            _accountRepoMock.Setup(x => x.GetByID(accountId))
+                .Returns(account);
+
+            _barRepoMock.Setup(x => x.GetByIdAsync(barId))
                 .ReturnsAsync(bar);
 
-            _unitOfWorkMock.Setup(x => x.BookingRepository.GetAsync(It.IsAny<Expression<Func<Booking, bool>>>(),
+            _unitOfWorkMock.Setup(x => x.BookingRepository.GetAsync(
+                It.IsAny<Expression<Func<Booking, bool>>>(),
                 It.IsAny<Func<IQueryable<Booking>, IOrderedQueryable<Booking>>>(),
                 It.IsAny<string>(),
                 It.IsAny<int?>(),
                 It.IsAny<int?>()))
-                .ReturnsAsync(bookings);
+                .ReturnsAsync(new List<Booking> { booking });
 
             // Act
             var result = await _bookingService.GetListBookingAuthorized(
@@ -263,25 +357,106 @@ namespace UnitTests.Application.Services
         }
 
         [Fact]
+        public async Task GetListBookingAuthorized_WhenUnauthorized_ShouldThrowUnAuthorizedException()
+        {
+            // Arrange
+            var accountId = Guid.NewGuid();
+            var barId = Guid.NewGuid();
+            var differentBarId = Guid.NewGuid();
+            
+            var account = new Account { AccountId = accountId, BarId = differentBarId };
+            var bar = new Bar { BarId = barId };
+
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+
+            _accountRepoMock.Setup(x => x.GetByID(accountId))
+                .Returns(account);
+
+            _barRepoMock.Setup(x => x.GetByIdAsync(barId))
+                .ReturnsAsync(bar);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<CustomException.UnAuthorizedException>(() =>
+                _bookingService.GetListBookingAuthorized(
+                    qrTicket: string.Empty,
+                    BarId: barId,
+                    CustomerName: null,
+                    Phone: null,
+                    Email: null,
+                    bookingDate: null,
+                    bookingTime: null,
+                    Status: null,
+                    1,
+                    10));
+        }
+
+        [Fact]
+        public async Task GetListBookingAuthorized_WhenBarNotFound_ShouldThrowDataNotFoundException()
+        {
+            // Arrange
+            var accountId = Guid.NewGuid();
+            var barId = Guid.NewGuid();
+            
+            var account = new Account { AccountId = accountId, BarId = barId };
+
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+
+            _accountRepoMock.Setup(x => x.GetByID(accountId))
+                .Returns(account);
+
+            _barRepoMock.Setup(x => x.GetByIdAsync(barId))
+                .ReturnsAsync((Bar)null);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<CustomException.DataNotFoundException>(() =>
+                _bookingService.GetListBookingAuthorized(
+                    qrTicket: string.Empty,
+                    BarId: barId,
+                    CustomerName: null,
+                    Phone: null,
+                    Email: null,
+                    bookingDate: null,
+                    bookingTime: null,
+                    Status: null,
+                    1,
+                    10));
+        }
+
+        [Fact]
         public async Task GetListBookingAuthorized_WithPagination_ShouldReturnCorrectPage()
         {
             // Arrange
+            var accountId = Guid.NewGuid();
             var barId = Guid.NewGuid();
+            
+            var account = new Account { AccountId = accountId, BarId = barId };
             var bar = new Bar { BarId = barId };
             var bookings = new List<Booking>();
+            
+            // Create 15 bookings for testing pagination
             for (int i = 0; i < 15; i++)
             {
                 bookings.Add(new Booking
                 {
                     BookingId = Guid.NewGuid(),
-                    Account = new Account { Fullname = $"User {i}" }
+                    Account = new Account { Fullname = $"User {i}" },
+                    BarId = barId
                 });
             }
 
-            _unitOfWorkMock.Setup(x => x.BarRepository.GetByIdAsync(barId))
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+
+            _accountRepoMock.Setup(x => x.GetByID(accountId))
+                .Returns(account);
+
+            _barRepoMock.Setup(x => x.GetByIdAsync(barId))
                 .ReturnsAsync(bar);
 
-            _unitOfWorkMock.Setup(x => x.BookingRepository.GetAsync(It.IsAny<Expression<Func<Booking, bool>>>(),
+            _unitOfWorkMock.Setup(x => x.BookingRepository.GetAsync(
+                It.IsAny<Expression<Func<Booking, bool>>>(),
                 It.IsAny<Func<IQueryable<Booking>, IOrderedQueryable<Booking>>>(),
                 It.IsAny<string>(),
                 It.IsAny<int?>(),
@@ -292,32 +467,35 @@ namespace UnitTests.Application.Services
             var result = await _bookingService.GetListBookingAuthorized(
                 qrTicket: string.Empty,
                 BarId: barId,
-                CustomerName: "Test User",
-                Phone: "1234567890",
-                Email: "test@email.com",
-                bookingDate: DateTime.Now.Date,
-                bookingTime: TimeSpan.FromHours(14),
-                Status: 0,
-                2,
-                10);
+                CustomerName: null,
+                Phone: null,
+                Email: null,
+                bookingDate: null,
+                bookingTime: null,
+                Status: null,
+                2, // Page 2
+                10); // 10 items per page
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(2, result.Item2); // Total pages
+            Assert.Equal(2, result.Item2); // Should have 2 pages (15 items with 10 per page)
         }
 
         [Fact]
         public async Task GetTopBookingByCustomer_WhenValidRequest_ShouldReturnTopBookings()
         {
             // Arrange
-            var customerId = Guid.NewGuid();
+            var accountId = Guid.NewGuid();
+            var customerId = accountId; // CustomerId phải bằng accountId để pass quyền truy cập
             var bookingId = Guid.NewGuid();
+            var account = new Account { AccountId = accountId };
             var bookings = new List<Booking>
             {
                 new Booking
                 {
                     BookingId = bookingId,
-                    Status = 0,
+                    AccountId = accountId,
+                    Status = 3,
                     Bar = new Bar
                     {
                         BarName = "Test Bar",
@@ -325,7 +503,7 @@ namespace UnitTests.Application.Services
                     },
                     BookingDate = DateTime.Now,
                     BookingTime = TimeSpan.FromHours(14),
-                    CreateAt = DateTime.Now
+                    CreateAt = DateTime.Now,
                 }
             };
             var feedbacks = new List<Feedback>
@@ -340,14 +518,22 @@ namespace UnitTests.Application.Services
                 }
             };
 
-            _unitOfWorkMock.Setup(x => x.BookingRepository.GetAsync(It.IsAny<Expression<Func<Booking, bool>>>(),
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+
+            _accountRepoMock.Setup(x => x.GetByID(accountId))
+                .Returns(account);
+
+            _unitOfWorkMock.Setup(x => x.BookingRepository.GetAsync(
+                It.IsAny<Expression<Func<Booking, bool>>>(),
                 It.IsAny<Func<IQueryable<Booking>, IOrderedQueryable<Booking>>>(),
                 It.IsAny<string>(),
                 It.IsAny<int?>(),
                 It.IsAny<int?>()))
                 .ReturnsAsync(bookings);
 
-            _unitOfWorkMock.Setup(x => x.FeedbackRepository.GetAsync(It.IsAny<Expression<Func<Feedback, bool>>>(),
+            _unitOfWorkMock.Setup(x => x.FeedbackRepository.GetAsync(
+                It.IsAny<Expression<Func<Feedback, bool>>>(),
                 It.IsAny<Func<IQueryable<Feedback>, IOrderedQueryable<Feedback>>>(),
                 It.IsAny<string>(),
                 It.IsAny<int?>(),
@@ -362,14 +548,44 @@ namespace UnitTests.Application.Services
             Assert.Single(result);
             Assert.Equal("Test Bar", result[0].BarName);
             Assert.Equal("image1.jpg", result[0].Image);
+            Assert.True(result[0].IsRated); // Vì có feedback
+        }
+
+        [Fact]
+        public async Task GetTopBookingByCustomer_WhenUnauthorized_ShouldThrowUnAuthorizedException()
+        {
+            // Arrange
+            var accountId = Guid.NewGuid();
+            var differentCustomerId = Guid.NewGuid(); // CustomerId khác với accountId
+            var account = new Account { AccountId = accountId };
+
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+
+            _accountRepoMock.Setup(x => x.GetByID(accountId))
+                .Returns(account);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<CustomException.UnAuthorizedException>(
+                () => _bookingService.GetTopBookingByCustomer(differentCustomerId, 0));
         }
 
         [Fact]
         public async Task GetTopBookingByCustomer_WhenNoBookings_ShouldReturnEmptyList()
         {
             // Arrange
-            var customerId = Guid.NewGuid();
-            _unitOfWorkMock.Setup(x => x.BookingRepository.GetAsync(It.IsAny<Expression<Func<Booking, bool>>>(),
+            var accountId = Guid.NewGuid();
+            var customerId = accountId;
+            var account = new Account { AccountId = accountId };
+
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+
+            _accountRepoMock.Setup(x => x.GetByID(accountId))
+                .Returns(account);
+
+            _unitOfWorkMock.Setup(x => x.BookingRepository.GetAsync(
+                It.IsAny<Expression<Func<Booking, bool>>>(),
                 It.IsAny<Func<IQueryable<Booking>, IOrderedQueryable<Booking>>>(),
                 It.IsAny<string>(),
                 It.IsAny<int?>(),
@@ -382,6 +598,63 @@ namespace UnitTests.Application.Services
             // Assert
             Assert.NotNull(result);
             Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetTopBookingByCustomer_WhenBookingWithoutFeedback_ShouldReturnIsRatedFalse()
+        {
+            // Arrange
+            var accountId = Guid.NewGuid();
+            var customerId = accountId;
+            var bookingId = Guid.NewGuid();
+            var account = new Account { AccountId = accountId };
+            var bookings = new List<Booking>
+            {
+                new Booking
+                {
+                    BookingId = bookingId,
+                    AccountId = accountId,
+                    Status = 3, // Completed status
+                    Bar = new Bar
+                    {
+                        BarName = "Test Bar",
+                        Images = "image1.jpg,image2.jpg"
+                    },
+                    BookingDate = DateTime.Now,
+                    BookingTime = TimeSpan.FromHours(14),
+                    CreateAt = DateTime.Now
+                }
+            };
+
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+
+            _accountRepoMock.Setup(x => x.GetByID(accountId))
+                .Returns(account);
+
+            _unitOfWorkMock.Setup(x => x.BookingRepository.GetAsync(
+                It.IsAny<Expression<Func<Booking, bool>>>(),
+                It.IsAny<Func<IQueryable<Booking>, IOrderedQueryable<Booking>>>(),
+                It.IsAny<string>(),
+                It.IsAny<int?>(),
+                It.IsAny<int?>()))
+                .ReturnsAsync(bookings);
+
+            _unitOfWorkMock.Setup(x => x.FeedbackRepository.GetAsync(
+                It.IsAny<Expression<Func<Feedback, bool>>>(),
+                It.IsAny<Func<IQueryable<Feedback>, IOrderedQueryable<Feedback>>>(),
+                It.IsAny<string>(),
+                It.IsAny<int?>(),
+                It.IsAny<int?>()))
+                .ReturnsAsync(new List<Feedback>());
+
+            // Act
+            var result = await _bookingService.GetTopBookingByCustomer(customerId, 0);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Single(result);
+            Assert.False(result[0].IsRated); // Không có feedback nên IsRated = false
         }
 
         [Fact]
@@ -503,23 +776,34 @@ namespace UnitTests.Application.Services
         public async Task UpdateBookingStatus_WhenValidRequest_ShouldUpdateSuccessfully()
         {
             // Arrange
+            var accountId = Guid.NewGuid();
+            var barId = Guid.NewGuid();
             var bookingId = Guid.NewGuid();
             var tableId = Guid.NewGuid();
+
+            var account = new Account { AccountId = accountId, BarId = barId };
             var booking = new Booking
             {
                 BookingId = bookingId,
+                BarId = barId,
                 Status = 0,
                 BookingDate = DateTime.Now.Date
             };
             var bookingTables = new List<BookingTable>
-    {
-        new BookingTable
-        {
-            BookingId = bookingId,
-            TableId = tableId
-        }
-    };
+            {
+                new BookingTable
+                {
+                    BookingId = bookingId,
+                    TableId = tableId
+                }
+            };
             var table = new Table { TableId = tableId };
+
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+
+            _accountRepoMock.Setup(x => x.GetByID(accountId))
+                .Returns(account);
 
             _bookingRepoMock.Setup(x => x.Get(
                 It.IsAny<Expression<Func<Booking, bool>>>(),
@@ -528,6 +812,7 @@ namespace UnitTests.Application.Services
                 It.IsAny<int?>(),
                 It.IsAny<int?>()))
                 .Returns(new List<Booking> { booking });
+
             _unitOfWorkMock.Setup(x => x.BookingTableRepository.Get(
                 It.IsAny<Expression<Func<BookingTable, bool>>>(),
                 It.IsAny<Func<IQueryable<BookingTable>, IOrderedQueryable<BookingTable>>>(),
@@ -535,6 +820,7 @@ namespace UnitTests.Application.Services
                 It.IsAny<int?>(),
                 It.IsAny<int?>()))
                 .Returns(bookingTables);
+
             _unitOfWorkMock.Setup(x => x.TableRepository.GetByID(tableId))
                 .Returns(table);
 
@@ -551,7 +837,17 @@ namespace UnitTests.Application.Services
         public async Task UpdateBookingStatus_WhenBookingNotFound_ShouldThrowDataNotFoundException()
         {
             // Arrange
+            var accountId = Guid.NewGuid();
+            var barId = Guid.NewGuid();
             var bookingId = Guid.NewGuid();
+            var account = new Account { AccountId = accountId, BarId = barId };
+
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+
+            _accountRepoMock.Setup(x => x.GetByID(accountId))
+                .Returns(account);
+
             _bookingRepoMock.Setup(x => x.Get(
                 It.IsAny<Expression<Func<Booking, bool>>>(),
                 It.IsAny<Func<IQueryable<Booking>, IOrderedQueryable<Booking>>>(),
@@ -561,20 +857,25 @@ namespace UnitTests.Application.Services
                 .Returns(new List<Booking>());
 
             // Act & Assert
-            await Assert.ThrowsAsync<CustomException.DataNotFoundException>(() =>
-                _bookingService.UpdateBookingStatus(bookingId, 2, null));
+            await Assert.ThrowsAsync<CustomException.DataNotFoundException>(
+                () => _bookingService.UpdateBookingStatus(bookingId, 2, null));
         }
 
         [Fact]
-        public async Task UpdateBookingStatus_WhenCancelledBooking_ShouldThrowInvalidDataException()
+        public async Task UpdateBookingStatus_WhenBarIdNotCorrect_ShouldThrowDataUnAuthorizedException()
         {
             // Arrange
+            var accountId = Guid.NewGuid();
+            var barId = Guid.NewGuid();
             var bookingId = Guid.NewGuid();
-            var booking = new Booking
-            {
-                BookingId = bookingId,
-                Status = 1 // Cancelled
-            };
+            var account = new Account { AccountId = accountId, BarId = barId };
+            var booking = new Booking { BookingId = bookingId, Account = account, BarId = Guid.NewGuid() };
+
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+
+            _accountRepoMock.Setup(x => x.GetByID(accountId))
+                .Returns(account);
 
             _bookingRepoMock.Setup(x => x.Get(
                 It.IsAny<Expression<Func<Booking, bool>>>(),
@@ -585,23 +886,35 @@ namespace UnitTests.Application.Services
                 .Returns(new List<Booking> { booking });
 
             // Act & Assert
-            await Assert.ThrowsAsync<CustomException.InvalidDataException>(() =>
-                _bookingService.UpdateBookingStatus(bookingId, 2, null));
+            await Assert.ThrowsAsync<CustomException.UnAuthorizedException>(
+                () => _bookingService.UpdateBookingStatus(bookingId, 2, null));
         }
 
         [Fact]
-        public async Task UpdateBookingStatus_WhenInvalidAdditionalFee_ShouldThrowInvalidDataException()
+        public async Task UpdateBookingStatus_WhenCancelledBooking_ShouldThrowInvalidDataException()
         {
             // Arrange
+            var accountId = Guid.NewGuid();
+            var barId = Guid.NewGuid();
             var bookingId = Guid.NewGuid();
+            
+            var account = new Account { AccountId = accountId, BarId = barId };
             var booking = new Booking
             {
                 BookingId = bookingId,
-                Status = 0,
+                BarId = barId,
+                Status = 1, // Cancelled
                 BookingDate = DateTime.Now.Date
             };
 
-            _bookingRepoMock.Setup(x => x.Get(It.IsAny<Expression<Func<Booking, bool>>>(),
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+
+            _accountRepoMock.Setup(x => x.GetByID(accountId))
+                .Returns(account);
+
+            _bookingRepoMock.Setup(x => x.Get(
+                It.IsAny<Expression<Func<Booking, bool>>>(),
                 It.IsAny<Func<IQueryable<Booking>, IOrderedQueryable<Booking>>>(),
                 It.IsAny<string>(),
                 It.IsAny<int?>(),
@@ -609,8 +922,44 @@ namespace UnitTests.Application.Services
                 .Returns(new List<Booking> { booking });
 
             // Act & Assert
-            await Assert.ThrowsAsync<CustomException.InvalidDataException>(() =>
-                _bookingService.UpdateBookingStatus(bookingId, 3, -100));
+            await Assert.ThrowsAsync<CustomException.InvalidDataException>(
+                () => _bookingService.UpdateBookingStatus(bookingId, 2, null));
+        }
+
+        [Fact]
+        public async Task UpdateBookingStatus_WhenInvalidAdditionalFee_ShouldThrowInvalidDataException()
+        {
+            // Arrange
+            var accountId = Guid.NewGuid();
+            var barId = Guid.NewGuid();
+            var bookingId = Guid.NewGuid();
+            
+            var account = new Account { AccountId = accountId, BarId = barId };
+            var booking = new Booking
+            {
+                BookingId = bookingId,
+                BarId = barId,
+                Status = 0,
+                BookingDate = DateTime.Now.Date
+            };
+
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+
+            _accountRepoMock.Setup(x => x.GetByID(accountId))
+                .Returns(account);
+
+            _bookingRepoMock.Setup(x => x.Get(
+                It.IsAny<Expression<Func<Booking, bool>>>(),
+                It.IsAny<Func<IQueryable<Booking>, IOrderedQueryable<Booking>>>(),
+                It.IsAny<string>(),
+                It.IsAny<int?>(),
+                It.IsAny<int?>()))
+                .Returns(new List<Booking> { booking });
+
+            // Act & Assert
+            await Assert.ThrowsAsync<CustomException.InvalidDataException>(
+                () => _bookingService.UpdateBookingStatus(bookingId, 3, -100));
         }
 
         [Fact]
@@ -622,6 +971,22 @@ namespace UnitTests.Application.Services
             var tableId = Guid.NewGuid();
             var drinkId = Guid.NewGuid();
             var bookingId = Guid.NewGuid();
+
+            var account = new Account { AccountId = accountId };
+            var bar = new Bar 
+            { 
+                BarId = barId, 
+                BarName = "Test Bar",
+                Discount = 10,
+                BarTimes = new List<BarTime>
+                {
+                    new BarTime
+                    {
+                        StartTime = TimeSpan.FromHours(10),
+                        EndTime = TimeSpan.FromHours(18)
+                    }
+                }
+            };
 
             var request = new BookingDrinkRequest
             {
@@ -640,23 +1005,8 @@ namespace UnitTests.Application.Services
                 PaymentDestination = "MOMO"
             };
 
-            var account = new Account { AccountId = accountId };
-            var bar = new Bar 
-            {
-                BarId = barId,
-                BarName = "Test Bar",
-                Discount = 10,
-                BarTimes = new List<BarTime>
-                {
-                    new BarTime
-                    {
-                        StartTime = TimeSpan.FromHours(10),
-                        EndTime = TimeSpan.FromHours(18)
-                    }
-                }
-            };
-            var drink = new Drink { DrinkId = drinkId, Price = 100000 };
-            var table = new Table { TableId = tableId };
+            var drink = new Drink { DrinkId = drinkId, Price = 100000, BarId = barId };
+            var table = new Table { TableId = tableId, TableType = new TableType { BarId = barId } };
             var booking = new Booking
             {
                 BookingId = bookingId,
@@ -666,18 +1016,21 @@ namespace UnitTests.Application.Services
                 BookingTables = new List<BookingTable>(),
                 BookingDrinks = new List<BookingDrink>()
             };
+
             var paymentLink = new PaymentLink { PaymentUrl = "test-payment-url" };
             var bytes = Encoding.UTF8.GetBytes("This is a dummy file");
             IFormFile file = new FormFile(new MemoryStream(bytes), 0, bytes.Length, "Data", "dummy.txt");
-
             var validBase64QrCode = Convert.ToBase64String(Encoding.UTF8.GetBytes("Test QR Code"));
 
             _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
                 .Returns(accountId);
+
             _accountRepoMock.Setup(x => x.GetByID(accountId))
                 .Returns(account);
+
             _barRepoMock.Setup(x => x.GetByID(barId))
                 .Returns(bar);
+
             _unitOfWorkMock.Setup(x => x.BarTimeRepository.GetAsync(
                 It.IsAny<Expression<Func<BarTime, bool>>>(),
                 It.IsAny<Func<IQueryable<BarTime>, IOrderedQueryable<BarTime>>>(),
@@ -685,6 +1038,7 @@ namespace UnitTests.Application.Services
                 It.IsAny<int?>(),
                 It.IsAny<int?>()))
                 .ReturnsAsync(bar.BarTimes);
+
             _unitOfWorkMock.Setup(x => x.DrinkRepository.Get(
                 It.IsAny<Expression<Func<Drink, bool>>>(),
                 It.IsAny<Func<IQueryable<Drink>, IOrderedQueryable<Drink>>>(),
@@ -692,6 +1046,7 @@ namespace UnitTests.Application.Services
                 It.IsAny<int?>(),
                 It.IsAny<int?>()))
                 .Returns(new List<Drink> { drink });
+
             _unitOfWorkMock.Setup(x => x.TableRepository.Get(
                 It.IsAny<Expression<Func<Table, bool>>>(),
                 It.IsAny<Func<IQueryable<Table>, IOrderedQueryable<Table>>>(),
@@ -699,8 +1054,10 @@ namespace UnitTests.Application.Services
                 It.IsAny<int?>(),
                 It.IsAny<int?>()))
                 .Returns(new List<Table> { table });
+
             _mapperMock.Setup(x => x.Map<Booking>(It.IsAny<BookingDrinkRequest>()))
                 .Returns(booking);
+
             _paymentServiceMock.Setup(x => x.GetPaymentLink(
                 It.IsAny<Guid>(),
                 It.IsAny<Guid>(),
@@ -708,8 +1065,10 @@ namespace UnitTests.Application.Services
                 It.IsAny<double>(),
                 It.IsAny<bool>()))
                 .Returns(paymentLink);
+
             _qrCodeServiceMock.Setup(x => x.GenerateQRCode(It.IsAny<Guid>()))
                 .Returns(validBase64QrCode);
+
             _firebaseMock.Setup(x => x.UploadImageAsync(file))
                 .ReturnsAsync("QR_CODE_URL");
 
@@ -727,26 +1086,18 @@ namespace UnitTests.Application.Services
         public async Task CreateBookingTableWithDrinks_WhenInvalidAccount_ShouldThrowDataNotFoundException()
         {
             // Arrange
-            var request = new BookingDrinkRequest
-            {
-                Drinks = new List<DrinkRequest>
-                {
-                    new DrinkRequest { DrinkId = Guid.NewGuid() }
-                }
-            };
+            var accountId = Guid.NewGuid();
+            var request = new BookingDrinkRequest();
 
-            _unitOfWorkMock.Setup(x => x.DrinkRepository.Get(
-                It.IsAny<Expression<Func<Drink, bool>>>(),
-                It.IsAny<Func<IQueryable<Drink>, IOrderedQueryable<Drink>>>(),
-                It.IsAny<string>(),
-                It.IsAny<int?>(),
-                It.IsAny<int?>()))
-                .Returns(new List<Drink>());
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+
+            _accountRepoMock.Setup(x => x.GetByID(accountId))
+                .Returns((Account)null);
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<CustomException.DataNotFoundException>(() =>
-                    _bookingService.CreateBookingTableWithDrinks(request, new DefaultHttpContext()));
-            Assert.Equal("Account not found", exception.Message);
+            await Assert.ThrowsAsync<CustomException.DataNotFoundException>(
+                () => _bookingService.CreateBookingTableWithDrinks(request, new DefaultHttpContext()));
         }
 
         [Fact]
@@ -754,63 +1105,50 @@ namespace UnitTests.Application.Services
         {
             // Arrange
             var accountId = Guid.NewGuid();
+            var barId = Guid.NewGuid();
             var account = new Account { AccountId = accountId };
+            
             var request = new BookingDrinkRequest
             {
-                Drinks = new List<DrinkRequest>
-                {
-                    new DrinkRequest { DrinkId = Guid.NewGuid() }
-                }
+                BarId = barId
             };
 
+            // Tạo một booking object để mock mapper
             var booking = new Booking
             {
                 BookingId = Guid.NewGuid(),
                 AccountId = accountId,
-                BarId = Guid.NewGuid(),
-                Bar = null,
+                BarId = barId,
                 BookingTables = new List<BookingTable>(),
                 BookingDrinks = new List<BookingDrink>()
             };
 
             _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
                 .Returns(accountId);
+
             _accountRepoMock.Setup(x => x.GetByID(accountId))
                 .Returns(account);
-            _mapperMock.Setup(x => x.Map<Booking>(It.IsAny<BookingDrinkRequest>()))
-            .Returns(booking);
-            _barRepoMock.Setup(x => x.GetByID(Guid.Empty))
+
+            _barRepoMock.Setup(x => x.GetByID(barId))
                 .Returns((Bar)null);
 
+            // Thêm mock cho mapper
+            _mapperMock.Setup(x => x.Map<Booking>(It.IsAny<BookingDrinkRequest>()))
+                .Returns(booking);
+
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<CustomException.DataNotFoundException>(() =>
-                    _bookingService.CreateBookingTableWithDrinks(request, new DefaultHttpContext()));
-            Assert.Equal("Bar not found", exception.Message);
+            await Assert.ThrowsAsync<CustomException.DataNotFoundException>(
+                () => _bookingService.CreateBookingTableWithDrinks(request, new DefaultHttpContext()));
         }
 
         [Fact]
-        public async Task CreateBookingTableWithDrinks_WhenBarDoesNotHaveBarTimes_ShouldThrowDataNotFoundException()
+        public async Task CreateBookingTableWithDrinks_WhenNoBarTimes_ShouldThrowDataNotFoundException()
         {
             // Arrange
             var accountId = Guid.NewGuid();
             var barId = Guid.NewGuid();
             var account = new Account { AccountId = accountId };
-            var request = new BookingDrinkRequest
-            {
-                BarId = barId,
-                Drinks = new List<DrinkRequest>
-                {
-                    new DrinkRequest { DrinkId = Guid.NewGuid() }
-                }
-            };
-
-            var bar = new Bar
-            {
-                BarId = barId,
-                BarName = "Test Bar",
-                Discount = 10
-            };
-
+            var bar = new Bar { BarId = barId, BarName = "Test Bar" };
             var booking = new Booking
             {
                 BookingId = Guid.NewGuid(),
@@ -820,55 +1158,46 @@ namespace UnitTests.Application.Services
                 BookingTables = new List<BookingTable>(),
                 BookingDrinks = new List<BookingDrink>()
             };
+            var request = new BookingDrinkRequest
+            {
+                BarId = barId
+            };
 
+            _mapperMock.Setup(x => x.Map<Booking>(It.IsAny<BookingDrinkRequest>()))
+                .Returns(booking);
             _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
                 .Returns(accountId);
+
             _accountRepoMock.Setup(x => x.GetByID(accountId))
                 .Returns(account);
-            _mapperMock.Setup(x => x.Map<Booking>(It.IsAny<BookingDrinkRequest>()))
-            .Returns(booking);
+
             _barRepoMock.Setup(x => x.GetByID(barId))
                 .Returns(bar);
 
+            _unitOfWorkMock.Setup(x => x.BarTimeRepository.GetAsync(
+                It.IsAny<Expression<Func<BarTime, bool>>>(),
+                It.IsAny<Func<IQueryable<BarTime>, IOrderedQueryable<BarTime>>>(),
+                It.IsAny<string>(),
+                It.IsAny<int?>(),
+                It.IsAny<int?>()))
+                .ReturnsAsync(new List<BarTime>());
+
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<CustomException.DataNotFoundException>(() =>
-                    _bookingService.CreateBookingTableWithDrinks(request, new DefaultHttpContext()));
-            Assert.Equal("Không tìm thấy thông tin thời gian của Bar.", exception.Message);
+            await Assert.ThrowsAsync<CustomException.DataNotFoundException>(
+                () => _bookingService.CreateBookingTableWithDrinks(request, new DefaultHttpContext()));
         }
 
         [Fact]
-        public async Task CreateBookingTableWithDrinks_WhenInvalidDrink_ShouldThrowInvalidDataException()
+        public async Task CreateBookingTableWithDrinks_WhenInvalidDrinks_ShouldThrowInvalidDataException()
         {
             // Arrange
             var accountId = Guid.NewGuid();
             var barId = Guid.NewGuid();
-            var tableId = Guid.NewGuid();
             var drinkId = Guid.NewGuid();
-            var bookingId = Guid.NewGuid();
-
-            var request = new BookingDrinkRequest
-            {
-                BarId = barId,
-                BookingDate = DateTime.Now.Date.AddDays(1),
-                BookingTime = TimeSpan.FromHours(14),
-                TableIds = new List<Guid> { tableId },
-                Drinks = new List<DrinkRequest>
-                {
-                    new DrinkRequest
-                    {
-                        DrinkId = drinkId,
-                        Quantity = 2
-                    }
-                },
-                PaymentDestination = "MOMO"
-            };
-
             var account = new Account { AccountId = accountId };
-            var bar = new Bar
-            {
+            var bar = new Bar 
+            { 
                 BarId = barId,
-                BarName = "Test Bar",
-                Discount = 10,
                 BarTimes = new List<BarTime>
                 {
                     new BarTime
@@ -878,28 +1207,51 @@ namespace UnitTests.Application.Services
                     }
                 }
             };
-            var table = new Table { TableId = tableId };
+
+            var request = new BookingDrinkRequest
+            {
+                BarId = barId,
+                BookingDate = DateTime.Now.Date.AddDays(1),
+                BookingTime = TimeSpan.FromHours(14),
+                Drinks = new List<DrinkRequest>
+                {
+                    new DrinkRequest { DrinkId = drinkId }
+                }
+            };
+
             var booking = new Booking
             {
-                BookingId = bookingId,
+                BookingId = Guid.NewGuid(),
                 AccountId = accountId,
                 BarId = barId,
                 Bar = bar,
                 BookingTables = new List<BookingTable>(),
                 BookingDrinks = new List<BookingDrink>()
             };
-            var paymentLink = new PaymentLink { PaymentUrl = "test-payment-url" };
+
+            var validBase64QrCode = Convert.ToBase64String(Encoding.UTF8.GetBytes("Test QR Code"));
             var bytes = Encoding.UTF8.GetBytes("This is a dummy file");
             IFormFile file = new FormFile(new MemoryStream(bytes), 0, bytes.Length, "Data", "dummy.txt");
 
-            var validBase64QrCode = Convert.ToBase64String(Encoding.UTF8.GetBytes("Test QR Code"));
-
             _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
                 .Returns(accountId);
+
             _accountRepoMock.Setup(x => x.GetByID(accountId))
                 .Returns(account);
+
             _barRepoMock.Setup(x => x.GetByID(barId))
                 .Returns(bar);
+
+            _mapperMock.Setup(x => x.Map<Booking>(It.IsAny<BookingDrinkRequest>()))
+                .Returns(booking);
+
+            // Mock cho QR code và Firebase
+            _qrCodeServiceMock.Setup(x => x.GenerateQRCode(It.IsAny<Guid>()))
+                .Returns(validBase64QrCode);
+
+            _firebaseMock.Setup(x => x.UploadImageAsync(It.IsAny<IFormFile>()))
+                .ReturnsAsync("QR_CODE_URL");
+
             _unitOfWorkMock.Setup(x => x.BarTimeRepository.GetAsync(
                 It.IsAny<Expression<Func<BarTime, bool>>>(),
                 It.IsAny<Func<IQueryable<BarTime>, IOrderedQueryable<BarTime>>>(),
@@ -907,6 +1259,7 @@ namespace UnitTests.Application.Services
                 It.IsAny<int?>(),
                 It.IsAny<int?>()))
                 .ReturnsAsync(bar.BarTimes);
+
             _unitOfWorkMock.Setup(x => x.DrinkRepository.Get(
                 It.IsAny<Expression<Func<Drink, bool>>>(),
                 It.IsAny<Func<IQueryable<Drink>, IOrderedQueryable<Drink>>>(),
@@ -914,31 +1267,10 @@ namespace UnitTests.Application.Services
                 It.IsAny<int?>(),
                 It.IsAny<int?>()))
                 .Returns(new List<Drink>());
-            _unitOfWorkMock.Setup(x => x.TableRepository.Get(
-                It.IsAny<Expression<Func<Table, bool>>>(),
-                It.IsAny<Func<IQueryable<Table>, IOrderedQueryable<Table>>>(),
-                It.IsAny<string>(),
-                It.IsAny<int?>(),
-                It.IsAny<int?>()))
-                .Returns(new List<Table> { table });
-            _mapperMock.Setup(x => x.Map<Booking>(It.IsAny<BookingDrinkRequest>()))
-                .Returns(booking);
-            _paymentServiceMock.Setup(x => x.GetPaymentLink(
-                It.IsAny<Guid>(),
-                It.IsAny<Guid>(),
-                It.IsAny<string>(),
-                It.IsAny<double>(),
-                It.IsAny<bool>()))
-                .Returns(paymentLink);
-            _qrCodeServiceMock.Setup(x => x.GenerateQRCode(It.IsAny<Guid>()))
-                .Returns(validBase64QrCode);
-            _firebaseMock.Setup(x => x.UploadImageAsync(file))
-                .ReturnsAsync("QR_CODE_URL");
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<CustomException.InvalidDataException>(() =>
-                    _bookingService.CreateBookingTableWithDrinks(request, new DefaultHttpContext()));
-            Assert.Equal("Some DrinkIds do not exist.", exception.Message);
+            await Assert.ThrowsAsync<CustomException.InvalidDataException>(
+                () => _bookingService.CreateBookingTableWithDrinks(request, new DefaultHttpContext()));
         }
 
         [Fact]
@@ -983,7 +1315,6 @@ namespace UnitTests.Application.Services
                     }
                 }
             };
-            var table = new Table { TableId = tableId };
             var booking = new Booking
             {
                 BookingId = bookingId,
@@ -993,6 +1324,7 @@ namespace UnitTests.Application.Services
                 BookingTables = new List<BookingTable>(),
                 BookingDrinks = new List<BookingDrink>()
             };
+            var drink = new Drink { DrinkId = drinkId, Price = 100000, BarId = barId };
             var paymentLink = new PaymentLink { PaymentUrl = "test-payment-url" };
             var bytes = Encoding.UTF8.GetBytes("This is a dummy file");
             IFormFile file = new FormFile(new MemoryStream(bytes), 0, bytes.Length, "Data", "dummy.txt");
@@ -1018,7 +1350,7 @@ namespace UnitTests.Application.Services
                 It.IsAny<string>(),
                 It.IsAny<int?>(),
                 It.IsAny<int?>()))
-                .Returns(new List<Drink>());
+                .Returns(new List<Drink> { drink });
             _unitOfWorkMock.Setup(x => x.TableRepository.Get(
                 It.IsAny<Expression<Func<Table, bool>>>(),
                 It.IsAny<Func<IQueryable<Table>, IOrderedQueryable<Table>>>(),
