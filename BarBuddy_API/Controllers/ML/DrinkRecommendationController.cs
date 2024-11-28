@@ -24,7 +24,7 @@ namespace BarBuddy_API.Controllers.ML
             return Ok("Model đã được huấn luyện thành công");
         }
 
-        [Authorize(Roles = "CUSTOMER")]
+        //[Authorize(Roles = "CUSTOMER")]
         [HttpGet("drink-recommendation")]
         public async Task<IActionResult> GetRecommendations([FromQuery] string emotion, [FromQuery] Guid barId)
         {
@@ -37,7 +37,7 @@ namespace BarBuddy_API.Controllers.ML
             return CustomResult("Data loaded", response);
         }
 
-        [AllowAnonymous]
+        //[Authorize(Roles = "CUSTOMER")]
         [HttpGet("drink-recommendation-v2")]
         public async Task<IActionResult> GetRecommendationsV2([FromQuery] string emotion, [FromQuery] Guid barId)
         {
