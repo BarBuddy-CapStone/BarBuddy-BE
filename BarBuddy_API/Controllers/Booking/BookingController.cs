@@ -186,6 +186,50 @@ namespace BarBuddy_API.Controllers.Booking
             }
         }
 
+        [Authorize(Roles = "ADMIN")]
+        [HttpGet("admin")]
+        public async Task<IActionResult> GetListBookingByAdmin([FromQuery] string? qrTicket, [FromQuery] Guid BarId, [FromQuery] string? CustomerName, [FromQuery] string? Phone, [FromQuery] string? Email,
+            [FromQuery] DateTimeOffset? bookingDate, [FromQuery] TimeSpan? bookingTime, [FromQuery] int? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
+        {
+            try
+            {
+                var responses = await _bookingService.GetListBookingAuthorizedAdmin(qrTicket, BarId, CustomerName, Phone, Email, bookingDate, bookingTime, Status, PageIndex, PageSize);
+                return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.responses });
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
+        }
+
+        /// <summary>
+        /// Get Booking Detail By ADMIN
+        /// </summary>
+        /// <param name="bookingId"></param>
+        /// <returns></returns>ssss
+        [Authorize(Roles = "ADMIN")]
+        [HttpGet("admin/{bookingId}")]
+        public async Task<IActionResult> GetBookingDetailByAdmin(Guid bookingId)
+        {
+            try
+            {
+                var responses = await _bookingService.GetBookingDetailAuthorizedAdmin(bookingId);
+                return CustomResult("Tải dữ liệu thành công", responses);
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
+        }
+
         /// <summary>
         /// Update booking by staff based Status and BookingId and AdditionalFee (if it has)
         /// </summary>
