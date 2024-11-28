@@ -10,6 +10,7 @@ namespace Application.DTOs.Booking
     public class BookingByIdResponse
     {
         public Guid BookingId { get; set; }
+        public Guid BarId { get; set; }
         public string BarName { get; set; }
         public string BarAddress { get; set; }
         public string BookingCode { get; set; }
