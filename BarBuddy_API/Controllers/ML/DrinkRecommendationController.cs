@@ -36,5 +36,14 @@ namespace BarBuddy_API.Controllers.ML
             };
             return CustomResult("Data loaded", response);
         }
+
+        [AllowAnonymous]
+        [HttpGet("drink-recommendation-v2")]
+        public async Task<IActionResult> GetRecommendationsV2([FromQuery] string emotion, [FromQuery] Guid barId)
+        {
+            var recommendations = await _recommendationService.GetRecommendationsAsync(emotion, barId);
+            
+            return CustomResult("Data loaded", recommendations);
+        }
     }
 }

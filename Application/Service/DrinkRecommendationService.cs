@@ -1,15 +1,21 @@
 ﻿using Application.DTOs.Drink;
+using Application.DTOs.DrinkRecommendation;
+using Application.DTOs.Gemini;
 using Application.DTOs.ML;
 using Application.IService;
 using AutoMapper;
 using Domain.Entities;
 using Domain.IRepository;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using System.Data;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 
 namespace Application.Service
 {
@@ -18,14 +24,18 @@ namespace Application.Service
         private readonly IUnitOfWork _unitOfWork;
         private readonly MLContext _mlContext;
         private readonly IMapper _mapper;
+        private readonly HttpClient _httpClient;
+        private readonly IConfiguration _configuration;
         private ITransformer _model;
         private readonly string MODEL_PATH = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "drink_emotion_model.zip");
 
-        public DrinkRecommendationService(IUnitOfWork unitOfWork, IMapper mapper)
+        public DrinkRecommendationService(IUnitOfWork unitOfWork, IMapper mapper, HttpClient httpClient, IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
             _mlContext = new MLContext(seed: 0);
             _mapper = mapper;
+            _httpClient = httpClient;
+            _configuration = configuration;
         }
 
         private void LoadModel()
@@ -365,6 +375,108 @@ namespace Application.Service
             {
                 Console.WriteLine($"Lỗi khi xóa dòng trùng lặp: {ex.Message}");
                 throw;
+            }
+        }
+
+        public async Task<List<DrinkRecommendation>> GetRecommendationsAsync(string emotionText, Guid barId)
+        {
+            try
+            {
+                string? apiKey = _configuration["Gemini:ApiKey"];
+                string? endpoint = _configuration["Gemini:Endpoint"];
+
+                var drinks = _unitOfWork.DrinkRepository.Get(
+                    filter: x => x.BarId.Equals(barId),
+                    includeProperties: "DrinkEmotionalCategories.EmotionalDrinkCategory");
+
+                var drinksData = drinks.Select(d => new {
+                    drinkName = d.DrinkName,
+                    drinkDescription = d.Description,
+                    emotionsDrink = d.DrinkEmotionalCategories.Select(e => e.EmotionalDrinkCategory.CategoryName)
+                });
+
+                // Tạo prompt
+                var prompt = new
+                {
+                    contents = new[]
+                    {
+                    new {
+                        role = "user",
+                        parts = new[] { new { text = $"Đây là danh sách đồ uống: {JsonSerializer.Serialize(drinksData)}" } }
+                    },
+                    new {
+                        role = "model",
+                        parts = new[] { new { text = "Tôi đã hiểu danh sách đồ uống của quán. Tôi sẽ đóng vai một bartender để gợi ý đồ uống phù hợp với cảm xúc của khách hàng. Tôi sẽ trả về kết quả theo format JSON với drinkRecommendation:[{drinkName, reason}]" } }
+                    },
+                    new {
+                        role = "user",
+                        parts = new[] { new { text = $"Cảm xúc của tôi là: {emotionText}" } }
+                    }
+                },
+                    generationConfig = new
+                    {
+                        temperature = 1,
+                        topP = 0.95,
+                        topK = 64,
+                        maxOutputTokens = 8192
+                    }
+                };
+
+                // Gọi API
+                var request = new HttpRequestMessage(HttpMethod.Post, $"{endpoint}?key={apiKey}")
+                {
+                    Content = new StringContent(
+                        JsonSerializer.Serialize(prompt),
+                        Encoding.UTF8,
+                    "application/json")
+                };
+
+                var response = await _httpClient.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                // Thêm options để xử lý JSON case-sensitive
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+
+                var geminiResponse = JsonSerializer.Deserialize<GeminiResponse>(responseContent, options);
+
+                // Kiểm tra null trước khi xử lý
+                if (geminiResponse?.Candidates == null || !geminiResponse.Candidates.Any())
+                {
+                    throw new Exception("Không nhận được phản hồi hợp lệ từ Gemini API");
+                }
+
+                // Xử lý response
+                var recommendationsJson = geminiResponse
+                    .Candidates[0]
+                    .Content
+                    .Parts[0]
+                    .Text
+                    .Replace("```json\n", "")
+                    .Replace("\n```", "")
+                    .Trim();
+
+                var recommendationItems = JsonSerializer.Deserialize<List<RecommendationItem>>(recommendationsJson, options);
+
+                return recommendationItems
+                    .Select(rec => {
+                        var drink = drinks.FirstOrDefault(d => d.DrinkName == rec.DrinkName);
+                        return new DrinkRecommendation
+                        {
+                            Drink = _mapper.Map<DrinkResponse>(drink),
+                            Reason = rec.Reason
+                        };
+                    })
+                    .Where(r => r.Drink != null)
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Lỗi khi lấy gợi ý đồ uống", ex);
             }
         }
     }

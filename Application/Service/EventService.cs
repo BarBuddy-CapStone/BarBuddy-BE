@@ -20,6 +20,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection.Metadata;
+using static Domain.CustomException.CustomException;
 
 namespace Application.Service
 {
@@ -133,9 +134,21 @@ namespace Application.Service
                 await _unitOfWork.SaveAsync();
                 _unitOfWork.CommitTransaction();
             }
-            catch (CustomException.InternalServerErrorException ex)
+            catch (CustomException.InvalidDataException ex)
             {
-                throw new CustomException.InternalServerErrorException(ex.Message, ex);
+                throw new CustomException.InvalidDataException(ex.Message);
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                throw new CustomException.UnAuthorizedException(ex.Message);
+            }
+            catch (DataNotFoundException ex)
+            {
+                throw new DataNotFoundException(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
 
@@ -167,7 +180,15 @@ namespace Application.Service
                 await _unitOfWork.SaveAsync();
 
             }
-            catch
+            catch (CustomException.DataNotFoundException ex) 
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                throw new CustomException.UnAuthorizedException(ex.Message);
+            }
+            catch(Exception ex)
             {
                 throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
             }

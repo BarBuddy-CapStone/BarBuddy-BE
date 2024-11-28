@@ -133,7 +133,13 @@ namespace UnitTests.Application.Services
             new Bar { BarId = Guid.NewGuid(), BarName = "Test Bar 1" },
             new Bar { BarId = Guid.NewGuid(), BarName = "Test Bar 2" }
         };
-            var barResponses = bars.Select(b => new BarResponse { BarId = b.BarId, BarName = b.BarName });
+
+            // Tạo expected response để mock mapper
+            var expectedBarResponses = bars.Select(b => new BarResponse 
+            { 
+                BarId = b.BarId, 
+                BarName = b.BarName 
+            }).ToList();
 
             _barRepoMock.Setup(x => x.GetAsync(
                 It.IsAny<Expression<Func<Bar, bool>>>(),
@@ -143,8 +149,9 @@ namespace UnitTests.Application.Services
                 It.IsAny<int?>()))
                 .ReturnsAsync(bars);
 
-            _mapperMock.Setup(x => x.Map<IEnumerable<BarResponse>>(bars))
-                .Returns(barResponses);
+            // Mock mapper để trả về expected response
+            _mapperMock.Setup(x => x.Map<List<BarResponse>>(bars))
+                .Returns(expectedBarResponses);
 
             // Act
             var result = await _barService.GetAllBar(query);
@@ -152,6 +159,7 @@ namespace UnitTests.Application.Services
             // Assert
             Assert.NotNull(result);
             Assert.Equal(bars.Count, result.BarResponses.Count());
+            Assert.Equal(expectedBarResponses, result.BarResponses);
         }
 
         [Fact]
