@@ -394,7 +394,7 @@ namespace Application.Service
 
                     var drinks = _unitOfWork.DrinkRepository.Get(
                         filter: x => x.BarId.Equals(barId),
-                        includeProperties: "DrinkEmotionalCategories.EmotionalDrinkCategory");
+                        includeProperties: "DrinkEmotionalCategories.EmotionalDrinkCategory,DrinkCategory,Bar");
 
                     var drinksData = drinks.Select(d => new {
                         drinkName = d.DrinkName,
