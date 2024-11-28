@@ -52,5 +52,13 @@ namespace Domain.CustomException
             public ForbbidenException(string statuscode, string message) : base(message) { }
             public ForbbidenException(string message, Exception innerException) : base(message, innerException) { }
         }
+
+        public class ThirdPartyApiException : Exception
+        {
+            public ThirdPartyApiException() : base() { }
+            public ThirdPartyApiException(string message) : base(message) { }
+            public ThirdPartyApiException(string statuscode, string message) : base(message) { }
+            public ThirdPartyApiException(string message, Exception innerException) : base(message, innerException) { }
+        }
     }
 }

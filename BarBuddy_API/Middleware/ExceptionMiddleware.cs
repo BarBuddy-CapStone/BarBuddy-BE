@@ -94,6 +94,10 @@ namespace BarBuddy_API.Middleware
                     code = HttpStatusCode.InternalServerError;
                     result = internalServerEx.Message;
                     break;
+                case CustomException.ThirdPartyApiException thoroughApiEx:
+                    code = HttpStatusCode.BadGateway;
+                    result = thoroughApiEx.Message; 
+                    break;
                 default:
                     _logger.LogError(exception, $"Unhandled exception: {exception.GetType().Name} - {exception.Message}");
                     result = "Đã xảy ra lỗi không xác định.";

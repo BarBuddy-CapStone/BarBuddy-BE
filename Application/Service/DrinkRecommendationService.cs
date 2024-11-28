@@ -4,6 +4,7 @@ using Application.DTOs.Gemini;
 using Application.DTOs.ML;
 using Application.IService;
 using AutoMapper;
+using Domain.CustomException;
 using Domain.Entities;
 using Domain.IRepository;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ using System.Data;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using static Domain.CustomException.CustomException;
 
 namespace Application.Service
 {
@@ -380,104 +382,147 @@ namespace Application.Service
 
         public async Task<List<DrinkRecommendation>> GetRecommendationsAsync(string emotionText, Guid barId)
         {
-            try
+            int maxRetries = 3;
+            int currentRetry = 0;
+
+            while (currentRetry < maxRetries)
             {
-                string? apiKey = _configuration["Gemini:ApiKey"];
-                string? endpoint = _configuration["Gemini:Endpoint"];
-
-                var drinks = _unitOfWork.DrinkRepository.Get(
-                    filter: x => x.BarId.Equals(barId),
-                    includeProperties: "DrinkEmotionalCategories.EmotionalDrinkCategory");
-
-                var drinksData = drinks.Select(d => new {
-                    drinkName = d.DrinkName,
-                    drinkDescription = d.Description,
-                    emotionsDrink = d.DrinkEmotionalCategories.Select(e => e.EmotionalDrinkCategory.CategoryName)
-                });
-
-                // Tạo prompt
-                var prompt = new
+                try
                 {
-                    contents = new[]
+                    string? apiKey = _configuration["Gemini:ApiKey"];
+                    string? endpoint = _configuration["Gemini:Endpoint"];
+
+                    var drinks = _unitOfWork.DrinkRepository.Get(
+                        filter: x => x.BarId.Equals(barId),
+                        includeProperties: "DrinkEmotionalCategories.EmotionalDrinkCategory");
+
+                    var drinksData = drinks.Select(d => new {
+                        drinkName = d.DrinkName,
+                        drinkDescription = d.Description,
+                        emotionsDrink = d.DrinkEmotionalCategories.Select(e => e.EmotionalDrinkCategory.CategoryName)
+                    });
+
+                    // Tạo prompt
+                    var prompt = new
                     {
-                    new {
-                        role = "user",
-                        parts = new[] { new { text = $"Đây là danh sách đồ uống: {JsonSerializer.Serialize(drinksData)}" } }
-                    },
-                    new {
-                        role = "model",
-                        parts = new[] { new { text = "Tôi đã hiểu danh sách đồ uống của quán. Tôi sẽ đóng vai một bartender để gợi ý đồ uống phù hợp với cảm xúc của khách hàng. Tôi sẽ trả về kết quả theo format JSON với drinkRecommendation:[{drinkName, reason}]" } }
-                    },
-                    new {
-                        role = "user",
-                        parts = new[] { new { text = $"Cảm xúc của tôi là: {emotionText}" } }
-                    }
-                },
-                    generationConfig = new
-                    {
-                        temperature = 1,
-                        topP = 0.95,
-                        topK = 64,
-                        maxOutputTokens = 8192
-                    }
-                };
-
-                // Gọi API
-                var request = new HttpRequestMessage(HttpMethod.Post, $"{endpoint}?key={apiKey}")
-                {
-                    Content = new StringContent(
-                        JsonSerializer.Serialize(prompt),
-                        Encoding.UTF8,
-                    "application/json")
-                };
-
-                var response = await _httpClient.SendAsync(request);
-                response.EnsureSuccessStatusCode();
-
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                // Thêm options để xử lý JSON case-sensitive
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                };
-
-                var geminiResponse = JsonSerializer.Deserialize<GeminiResponse>(responseContent, options);
-
-                // Kiểm tra null trước khi xử lý
-                if (geminiResponse?.Candidates == null || !geminiResponse.Candidates.Any())
-                {
-                    throw new Exception("Không nhận được phản hồi hợp lệ từ Gemini API");
-                }
-
-                // Xử lý response
-                var recommendationsJson = geminiResponse
-                    .Candidates[0]
-                    .Content
-                    .Parts[0]
-                    .Text
-                    .Replace("```json\n", "")
-                    .Replace("\n```", "")
-                    .Trim();
-
-                var recommendationItems = JsonSerializer.Deserialize<List<RecommendationItem>>(recommendationsJson, options);
-
-                return recommendationItems
-                    .Select(rec => {
-                        var drink = drinks.FirstOrDefault(d => d.DrinkName == rec.DrinkName);
-                        return new DrinkRecommendation
+                        contents = new[]
                         {
-                            Drink = _mapper.Map<DrinkResponse>(drink),
-                            Reason = rec.Reason
-                        };
-                    })
-                    .Where(r => r.Drink != null)
-                    .ToList();
+                        new {
+                            role = "user",
+                            parts = new[] { new { text = $"Đây là danh sách đồ uống: {JsonSerializer.Serialize(drinksData)}" } }
+                        },
+                        new {
+                            role = "model",
+                            parts = new[] { new { text = "Tôi đã hiểu danh sách đồ uống của quán. Tôi sẽ đóng vai một bartender để gợi ý đồ uống phù hợp với cảm xúc của khách hàng. Tôi sẽ trả về kết quả theo format JSON với drinkRecommendation:[{drinkName, reason}]" } }
+                        },
+                        new {
+                            role = "user",
+                            parts = new[] { new { text = $"Cảm xúc của tôi là: {emotionText}" } }
+                        }
+                    },
+                        generationConfig = new
+                        {
+                            temperature = 1,
+                            topP = 0.95,
+                            topK = 64,
+                            maxOutputTokens = 8192
+                        }
+                    };
+
+                    // Gọi API
+                    var request = new HttpRequestMessage(HttpMethod.Post, $"{endpoint}?key={apiKey}")
+                    {
+                        Content = new StringContent(
+                            JsonSerializer.Serialize(prompt),
+                            Encoding.UTF8,
+                        "application/json")
+                    };
+
+                    var response = await _httpClient.SendAsync(request);
+                    response.EnsureSuccessStatusCode();
+
+                    var responseContent = await response.Content.ReadAsStringAsync();
+
+                    // Thêm options để xử lý JSON case-sensitive
+                    var options = new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    };
+
+                    var geminiResponse = JsonSerializer.Deserialize<GeminiResponse>(responseContent, options);
+
+                    // Kiểm tra null trước khi xử lý
+                    if (geminiResponse?.Candidates == null || !geminiResponse.Candidates.Any())
+                    {
+                        throw new CustomException.ThirdPartyApiException("Không nhận được phản hồi hợp lệ từ Gemini API");
+                    }
+
+                    // Xử lý response
+                    var recommendationsJson = geminiResponse
+                        .Candidates[0]
+                        .Content
+                        .Parts[0]
+                        .Text
+                        .Replace("```json\n", "")
+                        .Replace("\n```", "")
+                        .Trim();
+
+                    var jsonDocument = JsonDocument.Parse(recommendationsJson);
+                    var recommendationsArray = jsonDocument.RootElement
+                        .GetProperty("drinkRecommendation")
+                        .GetRawText();
+                    Task.Delay(TimeSpan.FromSeconds(5));
+                    var recommendationItems = JsonSerializer.Deserialize<List<RecommendationItem>>(recommendationsArray, options);
+
+                    return recommendationItems
+                        .Select(rec => {
+                            var drink = drinks.FirstOrDefault(d => d.DrinkName == rec.DrinkName);
+                            return new DrinkRecommendation
+                            {
+                                Drink = _mapper.Map<DrinkResponse>(drink),
+                                Reason = rec.Reason
+                            };
+                        })
+                        .Where(r => r.Drink != null)
+                        .ToList();
+                }
+                catch (JsonException ex)
+                {
+                    throw new CustomException.InvalidDataException(ex.Message);
+                }
+                catch (ThirdPartyApiException ex)
+                {
+                    currentRetry++;
+                    if (currentRetry == maxRetries)
+                    {
+                        throw new CustomException.ThirdPartyApiException($"Đã thử lại {maxRetries} lần nhưng vẫn thất bại: {ex.Message}");
+                    }
+                    await Task.Delay(TimeSpan.FromSeconds(Math.Pow(2, currentRetry))); // Exponential backoff
+                    continue;
+                }
+                catch (HttpRequestException ex)
+                {
+                    currentRetry++;
+                    if (currentRetry == maxRetries)
+                    {
+                        throw new CustomException.InternalServerErrorException($"Đã thử lại {maxRetries} lần nhưng vẫn thất bại: {ex.Message}");
+                    }
+                    await Task.Delay(TimeSpan.FromSeconds(Math.Pow(2, currentRetry))); // Exponential backoff
+                    continue;
+                }
+                catch (Exception ex)
+                {
+                    currentRetry++;
+                    if (currentRetry == maxRetries)
+                    {
+                        throw new Exception($"Đã thử lại {maxRetries} lần nhưng vẫn thất bại khi lấy gợi ý đồ uống: {ex.Message}");
+                    }
+                    await Task.Delay(TimeSpan.FromSeconds(Math.Pow(2, currentRetry))); // Exponential backoff
+                    continue;
+                }
             }
-            catch (Exception ex)
-            {
-                throw new Exception("Lỗi khi lấy gợi ý đồ uống", ex);
-            }
+            
+            throw new CustomException.InternalServerErrorException($"Đã thử lại {maxRetries} lần nhưng vẫn thất bại");
         }
     }
 }
