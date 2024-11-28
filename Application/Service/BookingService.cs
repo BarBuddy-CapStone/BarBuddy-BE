@@ -493,7 +493,8 @@ namespace Application.Service
                     throw new CustomException.DataNotFoundException("Không tìm thấy thông tin thời gian của Bar.");
                 }
 
-                Utils.ValidateOpenCloseTime(request.BookingDate, request.BookingTime, barTimes.ToList());
+                Utils.ValidateOpenCloseTimeWithTimeSlot(request.BookingDate, request.BookingTime, 
+                    barTimes.ToList(), booking.Bar.TimeSlot);
 
                 booking.BookingTables = booking.BookingTables ?? new List<BookingTable>();
                 booking.BookingCode = $"{booking.BookingDate.ToString("yyMMdd")}{RandomHelper.GenerateRandomNumberString()}";
@@ -670,7 +671,8 @@ namespace Application.Service
                     throw new CustomException.DataNotFoundException("Không tìm thấy thông tin thời gian của Bar.");
                 }
 
-                Utils.ValidateOpenCloseTime(request.BookingDate, request.BookingTime, barTimes.ToList());
+                Utils.ValidateOpenCloseTimeWithTimeSlot(request.BookingDate, request.BookingTime, 
+                    barTimes.ToList(), booking.Bar.TimeSlot);
 
                 booking.BookingTables = booking.BookingTables ?? new List<BookingTable>();
                 booking.BookingDrinks = booking.BookingDrinks ?? new List<BookingDrink>();

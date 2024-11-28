@@ -87,12 +87,12 @@ namespace BarBuddy_API.Controllers.PaymentHistory
         /// </summary>
         /// <param name="barId"></param>
         /// <returns></returns>
-        //[Authorize(Roles = "MANAGER,STAFF")]
-        //[HttpGet("/manager/{barId}")]
-        //public async Task<IActionResult> GetAllHistoryPaymentByBarId(Guid barId, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
-        //{
-        //    var response = await _service.GetByBarId(barId, PageIndex, PageSize);
-        //    return CustomResult("Data Loaded", new { response = response.response, totalPage = response.totalPage });
-        //}
+        [Authorize(Roles = "MANAGER,STAFF")]
+        [HttpGet("/manager/{barId}")]
+        public async Task<IActionResult> GetAllHistoryPaymentByBarId(Guid barId, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
+        {
+            var response = await _service.GetByBarId(barId, PageIndex, PageSize);
+            return CustomResult("Data Loaded", new { response = response.response, totalPage = response.totalPage });
+        }
     }
 }

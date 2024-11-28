@@ -81,6 +81,50 @@ namespace Application.Common
                 throw new CustomException.InvalidDataException("Thời gian phải nằm trong giờ mở cửa và giờ đóng cửa của quán Bar!");
             }
         }
+
+        public static void ValidateOpenCloseTimeWithTimeSlot(DateTimeOffset requestDate, TimeSpan requestTime,
+            List<BarTime> barTimes, double timeSlot)
+        {
+            var currentDate = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now.Date);
+            if (requestDate < currentDate)
+            {
+                throw new CustomException.InvalidDataException("Ngày không hợp lệ");
+            }
+
+            bool isValidTime = barTimes.Any(barTime =>
+            {
+                if (barTime.StartTime < barTime.EndTime)
+                {
+                    return IsValidSlot(requestTime, barTime.StartTime, barTime.EndTime, timeSlot);
+                }
+                else
+                {
+                    return IsValidSlot(requestTime, barTime.StartTime, TimeSpan.FromHours(24), timeSlot) ||
+                           IsValidSlot(requestTime, TimeSpan.Zero, barTime.EndTime, timeSlot);
+                }
+            });
+
+            if (!isValidTime)
+            {
+                throw new CustomException.InvalidDataException("Thời gian phải nằm trong giờ mở cửa và giờ đóng cửa của quán Bar!");
+            }
+        }
+
+        private static bool IsValidSlot(TimeSpan requestTime, TimeSpan startTime, TimeSpan endTime, double timeSlot)
+        {
+            if (requestTime < startTime || requestTime > endTime)
+                return false;
+
+            TimeSpan slotDuration = TimeSpan.FromHours(timeSlot);
+            for (var time = startTime; time <= endTime; time += slotDuration)
+            {
+                if (requestTime == time)
+                    return true;
+            }
+
+            return false;
+        }
+
         public static void ValidateEventTime(DateTimeOffset? requestDate, TimeSpan startTime, TimeSpan endTime, List<BarTime> barTimes)
         {
             if (requestDate != null)
