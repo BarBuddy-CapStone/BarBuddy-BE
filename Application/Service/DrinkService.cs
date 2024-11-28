@@ -171,6 +171,10 @@ namespace Application.Service
                 var response = _mapper.Map<IEnumerable<DrinkResponse>>(getAllDrink);
                 return response;
             }
+            catch(CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
             catch (CustomException.InternalServerErrorException e)
             {
                 throw new CustomException.InternalServerErrorException(e.Message);
@@ -539,7 +543,7 @@ namespace Application.Service
                                 continue;
                             }
                             var breakPoint = _unitOfWork.DrinkRepository.GetAll().Count();
-                            if (breakPoint >= 300) throw new InvalidDataException("BreakPoint");
+                            if (breakPoint >= 180) throw new InvalidDataException("BreakPoint");
                         }
                     }
                     catch (InvalidDataException ix)
@@ -594,7 +598,7 @@ namespace Application.Service
 
                 double price = double.TryParse(cleanedPrice, NumberStyles.Any, CultureInfo.InvariantCulture, out double parsedPrice)
                     ? parsedPrice
-                    : 0;
+                    : 10000000;
                 return new Drink
                 {
                     DrinkName = name.Trim(),

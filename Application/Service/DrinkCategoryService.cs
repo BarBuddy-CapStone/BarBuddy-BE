@@ -134,13 +134,13 @@ namespace Application.Service
                     TotalItems = totalItems
                 };
             }
-            catch (CustomException.InternalServerErrorException e)
-            {
-                throw new CustomException.InternalServerErrorException(e.Message);
-            }
             catch (CustomException.DataNotFoundException e)
             {
                 throw new CustomException.DataNotFoundException(e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new CustomException.InternalServerErrorException(e.Message);
             }
         }
 
@@ -160,14 +160,15 @@ namespace Application.Service
                 var response = _mapper.Map<IEnumerable<DrinkCategoryResponse>>(getAllDrinkCateOfBar);
                 return response;
             }
-            catch (CustomException.InternalServerErrorException e)
-            {
-                throw new CustomException.InternalServerErrorException(e.Message);
-            }
             catch (CustomException.DataNotFoundException e)
             {
                 throw new CustomException.DataNotFoundException(e.Message);
             }
+            catch (Exception e)
+            {
+                throw new CustomException.InternalServerErrorException(e.Message);
+            }
+            
         }
 
         public async Task<DrinkCategoryResponse> GetDrinkCategoryById(Guid drinkCateId)
@@ -187,7 +188,11 @@ namespace Application.Service
                 var response = _mapper.Map<DrinkCategoryResponse>(getOne);
                 return response;
             }
-            catch (CustomException.InternalServerErrorException e)
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
+            catch (Exception e)
             {
                 throw new CustomException.InternalServerErrorException(e.Message);
             }
@@ -215,13 +220,13 @@ namespace Application.Service
                 var response = _mapper.Map<DrinkCategoryResponse>(mapper);
                 return response;
             }
-            catch (CustomException.InternalServerErrorException e)
-            {
-                throw new CustomException.InternalServerErrorException(e.Message);
-            }
             catch (CustomException.DataNotFoundException e)
             {
                 throw new CustomException.DataNotFoundException(e.Message);
+            }
+            catch (Exception e)
+            {
+                throw new CustomException.InternalServerErrorException(e.Message);
             }
         }
     }
