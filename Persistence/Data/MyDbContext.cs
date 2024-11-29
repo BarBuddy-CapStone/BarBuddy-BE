@@ -2685,33 +2685,37 @@ namespace Persistence.Data
                     BookingId = Constants.Ids.Bookings.Booking5,
                     DrinkId = Constants.Ids.Drinks.Mojito, // Mojito cho không khí lãng mạn
                     Quantity = 2, // Đặt 2 ly cho cặp đôi
-                    ActualPrice = 70000 // Giá gốc của Mojito
+                    ActualPrice = 70000, // Giá gốc của Mojito
+                    IsExtra = false
                 },
                 new BookingDrink
                 {
-                    BookingDrinkId = Constants.Ids.BookingDrinks.BookingDrink2,
+                    BookingDrinkId = Constants.Ids.BookingDrinks.BookingDrink1,
                     BookingId = Constants.Ids.Bookings.Booking5,
                     DrinkId = Constants.Ids.Drinks.TraDao, // Trà đào để giải khát
                     Quantity = 2,
-                    ActualPrice = 35000 // Giá gốc của Trà đào
+                    ActualPrice = 35000,
+                    IsExtra = false // Giá gốc của Trà đào
                 },
 
                 // Booking 6 - Business meeting
                 new BookingDrink
                 {
-                    BookingDrinkId = Constants.Ids.BookingDrinks.BookingDrink3,
+                    BookingDrinkId = Constants.Ids.BookingDrinks.BookingDrink1,
                     BookingId = Constants.Ids.Bookings.Booking6,
                     DrinkId = Constants.Ids.Drinks.Screwdriver, // Cocktail cho khách VIP
                     Quantity = 3, // Đặt 3 ly cho nhóm khách
-                    ActualPrice = 80000 // Giá gốc của Screwdriver
+                    ActualPrice = 80000, // Giá gốc của Screwdriver
+                    IsExtra = true
                 },
                 new BookingDrink
                 {
-                    BookingDrinkId = Constants.Ids.BookingDrinks.BookingDrink4,
+                    BookingDrinkId = Constants.Ids.BookingDrinks.BookingDrink1,
                     BookingId = Constants.Ids.Bookings.Booking6,
                     DrinkId = Constants.Ids.Drinks.BlackCoffee, // Cà phê đen cho cuộc họp
                     Quantity = 4, // Đặt 4 ly cho cả nhóm
-                    ActualPrice = 15000 // Giá gốc của Cà phê đen
+                    ActualPrice = 15000, // Giá gốc của Cà phê đen
+                    IsExtra = true
                 }
             };
         }

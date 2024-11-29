@@ -38,7 +38,7 @@ namespace UnitTests.Application.Services
         private readonly Mock<IGenericRepository<BarTime>> _barTimeRepoMock;
         private readonly BookingService _bookingService;
         private readonly Mock<IHttpContextAccessor> _contextAccessor;
-
+        private readonly Mock<IFcmService> _fcmService;
         public BookingServiceTests()
         {
             _unitOfWorkMock = new Mock<IUnitOfWork>();
@@ -51,7 +51,7 @@ namespace UnitTests.Application.Services
             _firebaseMock = new Mock<IFirebase>();
             _eventVoucherServiceMock = new Mock<IEventVoucherService>();
             _contextAccessor = new Mock<IHttpContextAccessor>();
-
+            _fcmService = new Mock<IFcmService>();
 
             _bookingRepoMock = new Mock<IGenericRepository<Booking>>();
             _accountRepoMock = new Mock<IGenericRepository<Account>>();
@@ -73,7 +73,8 @@ namespace UnitTests.Application.Services
                 _qrCodeServiceMock.Object,
                 _firebaseMock.Object,
                 _eventVoucherServiceMock.Object,
-                _contextAccessor.Object
+                _contextAccessor.Object,
+                _fcmService.Object                
             );
         }
 
