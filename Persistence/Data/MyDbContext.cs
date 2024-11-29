@@ -2690,7 +2690,7 @@ namespace Persistence.Data
                 },
                 new BookingDrink
                 {
-                    BookingDrinkId = Constants.Ids.BookingDrinks.BookingDrink1,
+                    BookingDrinkId = Constants.Ids.BookingDrinks.BookingDrink2,
                     BookingId = Constants.Ids.Bookings.Booking5,
                     DrinkId = Constants.Ids.Drinks.TraDao, // Trà đào để giải khát
                     Quantity = 2,
@@ -2701,7 +2701,7 @@ namespace Persistence.Data
                 // Booking 6 - Business meeting
                 new BookingDrink
                 {
-                    BookingDrinkId = Constants.Ids.BookingDrinks.BookingDrink1,
+                    BookingDrinkId = Constants.Ids.BookingDrinks.BookingDrink3,
                     BookingId = Constants.Ids.Bookings.Booking6,
                     DrinkId = Constants.Ids.Drinks.Screwdriver, // Cocktail cho khách VIP
                     Quantity = 3, // Đặt 3 ly cho nhóm khách
@@ -2710,7 +2710,7 @@ namespace Persistence.Data
                 },
                 new BookingDrink
                 {
-                    BookingDrinkId = Constants.Ids.BookingDrinks.BookingDrink1,
+                    BookingDrinkId = Constants.Ids.BookingDrinks.BookingDrink4,
                     BookingId = Constants.Ids.Bookings.Booking6,
                     DrinkId = Constants.Ids.Drinks.BlackCoffee, // Cà phê đen cho cuộc họp
                     Quantity = 4, // Đặt 4 ly cho cả nhóm
