@@ -67,7 +67,7 @@ namespace Infrastructure.Quartz
                         booking.TotalPrice != null &&
                         booking.Status == (int)PrefixValueEnum.PendingBooking)
                         {
-                            await _bookingService.UpdateBookingStatus(booking.BookingId, (int)PrefixValueEnum.Completed, null);
+                            await _bookingService.UpdateBookingStatus(booking.BookingId, (int)PrefixValueEnum.Completed);
                             _cache.Remove(cacheKey);
                             var messages = string.Format(PrefixKeyConstant.BOOKING_DRINKS_COMPLETED_NOTI, booking.BarName);
                             var creNotiRequest = new NotificationRequest
@@ -93,7 +93,7 @@ namespace Infrastructure.Quartz
                            booking.TotalPrice == null &&
                            booking.Status == (int)PrefixValueEnum.PendingBooking)
                         {
-                            await _bookingService.UpdateBookingStatus(booking.BookingId, (int)PrefixValueEnum.Cancelled, null);
+                            await _bookingService.UpdateBookingStatus(booking.BookingId, (int)PrefixValueEnum.Cancelled);
                             var messages = string.Format(PrefixKeyConstant.BOOKING_CANCEL_NOTI_JOB, booking.BarName);
                             var creNotiRequest = new NotificationRequest
                             {

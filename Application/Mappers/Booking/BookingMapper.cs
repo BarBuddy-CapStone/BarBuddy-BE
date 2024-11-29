@@ -27,11 +27,14 @@ namespace Application.Mappers.Booking
             CreateMap<BookingTableRequest, Domain.Entities.Booking>();
 
             CreateMap<BookingDrink, BookingDrinkDetailResponse>()
-                .ForMember(x => x.DrinkName, opt => opt.MapFrom(y => y.Drink.DrinkName));
+                .ForMember(x => x.DrinkName, opt => opt.MapFrom(y => y.Drink.DrinkName))
+                .ForMember(x => x.Image, opt => opt.MapFrom(y => y.Drink.Image));
 
             CreateMap<Domain.Entities.Booking, BookingCustomResponse>()
                 .ForMember(dst => dst.BarName, src => src.MapFrom(x => x.Bar.BarName))
                 .ForMember(dst => dst.TimeSlot, src => src.MapFrom(x => x.Bar.TimeSlot));
+
+            CreateMap<DrinkRequest, BookingDrink>().ReverseMap();
         }
     }
 }

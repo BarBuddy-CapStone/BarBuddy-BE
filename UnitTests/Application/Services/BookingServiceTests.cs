@@ -826,7 +826,7 @@ namespace UnitTests.Application.Services
                 .Returns(table);
 
             // Act
-            await _bookingService.UpdateBookingStatus(bookingId, 2, null);
+            await _bookingService.UpdateBookingStatus(bookingId, 2);
 
             // Assert
             Assert.Equal(2, booking.Status);
@@ -859,7 +859,7 @@ namespace UnitTests.Application.Services
 
             // Act & Assert
             await Assert.ThrowsAsync<CustomException.DataNotFoundException>(
-                () => _bookingService.UpdateBookingStatus(bookingId, 2, null));
+                () => _bookingService.UpdateBookingStatus(bookingId, 2));
         }
 
         [Fact]
@@ -888,7 +888,7 @@ namespace UnitTests.Application.Services
 
             // Act & Assert
             await Assert.ThrowsAsync<CustomException.UnAuthorizedException>(
-                () => _bookingService.UpdateBookingStatus(bookingId, 2, null));
+                () => _bookingService.UpdateBookingStatus(bookingId, 2));
         }
 
         [Fact]
@@ -924,7 +924,7 @@ namespace UnitTests.Application.Services
 
             // Act & Assert
             await Assert.ThrowsAsync<CustomException.InvalidDataException>(
-                () => _bookingService.UpdateBookingStatus(bookingId, 2, null));
+                () => _bookingService.UpdateBookingStatus(bookingId, 2));
         }
 
         [Fact]
@@ -960,7 +960,7 @@ namespace UnitTests.Application.Services
 
             // Act & Assert
             await Assert.ThrowsAsync<CustomException.InvalidDataException>(
-                () => _bookingService.UpdateBookingStatus(bookingId, 3, -100));
+                () => _bookingService.UpdateBookingStatus(bookingId, 3));
         }
 
         [Fact]
