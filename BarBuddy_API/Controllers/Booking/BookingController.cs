@@ -450,7 +450,7 @@ namespace BarBuddy_API.Controllers.Booking
         }
 
         [Authorize(Roles = "STAFF")]
-        [HttpPost("upd-extra-drink/{bookingId}")]
+        [HttpPatch("upd-extra-drink/{bookingId}")]
         public async Task<IActionResult> UpdateExtraDrinkInServing(Guid bookingId, [FromBody] List<DrinkRequest> request)
         {
             try
@@ -473,7 +473,7 @@ namespace BarBuddy_API.Controllers.Booking
         }
 
         [Authorize(Roles = "STAFF,CUSTOMER")]
-        [HttpPost("get-extra-drink/{bookingId}")]
+        [HttpGet("get-extra-drink/{bookingId}")]
         public async Task<IActionResult> GetExtraDrinkInServing(Guid bookingId)
         {
             try
