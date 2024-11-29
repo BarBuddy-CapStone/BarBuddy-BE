@@ -232,14 +232,18 @@ namespace BarBuddy_API.Controllers.Bar
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        [Authorize(Roles = "ADMIN")]
-        [HttpGet("admin/dashboard/revenueChart")]
+        [Authorize(Roles = "ADMIN,MANAGER")]
+        [HttpGet("dashboard/revenueChart")]
         public async Task<IActionResult> GetRevenueOfBar([FromQuery] RevenueRequest request)
         {
             try
             {
                 var response = await _barService.GetRevenueOfBar(request);
                 return CustomResult("Đã tải dữ liệu", response);
+            }
+            catch (CustomException.UnAuthorizedException e)
+            {
+                return CustomResult(e.Message, HttpStatusCode.Unauthorized);
             }
             catch (CustomException.DataNotFoundException e)
             {
@@ -284,8 +288,8 @@ namespace BarBuddy_API.Controllers.Bar
         /// Get All Revenue
         /// </summary>
         /// <returns></returns>
-        [Authorize(Roles = "ADMIN")]
-        [HttpGet("admin/dashboard/getAllRevenue")]
+        [Authorize(Roles = "ADMIN,MANAGER")]
+        [HttpGet("dashboard/getAllRevenue")]
         public async Task<IActionResult> GetAllRevenue()
         {
             try
