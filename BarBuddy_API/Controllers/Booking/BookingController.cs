@@ -403,7 +403,7 @@ namespace BarBuddy_API.Controllers.Booking
             }
         }
 
-        [Authorize(Roles ="STAFF")]
+        [Authorize(Roles = "STAFF")]
         [HttpPatch("update-serving/{bookingId}")]
         public async Task<IActionResult> UpdateStsBookingServing(Guid bookingId)
         {
@@ -411,6 +411,75 @@ namespace BarBuddy_API.Controllers.Booking
             {
                 await _bookingService.UpdateStsBookingServing(bookingId);
                 return CustomResult("Đã cập nhật đơn booking với trạng thái đang phục vụ !");
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.BadRequest);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [Authorize(Roles = "STAFF,CUSTOMER")]
+        [HttpPost("extra-drink/{bookingId}")]
+        public async Task<IActionResult> ExtraDrinkInServing(Guid bookingId, [FromBody] List<DrinkRequest> request)
+        {
+            try
+            {
+                var response = await _bookingService.ExtraDrinkInServing(bookingId, request);
+                return CustomResult("Đã thêm đồ uống thành công !", response);
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.BadRequest);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [Authorize(Roles = "STAFF")]
+        [HttpPost("upd-extra-drink/{bookingId}")]
+        public async Task<IActionResult> UpdateExtraDrinkInServing(Guid bookingId, [FromBody] List<DrinkRequest> request)
+        {
+            try
+            {
+                await _bookingService.UpdExtraDrinkInServing(bookingId, request);
+                return CustomResult("Đã cập nhật thành công !");
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.BadRequest);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [Authorize(Roles = "STAFF,CUSTOMER")]
+        [HttpPost("get-extra-drink/{bookingId}")]
+        public async Task<IActionResult> GetExtraDrinkInServing(Guid bookingId)
+        {
+            try
+            {
+                var response = await _bookingService.GetExtraBookingServing(bookingId);
+                return CustomResult("Đã tải dữ liệu đồ uống !", response);
             }
             catch (CustomException.UnAuthorizedException ex)
             {

@@ -17,6 +17,7 @@ namespace Domain.Entities
         public Guid BookingId { get; set; }
         public double ActualPrice { get; set; }
         public int Quantity { get; set; }
+        public bool IsExtra { get; set; }
 
         [ForeignKey("BookingId")]
         public virtual Booking Booking { get; set; }
