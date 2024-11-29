@@ -110,7 +110,7 @@ namespace Application.Common
             }
         }
 
-        private static bool IsValidSlot(TimeSpan requestTime, TimeSpan startTime, TimeSpan endTime, double timeSlot)
+        public static bool IsValidSlot(TimeSpan requestTime, TimeSpan startTime, TimeSpan endTime, double timeSlot)
         {
             if (requestTime < startTime || requestTime > endTime)
                 return false;

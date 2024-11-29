@@ -14,6 +14,7 @@ namespace Application.IService
         Task UpdateTable(Guid TableId, UpdateTableRequest request);
         Task UpdateTableStatus(Guid TableId, int status);
         Task<bool> DeleteTable(Guid TableId);
-        Task<(List<TableResponse> response, int TotalPage)> GetAllOfBar(Guid BarId, Guid? TableTypeId, string? TableName, int? Status, int PageIndex, int PageSize);
+        Task<(List<TableResponse> response, int TotalPage)> GetAllOfBar(Guid BarId, Guid? TableTypeId,
+            string? TableName, int? Status, int PageIndex, int PageSize, DateTime BookingDate, TimeSpan BookingTime);
     }
 }
