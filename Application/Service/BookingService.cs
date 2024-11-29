@@ -614,14 +614,17 @@ namespace Application.Service
             }
         }
 
-        public async Task UpdateBookingStatus(Guid BookingId, int Status, double? AdditionalFee)
+        public async Task UpdateBookingStatus(Guid BookingId, int Status)
         {
             try
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
                 var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
 
-                var booking = _unitOfWork.BookingRepository.Get(b => b.BookingId == BookingId).FirstOrDefault();
+                var booking = _unitOfWork.BookingRepository
+                                         .Get(b => b.BookingId == BookingId,
+                                                includeProperties: "BookingDrinks")
+                                         .FirstOrDefault();
                 _unitOfWork.BeginTransaction();
 
                 if (booking == null)
@@ -642,9 +645,15 @@ namespace Application.Service
                 {
                     throw new CustomException.InvalidDataException("Không thể thực hiện check-in: vẫn chưa đến ngày đặt bàn");
                 }
-                if (Status == 3)
+                if (Status == 3 && booking.BookingDrinks != null)
                 {
-                    booking.AdditionalFee = AdditionalFee == null ? 0 : (AdditionalFee < 0 ? throw new CustomException.InvalidDataException("Dịch vụ cộng thêm không thể nhỏ hơn 0") : AdditionalFee);
+                    booking.AdditionalFee = booking.BookingDrinks
+                        .Where(x => x.IsExtra)
+                        .Sum(x => x.ActualPrice * x.Quantity);
+                }
+                else
+                {
+                    booking.AdditionalFee = 0;
                 }
 
                 switch (booking.Status)
@@ -681,7 +690,7 @@ namespace Application.Service
 
                 if (Status == 3)
                 {
-                    booking.AdditionalFee = AdditionalFee ?? 0;
+                    booking.CheckOutStaffId = accountId;
                     if (booking.AdditionalFee < 0)
                     {
                         throw new CustomException.InvalidDataException("Dịch vụ cộng thêm không thể nhỏ hơn 0");
@@ -1023,6 +1032,7 @@ namespace Application.Service
                     throw new CustomException.InvalidDataException("Đơn này phải ở trạng thái đang chờ !");
                 }
 
+                getBooking.CheckInStaffId = accountId;
                 getBooking.Status = (int)PrefixValueEnum.Serving;
                 await _unitOfWork.BookingRepository.UpdateRangeAsync(getBooking);
                 await Task.Delay(10);
@@ -1187,7 +1197,12 @@ namespace Application.Service
                                             .Get(filter: x => x.AccountId.Equals(accountId),
                                                  includeProperties: "Role")
                                             .FirstOrDefault();
-                var getBooking = _unitOfWork.BookingRepository.GetByID(bookingId);
+                var getBooking = _unitOfWork.BookingRepository
+                                            .Get(filter: x => x.BookingId.Equals(bookingId), 
+                                                 includeProperties: "Bar")
+                                            .FirstOrDefault();
+
+                
 
                 if (!getAccount.BarId.HasValue && getAccount.Role.RoleName.Equals("CUSTOMER"))
                 {
@@ -1200,10 +1215,20 @@ namespace Application.Service
                 {
                     throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
                 }
-                if (getBooking.Status != (int)PrefixValueEnum.PendingBooking)
+                if (getBooking.Status != (int)PrefixValueEnum.Serving)
                 {
                     throw new CustomException.InvalidDataException("Không thể thêm đồ uống khi đơn không ở trạng thái đang phục vụ !");
                 }
+
+                var getTimeSlot = getBooking?.Bar.TimeSlot ?? 0;
+
+                if(getBooking.BookingDate.Date != DateTime.Now.Date &&
+                                                              getBooking.BookingTime >= DateTime.Now.TimeOfDay &&
+                                                              getBooking.BookingTime.Add(TimeSpan.FromHours(getTimeSlot)) <= DateTime.Now.TimeOfDay)
+                {
+                    throw new CustomException.InvalidDataException("Thời gian đặt đồ uống phải nằm trong thời gian phục vụ !");
+                }
+                
 
                 var extraDrink = new List<BookingDrink>();
                 double addFeeExtraDrink = 0;
@@ -1258,7 +1283,10 @@ namespace Application.Service
                                             .Get(filter: x => x.AccountId.Equals(accountId),
                                                  includeProperties: "Role")
                                             .FirstOrDefault();
-                var getBooking = _unitOfWork.BookingRepository.GetByID(bookingId);
+                var getBooking = _unitOfWork.BookingRepository
+                                            .Get(filter: x => x.BookingId.Equals(bookingId),
+                                                 includeProperties: "Bar")
+                                            .FirstOrDefault();
 
                 if (!getAccount.BarId.HasValue && getAccount.Role.RoleName.Equals("CUSTOMER"))
                 {
@@ -1271,17 +1299,26 @@ namespace Application.Service
                 {
                     throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
                 }
-                if (getBooking.Status != (int)PrefixValueEnum.PendingBooking)
+                if (getBooking.Status != (int)PrefixValueEnum.Serving)
                 {
                     throw new CustomException.InvalidDataException("Không thể thêm đồ uống khi đơn không ở trạng thái đang phục vụ !");
+                }
+
+                var getTimeSlot = getBooking?.Bar.TimeSlot ?? 0;
+
+                if (getBooking.BookingDate.Date != DateTime.Now.Date &&
+                                                              getBooking.BookingTime >= DateTime.Now.TimeOfDay &&
+                                                              getBooking.BookingTime.Add(TimeSpan.FromHours(getTimeSlot)) <= DateTime.Now.TimeOfDay)
+                {
+                    throw new CustomException.InvalidDataException("Thời gian đặt đồ uống phải nằm trong thời gian phục vụ !");
                 }
 
                 var listExtraDrink = _unitOfWork.BookingDrinkRepository
                                                 .Get(filter: x => x.BookingId.Equals(getBooking.BookingId) &&
                                                                   x.IsExtra == PrefixKeyConstant.TRUE);
-                var delExtraDrink = listExtraDrink.Where(ex => !request.Any(x => x.DrinkId.Equals(ex.DrinkId))).ToList();
-                var newExtraDrink = request.Where(ex => !listExtraDrink.Any(x => x.DrinkId.Equals(ex.DrinkId))).ToList();
-                var updExtraDrink = listExtraDrink.Where(ex => request.Any(x => x.DrinkId.Equals(ex.DrinkId))).ToList();
+                var delExtraDrink = listExtraDrink.Where(ex => !request.Any(x => x.DrinkId.Equals(ex.DrinkId))).Distinct().ToList();
+                var newExtraDrink = request.Where(ex => !listExtraDrink.Any(x => x.DrinkId.Equals(ex.DrinkId))).Distinct().ToList();
+                var updExtraDrink = listExtraDrink.Where(ex => request.Any(x => x.DrinkId.Equals(ex.DrinkId))).Distinct().ToList();
                 var extraDrink = new List<BookingDrink>();
 
                 _unitOfWork.BeginTransaction();
@@ -1351,6 +1388,10 @@ namespace Application.Service
                 }
 
                 getBooking.AdditionalFee = addFeeExtraDrink;
+                if (getAccount.BarId.HasValue && getAccount.BarId.Equals(getBooking.BarId))
+                {
+                    getBooking.CheckOutStaffId = accountId;
+                }
                 await _unitOfWork.BookingRepository.UpdateRangeAsync(getBooking);
                 await Task.Delay(10);
                 await _unitOfWork.SaveAsync();
@@ -1374,25 +1415,25 @@ namespace Application.Service
                                             .Get(filter: x => x.AccountId.Equals(accountId),
                                                  includeProperties: "Role")
                                             .FirstOrDefault();
-                var getBooking = _unitOfWork.BookingRepository
+                var getBooking = _unitOfWork.BookingDrinkRepository
                                             .Get(filter: x => x.BookingId.Equals(bookingId) && 
-                                                         x.BookingDrinks.Any(x => x.IsExtra == PrefixKeyConstant.TRUE),
-                                                includeProperties: "BookingDrinks")
-                                            .FirstOrDefault();
+                                                         x.IsExtra == PrefixKeyConstant.TRUE,
+                                                includeProperties: "Booking,Drink");
 
                 if (!getAccount.BarId.HasValue && getAccount.Role.RoleName.Equals("CUSTOMER"))
                 {
-                    if (!getAccount.AccountId.Equals(getBooking.AccountId))
+                    if (!getBooking.Any( x => x.Booking.AccountId.Equals(getAccount.AccountId)) && getBooking != null)
                     {
                         throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào đơn booking này !");
                     }
+
                 }
-                if (getAccount.BarId.HasValue && !getAccount.BarId.Equals(getBooking.BarId))
+                if (getAccount.BarId.HasValue && !getBooking.Any(x => x.Booking.BarId.Equals(getAccount.BarId)))
                 {
                     throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
                 }
 
-                var response = _mapper.Map<List<BookingDrinkDetailResponse>>(getBooking.BookingDrinks);
+                var response = _mapper.Map<List<BookingDrinkDetailResponse>>(getBooking);
                 return response;
             }
             catch (CustomException.InternalServerErrorException ex)

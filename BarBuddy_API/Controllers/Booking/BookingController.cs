@@ -243,7 +243,7 @@ namespace BarBuddy_API.Controllers.Booking
         {
             try
             {
-                await _bookingService.UpdateBookingStatus(BookingId, Status, AdditionalFee);
+                await _bookingService.UpdateBookingStatus(BookingId, Status);
                 return CustomResult("Cập nhật trạng thái thành công");
             }
             catch (CustomException.DataNotFoundException e)
