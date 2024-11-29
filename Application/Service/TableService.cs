@@ -1,11 +1,14 @@
-﻿using Application.DTOs.Table;
+﻿using Application.Common;
+using Application.DTOs.Table;
 using Application.Interfaces;
 using Application.IService;
 using Azure.Core;
 using Domain.Constants;
 using Domain.CustomException;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.IRepository;
+using Domain.Utils;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -167,7 +170,8 @@ namespace Application.Service
             }
         }
 
-        public async Task<(List<TableResponse> response, int TotalPage)> GetAllOfBar(Guid BarId, Guid? TableTypeId, string? TableName, int? Status, int PageIndex, int PageSize)
+        public async Task<(List<TableResponse> response, int TotalPage)> GetAllOfBar(Guid BarId, Guid? TableTypeId, 
+            string? TableName, int? Status, int PageIndex, int PageSize, DateTime RequestDate, TimeSpan RequestTime)
         {
             try
             {
@@ -181,6 +185,9 @@ namespace Application.Service
                 (TableTypeId == null || t.TableTypeId == TableTypeId) &&
                 (TableName == null || t.TableName.Contains(TableName)) &&
                 t.IsDeleted == false;
+
+                if (RequestDate.Date < DateTime.Now.Date) 
+                    throw new CustomException.InvalidDataException("Ngày không hợp lệ");
 
                 var totalTable = (await _unitOfWork.TableRepository.GetAsync(filter: filter)).Count();
 
@@ -198,22 +205,44 @@ namespace Application.Service
                         }
                     }
 
-                    var tablesWithPagination = await _unitOfWork.TableRepository.GetAsync(filter: filter,
-                            orderBy: q => q.OrderBy(x => x.TableName),
-                            pageIndex: PageIndex,
-                            pageSize: PageSize,
-                            includeProperties: "TableType.Bar");
+                    var bar = (await _unitOfWork.BarRepository.GetAsync(filter: x => x.BarId.Equals(BarId), 
+                        includeProperties: "BarTimes")).FirstOrDefault() ?? throw new CustomException.DataNotFoundException("Không tìm thấy quán bar");
 
+                    var tablesWithPagination = await _unitOfWork.TableRepository.GetAsync(
+                        filter: filter,
+                        orderBy: q => q.OrderBy(x => x.TableName),
+                        pageIndex: PageIndex,
+                        pageSize: PageSize,
+                        includeProperties: "TableType.Bar.BarTimes");
+
+                    bool isValidTime = bar.BarTimes.Where(barTime => barTime.DayOfWeek.Equals((int)RequestDate.DayOfWeek))
+                        .Any(barTime =>
+                    {
+                        if (barTime.StartTime < barTime.EndTime)
+                        {
+                            return Utils.IsValidSlot(RequestTime, barTime.StartTime, barTime.EndTime, bar.TimeSlot);
+                        }
+                        else
+                        {
+                            return Utils.IsValidSlot(RequestTime, barTime.StartTime, TimeSpan.FromHours(24), bar.TimeSlot) ||
+                                   Utils.IsValidSlot(RequestTime, TimeSpan.Zero, barTime.EndTime, bar.TimeSlot);
+                        }
+                    });
                     foreach (var table in tablesWithPagination)
                     {
+                        int currentStatus = 3;
+                        if (isValidTime)
+                        {
+                            currentStatus = await GetTableStatus(table, RequestDate, RequestTime);
+                        }
+                        
                         var tableResponse = new TableResponse
                         {
-                            //BarId = table.BarId,
                             TableTypeId = table.TableTypeId,
                             MinimumGuest = table.TableType.MinimumGuest,
                             MaximumGuest = table.TableType.MaximumGuest,
                             MinimumPrice = table.TableType.MinimumPrice,
-                            Status = table.Status,
+                            Status = currentStatus,
                             TableName = table.TableName,
                             TableTypeName = table.TableType.TypeName,
                             TableId = table.TableId
@@ -223,6 +252,57 @@ namespace Application.Service
                 }
 
                 return (responses, totalPage);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
+
+        private async Task<int> GetTableStatus(Table table, DateTime bookingDate, TimeSpan bookingTime)
+        {
+            try
+            {
+                // Lấy tất cả booking table của bàn trong ngày được chọn
+                var bookingTables = await _unitOfWork.BookingTableRepository.GetAsync(
+                    filter: bt => bt.TableId == table.TableId &&
+                                 bt.Booking.BookingDate.Date == bookingDate.Date &&
+                                 bt.Booking.BookingTime.Hours == bookingTime.Hours &&
+                                 bt.Booking.Status != (int)BookingStatusEnum.Failed,
+                    includeProperties: "Booking");
+
+                if (!bookingTables.Any())
+                    return (int)TableStatusEnum.Available;
+
+                foreach (var bt in bookingTables)
+                {
+                    var booking = bt.Booking;
+                    
+                    // Thời gian bắt đầu và kết thúc của booking hiện tại đang xét
+                    var bookingStartTime = booking.BookingTime;
+                    var bookingEndTime = booking.BookingTime.Add(TimeSpan.FromHours(3)); // Giả sử mỗi booking kéo dài 3 tiếng
+                    
+                    // Thời gian của booking mới muốn đặt
+                    var requestedStartTime = bookingTime;
+                    var requestedEndTime = bookingTime.Add(TimeSpan.FromHours(3));
+
+                    // Kiểm tra xem có bị trùng thời gian không
+                    bool isTimeOverlap = !(requestedEndTime <= bookingStartTime || requestedStartTime >= bookingEndTime);
+
+                    if (isTimeOverlap)
+                    {
+                        // Nếu booking hiện tại đang trong trạng thái check-in
+                        if (booking.Status == (int)BookingStatusEnum.IsCheckIn)
+                            return (int)TableStatusEnum.InUse;
+                        
+                        // Nếu booking hiện tại đang trong trạng thái pending
+                        if (booking.Status == (int)BookingStatusEnum.Pending)
+                            return (int)TableStatusEnum.Reserved;
+                    }
+                }
+
+                // Nếu không có booking nào trùng thời gian
+                return (int)TableStatusEnum.Available;
             }
             catch (Exception ex)
             {

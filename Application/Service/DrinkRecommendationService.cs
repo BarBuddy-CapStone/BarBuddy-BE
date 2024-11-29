@@ -382,7 +382,7 @@ namespace Application.Service
 
         public async Task<List<DrinkRecommendation>> GetRecommendationsAsync(string emotionText, Guid barId)
         {
-            int maxRetries = 5;
+            int maxRetries = 15;
             int currentRetry = 0;
 
             while (currentRetry < maxRetries)
@@ -471,7 +471,7 @@ namespace Application.Service
                     var recommendationsArray = jsonDocument.RootElement
                         .GetProperty("drinkRecommendation")
                         .GetRawText();
-                    Task.Delay(TimeSpan.FromSeconds(2));
+                    await Task.Delay(1500);
                     var recommendationItems = JsonSerializer.Deserialize<List<RecommendationItem>>(recommendationsArray, options);
 
                     return recommendationItems

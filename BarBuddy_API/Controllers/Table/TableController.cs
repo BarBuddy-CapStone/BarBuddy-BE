@@ -3,6 +3,7 @@ using Application.IService;
 using Azure;
 using CoreApiResponse;
 using Domain.CustomException;
+using Domain.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -47,9 +48,15 @@ namespace BarBuddy_API.Controllers.Table
         /// <param name="PageSize"></param>
         /// <returns></returns>
         [HttpGet("tables-of-bar")]
-        public async Task<IActionResult> GetAllOfBar([FromQuery] Guid BarId, [FromQuery] Guid? TableTypeId, [FromQuery] string? TableName, [FromQuery] int? Status, [FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
+        public async Task<IActionResult> GetAllOfBar([FromQuery] Guid BarId, [FromQuery] Guid? TableTypeId,
+            [FromQuery] string? TableName, [FromQuery] int? Status, [FromQuery] int PageIndex = 1,
+            [FromQuery] int PageSize = 10, [FromQuery] DateTime? RequestDate = null, 
+            [FromQuery] TimeSpan? RequestTime = null)
         {
-            var responses = await _tableService.GetAllOfBar(BarId, TableTypeId, TableName, Status, PageIndex, PageSize);
+            var date = RequestDate ?? CoreHelper.SystemTimeNow.Date;
+            var time = RequestTime ?? CoreHelper.SystemTimeNow.TimeOfDay;
+
+            var responses = await _tableService.GetAllOfBar(BarId,TableTypeId,TableName,Status,PageIndex,PageSize,date,time);
             return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.response });
         }
 

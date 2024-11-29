@@ -7,7 +7,6 @@ namespace Application.DTOs.BookingTable
         [Required]
         public Guid BarId { get; set; }
 
-        [Required]
         public Guid TableTypeId { get; set; }
 
         [Required]
