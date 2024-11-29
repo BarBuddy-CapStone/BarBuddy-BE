@@ -441,6 +441,13 @@ namespace Application.Service
         {
             try
             {
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+
+                if (getAccount.BarId.HasValue &&  request.BarId != null && !getAccount.BarId.Equals(Guid.Parse(request.BarId)))
+                {
+                    throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào Bar này !");
+                }
                 if ((request.FromTime.HasValue && !request.ToTime.HasValue) ||
                     (!request.FromTime.HasValue && request.ToTime.HasValue))
                 {
@@ -525,10 +532,14 @@ namespace Application.Service
         {
             try
             {
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+
                 var bookings = await _unitOfWork.BookingRepository.GetAsync(
                     filter: x =>
                         x.Status != (int)PrefixValueEnum.Serving &&
-                        x.Status != (int)PrefixValueEnum.Pending,
+                        x.Status != (int)PrefixValueEnum.Pending &&
+                        (!getAccount.BarId.HasValue || x.BarId.Equals(getAccount.BarId)),
                     orderBy: x => x.OrderBy(x => x.BookingDate)
                 );
 
@@ -536,7 +547,7 @@ namespace Application.Service
 
                 var totalRevenue = bookings.Sum(x => (x.TotalPrice ?? 0) + (x.AdditionalFee ?? 0));
                 var totalBooking = bookings.Count();
-                var totalBar = barList.Count();
+                var totalBar = barList.Where( x => !getAccount.BarId.HasValue || x.BarId.Equals(getAccount.BarId)).Count();
 
                 var response = new RevenueBranchResponse
                 {
