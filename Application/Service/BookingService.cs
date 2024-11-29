@@ -255,9 +255,12 @@ namespace Application.Service
                 response.IsRated = isRated;
                 response.Images = booking.Bar.Images.Split(',').ToList();
 
-                if (booking.TotalPrice >= 0)
+                if (booking.TotalPrice >= 0 || (booking.AdditionalFee >= 0 && booking.AdditionalFee.HasValue))
                 {
-                    var bookingDrinks = await _unitOfWork.BookingDrinkRepository.GetAsync(bd => bd.BookingId == booking.BookingId, includeProperties: "Drink");
+                    var bookingDrinks = await _unitOfWork.BookingDrinkRepository
+                                                         .GetAsync(bd => bd.BookingId == booking.BookingId,
+                                                         includeProperties: "Drink");
+
                     foreach (var drink in bookingDrinks)
                     {
                         var drinkResponse = new BookingDrinkDetailResponse
@@ -267,9 +270,24 @@ namespace Application.Service
                             DrinkName = drink.Drink.DrinkName,
                             Quantity = drink.Quantity,
                             Image = drink.Drink.Image.Split(',')[0],
-                            IsExtra= drink.IsExtra
                         };
-                        response.bookingDrinksList.Add(drinkResponse);
+
+                        if (!drink.IsExtra && booking.TotalPrice >= 0)
+                        {
+                            response.bookingDrinksList.Add(drinkResponse);
+                        }
+                        else if (drink.IsExtra && booking.AdditionalFee >= 0 && booking.AdditionalFee.HasValue)
+                        {
+                            var extraResponse = new BookingDrinkExtraResponse
+                            {
+                                ActualPrice = drink.ActualPrice,
+                                DrinkId = drink.DrinkId,
+                                DrinkName = drink.Drink.DrinkName,
+                                Quantity = drink.Quantity,
+                                Image = drink.Drink.Image.Split(',')[0],
+                            };
+                            response.BookingDrinkExtraResponses?.Add(extraResponse);
+                        }
                     }
                 }
 
@@ -329,9 +347,12 @@ namespace Application.Service
                 response.Note = booking.Note;
                 response.QRTicket = booking.QRTicket;
 
-                if (booking.TotalPrice >= 0)
+                if (booking.TotalPrice >= 0 || (booking.AdditionalFee >= 0 && booking.AdditionalFee.HasValue))
                 {
-                    var bookingDrinks = await _unitOfWork.BookingDrinkRepository.GetAsync(bd => bd.BookingId == booking.BookingId, includeProperties: "Drink");
+                    var bookingDrinks = await _unitOfWork.BookingDrinkRepository
+                                                         .GetAsync(bd => bd.BookingId == booking.BookingId,
+                                                         includeProperties: "Drink");
+
                     foreach (var drink in bookingDrinks)
                     {
                         var drinkResponse = new BookingDrinkDetailResponse
@@ -341,9 +362,24 @@ namespace Application.Service
                             DrinkName = drink.Drink.DrinkName,
                             Quantity = drink.Quantity,
                             Image = drink.Drink.Image.Split(',')[0],
-                            IsExtra = drink.IsExtra
                         };
-                        response.bookingDrinksList.Add(drinkResponse);
+
+                        if (!drink.IsExtra && booking.TotalPrice >= 0)
+                        {
+                            response.bookingDrinksList.Add(drinkResponse);
+                        }
+                        else if (drink.IsExtra && booking.AdditionalFee >= 0 && booking.AdditionalFee.HasValue)
+                        {
+                            var extraResponse = new BookingDrinkExtraResponse
+                            {
+                                ActualPrice = drink.ActualPrice,
+                                DrinkId = drink.DrinkId,
+                                DrinkName = drink.Drink.DrinkName,
+                                Quantity = drink.Quantity,
+                                Image = drink.Drink.Image.Split(',')[0],
+                            };
+                            response.BookingDrinkExtraResponses?.Add(extraResponse);
+                        }
                     }
                 }
 
@@ -1150,9 +1186,12 @@ namespace Application.Service
                 response.Note = booking.Note;
                 response.QRTicket = booking.QRTicket;
 
-                if (booking.TotalPrice >= 0)
+                if (booking.TotalPrice >= 0 || (booking.AdditionalFee >= 0 && booking.AdditionalFee.HasValue))
                 {
-                    var bookingDrinks = await _unitOfWork.BookingDrinkRepository.GetAsync(bd => bd.BookingId == booking.BookingId, includeProperties: "Drink");
+                    var bookingDrinks = await _unitOfWork.BookingDrinkRepository
+                                                         .GetAsync(bd => bd.BookingId == booking.BookingId,
+                                                         includeProperties: "Drink");
+
                     foreach (var drink in bookingDrinks)
                     {
                         var drinkResponse = new BookingDrinkDetailResponse
@@ -1162,9 +1201,24 @@ namespace Application.Service
                             DrinkName = drink.Drink.DrinkName,
                             Quantity = drink.Quantity,
                             Image = drink.Drink.Image.Split(',')[0],
-                            IsExtra = drink.IsExtra,
                         };
-                        response.bookingDrinksList.Add(drinkResponse);
+
+                        if (!drink.IsExtra && booking.TotalPrice >= 0)
+                        {
+                            response.bookingDrinksList.Add(drinkResponse);
+                        }
+                        else if (drink.IsExtra && booking.AdditionalFee >= 0 && booking.AdditionalFee.HasValue)
+                        {
+                            var extraResponse = new BookingDrinkExtraResponse
+                            {
+                                ActualPrice = drink.ActualPrice,
+                                DrinkId = drink.DrinkId,
+                                DrinkName = drink.Drink.DrinkName,
+                                Quantity = drink.Quantity,
+                                Image = drink.Drink.Image.Split(',')[0],
+                            };
+                            response.BookingDrinkExtraResponses?.Add(extraResponse);
+                        }
                     }
                 }
 
