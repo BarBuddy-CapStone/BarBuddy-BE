@@ -18,6 +18,7 @@ namespace Application.DTOs.Booking
     public class DrinkRequest()
     {
         public Guid DrinkId { get; set; }
+        [Range(1, int.MaxValue, ErrorMessage = "Đồ uống phải từ 1 trở lên !")]
         public int Quantity { get; set; }
     }
 }
