@@ -1312,7 +1312,7 @@ namespace Application.Service
                     addFeeExtraDrink += isExistDrink.Price * drink.Quantity;
                 }
 
-                getBooking.AdditionalFee = addFeeExtraDrink;
+                getBooking.AdditionalFee += addFeeExtraDrink;
                 await _unitOfWork.BookingRepository.UpdateRangeAsync(getBooking);
                 await Task.Delay(10);
                 await _unitOfWork.SaveAsync();
@@ -1372,7 +1372,7 @@ namespace Application.Service
                                                                   x.IsExtra == PrefixKeyConstant.TRUE);
                 var delExtraDrink = listExtraDrink.Where(ex => !request.Any(x => x.DrinkId.Equals(ex.DrinkId))).Distinct().ToList();
                 var newExtraDrink = request.Where(ex => !listExtraDrink.Any(x => x.DrinkId.Equals(ex.DrinkId))).Distinct().ToList();
-                var updExtraDrink = listExtraDrink.Where(ex => request.Any(x => x.DrinkId.Equals(ex.DrinkId))).Distinct().ToList();
+                var updExtraDrink = request.Where(ex => listExtraDrink.Any(x => x.DrinkId.Equals(ex.DrinkId))).Distinct().ToList();
                 var extraDrink = new List<BookingDrink>();
 
                 _unitOfWork.BeginTransaction();
@@ -1435,7 +1435,7 @@ namespace Application.Service
                     {
                         throw new CustomException.DataNotFoundException("Không tìm thấy đồ uống ở quán bar này !");
                     }
-
+                    addFeeExtraDrink -= isExistDrink.ActualPrice * isExistDrink.Quantity;
                     await _unitOfWork.BookingDrinkRepository.DeleteAsync(isExistDrink.BookingDrinkId);
                     await Task.Delay(10);
                     await _unitOfWork.SaveAsync();
