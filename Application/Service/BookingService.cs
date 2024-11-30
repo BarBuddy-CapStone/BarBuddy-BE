@@ -1,6 +1,7 @@
 ﻿using Application.Common;
 using Application.DTOs.Booking;
 using Application.DTOs.BookingDrink;
+using Application.DTOs.BookingExtraDrink;
 using Application.DTOs.BookingTable;
 using Application.DTOs.Events.EventVoucher;
 using Application.DTOs.Fcm;
@@ -100,6 +101,7 @@ namespace Application.Service
 
                 // Cancelled status (temp)
                 booking.Status = 1;
+                booking.CheckOutStaffId = accountId;
                 _unitOfWork.BeginTransaction();
                 await _unitOfWork.BookingRepository.UpdateAsync(booking);
                 await _notificationService.CreateNotification(creNoti);
@@ -213,7 +215,7 @@ namespace Application.Service
                 var booking = (await _unitOfWork.BookingRepository
                                                 .GetAsync(b => b.BookingId == BookingId &&
                                                                b.AccountId.Equals(accountId),
-                                                          includeProperties: "Account,Bar"))
+                                                          includeProperties: "Account,Bar,BookingExtraDrinks.Drink,BookingDrinks.Drink"))
                                                 .FirstOrDefault();
 
                 if (booking == null)
@@ -257,38 +259,8 @@ namespace Application.Service
 
                 if (booking.TotalPrice >= 0 || (booking.AdditionalFee >= 0 && booking.AdditionalFee.HasValue))
                 {
-                    var bookingDrinks = await _unitOfWork.BookingDrinkRepository
-                                                         .GetAsync(bd => bd.BookingId == booking.BookingId,
-                                                         includeProperties: "Drink");
-
-                    foreach (var drink in bookingDrinks)
-                    {
-                        var drinkResponse = new BookingDrinkDetailResponse
-                        {
-                            ActualPrice = drink.ActualPrice,
-                            DrinkId = drink.DrinkId,
-                            DrinkName = drink.Drink.DrinkName,
-                            Quantity = drink.Quantity,
-                            Image = drink.Drink.Image.Split(',')[0],
-                        };
-
-                        if (!drink.IsExtra && booking.TotalPrice >= 0)
-                        {
-                            response.bookingDrinksList.Add(drinkResponse);
-                        }
-                        else if (drink.IsExtra && booking.AdditionalFee >= 0 && booking.AdditionalFee.HasValue)
-                        {
-                            var extraResponse = new BookingDrinkExtraResponse
-                            {
-                                ActualPrice = drink.ActualPrice,
-                                DrinkId = drink.DrinkId,
-                                DrinkName = drink.Drink.DrinkName,
-                                Quantity = drink.Quantity,
-                                Image = drink.Drink.Image.Split(',')[0],
-                            };
-                            response.BookingDrinkExtraResponses?.Add(extraResponse);
-                        }
-                    }
+                    response.bookingDrinksList = _mapper.Map<List<BookingDrinkDetailResponse>>(booking.BookingDrinks);
+                    response.BookingDrinkExtraResponses = _mapper.Map<List<BookingDrinkDetailResponse>>(booking.BookingExtraDrinks);
                 }
 
                 var bookingTables = await _unitOfWork.BookingTableRepository.GetAsync(bt => bt.BookingId == BookingId, includeProperties: "Table");
@@ -317,7 +289,7 @@ namespace Application.Service
                 var booking = (await _unitOfWork.BookingRepository
                                                 .GetAsync(b => b.BookingId == BookingId &&
                                                                b.BarId.Equals(getAccount.BarId),
-                                                          includeProperties: "Account,Bar"))
+                                                          includeProperties: "Account,Bar,BookingExtraDrinks.Drink,BookingDrinks.Drink"))
                                                 .FirstOrDefault();
 
                 if (!getAccount.BarId.Equals(booking?.BarId))
@@ -349,38 +321,8 @@ namespace Application.Service
 
                 if (booking.TotalPrice >= 0 || (booking.AdditionalFee >= 0 && booking.AdditionalFee.HasValue))
                 {
-                    var bookingDrinks = await _unitOfWork.BookingDrinkRepository
-                                                         .GetAsync(bd => bd.BookingId == booking.BookingId,
-                                                         includeProperties: "Drink");
-
-                    foreach (var drink in bookingDrinks)
-                    {
-                        var drinkResponse = new BookingDrinkDetailResponse
-                        {
-                            ActualPrice = drink.ActualPrice,
-                            DrinkId = drink.DrinkId,
-                            DrinkName = drink.Drink.DrinkName,
-                            Quantity = drink.Quantity,
-                            Image = drink.Drink.Image.Split(',')[0],
-                        };
-
-                        if (!drink.IsExtra && booking.TotalPrice >= 0)
-                        {
-                            response.bookingDrinksList.Add(drinkResponse);
-                        }
-                        else if (drink.IsExtra && booking.AdditionalFee >= 0 && booking.AdditionalFee.HasValue)
-                        {
-                            var extraResponse = new BookingDrinkExtraResponse
-                            {
-                                ActualPrice = drink.ActualPrice,
-                                DrinkId = drink.DrinkId,
-                                DrinkName = drink.Drink.DrinkName,
-                                Quantity = drink.Quantity,
-                                Image = drink.Drink.Image.Split(',')[0],
-                            };
-                            response.BookingDrinkExtraResponses?.Add(extraResponse);
-                        }
-                    }
+                    response.bookingDrinksList = _mapper.Map<List<BookingDrinkDetailResponse>>(booking.BookingDrinks);
+                    response.BookingDrinkExtraResponses = _mapper.Map<List<BookingDrinkExtraResponse>>(booking.BookingExtraDrinks);
                 }
 
                 var bookingTables = await _unitOfWork.BookingTableRepository.GetAsync(bt => bt.BookingId == BookingId);
@@ -657,9 +599,9 @@ namespace Application.Service
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
                 var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
 
-                var booking = _unitOfWork.BookingRepository
-                                         .Get(b => b.BookingId == BookingId,
-                                                includeProperties: "BookingDrinks")
+                var booking = (await _unitOfWork.BookingRepository
+                                         .GetAsync(b => b.BookingId == BookingId,
+                                                includeProperties: "BookingExtraDrinks"))
                                          .FirstOrDefault();
                 _unitOfWork.BeginTransaction();
 
@@ -683,8 +625,7 @@ namespace Application.Service
                 }
                 if (Status == 3 && booking.BookingDrinks != null)
                 {
-                    booking.AdditionalFee = booking.BookingDrinks
-                        .Where(x => x.IsExtra)
+                    booking.AdditionalFee = booking.BookingExtraDrinks
                         .Sum(x => x.ActualPrice * x.Quantity);
                 }
                 else
@@ -864,8 +805,7 @@ namespace Application.Service
                             DrinkId = drink.DrinkId,
                             ActualPrice = existingDrinks.FirstOrDefault(e => e.DrinkId == drink.DrinkId &&
                                                               e.BarId.Equals(request.BarId)).Price,
-                            Quantity = drink.Quantity,
-                            IsExtra = PrefixKeyConstant.FALSE
+                            Quantity = drink.Quantity
 
                         };
                         totalPrice += bookingDrink.ActualPrice * bookingDrink.Quantity;
@@ -1161,7 +1101,7 @@ namespace Application.Service
 
                 var booking = (await _unitOfWork.BookingRepository
                                                 .GetAsync(b => b.BookingId == BookingId,
-                                                          includeProperties: "Account,Bar"))
+                                                          includeProperties: "Account,Bar,BookingExtraDrinks.Drink,BookingDrinks.Drink"))
                                                 .FirstOrDefault();
 
                 if (booking == null)
@@ -1188,38 +1128,8 @@ namespace Application.Service
 
                 if (booking.TotalPrice >= 0 || (booking.AdditionalFee >= 0 && booking.AdditionalFee.HasValue))
                 {
-                    var bookingDrinks = await _unitOfWork.BookingDrinkRepository
-                                                         .GetAsync(bd => bd.BookingId == booking.BookingId,
-                                                         includeProperties: "Drink");
-
-                    foreach (var drink in bookingDrinks)
-                    {
-                        var drinkResponse = new BookingDrinkDetailResponse
-                        {
-                            ActualPrice = drink.ActualPrice,
-                            DrinkId = drink.DrinkId,
-                            DrinkName = drink.Drink.DrinkName,
-                            Quantity = drink.Quantity,
-                            Image = drink.Drink.Image.Split(',')[0],
-                        };
-
-                        if (!drink.IsExtra && booking.TotalPrice >= 0)
-                        {
-                            response.bookingDrinksList.Add(drinkResponse);
-                        }
-                        else if (drink.IsExtra && booking.AdditionalFee >= 0 && booking.AdditionalFee.HasValue)
-                        {
-                            var extraResponse = new BookingDrinkExtraResponse
-                            {
-                                ActualPrice = drink.ActualPrice,
-                                DrinkId = drink.DrinkId,
-                                DrinkName = drink.Drink.DrinkName,
-                                Quantity = drink.Quantity,
-                                Image = drink.Drink.Image.Split(',')[0],
-                            };
-                            response.BookingDrinkExtraResponses?.Add(extraResponse);
-                        }
-                    }
+                    response.bookingDrinksList = _mapper.Map<List<BookingDrinkDetailResponse>>(booking.BookingDrinks);
+                    response.BookingDrinkExtraResponses = _mapper.Map<List<BookingDrinkExtraResponse>>(booking.BookingExtraDrinks);
                 }
 
                 var bookingTables = await _unitOfWork.BookingTableRepository.GetAsync(bt => bt.BookingId == BookingId);
@@ -1282,13 +1192,12 @@ namespace Application.Service
                 }
                 
 
-                var extraDrink = new List<BookingDrink>();
+                var extraDrink = new List<BookingExtraDrink>();
                 double addFeeExtraDrink = 0;
                 _unitOfWork.BeginTransaction();
                 
-                var listExtraDrink = _unitOfWork.BookingDrinkRepository
-                                                .Get(filter: x => x.BookingId.Equals(getBooking.BookingId) &&
-                                                                  x.IsExtra == PrefixKeyConstant.TRUE);
+                var listExtraDrink = _unitOfWork.BookingExtraDrinkRepository
+                                                .Get(filter: x => x.BookingId.Equals(getBooking.BookingId));
                 var newExtraDrink = request.Where(ex => !listExtraDrink.Any(x => x.DrinkId.Equals(ex.DrinkId))).Distinct().ToList();
                 var addMoreExtraDrink = request.Where(ex => listExtraDrink.Any(x => x.DrinkId.Equals(ex.DrinkId))).Distinct().ToList();
 
@@ -1304,12 +1213,19 @@ namespace Application.Service
                         throw new CustomException.DataNotFoundException("Không tìm thấy đồ uống ở quán bar này !");
                     }
 
-                    var mapper = _mapper.Map<BookingDrink>(drink);
+                    var mapper = _mapper.Map<BookingExtraDrink>(drink);
                     mapper.BookingId = getBooking.BookingId;
                     mapper.ActualPrice = isExistDrink.Price;
-                    mapper.IsExtra = PrefixKeyConstant.TRUE;
+                    mapper.CreatedDate = DateTime.Now;
+                    mapper.UpdatedDate = mapper.CreatedDate;
+                    _ = getAccount.Role.RoleName.Equals(PrefixKeyConstant.CUSTOMER) ? 
+                                                mapper.CustomerId = accountId : 
+                                                mapper.StaffId = accountId;
+                    _ = getAccount.Role.RoleName.Equals(PrefixKeyConstant.CUSTOMER) ?
+                                                mapper.Status = (int) ExtraDrinkStsEnum.Pending :
+                                                mapper.Status = (int)ExtraDrinkStsEnum.Preparing;
 
-                    await _unitOfWork.BookingDrinkRepository.InsertAsync(mapper);
+                    await _unitOfWork.BookingExtraDrinkRepository.InsertAsync(mapper);
                     await Task.Delay(10);
                     await _unitOfWork.SaveAsync();
                     extraDrink.Add(mapper);
@@ -1317,7 +1233,7 @@ namespace Application.Service
                 }
                 foreach (var drink in addMoreExtraDrink)
                 {
-                    var isExistDrink = _unitOfWork.BookingDrinkRepository
+                    var isExistDrink = _unitOfWork.BookingExtraDrinkRepository
                                                     .Get(filter: x => x.DrinkId.Equals(drink.DrinkId) &&
                                                                       x.Drink.BarId.Equals(getBooking.BarId) &&
                                                                       x.Drink.Status == PrefixKeyConstant.TRUE,
@@ -1332,7 +1248,7 @@ namespace Application.Service
                     getBooking.AdditionalFee += isExistDrink.ActualPrice * drink.Quantity;
                     isExistDrink.Quantity = quantityDifference;
 
-                    await _unitOfWork.BookingDrinkRepository.UpdateRangeAsync(isExistDrink);
+                    await _unitOfWork.BookingExtraDrinkRepository.UpdateRangeAsync(isExistDrink);
                     await Task.Delay(10);
                     await _unitOfWork.SaveAsync();
 
@@ -1353,7 +1269,7 @@ namespace Application.Service
             }
         }
 
-        public async Task<List<BookingDrinkDetailResponse>> UpdExtraDrinkInServing(Guid bookingId, List<DrinkRequest> request)
+        public async Task<List<BookingDrinkDetailResponse>> UpdExtraDrinkInServing(Guid bookingId, List<UpdBkDrinkExtraRequest> request)
         {
             try
             {
@@ -1392,13 +1308,12 @@ namespace Application.Service
                     throw new CustomException.InvalidDataException("Thời gian đặt đồ uống phải nằm trong thời gian phục vụ !");
                 }
 
-                var listExtraDrink = _unitOfWork.BookingDrinkRepository
-                                                .Get(filter: x => x.BookingId.Equals(getBooking.BookingId) &&
-                                                                  x.IsExtra == PrefixKeyConstant.TRUE);
+                var listExtraDrink = _unitOfWork.BookingExtraDrinkRepository
+                                                .Get(filter: x => x.BookingId.Equals(getBooking.BookingId));
                 var delExtraDrink = listExtraDrink.Where(ex => !request.Any(x => x.DrinkId.Equals(ex.DrinkId))).Distinct().ToList();
                 var newExtraDrink = request.Where(ex => !listExtraDrink.Any(x => x.DrinkId.Equals(ex.DrinkId))).Distinct().ToList();
                 var updExtraDrink = request.Where(ex => listExtraDrink.Any(x => x.DrinkId.Equals(ex.DrinkId) && x.Quantity != ex.Quantity)).Distinct().ToList();
-                var extraDrink = new List<BookingDrink>();
+                var extraDrink = new List<BookingExtraDrink>();
 
                 double addFeeExtraDrink = 0;
                 _unitOfWork.BeginTransaction();
@@ -1414,12 +1329,14 @@ namespace Application.Service
                         throw new CustomException.DataNotFoundException("Không tìm thấy đồ uống ở quán bar này !");
                     }
 
-                    var mapper = _mapper.Map<BookingDrink>(newDrink);
+                    var mapper = _mapper.Map<BookingExtraDrink>(newDrink);
                     mapper.BookingId = getBooking.BookingId;
                     mapper.ActualPrice = isExistDrink.Price;
-                    mapper.IsExtra = PrefixKeyConstant.TRUE;
+                    mapper.StaffId = accountId;
+                    mapper.CreatedDate = DateTime.Now;
+                    mapper.UpdatedDate = mapper.CreatedDate;
 
-                    await _unitOfWork.BookingDrinkRepository.InsertAsync(mapper);
+                    await _unitOfWork.BookingExtraDrinkRepository.InsertAsync(mapper);
                     await Task.Delay(10);
                     await _unitOfWork.SaveAsync();
                     extraDrink.Add(mapper);
@@ -1427,7 +1344,7 @@ namespace Application.Service
                 }
                 foreach (var updDrink in updExtraDrink)
                 {
-                    var isExistDrink = _unitOfWork.BookingDrinkRepository
+                    var isExistDrink = _unitOfWork.BookingExtraDrinkRepository
                                                     .Get(filter: x => x.DrinkId.Equals(updDrink.DrinkId) &&
                                                                       x.Drink.BarId.Equals(getBooking.BarId) &&
                                                                       x.Drink.Status == PrefixKeyConstant.TRUE,
@@ -1442,33 +1359,32 @@ namespace Application.Service
                     getBooking.AdditionalFee += isExistDrink.ActualPrice * quantityDifference;
 
                     isExistDrink.Quantity = updDrink.Quantity;
-                    await _unitOfWork.BookingDrinkRepository.UpdateRangeAsync(isExistDrink);
+                    isExistDrink.StaffId = accountId;
+                    isExistDrink.UpdatedDate = DateTime.Now;
+                    isExistDrink.Status = updDrink.Status;
+
+                    await _unitOfWork.BookingExtraDrinkRepository.UpdateRangeAsync(isExistDrink);
                     await Task.Delay(10);
                     await _unitOfWork.SaveAsync();
                     extraDrink.Add(isExistDrink);
                 }
                 foreach (var delDrink in delExtraDrink)
                 {
-                    var isExistDrink = _unitOfWork.BookingDrinkRepository
+                    var isExistDrink = _unitOfWork.BookingExtraDrinkRepository
                                                     .Get(filter: x => x.DrinkId.Equals(delDrink.DrinkId) &&
-                                                                      x.BookingDrinkId.Equals(delDrink.BookingDrinkId) &&
-                                                                      x.Booking.BarId.Equals(getAccount.BarId) &&
-                                                                      x.IsExtra == PrefixKeyConstant.TRUE)
+                                                                      x.BookingExtraDrinkId.Equals(delDrink.BookingExtraDrinkId) &&
+                                                                      x.Booking.BarId.Equals(getAccount.BarId))
                                                     .FirstOrDefault();
                     if (isExistDrink is null)
                     {
                         throw new CustomException.DataNotFoundException("Không tìm thấy đồ uống ở quán bar này !");
                     }
                     getBooking.AdditionalFee -= isExistDrink.ActualPrice * isExistDrink.Quantity;
-                    await _unitOfWork.BookingDrinkRepository.DeleteAsync(isExistDrink.BookingDrinkId);
+                    await _unitOfWork.BookingExtraDrinkRepository.DeleteAsync(isExistDrink.BookingExtraDrinkId);
                     await Task.Delay(10);
                     await _unitOfWork.SaveAsync();
                 }
 
-                if (getAccount.BarId.HasValue && getAccount.BarId.Equals(getBooking.BarId))
-                {
-                    getBooking.CheckOutStaffId = accountId;
-                }
                 await _unitOfWork.BookingRepository.UpdateRangeAsync(getBooking);
                 await Task.Delay(10);
                 await _unitOfWork.SaveAsync();
@@ -1492,9 +1408,8 @@ namespace Application.Service
                                             .Get(filter: x => x.AccountId.Equals(accountId),
                                                  includeProperties: "Role")
                                             .FirstOrDefault();
-                var getBooking = _unitOfWork.BookingDrinkRepository
-                                            .Get(filter: x => x.BookingId.Equals(bookingId) && 
-                                                         x.IsExtra == PrefixKeyConstant.TRUE,
+                var getBooking = await _unitOfWork.BookingExtraDrinkRepository
+                                            .GetAsync(filter: x => x.BookingId.Equals(bookingId),
                                                 includeProperties: "Booking,Drink");
 
                 if (!getAccount.BarId.HasValue && getAccount.Role.RoleName.Equals("CUSTOMER"))

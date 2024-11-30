@@ -32,8 +32,8 @@ namespace Domain.IRepository
         public IGenericRepository<Token> TokenRepository { get; }
         public IGenericRepository<FcmNotification> FcmNotificationRepository { get; }
         public IGenericRepository<FcmNotificationCustomer> FcmNotificationCustomerRepository { get; }
-
         public IGenericRepository<FcmUserDevice> FcmUserDeviceRepository { get; }
+        public IGenericRepository<BookingExtraDrink> BookingExtraDrinkRepository { get; }
 
         void Save();
         Task SaveAsync();

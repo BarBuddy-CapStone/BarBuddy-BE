@@ -8,15 +8,20 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities
 {
-    [Table("BookingDrink")]
-    public class BookingDrink
+    [Table("BookingExtraDrink")]
+    public class BookingExtraDrink
     {
         [Key]
-        public Guid BookingDrinkId { get; set; } = Guid.NewGuid();
+        public Guid BookingExtraDrinkId { get; set; } = Guid.NewGuid();
         public Guid DrinkId { get; set; }
         public Guid BookingId { get; set; }
         public double ActualPrice { get; set; }
         public int Quantity { get; set; }
+        public Guid? CustomerId { get; set; }
+        public Guid? StaffId { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public DateTime? UpdatedDate { get; set; }
+        public int Status { get; set; }
 
         [ForeignKey("BookingId")]
         public virtual Booking Booking { get; set; }

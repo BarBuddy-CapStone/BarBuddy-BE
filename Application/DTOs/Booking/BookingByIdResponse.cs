@@ -29,6 +29,6 @@ namespace Application.DTOs.Booking
         public bool? IsRated { get; set; }
         public List<string> TableNameList { get; set; } = new List<string>();
         public List<BookingDrinkDetailResponse> bookingDrinksList { get; set; } = new List<BookingDrinkDetailResponse>();
-        public List<BookingDrinkExtraResponse> BookingDrinkExtraResponses { get; set; } = new List<BookingDrinkExtraResponse>();
+        public List<BookingDrinkDetailResponse> BookingDrinkExtraResponses { get; set; } = new List<BookingDrinkDetailResponse>();
     }
 }
