@@ -10,7 +10,7 @@ namespace Application.IService
 {
     public interface IDrinkService
     {
-        Task<IEnumerable<DrinkResponse>> GetAllDrink();
+        Task<IEnumerable<DrinkResponse>> GetAllDrink(QueryDrinkRequest query);
         Task<IEnumerable<DrinkResponse>> GetAllDrinkCustomer();
         Task<IEnumerable<DrinkResponse>> GetDrinkCustomerOfBar(Guid barId);
         Task<DrinkResponse> GetDrink(Guid drinkId);
