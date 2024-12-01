@@ -545,7 +545,7 @@ namespace Persistence.Data
                 new Account
                 {
                     AccountId = Constants.Ids.Accounts.AdminAccount,
-                    BarId = Guid.Empty,
+                    BarId = null,
                     RoleId = Constants.Ids.Roles.Admin,
                     Email = "admin1@barbuddy.com",
                     Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
