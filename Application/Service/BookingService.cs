@@ -630,7 +630,7 @@ namespace Application.Service
                 }
                 else
                 {
-                    booking.AdditionalFee = 0;
+                    booking.AdditionalFee = null;
                 }
 
                 switch (booking.Status)
@@ -1431,6 +1431,130 @@ namespace Application.Service
             catch (CustomException.InternalServerErrorException ex)
             {
                 throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
+            }
+        }
+        public async Task UpdateBookingStatusJob(Guid accountId, Guid BookingId, int Status)
+        {
+            try
+            {
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+
+                var booking = (await _unitOfWork.BookingRepository
+                                         .GetAsync(b => b.BookingId == BookingId,
+                                                includeProperties: "BookingExtraDrinks"))
+                                         .FirstOrDefault();
+                _unitOfWork.BeginTransaction();
+
+                if (booking == null)
+                {
+                    throw new DataNotFoundException("Không tìm thấy đơn Đặt bàn.");
+                }
+
+                if (booking.Status == 1 && (Status == 2 || Status == 3))
+                {
+                    throw new CustomException.InvalidDataException("Không thể thực hiện check-in: Lịch đặt chỗ đã bị hủy");
+                }
+                if (booking.Status == 0 && booking.BookingDate.Date != DateTime.Now.Date && (Status == 2 || Status == 3))
+                {
+                    throw new CustomException.InvalidDataException("Không thể thực hiện check-in: vẫn chưa đến ngày đặt bàn");
+                }
+                if (Status == 3 && booking.BookingDrinks != null)
+                {
+                    booking.AdditionalFee = booking.BookingExtraDrinks
+                        .Sum(x => x.ActualPrice * x.Quantity);
+                }
+                else
+                {
+                    booking.AdditionalFee = null;
+                }
+
+                switch (booking.Status)
+                {
+                    case 1:
+                        if (Status == (int)PrefixValueEnum.Serving ||
+                            Status == (int)PrefixValueEnum.Completed ||
+                            Status == (int)PrefixValueEnum.PendingBooking)
+                        {
+                            throw new CustomException.InvalidDataException("Không thể thực hiện check-in: Lịch đặt chỗ đã bị hủy");
+                        }
+                        break;
+
+                    case 0:
+                        if ((Status == (int)PrefixValueEnum.Serving &&
+                                      (booking.BookingDate.Date != DateTime.Now.Date ||
+                                       booking.BookingTime > DateTime.Now.AddMinutes(45).TimeOfDay)) ||
+                            Status == (int)PrefixValueEnum.Completed)
+                        {
+                            throw new CustomException.InvalidDataException("Không thể thực hiện check-in: vẫn chưa đến ngày hoặc thời gian đặt bàn");
+                        }
+                        break;
+
+                    case 2:
+                        if (Status == (int)PrefixValueEnum.PendingBooking || Status == (int)PrefixValueEnum.Cancelled)
+                        {
+                            throw new CustomException.InvalidDataException("Không thể chuyển từ trạng thái đang phục vụ về pending hoặc cancelled");
+                        }
+                        break;
+
+                    case 3:
+                        throw new CustomException.InvalidDataException("Không thể thay đổi trạng thái của booking đã hoàn thành");
+                }
+
+                if (Status == 3)
+                {
+                    booking.CheckOutStaffId = accountId;
+                    if (booking.AdditionalFee < 0)
+                    {
+                        throw new CustomException.InvalidDataException("Dịch vụ cộng thêm không thể nhỏ hơn 0");
+                    }
+                }
+                booking.Status = Status;
+                _unitOfWork.BookingRepository.Update(booking);
+                _unitOfWork.Save();
+
+                if (Status == 2 || Status == 3)
+                {
+                    var bookingTables = _unitOfWork.BookingTableRepository.Get(t => t.BookingId == booking.BookingId);
+                    foreach (var bookingTable in bookingTables)
+                    {
+                        var table = _unitOfWork.TableRepository.GetByID(bookingTable.TableId);
+                        if (table == null)
+                        {
+                            throw new CustomException.DataNotFoundException("Không tìm thấy bàn");
+                        }
+                        if (Status == 2)
+                        {
+                            table.Status = 1;
+                        }
+                        else
+                        {
+                            table.Status = 0;
+                        }
+                        _unitOfWork.TableRepository.Update(table);
+                        _unitOfWork.Save();
+                    }
+                }
+                _unitOfWork.CommitTransaction();
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                _unitOfWork.RollBack();
+                throw new CustomException.UnAuthorizedException(ex.Message);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                _unitOfWork.RollBack();
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                _unitOfWork.RollBack();
+                throw new CustomException.InvalidDataException(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollBack();
+                throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
     }
