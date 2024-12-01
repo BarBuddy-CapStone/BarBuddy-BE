@@ -57,21 +57,25 @@ namespace Infrastructure.Quartz
                 var getListBooking = await _bookingService.GetAllBookingByStsPending();
                 var getBkStsPending = await _bookingService.GetAllBookingByStsPendingCus();
 
+                // Check bk pendiing
                 foreach (var booking in getBkStsPending)
                 {
+
                     var cacheKey = $"{booking.BarName}_{booking.BookingDate.Date}_{booking.BookingTime}_{booking.BookingId}";
                     if (_cache.TryGetValue(cacheKey, out _))
                     {
+                        //check booking có drink
                         if (booking.BookingDate.Date == now.Date &&
                         booking.BookingTime + TimeSpan.FromHours(booking.TimeSlot) == roundedTimeOfDay &&
                         booking.TotalPrice != null &&
                         booking.Status == (int)PrefixValueEnum.PendingBooking)
                         {
-                            await _bookingService.UpdateBookingStatus(booking.BookingId, (int)PrefixValueEnum.Completed);
+                            await _bookingService.UpdateBookingStatusJob(booking.AccountId, booking.BookingId, (int)PrefixValueEnum.Completed);
                             _cache.Remove(cacheKey);
                             var messages = string.Format(PrefixKeyConstant.BOOKING_DRINKS_COMPLETED_NOTI, booking.BarName);
                             var creNotiRequest = new NotificationRequest
                             {
+                                BarId = (Guid)booking.BarId,
                                 Title = booking.BarName,
                                 Message = messages
                             };
@@ -81,22 +85,24 @@ namespace Infrastructure.Quartz
                                 booking.AccountId,
                                 booking.BarName,
                                 messages,
-                                new Dictionary<string, string> 
-                                { 
+                                new Dictionary<string, string>
+                                {
                                     { "type", "booking" },
                                     { "bookingId", booking.BookingId.ToString() }
                                 }
                             );
                         }
+                        //check booking không có drink
                         else if (booking.BookingDate.Date == now.Date &&
                            booking.BookingTime + TimeSpan.FromHours(1) == roundedTimeOfDay &&
                            booking.TotalPrice == null &&
                            booking.Status == (int)PrefixValueEnum.PendingBooking)
                         {
-                            await _bookingService.UpdateBookingStatus(booking.BookingId, (int)PrefixValueEnum.Cancelled);
+                            await _bookingService.UpdateBookingStatusJob(booking.AccountId, booking.BookingId, (int)PrefixValueEnum.Cancelled);
                             var messages = string.Format(PrefixKeyConstant.BOOKING_CANCEL_NOTI_JOB, booking.BarName);
                             var creNotiRequest = new NotificationRequest
                             {
+                                BarId = (Guid)booking.BarId,
                                 Title = booking.BarName,
                                 Message = messages
                             };
@@ -107,8 +113,8 @@ namespace Infrastructure.Quartz
                                 booking.AccountId,
                                 booking.BarName,
                                 messages,
-                                new Dictionary<string, string> 
-                                { 
+                                new Dictionary<string, string>
+                                {
                                     { "type", "booking" },
                                     { "bookingId", booking.BookingId.ToString() }
                                 }
@@ -120,14 +126,18 @@ namespace Infrastructure.Quartz
                 //{
                 //    _logger.LogInformation("Không có danh sách booking nào đang chờ !");
                 //}
+                
+
                 foreach (var booking in getListBooking)
                 {
+                    // Nhắc nhở booking sắp tới
                     var cacheKey = $"{booking.BarName}_{booking.BookingDate.Date}_{booking.BookingTime}_{booking.BookingId}";
                     if (!_cache.TryGetValue(cacheKey, out _))
                     {
                         var messages = string.Format(PrefixKeyConstant.BOOKING_PENDING_NOTI, booking.BarName, booking.BookingDate.ToString("dd/MM/yyyy"));
                         var creNotiRequest = new NotificationRequest
                         {
+                            BarId = (Guid)booking.BarId,
                             Title = booking.BarName,
                             Message = messages
                         };
@@ -139,8 +149,8 @@ namespace Infrastructure.Quartz
                             booking.AccountId,
                             booking.BarName,
                             messages,
-                            new Dictionary<string, string> 
-                            { 
+                            new Dictionary<string, string>
+                            {
                                 { "type", "booking" },
                                 { "bookingId", booking.BookingId.ToString() }
                             }
@@ -148,31 +158,31 @@ namespace Infrastructure.Quartz
                     }
                     else
                     {
+                        //Đến giờ
                         if (booking.BookingDate.Date == now.Date &&
-                           booking.BookingTime != roundedTimeOfDay &&
+                           booking.BookingTime == roundedTimeOfDay &&
                            booking.Status == (int)PrefixValueEnum.PendingBooking)
                         {
-                            continue;
+                            var messages = string.Format(PrefixKeyConstant.BOOKING_REMIND_NOTI, booking.BarName, booking.BookingDate.ToString("dd/MM/yyyy"), roundedTimeOfDay);
+                            var creNotiRequest = new NotificationRequest
+                            {
+                                BarId = (Guid)booking.BarId,
+                                Title = booking.BarName,
+                                Message = messages
+                            };
+                            await _notificationService.CreateNotificationAllCustomer(booking.AccountId, creNotiRequest);
+                            _logger.LogInformation($"Đã gửi thông báo cho tài khoản {booking.AccountId} với {getListBooking.Count()} đơn đặt !");
+                            await _fcmService.SendNotificationToUser(
+                                booking.AccountId,
+                                booking.BarName,
+                                messages,
+                                new Dictionary<string, string>
+                                {
+                                    { "type", "booking" },
+                                    { "bookingId", booking.BookingId.ToString() }
+                                }
+                            );
                         }
-
-                        var messages = string.Format(PrefixKeyConstant.BOOKING_REMIND_NOTI, booking.BarName, booking.BookingDate.ToString("dd/MM/yyyy"), roundedTimeOfDay);
-                        var creNotiRequest = new NotificationRequest
-                        {
-                            Title = booking.BarName,
-                            Message = messages
-                        };
-                        await _notificationService.CreateNotificationAllCustomer(booking.AccountId, creNotiRequest);
-                        _logger.LogInformation($"Đã gửi thông báo cho tài khoản {booking.AccountId} với {getListBooking.Count()} đơn đặt !");
-                        await _fcmService.SendNotificationToUser(
-                            booking.AccountId,
-                            booking.BarName,
-                            messages,
-                            new Dictionary<string, string> 
-                            { 
-                                { "type", "booking" },
-                                { "bookingId", booking.BookingId.ToString() }
-                            }
-                        );
                     }
                 }
             }

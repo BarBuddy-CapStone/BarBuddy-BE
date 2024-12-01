@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.Booking;
+using Application.DTOs.BookingExtraDrink;
 using Application.IService;
 using Azure;
 using CoreApiResponse;
@@ -451,7 +452,7 @@ namespace BarBuddy_API.Controllers.Booking
 
         [Authorize(Roles = "STAFF")]
         [HttpPatch("upd-extra-drink/{bookingId}")]
-        public async Task<IActionResult> UpdateExtraDrinkInServing(Guid bookingId, [FromBody] List<DrinkRequest> request)
+        public async Task<IActionResult> UpdateExtraDrinkInServing(Guid bookingId, [FromBody] List<UpdBkDrinkExtraRequest> request)
         {
             try
             {

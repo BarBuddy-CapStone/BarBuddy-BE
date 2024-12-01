@@ -31,6 +31,7 @@ namespace Domain.Entities
         public int Status { get; set; }
 
         public virtual ICollection<BookingDrink> BookingDrinks { get; set; }
+        public virtual ICollection<BookingExtraDrink> BookingExtraDrinks { get; set; }
         public virtual ICollection<BookingTable> BookingTables { get; set; }
 
         [ForeignKey("AccountId")]

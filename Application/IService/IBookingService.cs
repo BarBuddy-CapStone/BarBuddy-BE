@@ -1,5 +1,6 @@
 ﻿using Application.DTOs.Booking;
 using Application.DTOs.BookingDrink;
+using Application.DTOs.BookingExtraDrink;
 using Application.DTOs.Payment;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +30,8 @@ namespace Application.IService
         Task<(List<StaffBookingReponse> responses, int TotalPage)> GetListBookingAuthorizedAdmin(string qrTicket, Guid? BarId, string? CustomerName, string? Phone, string? Email, DateTimeOffset? bookingDate, TimeSpan? bookingTime, int? Status, int PageIndex, int PageSize);
         Task<BookingDetailByStaff> GetBookingDetailAuthorizedAdmin(Guid BookingId);
         Task<List<BookingDrinkDetailResponse>> ExtraDrinkInServing(Guid bookingId, List<DrinkRequest> request);
-        Task<List<BookingDrinkDetailResponse>> UpdExtraDrinkInServing(Guid bookingId, List<DrinkRequest> request);
+        Task<List<BookingDrinkDetailResponse>> UpdExtraDrinkInServing(Guid bookingId, List<UpdBkDrinkExtraRequest> request);
         Task<List<BookingDrinkDetailResponse>> GetExtraBookingServing(Guid bookingId);
+        Task UpdateBookingStatusJob(Guid AccountId, Guid BookingId, int Status);
     }
 }

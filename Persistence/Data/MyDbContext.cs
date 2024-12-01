@@ -42,6 +42,7 @@ namespace Persistence.Data
         public DbSet<FcmNotification> FcmNotifications { get; set; }
         public DbSet<FcmNotificationCustomer> FcmNotificationCustomers { get; set; }
         public DbSet<FcmUserDevice> FcmUserDevices { get; set; }
+        public DbSet<BookingExtraDrink> BookingExtraDrinks { get; set; }
         #endregion
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -544,7 +545,7 @@ namespace Persistence.Data
                 new Account
                 {
                     AccountId = Constants.Ids.Accounts.AdminAccount,
-                    BarId = Constants.Ids.Bars.Bar1,
+                    BarId = null,
                     RoleId = Constants.Ids.Roles.Admin,
                     Email = "admin1@barbuddy.com",
                     Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
@@ -2686,7 +2687,6 @@ namespace Persistence.Data
                     DrinkId = Constants.Ids.Drinks.Mojito, // Mojito cho không khí lãng mạn
                     Quantity = 2, // Đặt 2 ly cho cặp đôi
                     ActualPrice = 70000, // Giá gốc của Mojito
-                    IsExtra = false
                 },
                 new BookingDrink
                 {
@@ -2695,7 +2695,6 @@ namespace Persistence.Data
                     DrinkId = Constants.Ids.Drinks.TraDao, // Trà đào để giải khát
                     Quantity = 2,
                     ActualPrice = 35000,
-                    IsExtra = false // Giá gốc của Trà đào
                 },
 
                 // Booking 6 - Business meeting
@@ -2706,7 +2705,6 @@ namespace Persistence.Data
                     DrinkId = Constants.Ids.Drinks.Screwdriver, // Cocktail cho khách VIP
                     Quantity = 3, // Đặt 3 ly cho nhóm khách
                     ActualPrice = 80000, // Giá gốc của Screwdriver
-                    IsExtra = true
                 },
                 new BookingDrink
                 {
@@ -2715,7 +2713,6 @@ namespace Persistence.Data
                     DrinkId = Constants.Ids.Drinks.BlackCoffee, // Cà phê đen cho cuộc họp
                     Quantity = 4, // Đặt 4 ly cho cả nhóm
                     ActualPrice = 15000, // Giá gốc của Cà phê đen
-                    IsExtra = true
                 }
             };
         }

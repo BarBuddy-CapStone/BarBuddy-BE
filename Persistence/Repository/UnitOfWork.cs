@@ -32,7 +32,7 @@ namespace Persistence.Repository
         private IGenericRepository<FcmNotification> _fcmNotification;
         private IGenericRepository<FcmNotificationCustomer> _fcmNotificationCustomer;
         private IGenericRepository<FcmUserDevice> _fcmUserDevice;
-
+        private IGenericRepository<BookingExtraDrink> _bookingExtraDrinkRepository;
         public UnitOfWork()
         {
         }
@@ -344,6 +344,17 @@ namespace Persistence.Repository
             }
         }
 
+        public IGenericRepository<BookingExtraDrink> BookingExtraDrinkRepository
+        {
+            get
+            {
+                if (_bookingExtraDrinkRepository == null)
+                {
+                    _bookingExtraDrinkRepository = new GenericRepository<BookingExtraDrink>(_context);
+                }
+                return _bookingExtraDrinkRepository;
+            }
+        }
         public async Task SaveAsync()
         {
             await _context.SaveChangesAsync();
