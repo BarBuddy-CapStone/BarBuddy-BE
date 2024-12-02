@@ -22,6 +22,8 @@ using CsvHelper.Configuration;
 using CsvHelper;
 using Application.DTOs.DrinkCategory;
 using Domain.Common;
+using Azure.Core;
+using System.Linq.Expressions;
 
 namespace Application.Service
 {
@@ -159,14 +161,28 @@ namespace Application.Service
             }
         }
 
-        public async Task<IEnumerable<DrinkResponse>> GetAllDrink()
+        public async Task<IEnumerable<DrinkResponse>> GetAllDrink(QueryDrinkRequest query)
         {
             try
             {
-                var getAllDrink = await _unitOfWork.DrinkRepository.GetAsync(includeProperties: "DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory");
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+
+                Expression<Func<Drink, bool>> filter = drink =>
+                        drink.BarId.Equals(getAccount.BarId) &&
+                        (string.IsNullOrWhiteSpace(query.Search) || drink.DrinkName.Contains(query.Search)) &&
+                        (!query.cateId.HasValue || drink.DrinkCategoryId.Equals(query.cateId));
+
+                var getAllDrink = await _unitOfWork.DrinkRepository
+                    .GetAsync(
+                        filter: filter,
+                        pageIndex: query.PageIndex,
+                        pageSize: query.PageSize,
+                        includeProperties: "Bar,DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory"
+                    );
                 if (getAllDrink.IsNullOrEmpty())
                 {
-                    throw new CustomException.DataNotFoundException("Data not found !");
+                    throw new CustomException.DataNotFoundException("Không tìm thấy đồ uống !");
                 }
                 var response = _mapper.Map<IEnumerable<DrinkResponse>>(getAllDrink);
                 return response;

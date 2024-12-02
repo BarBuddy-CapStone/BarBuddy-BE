@@ -20,17 +20,17 @@ namespace BarBuddy_API.Controllers.Drink
             _drinkService = drinkService;
         }
         /// <summary>
-        /// Get All Drink By Admin
+        /// Get All Drink By STAFF, MANAGER
         /// </summary>
         /// <returns></returns>
-        [Authorize(Roles = "MANAGER")]
-        [HttpGet]
-        public async Task<IActionResult> GetAllDrink()
+        [Authorize(Roles = "MANAGER,STAFF")]
+        [HttpGet("drinkOfBar")]
+        public async Task<IActionResult> GetAllDrink([FromQuery] QueryDrinkRequest query)
         {
             try
             {
-                var response = await _drinkService.GetAllDrink();
-                return CustomResult("Data loaded", response);
+                var response = await _drinkService.GetAllDrink(query);
+                return CustomResult("Đã tải dữ liệu đồ uống thành công.", response);
             }
             catch (CustomException.DataNotFoundException e)
             {
