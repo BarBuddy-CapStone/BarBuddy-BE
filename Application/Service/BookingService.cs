@@ -1215,6 +1215,10 @@ namespace Application.Service
                         throw new CustomException.DataNotFoundException("Không tìm thấy đồ uống !");
                     }
 
+                    if (getBooking.AdditionalFee == null) {
+                        getBooking.AdditionalFee = 0;
+                    }
+
                     var isExistDrink = _unitOfWork.BookingExtraDrinkRepository
                                                     .Get(filter: x => x.DrinkId.Equals(drink.DrinkId) &&
                                                                       x.BookingId.Equals(bookingId) &&
@@ -1237,7 +1241,7 @@ namespace Application.Service
                     else
                     {
                         mapper.BookingId = getBooking.BookingId;
-                        mapper.ActualPrice = isExistDrink.Drink.Price;
+                        mapper.ActualPrice = isDrink.Price;
                         mapper.CreatedDate = DateTime.Now;
                         mapper.UpdatedDate = mapper.CreatedDate;
                         _ = getAccount.Role.RoleName.Equals(PrefixKeyConstant.CUSTOMER) ?
@@ -1251,7 +1255,7 @@ namespace Application.Service
                     await Task.Delay(10);
                     await _unitOfWork.SaveAsync();
                     extraDrink.Add(mapper);
-                    addFeeExtraDrink += isExistDrink.Drink.Price * drink.Quantity;
+                    addFeeExtraDrink += isDrink.Price * drink.Quantity;
                 }
                 getBooking.AdditionalFee += addFeeExtraDrink;
                 await _unitOfWork.BookingRepository.UpdateRangeAsync(getBooking);
