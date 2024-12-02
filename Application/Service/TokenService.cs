@@ -122,9 +122,13 @@ namespace Application.Service
                 await _unitOfWork.SaveAsync();
                 return true;
             }
-            catch
+            catch (DataNotFoundException ex)
             {
-                throw new InternalServerErrorException("Lỗi hệ thống !");
+                throw new DataNotFoundException(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new InternalServerErrorException(ex.Message);
             }
         }
 

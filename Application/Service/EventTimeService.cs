@@ -110,13 +110,17 @@ namespace Application.Service
 
                 await DeleteEventTime(eventId, deleteEventTime);
             }
+            catch (CustomException.InvalidDataException ex)
+            {
+                throw new CustomException.InvalidDataException(ex.Message);
+            }
             catch (CustomException.InternalServerErrorException ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
 
-        private async Task DeleteEventTime(Guid eventId, List<Guid> eventTimeId)
+        public async Task DeleteEventTime(Guid eventId, List<Guid> eventTimeId)
         {
             try
             {

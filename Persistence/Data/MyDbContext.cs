@@ -2017,8 +2017,8 @@ namespace Persistence.Data
                 });
             }
 
-            // Bar Buddy 1 - Mở cả tuần 17:00-23:00
-            for (int day = 0; day <= 6; day++)
+            // Bar Buddy 1 - Mở 4 ngày đầu 17:00-23:00
+            for (int day = 0; day <= 4; day++)
             {
                 AddBarTime(Constants.Ids.Bars.Bar1, day, 17, 23);
             }

@@ -1,4 +1,6 @@
-﻿using Application.DTOs.Table;
+﻿using Application.DTOs.Bar;
+using Application.DTOs.BarTime;
+using Application.DTOs.Table;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +16,7 @@ namespace Application.IService
         Task UpdateTable(Guid TableId, UpdateTableRequest request);
         Task UpdateTableStatus(Guid TableId, int status);
         Task<bool> DeleteTable(Guid TableId);
-        Task<(List<TableResponse> response, int TotalPage)> GetAllOfBar(Guid BarId, Guid? TableTypeId,
+        Task<(List<TableResponse> response, int TotalPage, List<BarTimeResponse> barTimes, double timeSlot)> GetAllOfBar(Guid BarId, Guid? TableTypeId,
             string? TableName, int? Status, int PageIndex, int PageSize, DateTime BookingDate, TimeSpan BookingTime);
     }
 }

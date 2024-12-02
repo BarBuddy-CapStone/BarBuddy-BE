@@ -438,10 +438,25 @@ namespace Application.Service
                 await _unitOfWork.SaveAsync();
                 _unitOfWork.CommitTransaction();
             }
+            catch (UnAuthorizedException ex)
+            {
+                await _unitOfWork.DisposeAsync();
+                throw new CustomException.UnAuthorizedException(ex.Message);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                await _unitOfWork.DisposeAsync();
+                throw new CustomException.InvalidDataException(ex.Message);
+            }
+            catch (DataNotFoundException ex)
+            {
+                await _unitOfWork.DisposeAsync();
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
             catch (Exception ex)
             {
                 await _unitOfWork.DisposeAsync();
-                throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
+                throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
     }

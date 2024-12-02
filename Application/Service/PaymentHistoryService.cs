@@ -62,6 +62,11 @@ namespace Application.Service
 
                 var payments = await _unitOfWork.PaymentHistoryRepository.GetAsync(filter: filter);
 
+                if (payments is null || !payments.Any())
+                {
+                    throw new CustomException.DataNotFoundException("Bạn không có lịch sử giao dịch nào cả !");
+                }
+
                 int totalPage = 1;
                 if (payments.Count() > PageSize)
                 {
@@ -100,7 +105,16 @@ namespace Application.Service
 
                 return (response, totalPage);
             }
-            catch (Exception ex) { 
+            catch (UnAuthorizedException ex)
+            {
+                throw new UnAuthorizedException(ex.Message);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
+            catch (Exception ex) 
+            { 
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
@@ -171,6 +185,14 @@ namespace Application.Service
 
                 return (response, totalPage);
             }
+            catch (UnAuthorizedException ex)
+            {
+                throw new UnAuthorizedException(ex.Message);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
             catch (Exception ex) { 
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
@@ -213,6 +235,10 @@ namespace Application.Service
                 }
                 var paginationPayments = payments.Skip(validPageIndex * validPageSize).Take(validPageSize);
                 return (_mapper.Map<List<PaymentHistoryResponse>>(paginationPayments), totalPage);
+            }
+            catch (UnAuthorizedException ex)
+            {
+                throw new UnAuthorizedException(ex.Message);
             }
             catch (Exception ex)
             {

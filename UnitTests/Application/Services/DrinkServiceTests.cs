@@ -178,6 +178,7 @@ namespace UnitTests.Application.Services
                new Drink { DrinkId = Guid.NewGuid(), DrinkName = "Drink1" },
                new Drink { DrinkId = Guid.NewGuid(), DrinkName = "Drink2" }
            };
+            var queryDrinkRequest = new QueryDrinkRequest();
             _unitOfWorkMock.Setup(u => u.DrinkRepository.GetAsync(
                It.IsAny<Expression<Func<Drink, bool>>>(),
                It.IsAny<Func<IQueryable<Drink>, IOrderedQueryable<Drink>>>(),
@@ -188,7 +189,7 @@ namespace UnitTests.Application.Services
             _mapperMock.Setup(m => m.Map<IEnumerable<DrinkResponse>>(It.IsAny<IEnumerable<Drink>>()))
                .Returns((IEnumerable<Drink> source) => source.Select(d => new DrinkResponse { DrinkId = d.DrinkId, DrinkName = d.DrinkName }));
             // Act
-            var result = await _drinkService.GetAllDrink();
+            var result = await _drinkService.GetAllDrink(queryDrinkRequest);
             // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count());
@@ -198,6 +199,7 @@ namespace UnitTests.Application.Services
         public async Task GetAllDrink_NoData_ShouldThrowDataNotFoundException()
         {
             // Arrange
+            var queryDrinkRequest = new QueryDrinkRequest();
             _unitOfWorkMock.Setup(u => u.DrinkRepository.GetAsync(
                 It.IsAny<Expression<Func<Drink, bool>>>(),
                 It.IsAny<Func<IQueryable<Drink>, IOrderedQueryable<Drink>>>(),
@@ -206,7 +208,7 @@ namespace UnitTests.Application.Services
                 It.IsAny<int?>()))
                 .ReturnsAsync(new List<Drink>());
             // Act & Assert
-            await Assert.ThrowsAsync<CustomException.DataNotFoundException>(() => _drinkService.GetAllDrink());
+            await Assert.ThrowsAsync<CustomException.DataNotFoundException>(() => _drinkService.GetAllDrink(queryDrinkRequest));
         }
 
         [Fact]
