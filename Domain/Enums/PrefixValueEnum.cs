@@ -26,6 +26,7 @@ namespace Domain.Enums
         Serving = 2,
         [Description("Completed")]
         Completed = 3,
+        #endregion
 
         #region Event Status
 
