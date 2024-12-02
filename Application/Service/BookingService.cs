@@ -502,7 +502,7 @@ namespace Application.Service
 
                 booking.BookingTables = booking.BookingTables ?? new List<BookingTable>();
                 booking.BookingCode = $"{booking.BookingDate.ToString("yyMMdd")}{RandomHelper.GenerateRandomNumberString()}";
-                booking.Status = (int)BookingStatusEnum.Pending;
+                booking.Status = (int)PrefixValueEnum.PendingBooking;
                 var qrCode = _qrCodeService.GenerateQRCode(booking.BookingId);
                 booking.QRTicket = await _firebase.UploadImageAsync(Utils.ConvertBase64ToFile(qrCode));
                 booking.BookingTime = request.BookingTime;
@@ -745,7 +745,7 @@ namespace Application.Service
                 booking.BookingDrinks = booking.BookingDrinks ?? new List<BookingDrink>();
                 booking.BookingDate = request.BookingDate.Date;
                 booking.BookingCode = $"{booking.BookingDate.ToString("yyMMdd")}{RandomHelper.GenerateRandomNumberString()}";
-                booking.Status = (int)BookingStatusEnum.Pending;
+                booking.Status = (int)PrefixValueEnum.PendingBooking;
                 booking.BookingTime = request.BookingTime;
                 booking.CreateAt = TimeHelper.ConvertDateTimeToUtcPlus7(DateTime.UtcNow);
 

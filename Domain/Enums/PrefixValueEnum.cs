@@ -16,6 +16,8 @@ namespace Domain.Enums
         [Description("Pending")]
         Pending = 2,
 
+        #region Booking Status
+
         [Description("PendingBooking")]
         PendingBooking = 0,
         [Description("Cancelled")]

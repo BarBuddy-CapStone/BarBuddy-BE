@@ -289,7 +289,7 @@ namespace Application.Service
                     filter: bt => bt.TableId == table.TableId &&
                                  bt.Booking.BookingDate.Date == bookingDate.Date &&
                                  bt.Booking.BookingTime.Hours == bookingTime.Hours &&
-                                 bt.Booking.Status != (int)BookingStatusEnum.Failed,
+                                 bt.Booking.Status != (int)PrefixValueEnum.Cancelled,
                     includeProperties: "Booking");
 
                 if (!bookingTables.Any())
@@ -313,11 +313,11 @@ namespace Application.Service
                     if (isTimeOverlap)
                     {
                         // Nếu booking hiện tại đang trong trạng thái check-in
-                        if (booking.Status == (int)BookingStatusEnum.IsCheckIn)
+                        if (booking.Status == (int)PrefixValueEnum.Serving)
                             return (int)TableStatusEnum.InUse;
                         
                         // Nếu booking hiện tại đang trong trạng thái pending
-                        if (booking.Status == (int)BookingStatusEnum.Pending)
+                        if (booking.Status == (int)PrefixValueEnum.PendingBooking)
                             return (int)TableStatusEnum.Reserved;
                     }
                 }
