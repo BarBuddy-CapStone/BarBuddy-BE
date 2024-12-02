@@ -486,6 +486,10 @@ namespace Application.Service
             try
             {
                 var booking = _mapper.Map<Booking>(request);
+                if (request?.TableIds?.Count() > 6)
+                {
+                    throw new CustomException.InvalidDataException("Chỉ được đặt tối đa 5 bàn");
+                }
                 booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext))
                     ?? throw new DataNotFoundException("Không tìm thấy tài khoản !");
                 booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId)
@@ -727,6 +731,10 @@ namespace Application.Service
             try
             {
                 var booking = _mapper.Map<Booking>(request);
+                if (request?.TableIds?.Count() > 6)
+                {
+                    throw new CustomException.InvalidDataException("Chỉ được đặt tối đa 5 bàn");
+                }
                 booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext))
                     ?? throw new DataNotFoundException("Không tìm thấy tài khoản !");
                 booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId)
