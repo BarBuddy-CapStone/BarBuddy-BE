@@ -50,6 +50,10 @@ namespace Application.Service
 
                 return true;
             }
+            catch (CustomException.InvalidDataException ex)
+            {
+                throw new CustomException.InvalidDataException(ex.Message, ex);
+            }
             catch (Exception ex)
             {
                 return false;

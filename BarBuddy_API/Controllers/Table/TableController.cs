@@ -57,7 +57,8 @@ namespace BarBuddy_API.Controllers.Table
             var time = RequestTime ?? CoreHelper.SystemTimeNow.TimeOfDay;
 
             var responses = await _tableService.GetAllOfBar(BarId,TableTypeId,TableName,Status,PageIndex,PageSize,date,time);
-            return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.response });
+            return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, 
+                response = responses.response, barTimes = responses.barTimes, timeSlot = responses.timeSlot });
         }
 
         /// <summary>

@@ -1,7 +1,10 @@
 ﻿using Application.Common;
+using Application.DTOs.Bar;
+using Application.DTOs.BarTime;
 using Application.DTOs.Table;
 using Application.Interfaces;
 using Application.IService;
+using AutoMapper;
 using Azure.Core;
 using Domain.Constants;
 using Domain.CustomException;
@@ -17,6 +20,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using static Domain.CustomException.CustomException;
 
 namespace Application.Service
 {
@@ -25,12 +29,14 @@ namespace Application.Service
         private readonly IUnitOfWork _unitOfWork;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IAuthentication _authentication;
+        private readonly IMapper _mapper;
         public TableService(IUnitOfWork unitOfWork, IAuthentication authentication,
-                            IHttpContextAccessor contextAccessor)
+                            IHttpContextAccessor contextAccessor, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _authentication = authentication;
             _contextAccessor = contextAccessor;
+            _mapper = mapper;
         }
 
         public async Task CreateTable(CreateTableRequest request)
@@ -105,6 +111,10 @@ namespace Application.Service
                 await _unitOfWork.SaveAsync();
                 return true;
             }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
             catch (Exception ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
@@ -170,13 +180,19 @@ namespace Application.Service
             }
         }
 
-        public async Task<(List<TableResponse> response, int TotalPage)> GetAllOfBar(Guid BarId, Guid? TableTypeId, 
+        public async Task<(List<TableResponse> response, int TotalPage, List<BarTimeResponse> barTimes, double timeSlot)> GetAllOfBar(Guid BarId, Guid? TableTypeId, 
             string? TableName, int? Status, int PageIndex, int PageSize, DateTime RequestDate, TimeSpan RequestTime)
         {
             try
             {
                 var responses = new List<TableResponse>();
                 int totalPage = 1;
+
+                var bar = (await _unitOfWork.BarRepository.GetAsync(filter: x => x.BarId.Equals(BarId),
+                        includeProperties: "BarTimes")).FirstOrDefault()
+                        ?? throw new CustomException.DataNotFoundException("Không tìm thấy quán bar");
+                var timeSlot = bar.TimeSlot;
+                var barTimeResponses = _mapper.Map<List<BarTimeResponse>>(bar.BarTimes);
 
                 // filter expression
                 Expression<Func<Table, bool>> filter = t =>
@@ -204,9 +220,6 @@ namespace Application.Service
                             totalPage = (totalTable / PageSize) + 1;
                         }
                     }
-
-                    var bar = (await _unitOfWork.BarRepository.GetAsync(filter: x => x.BarId.Equals(BarId), 
-                        includeProperties: "BarTimes")).FirstOrDefault() ?? throw new CustomException.DataNotFoundException("Không tìm thấy quán bar");
 
                     var tablesWithPagination = await _unitOfWork.TableRepository.GetAsync(
                         filter: filter,
@@ -251,7 +264,15 @@ namespace Application.Service
                     }
                 }
 
-                return (responses, totalPage);
+                return (responses, totalPage, barTimeResponses, timeSlot);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                throw new CustomException.InvalidDataException(ex.Message);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
             }
             catch (Exception ex)
             {
@@ -364,6 +385,22 @@ namespace Application.Service
                 await _unitOfWork.TableRepository.UpdateAsync(existedTable);
                 await _unitOfWork.SaveAsync();
             }
+            catch (CustomException.InvalidDataException ex)
+            {
+                throw new CustomException.InvalidDataException(ex.Message);
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                throw new CustomException.UnAuthorizedException(ex.Message);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
+            catch (CustomException.DataExistException ex)
+            {
+                throw new CustomException.DataExistException(ex.Message);
+            }
             catch (Exception ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
@@ -398,6 +435,14 @@ namespace Application.Service
                 existedTable.Status = status;
                 await _unitOfWork.TableRepository.UpdateAsync(existedTable);
                 await _unitOfWork.SaveAsync();
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                throw new CustomException.UnAuthorizedException(ex.Message);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
             }
             catch (Exception ex)
             {

@@ -164,6 +164,10 @@ namespace Application.Service
                 };
                 return response;
             }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
             catch (Exception ex) {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
@@ -286,6 +290,14 @@ namespace Application.Service
                     PageSize = pageSize,
                     TotalItems = totalItems
                 };
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                throw new CustomException.UnAuthorizedException(ex.Message);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
             }
             catch (Exception ex)
             {

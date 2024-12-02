@@ -72,7 +72,19 @@ namespace Application.Service
                 await _unitOfWork.TableTypeRepository.InsertAsync(tableType);
                 await _unitOfWork.SaveAsync();
             }
-            catch (CustomException.InternalServerErrorException ex)
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                throw new CustomException.UnAuthorizedException(ex.Message);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                throw new CustomException.InvalidDataException(ex.Message);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
+            catch (Exception ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
@@ -115,7 +127,15 @@ namespace Application.Service
                 await _unitOfWork.SaveAsync();
                 return true;
             }
-            catch (CustomException.InternalServerErrorException ex)
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                throw new CustomException.UnAuthorizedException(ex.Message);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
+            catch (Exception ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
@@ -191,6 +211,10 @@ namespace Application.Service
 
                 return responses;
             }
+            catch (CustomException.InvalidDataException ex)
+            {
+                throw new CustomException.InvalidDataException(ex.Message);
+            }
             catch (Exception ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
@@ -213,6 +237,10 @@ namespace Application.Service
                     throw new CustomException.DataNotFoundException("Không tìm thấy loại bàn");
                 }
                 return tableTypeDto;
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
             }
             catch (Exception ex)
             {
@@ -264,7 +292,19 @@ namespace Application.Service
                 await _unitOfWork.TableTypeRepository.UpdateAsync(existedTableType);
                 await _unitOfWork.SaveAsync();
             }
-            catch (CustomException.InternalServerErrorException ex)
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                throw new CustomException.UnAuthorizedException(ex.Message);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                throw new CustomException.InvalidDataException(ex.Message);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
+            catch (Exception ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }

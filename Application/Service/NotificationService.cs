@@ -101,7 +101,11 @@ namespace Application.Service
                 var response = _mapper.Map<List<NotificationResponse>>(isExist);
                 return response;
             }
-            catch (CustomException.InternalServerErrorException ex)
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                throw new CustomException.UnAuthorizedException(ex.Message);
+            }
+            catch (Exception ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
@@ -157,9 +161,19 @@ namespace Application.Service
 
                 response.AccountId = accountId;
                 return response;
-            } catch (Exception ẽx) {
-                throw new Exception(ẽx.Message);
-                }
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                throw new CustomException.UnAuthorizedException(ex.Message);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
+            catch (Exception ex) 
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         public async Task<NotificationResponse> CreateNotificationAllCustomer(Guid accountId, NotificationRequest request)
@@ -183,7 +197,7 @@ namespace Application.Service
                 var response = _mapper.Map<NotificationResponse>(mapper);
                 return response;
             }
-            catch (CustomException.InternalServerErrorException ex)
+            catch (Exception ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }

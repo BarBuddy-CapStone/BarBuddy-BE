@@ -11,5 +11,6 @@ namespace Application.IService
     {
         Task CreateEventTime(Guid eventId, EventTimeRequest request);
         Task UpdateEventTime(Guid eventId, bool IsEveryWeek, List<UpdateEventTimeRequest> request);
+        Task DeleteEventTime(Guid eventId, List<Guid> eventTimeId);
     }
 }

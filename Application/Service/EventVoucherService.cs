@@ -46,10 +46,18 @@ namespace Application.Service
                 await Task.Delay(10);
                 await _unitOfWork.SaveAsync();
             }
+            catch (CustomException.InvalidDataException ex)
+            {
+                throw new CustomException.InvalidDataException(ex.Message, ex);
+            }
             catch (CustomException.InternalServerErrorException ex)
             {
                 throw new CustomException.InternalServerErrorException(ex.Message, ex);
             }
+            catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message, ex);
+            } 
         }
         public async Task UpdateEventVoucher(Guid eventId, UpdateEventVoucherRequest request)
         {
@@ -68,7 +76,11 @@ namespace Application.Service
                 await _unitOfWork.SaveAsync();
 
             }
-            catch
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
+            catch (Exception ex)
             {
                 throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
             }
@@ -90,7 +102,10 @@ namespace Application.Service
                 await Task.Delay(10);
                 await _unitOfWork.SaveAsync();
             }
-
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
             catch
             {
                 throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
@@ -149,7 +164,7 @@ namespace Application.Service
             {
                 throw new CustomException.InvalidDataException(ex.Message);
             }
-            catch
+            catch 
             {
                 throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
             }
@@ -167,6 +182,10 @@ namespace Application.Service
                 await _unitOfWork.EventVoucherRepository.UpdateRangeAsync(getOneVoucher);
                 await Task.Delay(10);
                 await _unitOfWork.SaveAsync();
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
             }
             catch
             {
@@ -190,6 +209,10 @@ namespace Application.Service
                 await _unitOfWork.EventVoucherRepository.UpdateRangeAsync(getOneVoucher);
                 await Task.Delay(10);
                 await _unitOfWork.SaveAsync();
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
             }
             catch
             {

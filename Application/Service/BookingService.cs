@@ -525,7 +525,6 @@ namespace Application.Service
                 booking.BookingTables = booking.BookingTables ?? new List<BookingTable>();
                 booking.BookingCode = $"{booking.BookingDate.ToString("yyMMdd")}{RandomHelper.GenerateRandomNumberString()}";
                 booking.Status = (int)BookingStatusEnum.Pending;
-                booking.CreateAt = TimeHelper.ConvertDateTimeToUtcPlus7(DateTime.Now);
                 var qrCode = _qrCodeService.GenerateQRCode(booking.BookingId);
                 booking.QRTicket = await _firebase.UploadImageAsync(Utils.ConvertBase64ToFile(qrCode));
                 booking.BookingTime = request.BookingTime;

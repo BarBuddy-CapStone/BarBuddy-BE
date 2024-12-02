@@ -19,6 +19,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using static Domain.CustomException.CustomException;
 
 namespace UnitTests.Application.Services
 {
@@ -694,7 +695,7 @@ namespace UnitTests.Application.Services
             Assert.Equal(3, result.TotalPages);
             Assert.Equal(5, result.TotalItems);
             
-            // Verify r���ng mỗi event có EventTimeResponses
+            // Verify rng mỗi event có EventTimeResponses
             Assert.All(result.EventResponses, e => Assert.NotEmpty(e.EventTimeResponses));
         }
 
@@ -918,6 +919,471 @@ namespace UnitTests.Application.Services
             // Verify mapper được gọi đúng số lần
             _mapperMock.Verify(x => x.Map<List<EventTimeResponse>>(It.IsAny<ICollection<TimeEvent>>()), Times.Exactly(2));
             _mapperMock.Verify(x => x.Map<EventVoucherResponse>(It.IsAny<EventVoucher>()), Times.Exactly(2));
+        }
+
+        [Fact]
+        public async Task UpdateEvent_WhenBarNotFound_ThrowsDataNotFoundException()
+        {
+            // Arrange
+            var eventId = Guid.NewGuid();
+            var barId = Guid.NewGuid();
+            var accountId = Guid.NewGuid();
+            var request = new UpdateEventRequest
+            {
+                BarId = barId,
+                Images = new List<string> { "base64Image" },
+                OldImages = new List<string> { "oldImage" },
+                UpdateEventTimeRequests = new List<UpdateEventTimeRequest>
+                {
+                    new UpdateEventTimeRequest { DayOfWeek = 1 }
+                }
+            };
+
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+            _unitOfWorkMock.Setup(x => x.AccountRepository.GetByID(accountId))
+                .Returns(new Account { BarId = barId });
+            _unitOfWorkMock.Setup(x => x.BarRepository.Get(
+                It.IsAny<Expression<Func<Bar, bool>>>(),
+                It.IsAny<Func<IQueryable<Bar>, IOrderedQueryable<Bar>>>(),
+                It.IsAny<string>(),
+                It.IsAny<int?>(),
+                It.IsAny<int?>()))
+                .Returns(new List<Bar>().AsQueryable());
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<CustomException.DataNotFoundException>(
+                () => _eventService.UpdateEvent(eventId, request)
+            );
+            Assert.Equal("Không tìm thấy quán Bar", exception.Message);
+        }
+
+        [Fact]
+        public async Task UpdateEvent_WhenUnauthorizedAccess_ThrowsUnAuthorizedException()
+        {
+            // Arrange
+            var eventId = Guid.NewGuid();
+            var barId = Guid.NewGuid();
+            var differentBarId = Guid.NewGuid();
+            var accountId = Guid.NewGuid();
+            var request = new UpdateEventRequest
+            {
+                BarId = barId,
+                Images = new List<string> { "base64Image" },
+                OldImages = new List<string> { "oldImage" },
+                UpdateEventTimeRequests = new List<UpdateEventTimeRequest>
+                {
+                    new UpdateEventTimeRequest { DayOfWeek = 1 }
+                }
+            };
+
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+            _unitOfWorkMock.Setup(x => x.AccountRepository.GetByID(accountId))
+                .Returns(new Account { BarId = differentBarId });
+            _unitOfWorkMock.Setup(x => x.BarRepository.Get(
+                It.IsAny<Expression<Func<Bar, bool>>>(),
+                It.IsAny<Func<IQueryable<Bar>, IOrderedQueryable<Bar>>>(),
+                It.IsAny<string>(),
+                It.IsAny<int?>(),
+                It.IsAny<int?>()))
+                .Returns(new List<Bar> { new Bar { BarId = barId, Status = true } }.AsQueryable());
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<CustomException.UnAuthorizedException>(
+                () => _eventService.UpdateEvent(eventId, request)
+            );
+            Assert.Equal("Bạn không có quyền truy cập vào quán bar này !", exception.Message);
+        }
+
+        [Fact]
+        public async Task UpdateEvent_WhenNoImages_ThrowsInvalidDataException()
+        {
+            // Arrange
+            var eventId = Guid.NewGuid();
+            var barId = Guid.NewGuid();
+            var accountId = Guid.NewGuid();
+            var request = new UpdateEventRequest
+            {
+                BarId = barId,
+                Images = new List<string>(),
+                OldImages = new List<string>(),
+                UpdateEventTimeRequests = new List<UpdateEventTimeRequest>
+                {
+                    new UpdateEventTimeRequest { DayOfWeek = 1 }
+                }
+            };
+
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+            _unitOfWorkMock.Setup(x => x.AccountRepository.GetByID(accountId))
+                .Returns(new Account { BarId = barId });
+            _unitOfWorkMock.Setup(x => x.BarRepository.Get(
+                It.IsAny<Expression<Func<Bar, bool>>>(),
+                It.IsAny<Func<IQueryable<Bar>, IOrderedQueryable<Bar>>>(),
+                It.IsAny<string>(),
+                It.IsAny<int?>(),
+                It.IsAny<int?>()))
+                .Returns(new List<Bar> { new Bar { BarId = barId, Status = true } }.AsQueryable());
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<CustomException.InvalidDataException>(
+                () => _eventService.UpdateEvent(eventId, request)
+            );
+            Assert.Equal("Không thể thiếu hình ảnh !", exception.Message);
+        }
+
+        [Fact]
+        public async Task UpdateEvent_WhenSuccessful_UpdatesEventCorrectly()
+        {
+            // Arrange
+            var eventId = Guid.NewGuid();
+            var barId = Guid.NewGuid();
+            var accountId = Guid.NewGuid();
+            var voucherId = Guid.NewGuid();
+            var request = new UpdateEventRequest
+            {
+                BarId = barId,
+                Images = new List<string>(), // Để trống để tránh xử lý base64
+                OldImages = new List<string> { "oldImage" }, // Giữ lại ít nhất 1 ảnh
+                UpdateEventTimeRequests = new List<UpdateEventTimeRequest>
+                {
+                    new UpdateEventTimeRequest { DayOfWeek = 1 }
+                },
+                UpdateEventVoucherRequests = new UpdateEventVoucherRequest
+                {
+                    EventVoucherId = voucherId
+                }
+            };
+
+            var existingEvent = new Event
+            {
+                EventId = eventId,
+                BarId = barId,
+                EventVoucher = new EventVoucher { EventVoucherId = voucherId },
+                TimeEvent = new List<TimeEvent>()
+            };
+
+            // Setup basic mocks (authentication, account, bar)
+            SetupBasicMocks(accountId, barId);
+
+            // Setup Event Repository
+            _unitOfWorkMock.Setup(x => x.EventRepository.Get(
+                It.IsAny<Expression<Func<Event, bool>>>(),
+                It.IsAny<Func<IQueryable<Event>, IOrderedQueryable<Event>>>(),
+                It.IsAny<string>(),
+                It.IsAny<int?>(),
+                It.IsAny<int?>()))
+                .Returns(new List<Event> { existingEvent }.AsQueryable());
+
+            // Setup Mapper
+            _mapperMock.Setup(x => x.Map(request, existingEvent))
+                .Returns(existingEvent);
+
+            // Setup EventVoucher service
+            _eventVoucherServiceMock.Setup(x => x.GetVoucherBasedEventId(eventId))
+                .ReturnsAsync(existingEvent.EventVoucher);
+            _eventVoucherServiceMock.Setup(x => x.UpdateEventVoucher(eventId, request.UpdateEventVoucherRequests))
+                .Returns(Task.CompletedTask);
+
+            // Setup EventTime service
+            _eventTimeServiceMock.Setup(x => x.UpdateEventTime(
+                eventId,
+                It.IsAny<bool>(),
+                request.UpdateEventTimeRequests))
+                .Returns(Task.CompletedTask);
+
+            // Setup UnitOfWork transaction methods
+            _unitOfWorkMock.Setup(x => x.BeginTransaction());
+            _unitOfWorkMock.Setup(x => x.SaveAsync())
+                .Returns(Task.CompletedTask);
+            _unitOfWorkMock.Setup(x => x.CommitTransaction());
+            _unitOfWorkMock.Setup(x => x.EventRepository.UpdateRangeAsync(It.IsAny<Event>()))
+                .Returns(Task.CompletedTask);
+
+            // Act
+            await _eventService.UpdateEvent(eventId, request);
+
+            // Assert
+            _unitOfWorkMock.Verify(x => x.BeginTransaction(), Times.Once);
+            _unitOfWorkMock.Verify(x => x.EventRepository.UpdateRangeAsync(It.IsAny<Event>()), Times.Exactly(2));
+            _unitOfWorkMock.Verify(x => x.SaveAsync(), Times.AtLeastOnce);
+            _unitOfWorkMock.Verify(x => x.CommitTransaction(), Times.Once);
+            _eventVoucherServiceMock.Verify(x => x.UpdateEventVoucher(eventId, request.UpdateEventVoucherRequests), Times.Once);
+            _eventTimeServiceMock.Verify(x => x.UpdateEventTime(eventId, It.IsAny<bool>(), request.UpdateEventTimeRequests), Times.Once);
+        }
+
+        [Fact]
+        public async Task UpdateEvent_WhenSystemError_ThrowsInternalServerErrorException()
+        {
+            // Arrange
+            var eventId = Guid.NewGuid();
+            var barId = Guid.NewGuid();
+            var accountId = Guid.NewGuid();
+            var voucherId = Guid.NewGuid();
+            var request = new UpdateEventRequest
+            {
+                BarId = barId,
+                Images = new List<string> { "base64Image" },
+                OldImages = new List<string> { "oldImage" },
+                UpdateEventTimeRequests = new List<UpdateEventTimeRequest>
+                {
+                    new UpdateEventTimeRequest { DayOfWeek = 1 }
+                },
+                UpdateEventVoucherRequests = new UpdateEventVoucherRequest
+                {
+                    EventVoucherId = voucherId
+                }
+            };
+
+            var existingEvent = new Event
+            {
+                EventId = eventId,
+                BarId = barId,
+                EventVoucher = new EventVoucher { EventVoucherId = voucherId }
+            };
+
+            SetupBasicMocks(accountId, barId);
+            _unitOfWorkMock.Setup(x => x.EventRepository.Get(
+                It.IsAny<Expression<Func<Event, bool>>>(),
+                It.IsAny<Func<IQueryable<Event>, IOrderedQueryable<Event>>>(),
+                It.IsAny<string>(),
+                It.IsAny<int?>(),
+                It.IsAny<int?>()))
+                .Returns(new List<Event> { existingEvent }.AsQueryable());
+
+            _mapperMock.Setup(x => x.Map(request, existingEvent))
+                .Returns(existingEvent);
+
+            // Giả lập lỗi khi cập nhật
+            _unitOfWorkMock.Setup(x => x.EventRepository.UpdateRangeAsync(It.IsAny<Event>()))
+                .ThrowsAsync(new Exception("Database error"));
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<CustomException.InternalServerErrorException>(
+                () => _eventService.UpdateEvent(eventId, request)
+            );
+        }
+
+        private void SetupBasicMocks(Guid accountId, Guid barId)
+        {
+            _authenticationMock.Setup(x => x.GetUserIdFromHttpContext(It.IsAny<HttpContext>()))
+                .Returns(accountId);
+            _unitOfWorkMock.Setup(x => x.AccountRepository.GetByID(accountId))
+                .Returns(new Account { BarId = barId });
+            _unitOfWorkMock.Setup(x => x.BarRepository.Get(
+                It.IsAny<Expression<Func<Bar, bool>>>(),
+                It.IsAny<Func<IQueryable<Bar>, IOrderedQueryable<Bar>>>(),
+                It.IsAny<string>(),
+                It.IsAny<int?>(),
+                It.IsAny<int?>()))
+                .Returns(new List<Bar> { new Bar { BarId = barId, Status = true } }.AsQueryable());
+        }
+
+        [Fact]
+        public async Task UpdateEvent_WhenEventNotFound_ThrowsDataNotFoundException()
+        {
+            // Arrange
+            var eventId = Guid.NewGuid();
+            var barId = Guid.NewGuid();
+            var accountId = Guid.NewGuid();
+            var request = new UpdateEventRequest
+            {
+                BarId = barId,
+                Images = new List<string>(), // Để trống để tránh xử lý base64
+                OldImages = new List<string> { "oldImage" }, // Giữ lại ít nhất 1 ảnh để pass validation
+                UpdateEventTimeRequests = new List<UpdateEventTimeRequest>
+                {
+                    new UpdateEventTimeRequest { DayOfWeek = 1 }
+                }
+            };
+
+            // Setup basic mocks
+            SetupBasicMocks(accountId, barId);
+
+            // Setup Event Repository để trả về null
+            _unitOfWorkMock.Setup(x => x.EventRepository.Get(
+                It.IsAny<Expression<Func<Event, bool>>>(),
+                It.IsAny<Func<IQueryable<Event>, IOrderedQueryable<Event>>>(),
+                It.IsAny<string>(),
+                It.IsAny<int?>(),
+                It.IsAny<int?>()))
+                .Returns(new List<Event>().AsQueryable());
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<CustomException.DataNotFoundException>(
+                () => _eventService.UpdateEvent(eventId, request)
+            );
+            Assert.Equal("Không tìm thấy Event !", exception.Message);
+
+            // Verify rằng transaction đã được bắt đầu
+            _unitOfWorkMock.Verify(x => x.BeginTransaction(), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetOneEvent_WhenEventNotFound_ThrowsDataNotFoundException()
+        {
+            // Arrange
+            var eventId = Guid.NewGuid();
+            _unitOfWorkMock.Setup(x => x.EventRepository.GetAsync(
+                It.IsAny<Expression<Func<Event, bool>>>(),
+                It.IsAny<Func<IQueryable<Event>, IOrderedQueryable<Event>>>(),
+                It.IsAny<string>(),
+                It.IsAny<int?>(),
+                It.IsAny<int?>()))
+                .ReturnsAsync(new List<Event>().AsQueryable());
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<CustomException.DataNotFoundException>(
+                () => _eventService.GetOneEvent(eventId)
+            );
+            Assert.Equal("Không tìm thấy sự kiện bạn đang tìm!", exception.Message);
+        }
+
+        [Fact]
+        public async Task GetOneEvent_WhenEventEnded_ThrowsInvalidDataException()
+        {
+            // Arrange
+            var eventId = Guid.NewGuid();
+            var existingEvent = new Event
+            {
+                EventId = eventId,
+                EventName = "Test Event",
+                IsDeleted = false,
+                IsHide = false,
+                TimeEvent = new List<TimeEvent>
+                {
+                    new TimeEvent
+                    {
+                        Date = DateTime.Now.AddDays(-1), // Sự kiện đã qua
+                        StartTime = new TimeSpan(10, 0, 0),
+                        EndTime = new TimeSpan(12, 0, 0)
+                    }
+                }
+            };
+
+            _unitOfWorkMock.Setup(x => x.EventRepository.GetAsync(
+                It.IsAny<Expression<Func<Event, bool>>>(),
+                It.IsAny<Func<IQueryable<Event>, IOrderedQueryable<Event>>>(),
+                It.IsAny<string>(),
+                It.IsAny<int?>(),
+                It.IsAny<int?>()))
+                .ReturnsAsync(new List<Event> { existingEvent }.AsQueryable());
+
+            _mapperMock.Setup(x => x.Map<EventResponse>(It.IsAny<Event>()))
+                .Returns(new EventResponse { EventId = eventId });
+
+            _mapperMock.Setup(x => x.Map<List<EventTimeResponse>>(It.IsAny<ICollection<TimeEvent>>()))
+                .Returns(new List<EventTimeResponse>
+                {
+                    new EventTimeResponse
+                    {
+                        Date = DateTime.Now.AddDays(-1),
+                        StartTime = new TimeSpan(10, 0, 0),
+                        EndTime = new TimeSpan(12, 0, 0)
+                    }
+                });
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<CustomException.InvalidDataException>(
+                () => _eventService.GetOneEvent(eventId)
+            );
+            Assert.Equal("Không hợp lệ !", exception.Message);
+        }
+
+        [Fact]
+        public async Task GetOneEvent_WhenEventValid_ReturnsEventResponse()
+        {
+            // Arrange
+            var eventId = Guid.NewGuid();
+            var existingEvent = new Event
+            {
+                EventId = eventId,
+                EventName = "Test Event",
+                IsDeleted = false,
+                IsHide = false,
+                TimeEvent = new List<TimeEvent>
+                {
+                    new TimeEvent
+                    {
+                        Date = DateTime.Now.AddDays(1), // Sự kiện trong tương lai
+                        StartTime = new TimeSpan(10, 0, 0),
+                        EndTime = new TimeSpan(12, 0, 0)
+                    }
+                },
+                EventVoucher = new EventVoucher
+                {
+                    EventVoucherId = Guid.NewGuid(),
+                    EventVoucherName = "Test Voucher"
+                }
+            };
+
+            var expectedResponse = new EventResponse
+            {
+                EventId = eventId,
+                EventName = "Test Event",
+                EventTimeResponses = new List<EventTimeResponse>
+                {
+                    new EventTimeResponse
+                    {
+                        Date = DateTime.Now.AddDays(1),
+                        StartTime = new TimeSpan(10, 0, 0),
+                        EndTime = new TimeSpan(12, 0, 0)
+                    }
+                },
+                EventVoucherResponse = new EventVoucherResponse
+                {
+                    EventVoucherId = existingEvent.EventVoucher.EventVoucherId,
+                    EventVoucherName = "Test Voucher"
+                }
+            };
+
+            _unitOfWorkMock.Setup(x => x.EventRepository.GetAsync(
+                It.IsAny<Expression<Func<Event, bool>>>(),
+                It.IsAny<Func<IQueryable<Event>, IOrderedQueryable<Event>>>(),
+                It.IsAny<string>(),
+                It.IsAny<int?>(),
+                It.IsAny<int?>()))
+                .ReturnsAsync(new List<Event> { existingEvent }.AsQueryable());
+
+            _mapperMock.Setup(x => x.Map<EventResponse>(It.IsAny<Event>()))
+                .Returns(expectedResponse);
+
+            _mapperMock.Setup(x => x.Map<List<EventTimeResponse>>(It.IsAny<ICollection<TimeEvent>>()))
+                .Returns(expectedResponse.EventTimeResponses);
+
+            _mapperMock.Setup(x => x.Map<EventVoucherResponse>(It.IsAny<EventVoucher>()))
+                .Returns(expectedResponse.EventVoucherResponse);
+
+            // Act
+            var result = await _eventService.GetOneEvent(eventId);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(expectedResponse.EventId, result.EventId);
+            Assert.Equal(expectedResponse.EventName, result.EventName);
+            Assert.NotEmpty(result.EventTimeResponses);
+            Assert.NotNull(result.EventVoucherResponse);
+        }
+
+        [Fact]
+        public async Task GetOneEvent_WhenSystemError_ThrowsInternalServerErrorException()
+        {
+            // Arrange
+            var eventId = Guid.NewGuid();
+            _unitOfWorkMock.Setup(x => x.EventRepository.GetAsync(
+                It.IsAny<Expression<Func<Event, bool>>>(),
+                It.IsAny<Func<IQueryable<Event>, IOrderedQueryable<Event>>>(),
+                It.IsAny<string>(),
+                It.IsAny<int?>(),
+                It.IsAny<int?>()))
+                .ThrowsAsync(new CustomException.InternalServerErrorException("Database error"));
+
+            // Act & Assert
+            var exception = await Assert.ThrowsAsync<CustomException.InternalServerErrorException>(
+                () => _eventService.GetOneEvent(eventId)
+            );
+            Assert.Equal("Database error", exception.Message);
         }
     }
 }
