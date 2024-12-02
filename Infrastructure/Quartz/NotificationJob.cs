@@ -144,7 +144,7 @@ namespace Infrastructure.Quartz
                     var cacheKey = $"{booking.BarName}_{booking.BookingDate.Date}_{booking.BookingTime}_{booking.BookingId}";
                     if (!_cache.TryGetValue(cacheKey, out _))
                     {
-                        var messages = string.Format(PrefixKeyConstant.BOOKING_PENDING_NOTI, booking.BarName, booking.BookingDate.ToString("dd/MM/yyyy"), booking.BookingTime.ToString("HH:mm"));
+                        var messages = string.Format(PrefixKeyConstant.BOOKING_PENDING_NOTI, booking.BarName, booking.BookingDate.ToString("dd/MM/yyyy"), $"{booking.BookingTime.Hours:D2}:{booking.BookingTime.Minutes:D2}");
                         var creNotiRequest = new NotificationRequest
                         {
                             BarId = (Guid)booking.BarId,
@@ -176,7 +176,7 @@ namespace Infrastructure.Quartz
                            booking.BookingTime == roundedTimeOfDay &&
                            booking.Status == (int)PrefixValueEnum.PendingBooking)
                         {
-                            var messages = string.Format(PrefixKeyConstant.BOOKING_REMIND_NOTI, booking.BarName, booking.BookingDate.ToString("dd/MM/yyyy"), booking.BookingTime.ToString("HH:mm"));
+                            var messages = string.Format(PrefixKeyConstant.BOOKING_REMIND_NOTI, booking.BarName, booking.BookingDate.ToString("dd/MM/yyyy"), $"{booking.BookingTime.Hours:D2}:{booking.BookingTime.Minutes:D2}");
                             var creNotiRequest = new NotificationRequest
                             {
                                 BarId = (Guid)booking.BarId,
