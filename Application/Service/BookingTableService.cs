@@ -170,6 +170,17 @@ namespace Application.Service
                     Time = request.Time
                 });
 
+                if(currentHeldTables.Any())
+                {
+                    var currentTable = currentHeldTables.First();
+                    if(currentTable.Date.Date != request.Date.Date)
+                    {
+                        throw new CustomException.InvalidDataException(
+                        $"Bạn đã giữ bàn cho ngày {currentTable.Date.ToString("dd/MM/yyyy")}. " +
+                        $"Không thể giữ bàn cho ngày {request.Date.ToString("dd/MM/yyyy")}");
+                    }
+                }
+
                 if (currentHeldTables.Count >= 5)
                 {
                     throw new CustomException.InvalidDataException("Bạn chỉ được phép giữ tối đa 5 bàn cùng lúc.");
