@@ -1,10 +1,12 @@
-﻿using Application.DTOs.Notification;
+﻿using Application.DTOs.Fcm;
+using Application.DTOs.Notification;
 using Application.Interfaces;
 using Application.IService;
 using Domain.Constants;
 using Domain.CustomException;
 using Domain.Entities;
 using Domain.Enums;
+using Domain.IRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -18,6 +20,7 @@ namespace Infrastructure.Quartz
     {
         private readonly INotificationService _notificationService;
         private readonly IBookingService _bookingService;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IAuthentication _authen;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMemoryCache _cache;
@@ -29,7 +32,7 @@ namespace Infrastructure.Quartz
                     IAuthentication authen, ILogger<NotificationJob> logger,
                     IHttpContextAccessor httpContextAccessor,
                     IMemoryCache cache,
-                    IFcmService fcmService)
+                    IFcmService fcmService, IUnitOfWork unitOfWork)
         {
             _notificationService = notificationService;
             _bookingService = bookingService;
@@ -38,6 +41,7 @@ namespace Infrastructure.Quartz
             _cache = cache;
             _logger = logger;
             _fcmService = fcmService;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task Execute(IJobExecutionContext context)
@@ -79,17 +83,20 @@ namespace Infrastructure.Quartz
                                 Title = booking.BarName,
                                 Message = messages
                             };
-                            await _notificationService.CreateNotificationAllCustomer(booking.AccountId, creNotiRequest);
+                            // await _notificationService.CreateNotificationAllCustomer(booking.AccountId, creNotiRequest);
                             _logger.LogInformation("Đã hoàn thành đơn hàng đặt với đồ uống");
-                            await _fcmService.SendNotificationToUser(
-                                booking.AccountId,
-                                booking.BarName,
-                                messages,
-                                new Dictionary<string, string>
+                            var bar = await _unitOfWork.BarRepository.GetByIdAsync(booking.BarId);
+                            await _fcmService.CreateAndSendNotificationToCustomer(
+                                new CreateNotificationRequest
                                 {
-                                    { "type", "booking" },
-                                    { "bookingId", booking.BookingId.ToString() }
-                                }
+                                    BarId = bar == null ? null : bar.BarId,
+                                    DeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
+                                    ImageUrl = bar == null ? null : bar.Images.Split(",")[0],
+                                    IsPublic = false,
+                                    Message = messages,
+                                    Title = booking.BarName,
+                                    Type = FcmNotificationType.BOOKING
+                                }, booking.AccountId
                             );
                         }
                         //check booking không có drink
@@ -106,18 +113,21 @@ namespace Infrastructure.Quartz
                                 Title = booking.BarName,
                                 Message = messages
                             };
-                            await _notificationService.CreateNotificationAllCustomer(booking.AccountId, creNotiRequest);
+                            // await _notificationService.CreateNotificationAllCustomer(booking.AccountId, creNotiRequest);
                             _cache.Remove(cacheKey);
                             _logger.LogInformation("Đã hoàn thành đơn hàng đặt với đồ uống");
-                            await _fcmService.SendNotificationToUser(
-                                booking.AccountId,
-                                booking.BarName,
-                                messages,
-                                new Dictionary<string, string>
+                            var bar = await _unitOfWork.BarRepository.GetByIdAsync(booking.BarId);
+                            await _fcmService.CreateAndSendNotificationToCustomer(
+                                new CreateNotificationRequest
                                 {
-                                    { "type", "booking" },
-                                    { "bookingId", booking.BookingId.ToString() }
-                                }
+                                    BarId = bar == null ? null : bar.BarId,
+                                    DeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
+                                    ImageUrl = bar == null ? null : bar.Images.Split(",")[0],
+                                    IsPublic = false,
+                                    Message = messages,
+                                    Title = booking.BarName,
+                                    Type = FcmNotificationType.BOOKING
+                                }, booking.AccountId
                             );
                         }
                     }
@@ -134,26 +144,29 @@ namespace Infrastructure.Quartz
                     var cacheKey = $"{booking.BarName}_{booking.BookingDate.Date}_{booking.BookingTime}_{booking.BookingId}";
                     if (!_cache.TryGetValue(cacheKey, out _))
                     {
-                        var messages = string.Format(PrefixKeyConstant.BOOKING_PENDING_NOTI, booking.BarName, booking.BookingDate.ToString("dd/MM/yyyy"));
+                        var messages = string.Format(PrefixKeyConstant.BOOKING_PENDING_NOTI, booking.BarName, booking.BookingDate.ToString("dd/MM/yyyy"), booking.BookingTime.ToString("HH:mm"));
                         var creNotiRequest = new NotificationRequest
                         {
                             BarId = (Guid)booking.BarId,
                             Title = booking.BarName,
                             Message = messages
                         };
-                        await _notificationService.CreateNotificationAllCustomer(booking.AccountId, creNotiRequest);
+                        // await _notificationService.CreateNotificationAllCustomer(booking.AccountId, creNotiRequest);
                         _cache.Set(cacheKey, true, TimeSpan.FromHours(2 + booking.TimeSlot));
 
                         _logger.LogInformation($"Đã gửi thông báo cho tài khoản {booking.AccountId} với {getListBooking.Count()} đơn đặt !");
-                        await _fcmService.SendNotificationToUser(
-                            booking.AccountId,
-                            booking.BarName,
-                            messages,
-                            new Dictionary<string, string>
+                        var bar = await _unitOfWork.BarRepository.GetByIdAsync(booking.BarId);
+                        await _fcmService.CreateAndSendNotificationToCustomer(
+                            new CreateNotificationRequest
                             {
-                                { "type", "booking" },
-                                { "bookingId", booking.BookingId.ToString() }
-                            }
+                                BarId = bar == null ? null : bar.BarId,
+                                DeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
+                                ImageUrl = bar == null ? null : bar.Images.Split(",")[0],
+                                IsPublic = false,
+                                Message = messages,
+                                Title = booking.BarName,
+                                Type = FcmNotificationType.BOOKING
+                            }, booking.AccountId
                         );
                     }
                     else
@@ -163,24 +176,27 @@ namespace Infrastructure.Quartz
                            booking.BookingTime == roundedTimeOfDay &&
                            booking.Status == (int)PrefixValueEnum.PendingBooking)
                         {
-                            var messages = string.Format(PrefixKeyConstant.BOOKING_REMIND_NOTI, booking.BarName, booking.BookingDate.ToString("dd/MM/yyyy"), roundedTimeOfDay);
+                            var messages = string.Format(PrefixKeyConstant.BOOKING_REMIND_NOTI, booking.BarName, booking.BookingDate.ToString("dd/MM/yyyy"), booking.BookingTime.ToString("HH:mm"));
                             var creNotiRequest = new NotificationRequest
                             {
                                 BarId = (Guid)booking.BarId,
                                 Title = booking.BarName,
                                 Message = messages
                             };
-                            await _notificationService.CreateNotificationAllCustomer(booking.AccountId, creNotiRequest);
+                            // await _notificationService.CreateNotificationAllCustomer(booking.AccountId, creNotiRequest);
                             _logger.LogInformation($"Đã gửi thông báo cho tài khoản {booking.AccountId} với {getListBooking.Count()} đơn đặt !");
-                            await _fcmService.SendNotificationToUser(
-                                booking.AccountId,
-                                booking.BarName,
-                                messages,
-                                new Dictionary<string, string>
+                            var bar = await _unitOfWork.BarRepository.GetByIdAsync(booking.BarId);
+                            await _fcmService.CreateAndSendNotificationToCustomer(
+                                new CreateNotificationRequest
                                 {
-                                    { "type", "booking" },
-                                    { "bookingId", booking.BookingId.ToString() }
-                                }
+                                    BarId = bar == null ? null : bar.BarId,
+                                    DeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
+                                    ImageUrl = bar == null ? null : bar.Images.Split(",")[0],
+                                    IsPublic = false,
+                                    Message = messages,
+                                    Title = booking.BarName,
+                                    Type = FcmNotificationType.BOOKING
+                                }, booking.AccountId
                             );
                         }
                     }

@@ -207,34 +207,6 @@ namespace Infrastructure.Integrations
             return notification.Id;
         }
 
-        // Send notification to user    
-        public async Task SendNotificationToUser(Guid accountId, string title, string message, Dictionary<string, string> data = null)
-        {
-            var request = new CreateNotificationRequest
-            {
-                Title = title,
-                Message = message,
-                Type = FcmNotificationType.SYSTEM,
-                IsPublic = false
-            };
-
-            await CreateAndSendNotification(request);
-        }
-
-        // Send broadcast notification
-        public async Task SendBroadcastNotification(string title, string message, Dictionary<string, string> data = null)
-        {
-            var request = new CreateNotificationRequest
-            {
-                Title = title,
-                Message = message,
-                Type = FcmNotificationType.SYSTEM,
-                IsPublic = true
-            };
-
-            await CreateAndSendNotification(request);
-        }
-
         // Get notifications for user
         public async Task<List<NotificationResponse>> GetNotifications(string deviceToken, Guid? accountId = null, int page = 1, int pageSize = 20)
         {
