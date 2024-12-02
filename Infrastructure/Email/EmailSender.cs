@@ -121,6 +121,21 @@ namespace Infrastructure.Email
                             ))}
                         </tbody>
                     </table>
+                    
+                    <div style="text-align: center; margin: 30px 0;">
+                        <div style="margin-bottom: 15px; color: #B8860B; font-weight: bold;">
+                            MÃ QR ĐẶT BÀN
+                        </div>
+                        <div style="background-color: white; padding: 15px; display: inline-block; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                            <img src="{booking.QRTicket}" 
+                                 alt="QR Code" 
+                                 style="width: 200px; height: 200px;" />
+                        </div>
+                        <div style="margin-top: 10px; font-size: 0.9em; color: #666;">
+                            Vui lòng xuất trình mã QR này khi đến quán
+                        </div>
+                    </div>
+
                     <div style="text-align: right; font-weight: bold; margin-top: 10px; color: black;">
                         TỔNG TIỀN (VNĐ) - ĐÃ ÁP DỤNG CHIẾT KHẤU {booking.Bar.Discount}%: {totalPrice}
                     </div>
