@@ -433,8 +433,8 @@ namespace BarBuddy_API.Controllers.Booking
         {
             try
             {
-                var response = await _bookingService.ExtraDrinkInServing(bookingId, request);
-                return CustomResult("Đã thêm đồ uống thành công !", response);
+                await _bookingService.ExtraDrinkInServing(bookingId, request);
+                return CustomResult("Đã thêm đồ uống thành công !");
             }
             catch (CustomException.UnAuthorizedException ex)
             {

@@ -10,7 +10,7 @@ namespace Application.DTOs.BookingExtraDrink
 {
     public class UpdBkDrinkExtraRequest : DrinkRequest
     {
-        [Range(1,2, ErrorMessage = "Không hợp lệ !")]
-        public int Status { get; set; }
+        //[Range(1,2, ErrorMessage = "Không hợp lệ !")]
+        //public int Status { get; set; }
     }
 }

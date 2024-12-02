@@ -176,6 +176,8 @@ namespace Application.Service
                 var getAllDrink = await _unitOfWork.DrinkRepository
                     .GetAsync(
                         filter: filter,
+                        pageIndex: query.PageIndex,
+                        pageSize: query.PageSize,
                         includeProperties: "Bar,DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory"
                     );
                 if (getAllDrink.IsNullOrEmpty())
