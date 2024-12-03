@@ -39,11 +39,16 @@ namespace Domain.Constants
 
         #region Notification
         public static string BOOKING_SUCCESS = "Bạn đã đặt bàn thành công!";
-        public static string BOOKING_PENDING_NOTI = "Chúng tôi xin nhắc nhở bạn rằng thời gian check-in của bạn tại quán {0} vào ngày {1} sẽ diễn ra trong khoảng thời gian 1 giờ tới.";
+        public static string BOOKING_PENDING_NOTI = "Chúng tôi xin nhắc nhở bạn rằng thời gian check-in của bạn tại quán {0} vào ngày {1} vào lúc {2} sẽ diễn ra trong khoảng thời gian 1 giờ tới.";
         public static string BOOKING_REMIND_NOTI = "Đã đến giờ check-in bàn tại quán {0} vào ngày {1} vào lúc {2}. Vui lòng đến trước 1 tiếng kể từ lúc thời gian check-in bàn! Chúc bạn vui vẻ khi tận hưởng tại quán.";
         public static string BOOKING_DRINKS_COMPLETED_NOTI = "Bạn đã hoàn thành đơn đặt bàn với đồ uống tại quán {0}. Cảm ơn bạn đã trải nghiệm tại quán.";
         public static string BOOKING_CANCEL_NOTI_JOB = "Đơn đặt bàn vào lúc {0} ngày {1} của bạn đã bị hủy do vượt quá giờ quy định tại quán {2}.";
-        public static string BOOKING_CANCEL_NOTI = "Bạn đã hủy đơn đặt bàn tại quán {2} với thời gian check-in vào lúc {0} ngày {1} thành công.";
+        public static string BOOKING_CANCEL_NOTI = "Bạn đã hủy đơn đặt bàn tại quán {0} với mã đặt chỗ {1} với thời gian check-in vào lúc {2} ngày {3} thành công.";
+        public static string BOOKING_SUCCESS_V1 = "Đặt bàn thành công tại {1} với mã đặt chỗ {2}, quý khách hãy dùng mã đặt chỗ hoặc mã QR để thực hiện check-in khi đến quán.";
+        public static string BOOKING_SUCCESS_TITLE = "Đặt bàn thành công tại {1} với mã đặt chỗ {2}, quý khách hãy dùng mã đặt chỗ hoặc mã QR để thực hiện check-in khi đến quán.";
+        public static string BOOKING_CANCEL_TITLE = "Hủy đặt chỗ tại {0} thành công!";
+        public static string EVENT_TITLE_NOTI = "Đừng bỏ lỡ tại {0}!";
+        public static string EVENT_CONTENT_MESSAGE_NOTI = "Sự kiện {0} tại {1} sẽ diễn ra vào ngày {2} từ {3} đến {4}";
         #endregion
     }
 }

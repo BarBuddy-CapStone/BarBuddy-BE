@@ -12,6 +12,7 @@ using Application.DTOs.Fcm;
 using Microsoft.AspNetCore.SignalR;
 using Infrastructure.SignalR;
 using Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Integrations
 {
@@ -207,34 +208,6 @@ namespace Infrastructure.Integrations
             return notification.Id;
         }
 
-        // Send notification to user    
-        public async Task SendNotificationToUser(Guid accountId, string title, string message, Dictionary<string, string> data = null)
-        {
-            var request = new CreateNotificationRequest
-            {
-                Title = title,
-                Message = message,
-                Type = FcmNotificationType.SYSTEM,
-                IsPublic = false
-            };
-
-            await CreateAndSendNotification(request);
-        }
-
-        // Send broadcast notification
-        public async Task SendBroadcastNotification(string title, string message, Dictionary<string, string> data = null)
-        {
-            var request = new CreateNotificationRequest
-            {
-                Title = title,
-                Message = message,
-                Type = FcmNotificationType.SYSTEM,
-                IsPublic = true
-            };
-
-            await CreateAndSendNotification(request);
-        }
-
         // Get notifications for user
         public async Task<List<NotificationResponse>> GetNotifications(string deviceToken, Guid? accountId = null, int page = 1, int pageSize = 20)
         {
@@ -421,6 +394,152 @@ namespace Infrastructure.Integrations
             }
 
             return notification.Id;
+        }
+
+        public async Task MarkAsRead(string deviceToken, Guid notificationId, Guid? accountId = null)
+        {
+            var notificationCustomer = (await _unitOfWork.FcmNotificationCustomerRepository
+                .GetAsync(nc => 
+                    nc.NotificationId == notificationId && 
+                    ((accountId.HasValue && nc.CustomerId == accountId) || 
+                     (!accountId.HasValue && nc.DeviceToken == deviceToken))))
+                .FirstOrDefault();
+
+            if (notificationCustomer != null && !notificationCustomer.IsRead)
+            {
+                notificationCustomer.IsRead = true;
+                notificationCustomer.ReadAt = DateTimeOffset.UtcNow;
+                await _unitOfWork.FcmNotificationCustomerRepository.UpdateAsync(notificationCustomer);
+                await _unitOfWork.SaveAsync();
+
+                // Lấy thông tin notification để gửi qua SignalR
+                var notification = (await _unitOfWork.FcmNotificationRepository
+                    .GetAsync(n => n.Id == notificationId, includeProperties: "Bar")).FirstOrDefault();
+
+                if (notification != null)
+                {
+                    var notificationData = new
+                    {
+                        id = notification.Id,
+                        title = notification.Title,
+                        message = notification.Message,
+                        type = notification.Type,
+                        timestamp = notification.CreatedAt,
+                        deepLink = notification.DeepLink,
+                        imageUrl = notification.ImageUrl,
+                        isRead = true,
+                        barId = notification.BarId,
+                        isPublic = notification.IsPublic,
+                        readAt = notificationCustomer.ReadAt
+                    };
+
+                    // Gửi notification đã cập nhật
+                    if (!string.IsNullOrEmpty(accountId?.ToString()))
+                    {
+                        await _notificationHub.Clients.Group($"user_{accountId}")
+                            .SendAsync("ReceiveNotification", notificationData);
+                    }
+                    else
+                    {
+                        var connectionIds = _connectionMapping.GetConnectionIds(deviceToken);
+                        if (connectionIds.Any())
+                        {
+                            await _notificationHub.Clients.Clients(connectionIds)
+                                .SendAsync("ReceiveNotification", notificationData);
+                        }
+                    }
+
+                    // Gửi số lượng thông báo chưa đọc mới
+                    var unreadCount = await GetUnreadNotificationCount(deviceToken, accountId);
+                    if (!string.IsNullOrEmpty(accountId?.ToString()))
+                    {
+                        await _notificationHub.Clients.Group($"user_{accountId}")
+                            .SendAsync("ReceiveUnreadCount", unreadCount);
+                    }
+                    else
+                    {
+                        var connectionIds = _connectionMapping.GetConnectionIds(deviceToken);
+                        if (connectionIds.Any())
+                        {
+                            await _notificationHub.Clients.Clients(connectionIds)
+                                .SendAsync("ReceiveUnreadCount", unreadCount);
+                        }
+                    }
+                }
+            }
+        }
+
+        public async Task MarkAllAsRead(string deviceToken, Guid? accountId = null)
+        {
+            var notificationCustomers = await _unitOfWork.FcmNotificationCustomerRepository
+                .GetAsync(nc => 
+                    !nc.IsRead && 
+                    ((accountId.HasValue && nc.CustomerId == accountId) || 
+                     (!accountId.HasValue && nc.DeviceToken == deviceToken)));
+
+            foreach (var nc in notificationCustomers)
+            {
+                nc.IsRead = true;
+                nc.ReadAt = DateTimeOffset.UtcNow;
+                await _unitOfWork.FcmNotificationCustomerRepository.UpdateAsync(nc);
+            }
+
+            await _unitOfWork.SaveAsync();
+
+            // Lấy danh sách notifications từ database thay vì dùng GetNotifications
+            var notificationIds = notificationCustomers.Select(nc => nc.NotificationId).ToList();
+            var notifications = await _unitOfWork.FcmNotificationRepository
+                .GetAsync(n => notificationIds.Contains(n.Id), includeProperties: "Bar");
+            
+            foreach (var notification in notifications)
+            {
+                var notificationData = new
+                {
+                    id = notification.Id,
+                    title = notification.Title,
+                    message = notification.Message,
+                    type = notification.Type,
+                    timestamp = notification.CreatedAt,
+                    deepLink = notification.DeepLink,
+                    imageUrl = notification.ImageUrl,
+                    isRead = true,
+                    barId = notification.BarId,
+                    isPublic = notification.IsPublic,
+                    readAt = DateTimeOffset.UtcNow
+                };
+
+                // Gửi notification đã cập nhật
+                if (!string.IsNullOrEmpty(accountId?.ToString()))
+                {
+                    await _notificationHub.Clients.Group($"user_{accountId}")
+                        .SendAsync("ReceiveNotification", notificationData);
+                }
+                else
+                {
+                    var connectionIds = _connectionMapping.GetConnectionIds(deviceToken);
+                    if (connectionIds.Any())
+                    {
+                        await _notificationHub.Clients.Clients(connectionIds)
+                            .SendAsync("ReceiveNotification", notificationData);
+                    }
+                }
+            }
+
+            // Gửi số lượng thông báo chưa đọc mới (sẽ là 0)
+            if (!string.IsNullOrEmpty(accountId?.ToString()))
+            {
+                await _notificationHub.Clients.Group($"user_{accountId}")
+                    .SendAsync("ReceiveUnreadCount", 0);
+            }
+            else
+            {
+                var connectionIds = _connectionMapping.GetConnectionIds(deviceToken);
+                if (connectionIds.Any())
+                {
+                    await _notificationHub.Clients.Clients(connectionIds)
+                        .SendAsync("ReceiveUnreadCount", 0);
+                }
+            }
         }
     }
 }

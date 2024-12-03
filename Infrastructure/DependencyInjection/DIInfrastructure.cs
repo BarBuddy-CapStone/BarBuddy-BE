@@ -130,8 +130,6 @@ namespace Infrastructure.DependencyInjection
             services.AddScoped<IAuthenService, AuthenService>();
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<IBookingTableService, BookingTableService>();
-            services.AddScoped<INotificationDetailService, NotificationDetailService>();
-            services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IEventVoucherService, EventVoucherService>();
             services.AddScoped<IEventService, EventService>();
             services.AddScoped<IEventTimeService, EventTimeService>();
@@ -219,17 +217,26 @@ namespace Infrastructure.DependencyInjection
                 AddJobWithTrigger<NotificationJob>(options, nameof(NotificationJob));
                 AddJobWithTrigger<EventJob>(options, nameof(EventJob));
                 AddJobWithTrigger<TokenJob>(options, nameof(TokenJob));
+                AddJobWithTriggerTime<NotificationEventJob>(options, nameof(NotificationEventJob));
             });
 
             services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
         }
-
+        // Start moi phut
         public static void AddJobWithTrigger<TJob>(IServiceCollectionQuartzConfigurator options, string jobName) where TJob : IJob
         {
             var jobKey = JobKey.Create(jobName);
             options.AddJob<TJob>(joinBuilder => joinBuilder.WithIdentity(jobKey))
                    .AddTrigger(trigger => trigger.ForJob(jobKey)
                    .WithCronSchedule("0 * * ? * *"));
+        }
+        // Start luc 16am
+        public static void AddJobWithTriggerTime<TJob>(IServiceCollectionQuartzConfigurator options, string jobName) where TJob : IJob
+        {
+            var jobKey = JobKey.Create(jobName);
+            options.AddJob<TJob>(joinBuilder => joinBuilder.WithIdentity(jobKey))
+                   .AddTrigger(trigger => trigger.ForJob(jobKey)
+                   .WithCronSchedule("0 25 19 * * ?"));
         }
     }
 }

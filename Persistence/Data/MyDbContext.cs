@@ -32,8 +32,6 @@ namespace Persistence.Data
         public DbSet<Table> Tables { get; set; }
         public DbSet<TableType> TableTypes { get; set; }
         public DbSet<PaymentHistory> PaymentHistories { get; set; }
-        public DbSet<Notification> Notifications { get; set; }
-        public DbSet<NotificationDetail> NotificationDetails { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<TimeEvent> TimeEvents { get; set; }
         public DbSet<EventVoucher> EventVouchers { get; set; }
@@ -55,7 +53,7 @@ namespace Persistence.Data
                     .Build();
 
                 optionsBuilder.UseMySql(
-                    configuration.GetConnectionString("MyDB"), 
+                    configuration.GetConnectionString("MyDB"),
                     new MySqlServerVersion(new Version(8, 0, 23))
                 );
             }
@@ -78,10 +76,10 @@ namespace Persistence.Data
             modelBuilder.Entity<FcmNotification>(entity =>
             {
                 entity.ToTable("FcmNotifications");
-                
+
                 entity.HasIndex(e => new { e.Type, e.IsPublic });
                 entity.HasIndex(e => e.CreatedAt);
-                
+
                 entity.HasOne(e => e.Bar)
                     .WithMany()
                     .HasForeignKey(e => e.BarId)
@@ -91,16 +89,16 @@ namespace Persistence.Data
             modelBuilder.Entity<FcmNotificationCustomer>(entity =>
             {
                 entity.ToTable("FcmNotificationCustomers");
-                
+
                 entity.HasKey(e => e.Id);
-                
+
                 entity.HasIndex(e => new { e.NotificationId, e.DeviceToken })
                      .IsUnique();
-                 
+
                 entity.HasOne(e => e.Notification)
                       .WithMany(n => n.NotificationCustomers)
                       .HasForeignKey(e => e.NotificationId);
-                      
+
                 entity.HasOne(e => e.Customer)
                       .WithMany()
                       .HasForeignKey(e => e.CustomerId)
@@ -110,12 +108,12 @@ namespace Persistence.Data
             modelBuilder.Entity<FcmUserDevice>(entity =>
             {
                 entity.ToTable("FcmUserDevices");
-                
+
                 entity.HasKey(e => e.Id);
-                
+
                 entity.HasIndex(e => e.DeviceToken)
                      .IsUnique();
-                 
+
                 entity.HasOne(e => e.Account)
                       .WithMany()
                       .HasForeignKey(e => e.AccountId)
@@ -152,8 +150,6 @@ namespace Persistence.Data
             modelBuilder.Entity<DrinkEmotionalCategory>().HasData(SeedData.GetDrinkEmotionalCategories());
             modelBuilder.Entity<EventVoucher>().HasData(SeedData.GetEventVouchers());
             modelBuilder.Entity<Feedback>().HasData(SeedData.GetFeedbacks());
-            modelBuilder.Entity<Notification>().HasData(SeedData.GetNotifications());
-            modelBuilder.Entity<NotificationDetail>().HasData(SeedData.GetNotificationDetails());
         }
         #endregion
 
@@ -315,7 +311,7 @@ namespace Persistence.Data
             {
                 public static readonly Guid EventId = Guid.NewGuid();
                 public static readonly Guid Event1 = Guid.NewGuid();
-                public static readonly Guid Event2 = Guid.NewGuid(); 
+                public static readonly Guid Event2 = Guid.NewGuid();
                 public static readonly Guid Event3 = Guid.NewGuid();
                 public static readonly Guid Event4 = Guid.NewGuid();
                 public static readonly Guid Event5 = Guid.NewGuid();
@@ -461,7 +457,7 @@ namespace Persistence.Data
                 {
                     BarId = Constants.Ids.Bars.Bar5,
                     Address = "11 Đ.Nam Quốc Cang, Phường Phạm Ngũ Lão, Quận 1",
-                    BarName = "Bar Buddy 5", 
+                    BarName = "Bar Buddy 5",
                     Description = "Quán bar kết hợp giữa nhạc sống và DJ.",
                     Discount = 5,
                     Email = "contact@barbuddy5.com",
@@ -1041,18 +1037,18 @@ namespace Persistence.Data
                 },
                 new Event
                 {
-                    EventId = Constants.Ids.Event.Event2, 
+                    EventId = Constants.Ids.Event.Event2,
                     BarId = Constants.Ids.Bars.Bar2,
                     EventName = "Live Music Night",
                     Description = "Đêm nhạc acoustic với các nghệ sĩ nổi tiếng",
-                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg", 
+                    Images = "https://media.self.com/photos/5e70f72443731c000882cfe7/4:3/w_2560%2Cc_limit/GettyImages-125112134.jpg",
                     IsEveryWeek = false,
                     IsDeleted = false
                 },
                 new Event
                 {
                     EventId = Constants.Ids.Event.Event3,
-                    BarId = Constants.Ids.Bars.Bar3, 
+                    BarId = Constants.Ids.Bars.Bar3,
                     EventName = "Ladies Night",
                     Description = "Miễn phí đồ uống đầu tiên cho phái nữ",
                     Images = "https://vietnamnightlife.com/uploads/images/2023/06/1685613730-single_product1-bambamladiesnight.png.webp",
@@ -2003,7 +1999,7 @@ namespace Persistence.Data
         public static BarTime[] GetBarTimes()
         {
             var barTimes = new List<BarTime>();
-            
+
             // Helper method để tạo BarTime
             void AddBarTime(Guid barId, int dayOfWeek, int startHour, int endHour)
             {
@@ -2250,7 +2246,7 @@ namespace Persistence.Data
         public static Booking[] GetBookings()
         {
             DateTime baseDate = DateTime.Now.Date;
-            
+
             return new[]
             {
                 new Booking
@@ -2367,7 +2363,7 @@ namespace Persistence.Data
             // Helper function để tìm bàn theo bar và loại
             Table FindTable(Guid barId, string tableTypePrefix)
             {
-                return allTables.FirstOrDefault(t => 
+                return allTables.FirstOrDefault(t =>
                     t.TableName.Contains($"{tableTypePrefix}{barId.ToString().Substring(0, 8)}"));
             }
 
@@ -2386,10 +2382,10 @@ namespace Persistence.Data
                 }
 
                 // Booking 2 - Bar 2 (2 bàn VIP)
-                var tables2 = allTables.Where(t => 
+                var tables2 = allTables.Where(t =>
                     t.TableName.Contains($"VIP{Constants.Ids.Bars.Bar2.ToString().Substring(0, 8)}")
                 ).Take(2).ToList();
-                
+
                 if (tables2.Count >= 2)
                 {
                     bookingTables.Add(new BookingTable
@@ -2398,7 +2394,7 @@ namespace Persistence.Data
                         BookingId = Constants.Ids.Bookings.Booking2,
                         TableId = tables2[0].TableId
                     });
-                    
+
                     bookingTables.Add(new BookingTable
                     {
                         BookingTableId = Constants.Ids.BookingTables.BookingTable3,
@@ -2432,10 +2428,10 @@ namespace Persistence.Data
                 }
 
                 // Booking 5 - Bar 4 (2 bàn VIP)
-                var tables5 = allTables.Where(t => 
+                var tables5 = allTables.Where(t =>
                     t.TableName.Contains($"VIP{Constants.Ids.Bars.Bar4.ToString().Substring(0, 8)}")
                 ).Take(2).ToList();
-                
+
                 if (tables5.Count >= 2)
                 {
                     bookingTables.Add(new BookingTable
@@ -2444,7 +2440,7 @@ namespace Persistence.Data
                         BookingId = Constants.Ids.Bookings.Booking5,
                         TableId = tables5[0].TableId
                     });
-                    
+
                     bookingTables.Add(new BookingTable
                     {
                         BookingTableId = Constants.Ids.BookingTables.BookingTable7,
@@ -2454,10 +2450,10 @@ namespace Persistence.Data
                 }
 
                 // Booking 6 - Bar 5 (2 bàn SVIP)
-                var tables6 = allTables.Where(t => 
+                var tables6 = allTables.Where(t =>
                     t.TableName.Contains($"SVIP{Constants.Ids.Bars.Bar5.ToString().Substring(0, 8)}")
                 ).Take(2).ToList();
-                
+
                 if (tables6.Count >= 2)
                 {
                     bookingTables.Add(new BookingTable
@@ -2466,7 +2462,7 @@ namespace Persistence.Data
                         BookingId = Constants.Ids.Bookings.Booking6,
                         TableId = tables6[0].TableId
                     });
-                    
+
                     bookingTables.Add(new BookingTable
                     {
                         BookingTableId = Constants.Ids.BookingTables.BookingTable9,
@@ -2713,140 +2709,6 @@ namespace Persistence.Data
                     DrinkId = Constants.Ids.Drinks.BlackCoffee, // Cà phê đen cho cuộc họp
                     Quantity = 4, // Đặt 4 ly cho cả nhóm
                     ActualPrice = 15000, // Giá gốc của Cà phê đen
-                }
-            };
-        }
-
-        public static Notification[] GetNotifications()
-        {
-            DateTimeOffset baseTime = DateTimeOffset.Now;
-
-            return new[]
-            {
-                // Thông báo chào mừng
-                new Notification
-                {
-                    NotificationId = Constants.Ids.Notifications.Welcome,
-                    Title = "Welcome Notification",
-                    Message = "Welcome to Bar Buddy! We're excited to have you here.",
-                    CreatedAt = baseTime,
-                    UpdatedAt = baseTime,
-                    BarId = Constants.Ids.Bars.Bar1
-                },
-
-                // Thông báo bảo trì hệ thống
-                new Notification
-                {
-                    NotificationId = Constants.Ids.Notifications.Maintenance,
-                    Title = "System Maintenance Notice",
-                    Message = "Our system will undergo maintenance from midnight to 2 AM tomorrow. Some features may be unavailable during this time.",
-                    CreatedAt = baseTime.AddHours(-2),
-                    UpdatedAt = baseTime.AddHours(-2),
-                    BarId = Constants.Ids.Bars.Bar1
-                },
-
-                // Thông báo xác nhận đặt bàn
-                new Notification
-                {
-                    NotificationId = Constants.Ids.Notifications.BookingConfirm,
-                    Title = "Booking Confirmation",
-                    Message = "Your table reservation has been confirmed. We look forward to serving you!",
-                    CreatedAt = baseTime.AddHours(-4),
-                    UpdatedAt = baseTime.AddHours(-4),
-                    BarId = Constants.Ids.Bars.Bar2
-                },
-
-                // Thông báo Happy Hour
-                new Notification
-                {
-                    NotificationId = Constants.Ids.Notifications.HappyHour,
-                    Title = "Happy Hour Alert",
-                    Message = "Don't miss our Happy Hour special! 50% off all drinks from 5 PM to 7 PM today.",
-                    CreatedAt = baseTime.AddHours(-6),
-                    UpdatedAt = baseTime.AddHours(-6),
-                    BarId = Constants.Ids.Bars.Bar3
-                },
-
-                // Thông báo sự kiện mới
-                new Notification
-                {
-                    NotificationId = Constants.Ids.Notifications.NewEvent,
-                    Title = "New Event Announcement",
-                    Message = "Join us this weekend for live music performance by top local artists!",
-                    CreatedAt = baseTime.AddDays(-1),
-                    UpdatedAt = baseTime.AddDays(-1),
-                    BarId = Constants.Ids.Bars.Bar4
-                },
-
-                // Thông báo ưu đãi đặc biệt
-                new Notification
-                {
-                    NotificationId = Constants.Ids.Notifications.SpecialOffer,
-                    Title = "Special VIP Offer",
-                    Message = "Exclusive offer for VIP members: Buy 2 get 1 free on all premium cocktails this week!",
-                    CreatedAt = baseTime.AddDays(-2),
-                    UpdatedAt = baseTime.AddDays(-2),
-                    BarId = Constants.Ids.Bars.Bar5
-                }
-            };
-        }
-
-        public static NotificationDetail[] GetNotificationDetails()
-        {
-            return new[]
-            {
-                // Thông báo chào mừng cho Admin
-                new NotificationDetail
-                {
-                    NotificationDetailId = Constants.Ids.NotificationDetails.Welcome,
-                    AccountId = Constants.Ids.Accounts.AdminAccount,
-                    NotificationId = Constants.Ids.Notifications.Welcome,
-                    IsRead = false
-                },
-
-                // Thông báo bo trì cho Manager
-                new NotificationDetail
-                {
-                    NotificationDetailId = Constants.Ids.NotificationDetails.Maintenance,
-                    AccountId = Constants.Ids.Accounts.Manager1,
-                    NotificationId = Constants.Ids.Notifications.Maintenance,
-                    IsRead = true
-                },
-
-                // Thông báo xác nhận đặt bàn cho Customer
-                new NotificationDetail
-                {
-                    NotificationDetailId = Constants.Ids.NotificationDetails.BookingConfirm,
-                    AccountId = Constants.Ids.Accounts.Customer1,
-                    NotificationId = Constants.Ids.Notifications.BookingConfirm,
-                    IsRead = false
-                },
-
-                // Thông báo Happy Hour cho Staff
-                new NotificationDetail
-                {
-                    NotificationDetailId = Constants.Ids.NotificationDetails.HappyHour,
-                    AccountId = Constants.Ids.Accounts.Staff1,
-                    NotificationId = Constants.Ids.Notifications.HappyHour,
-                    IsRead = true
-                },
-
-                // Thông báo sự kiện mới cho Customer
-                new NotificationDetail
-                {
-                    NotificationDetailId = Constants.Ids.NotificationDetails.NewEvent,
-                    AccountId = Constants.Ids.Accounts.Customer1,
-                    NotificationId = Constants.Ids.Notifications.NewEvent,
-                    IsRead = false
-                },
-
-                // Thông báo ưu đãi đặc biệt cho Customer
-                new NotificationDetail
-                {
-                    NotificationDetailId = Constants.Ids.NotificationDetails.SpecialOffer,
-                    AccountId = Constants.Ids.Accounts.Customer1,
-                    NotificationId = Constants.Ids.Notifications.SpecialOffer,
-                    IsRead = false
                 }
             };
         }

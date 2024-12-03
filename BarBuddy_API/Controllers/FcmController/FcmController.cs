@@ -124,5 +124,51 @@ namespace BarBuddy_API.Controllers.FcmController
                 return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
             }
         }
+
+        [HttpPatch("notification/{notificationId}/mark-as-read")]
+        public async Task<IActionResult> MarkAsRead(
+            [FromRoute] Guid notificationId,
+            [FromQuery] string deviceToken)
+        {
+            try
+            {
+                Guid? accountId = null;
+                var flag = HttpContext.Request.Headers.ContainsKey("Authorization");
+
+                if (flag)
+                {
+                    accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
+                }
+
+                await _fcmService.MarkAsRead(deviceToken, notificationId, accountId);
+                return CustomResult("Đánh dấu thông báo đã đọc thành công");
+            }
+            catch (Exception ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpPatch("notifications/mark-all-as-read")]
+        public async Task<IActionResult> MarkAllAsRead([FromQuery] string deviceToken)
+        {
+            try
+            {
+                Guid? accountId = null;
+                var flag = HttpContext.Request.Headers.ContainsKey("Authorization");
+
+                if (flag)
+                {
+                    accountId = _authentication.GetUserIdFromHttpContext(HttpContext);
+                }
+
+                await _fcmService.MarkAllAsRead(deviceToken, accountId);
+                return CustomResult("Đánh dấu tất cả thông báo đã đọc thành công");
+            }
+            catch (Exception ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }
