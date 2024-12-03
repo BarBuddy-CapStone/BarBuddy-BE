@@ -31,6 +31,5 @@ namespace Domain.Entities
         public virtual ICollection<BarTime> BarTimes { get; set; }
         public virtual ICollection<DrinkCategory>? DrinkCategories { get; set; }
         public virtual ICollection<EmotionalDrinkCategory>? EmotionalDrinkCategories { get; set; }
-        public virtual ICollection<Notification>? Notifications { get; set; }
     }
 }

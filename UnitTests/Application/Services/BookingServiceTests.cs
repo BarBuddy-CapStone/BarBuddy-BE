@@ -28,7 +28,6 @@ namespace UnitTests.Application.Services
         private readonly Mock<IAuthentication> _authenticationMock;
         private readonly Mock<IPaymentService> _paymentServiceMock;
         private readonly Mock<IEmailSender> _emailSenderMock;
-        private readonly Mock<INotificationService> _notificationServiceMock;
         private readonly Mock<IQRCodeService> _qrCodeServiceMock;
         private readonly Mock<IFirebase> _firebaseMock;
         private readonly Mock<IEventVoucherService> _eventVoucherServiceMock;
@@ -46,7 +45,6 @@ namespace UnitTests.Application.Services
             _authenticationMock = new Mock<IAuthentication>();
             _paymentServiceMock = new Mock<IPaymentService>();
             _emailSenderMock = new Mock<IEmailSender>();
-            _notificationServiceMock = new Mock<INotificationService>();
             _qrCodeServiceMock = new Mock<IQRCodeService>();
             _firebaseMock = new Mock<IFirebase>();
             _eventVoucherServiceMock = new Mock<IEventVoucherService>();
@@ -69,7 +67,6 @@ namespace UnitTests.Application.Services
                 _authenticationMock.Object,
                 _paymentServiceMock.Object,
                 _emailSenderMock.Object,
-                _notificationServiceMock.Object,
                 _qrCodeServiceMock.Object,
                 _firebaseMock.Object,
                 _eventVoucherServiceMock.Object,

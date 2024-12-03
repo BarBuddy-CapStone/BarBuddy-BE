@@ -23,8 +23,6 @@ namespace Domain.IRepository
         public IGenericRepository<Role> RoleRepository { get; }
         public IGenericRepository<Table> TableRepository { get; }
         public IGenericRepository<TableType> TableTypeRepository { get; }
-        public IGenericRepository<Notification> NotificationRepository { get; }
-        public IGenericRepository<NotificationDetail> NotificationDetailRepository { get; }
         public IGenericRepository<Event> EventRepository { get; }
         public IGenericRepository<TimeEvent> TimeEventRepository { get; }
         public IGenericRepository<EventVoucher> EventVoucherRepository { get; }

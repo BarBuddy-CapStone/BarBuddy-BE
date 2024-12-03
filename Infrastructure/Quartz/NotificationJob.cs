@@ -18,7 +18,6 @@ namespace Infrastructure.Quartz
 {
     public class NotificationJob : IJob
     {
-        private readonly INotificationService _notificationService;
         private readonly IBookingService _bookingService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAuthentication _authen;
@@ -27,14 +26,14 @@ namespace Infrastructure.Quartz
         private readonly ILogger<NotificationJob> _logger;
         private readonly IFcmService _fcmService;
 
-        public NotificationJob(INotificationService notificationService,
+        public NotificationJob(
                     IBookingService bookingService,
                     IAuthentication authen, ILogger<NotificationJob> logger,
                     IHttpContextAccessor httpContextAccessor,
                     IMemoryCache cache,
                     IFcmService fcmService, IUnitOfWork unitOfWork)
         {
-            _notificationService = notificationService;
+           
             _bookingService = bookingService;
             _authen = authen;
             _httpContextAccessor = httpContextAccessor;

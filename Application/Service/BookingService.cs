@@ -32,7 +32,6 @@ namespace Application.Service
         private readonly IAuthentication _authentication;
         private readonly IPaymentService _paymentService;
         private readonly IEmailSender _emailSender;
-        private readonly INotificationService _notificationService;
         private readonly IQRCodeService _qrCodeService;
         private readonly IFirebase _firebase;
         private readonly ILogger<BookingService> _logger;
@@ -41,8 +40,7 @@ namespace Application.Service
         private readonly IFcmService _fcmService;
 
         public BookingService(IUnitOfWork unitOfWork, IMapper mapper, IAuthentication authentication,
-            IPaymentService paymentService, IEmailSender emailSender,
-            INotificationService notificationService, IQRCodeService qrCodeService, IFirebase firebase,
+            IPaymentService paymentService, IEmailSender emailSender,IQRCodeService qrCodeService, IFirebase firebase,
             IEventVoucherService eventVoucherService, IHttpContextAccessor contextAccessor, IFcmService fcmService)
         {
             _unitOfWork = unitOfWork;
@@ -50,7 +48,6 @@ namespace Application.Service
             _authentication = authentication;
             _paymentService = paymentService;
             _emailSender = emailSender;
-            _notificationService = notificationService;
             _qrCodeService = qrCodeService;
             _firebase = firebase;
             _eventVoucherService = eventVoucherService;
@@ -104,7 +101,6 @@ namespace Application.Service
                 booking.CheckOutStaffId = accountId;
                 _unitOfWork.BeginTransaction();
                 await _unitOfWork.BookingRepository.UpdateAsync(booking);
-                await _notificationService.CreateNotification(creNoti);
                 await _unitOfWork.SaveAsync();
                 _unitOfWork.CommitTransaction();
 
@@ -551,7 +547,6 @@ namespace Application.Service
                 {
                     _unitOfWork.BeginTransaction();
                     _unitOfWork.BookingRepository.Insert(booking);
-                    await _notificationService.CreateNotification(creNoti);
                     _unitOfWork.CommitTransaction();
                     await _emailSender.SendBookingInfo(booking);
 
@@ -872,7 +867,6 @@ namespace Application.Service
                     booking.TotalPrice = totalPrice;
                     _unitOfWork.BeginTransaction();
                     _unitOfWork.BookingRepository.Insert(booking);
-                    await _notificationService.CreateNotification(creNoti);
                     _unitOfWork.CommitTransaction();
                     await _emailSender.SendBookingInfo(booking, totalPrice);
 
