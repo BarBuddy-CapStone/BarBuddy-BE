@@ -181,7 +181,7 @@ namespace Application.Service
                     }
                 }
 
-                if (currentHeldTables.Count >= 5)
+                if (currentHeldTables.Count > 6)
                 {
                     throw new CustomException.InvalidDataException("Bạn chỉ được phép giữ tối đa 5 bàn cùng lúc.");
                 }
