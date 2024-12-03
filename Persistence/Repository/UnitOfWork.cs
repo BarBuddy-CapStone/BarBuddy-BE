@@ -28,7 +28,7 @@ namespace Persistence.Repository
         private IGenericRepository<BarTime> _barTimeRepository;
         private IGenericRepository<Token> _tokenRepository;
         private IGenericRepository<FcmNotification> _fcmNotification;
-        private IGenericRepository<FcmNotificationCustomer> _fcmNotificationCustomer;
+        private IGenericRepository<NotificationAccount> _notificationAccount;
         private IGenericRepository<FcmUserDevice> _fcmUserDevice;
         private IGenericRepository<BookingExtraDrink> _bookingExtraDrinkRepository;
         public UnitOfWork()
@@ -292,15 +292,15 @@ namespace Persistence.Repository
             }
         }
 
-        public IGenericRepository<FcmNotificationCustomer> FcmNotificationCustomerRepository
+        public IGenericRepository<NotificationAccount> NotificationAccountRepository
         {
             get
             {
-                if (_fcmNotificationCustomer == null)
+                if (_notificationAccount == null)
                 {
-                    _fcmNotificationCustomer = new GenericRepository<FcmNotificationCustomer>(_context);
+                    _notificationAccount = new GenericRepository<NotificationAccount>(_context);
                 }
-                return _fcmNotificationCustomer;
+                return _notificationAccount;
             }
         }
 

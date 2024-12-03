@@ -106,18 +106,36 @@ namespace Application.Service
 
                 var bar = await _unitOfWork.BarRepository.GetByIdAsync(booking.BarId);
 
+                //var fcmNotification = new CreateNotificationRequest
+                //{
+                //    BarId = booking.Bar.BarId,
+                //    DeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
+                //    ImageUrl = bar == null ? null : bar.Images.Split(',')[0],
+                //    IsPublic = false,
+                //    Message = $"Đơn đặt chỗ tại {bar.BarName} với mã đặt chỗ {booking.BookingCode} vào lúc {booking.BookingTime} - {booking.BookingDate.ToString("yyyy/mm/dd")} đã được hủy thành công.",
+                //    Title = $"Hủy đặt chỗ tại {bar.BarName} thành công!",
+                //    Type = FcmNotificationType.BOOKING
+                //};
+
+                //await _fcmService.CreateAndSendNotificationToCustomer(fcmNotification, booking.AccountId);
+
+                List<Guid> ids = new List<Guid>();
+                ids.Add(booking.AccountId);
+
                 var fcmNotification = new CreateNotificationRequest
                 {
                     BarId = booking.Bar.BarId,
-                    DeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
+                    MobileDeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
+                    WebDeepLink = $"/booking-detail/{booking.BookingId}",
                     ImageUrl = bar == null ? null : bar.Images.Split(',')[0],
                     IsPublic = false,
                     Message = $"Đơn đặt chỗ tại {bar.BarName} với mã đặt chỗ {booking.BookingCode} vào lúc {booking.BookingTime} - {booking.BookingDate.ToString("yyyy/mm/dd")} đã được hủy thành công.",
                     Title = $"Hủy đặt chỗ tại {bar.BarName} thành công!",
-                    Type = FcmNotificationType.BOOKING
+                    Type = FcmNotificationType.BOOKING,
+                    SpecificAccountIds = ids
                 };
 
-                await _fcmService.CreateAndSendNotificationToCustomer(fcmNotification, booking.AccountId);
+                await _fcmService.CreateAndSendNotification(fcmNotification);
 
                 return true;
             }
@@ -552,18 +570,50 @@ namespace Application.Service
 
                     var bar = await _unitOfWork.BarRepository.GetByIdAsync(booking.BarId);
 
+                    List<Guid> ids = new List<Guid>();
+                    ids.Add(booking.AccountId);
+
                     var fcmNotification = new CreateNotificationRequest
                     {
                         BarId = booking.Bar.BarId,
-                        DeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
+                        MobileDeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
+                        WebDeepLink = $"/booking-detail/{booking.BookingId}",
                         ImageUrl = bar == null ? null : bar.Images.Split(',')[0],
                         IsPublic = false,
                         Message = $"Đặt bàn thành công tại {bar.BarName} với mã đặt chỗ {booking.BookingCode}, quý khách hãy dùng mã đặt chỗ hoặc mã QR để thực hiện check-in khi đến quán.",
                         Title = $"Đặt bàn thành công tại {bar.BarName}!",
-                        Type = FcmNotificationType.BOOKING
+                        Type = FcmNotificationType.BOOKING,
+                        SpecificAccountIds = ids
                     };
 
-                    await _fcmService.CreateAndSendNotificationToCustomer(fcmNotification, booking.AccountId);
+                    await _fcmService.CreateAndSendNotification(fcmNotification);
+
+                    var accounts = await _unitOfWork.AccountRepository.GetAsync(a => a.BarId == booking.BarId && a.Role.RoleName == "STAFF", includeProperties: "Role");
+
+                    if (accounts.Any())
+                    {
+                        List<Guid> staffIds = new List<Guid>();
+
+                        foreach (var account in accounts)
+                        {
+                            staffIds.Add(account.AccountId);
+                        }
+
+                        var fcmNotificationForStaff = new CreateNotificationRequest
+                        {
+                            BarId = booking.Bar.BarId,
+                            MobileDeepLink = null,
+                            WebDeepLink = $"/staff/table-registration-detail/{booking.BookingId}",
+                            ImageUrl = bar == null ? null : bar.Images.Split(',')[0],
+                            IsPublic = false,
+                            Message = $"Đơn đăt chỗ mới với mã đặt chỗ {booking.BookingCode} đã được đặt vào ngày {booking.BookingDate.ToString("dd/MM/yyyy")} lúc {booking.BookingTime.Hours:D2}:{booking.BookingTime.Minutes:D2}.",
+                            Title = $"Có đơn đặt chỗ mới tại {bar.BarName}!",
+                            Type = FcmNotificationType.BOOKING,
+                            SpecificAccountIds = staffIds
+                        };
+
+                        await _fcmService.CreateAndSendNotification(fcmNotificationForStaff);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -869,21 +919,6 @@ namespace Application.Service
                     _unitOfWork.BookingRepository.Insert(booking);
                     _unitOfWork.CommitTransaction();
                     await _emailSender.SendBookingInfo(booking, totalPrice);
-
-                    var bar = await _unitOfWork.BarRepository.GetByIdAsync(booking.BarId);
-
-                    var fcmNotification = new CreateNotificationRequest
-                    {
-                        BarId = booking.Bar.BarId,
-                        DeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
-                        ImageUrl = bar == null ? null : bar.Images.Split(',')[0],
-                        IsPublic = false,
-                        Message = $"Đặt bàn thành công tại {bar.BarName} với mã đặt chỗ {booking.BookingCode}, quý khách hãy dùng mã đặt chỗ hoặc mã QR để thực hiện check-in khi đến quán.",
-                        Title = $"Đặt bàn thành công tại {bar.BarName}!",
-                        Type = FcmNotificationType.BOOKING
-                    };
-
-                    await _fcmService.CreateAndSendNotificationToCustomer(fcmNotification, booking.AccountId);
 
                     return _paymentService.GetPaymentLink(booking.BookingId, booking.AccountId,
                                 request.PaymentDestination, totalPrice, isMobile);

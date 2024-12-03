@@ -38,9 +38,9 @@ namespace Persistence.Data
         public DbSet<BarTime> BarTimes { get; set; }
         public DbSet<Token> Tokens { get; set; }
         public DbSet<FcmNotification> FcmNotifications { get; set; }
-        public DbSet<FcmNotificationCustomer> FcmNotificationCustomers { get; set; }
         public DbSet<FcmUserDevice> FcmUserDevices { get; set; }
         public DbSet<BookingExtraDrink> BookingExtraDrinks { get; set; }
+        public DbSet<NotificationAccount> NotificationAccounts { get; set; }
         #endregion
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -86,38 +86,37 @@ namespace Persistence.Data
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
-            modelBuilder.Entity<FcmNotificationCustomer>(entity =>
-            {
-                entity.ToTable("FcmNotificationCustomers");
-
-                entity.HasKey(e => e.Id);
-
-                entity.HasIndex(e => new { e.NotificationId, e.DeviceToken })
-                     .IsUnique();
-
-                entity.HasOne(e => e.Notification)
-                      .WithMany(n => n.NotificationCustomers)
-                      .HasForeignKey(e => e.NotificationId);
-
-                entity.HasOne(e => e.Customer)
-                      .WithMany()
-                      .HasForeignKey(e => e.CustomerId)
-                      .IsRequired(false);
-            });
-
             modelBuilder.Entity<FcmUserDevice>(entity =>
             {
                 entity.ToTable("FcmUserDevices");
-
+                
                 entity.HasKey(e => e.Id);
-
+                
                 entity.HasIndex(e => e.DeviceToken)
                      .IsUnique();
-
+                 
                 entity.HasOne(e => e.Account)
                       .WithMany()
                       .HasForeignKey(e => e.AccountId)
                       .IsRequired(false);
+            });
+
+            modelBuilder.Entity<NotificationAccount>(entity =>
+            {
+                entity.ToTable("NotificationAccounts");
+                
+                entity.HasKey(e => e.Id);
+                
+                entity.HasIndex(e => new { e.NotificationId, e.AccountId })
+                     .IsUnique();
+                 
+                entity.HasOne(e => e.Notification)
+                      .WithMany(n => n.NotificationAccounts)
+                      .HasForeignKey(e => e.NotificationId);
+                      
+                entity.HasOne(e => e.Account)
+                      .WithMany()
+                      .HasForeignKey(e => e.AccountId);
             });
         }
 
@@ -2605,7 +2604,7 @@ namespace Persistence.Data
                     BarId = Constants.Ids.Bars.Bar2,
                     Rating = 4,
                     Comment = "Âm nhc sôi động, không khí náo nhiệt. Phù hợp cho nhóm bạn đi chơi.",
-                    CommentEmotionalForDrink = "Cocktail ở đây khá đặc biệt, phù hợp với tâm trạng vui vẻ.",
+                    CommentEmotionalForDrink = "Cocktail ở đây khá đặc bi���t, phù hợp với tâm trạng vui vẻ.",
                     IsDeleted = false,
                     CreatedTime = DateTimeOffset.Now.AddDays(-6),
                     LastUpdatedTime = DateTimeOffset.Now.AddDays(-6)

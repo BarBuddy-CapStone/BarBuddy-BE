@@ -1,4 +1,5 @@
-﻿using Application.DTOs.Payment;
+﻿using Application.DTOs.Fcm;
+using Application.DTOs.Payment;
 using Application.DTOs.Payment.Momo;
 using Application.DTOs.Payment.Vnpay;
 using Application.DTOs.PaymentHistory;
@@ -11,6 +12,7 @@ using Domain.Entities;
 using Domain.Enums;
 using Domain.IRepository;
 using Domain.Utils;
+using Infrastructure.Integrations;
 using Infrastructure.Momo.Config;
 using Infrastructure.Vnpay.Config;
 using Infrastructure.Zalopay.Config;
@@ -21,6 +23,7 @@ using Microsoft.IdentityModel.Tokens;
 using Persistence.Repository;
 using static Domain.CustomException.CustomException;
 using static Google.Apis.Requests.BatchRequest;
+using static Persistence.Data.Constants.Ids;
 
 namespace Infrastructure.Payment.Service
 {
@@ -32,6 +35,7 @@ namespace Infrastructure.Payment.Service
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
+        private readonly IFcmService _fcmService;
 
         public PaymentService(
             IOptions<ZalopayConfig> zaloPayConfigOptions,
@@ -39,7 +43,8 @@ namespace Infrastructure.Payment.Service
             IOptions<MomoConfig> momoConfigOptions,
             IHttpContextAccessor httpContextAccessor,
             IUnitOfWork unitOfWork,
-            IMapper mapper)
+            IMapper mapper,
+            IFcmService fcmService)
         {
             zaloPayConfig = zaloPayConfigOptions.Value;
             vnPayConfig = vnPayConfigOptions.Value;
@@ -47,6 +52,7 @@ namespace Infrastructure.Payment.Service
             this.httpContextAccessor = httpContextAccessor;
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
+            _fcmService = fcmService;
         }
 
         public PaymentLink GetPaymentLink(Guid bookingId, Guid accountId, 
@@ -211,6 +217,53 @@ namespace Infrastructure.Payment.Service
                         paymentHistory.TransactionCode = $"{DateTime.Now.ToString("yyyyMMdd")}-{response.vnp_TransactionNo}";
                         await unitOfWork.PaymentHistoryRepository.UpdateAsync(paymentHistory);
                         await unitOfWork.SaveAsync();
+
+                        var bar = await unitOfWork.BarRepository.GetByIdAsync(paymentHistory.Booking.BarId);
+
+                        List<Guid> ids = new List<Guid>();
+                        ids.Add(paymentHistory.Booking.AccountId);
+
+                        var fcmNotification = new CreateNotificationRequest
+                        {
+                            BarId = paymentHistory.Booking.Bar.BarId,
+                            MobileDeepLink = $"com.fptu.barbuddy://booking-detail/{paymentHistory.Booking.BookingId}",
+                            WebDeepLink = $"/booking-detail/{paymentHistory.Booking.BookingId}",
+                            ImageUrl = bar == null ? null : bar.Images.Split(',')[0],
+                            IsPublic = false,
+                            Message = $"Đặt bàn thành công tại {bar.BarName} với mã đặt chỗ {paymentHistory.Booking.BookingCode}, quý khách hãy dùng mã đặt chỗ hoặc mã QR để thực hiện check-in khi đến quán.",
+                            Title = $"Đặt bàn thành công tại {bar.BarName}!",
+                            Type = FcmNotificationType.BOOKING,
+                            SpecificAccountIds = ids
+                        };
+
+                        await _fcmService.CreateAndSendNotification(fcmNotification);
+
+                        var accounts = await unitOfWork.AccountRepository.GetAsync(a => a.BarId == paymentHistory.Booking.BarId && a.Role.RoleName == "STAFF", includeProperties: "Role");
+
+                        if (accounts.Any())
+                        {
+                            List<Guid> staffIds = new List<Guid>();
+
+                            foreach (var account in accounts)
+                            {
+                                staffIds.Add(account.AccountId);
+                            }
+
+                            var fcmNotificationForStaff = new CreateNotificationRequest
+                            {
+                                BarId = paymentHistory.Booking.Bar.BarId,
+                                MobileDeepLink = null,
+                                WebDeepLink = $"/staff/table-registration-detail/{paymentHistory.Booking.BookingId}",
+                                ImageUrl = bar == null ? null : bar.Images.Split(',')[0],
+                                IsPublic = false,
+                                Message = $"Đơn đăt chỗ mới với mã đặt chỗ {paymentHistory.Booking.BookingCode} đã được đặt vào ngày {paymentHistory.Booking.BookingDate.ToString("dd/MM/yyyy")} lúc {paymentHistory.Booking.BookingTime.Hours:D2}:{paymentHistory.Booking.BookingTime.Minutes:D2}.",
+                                Title = $"Có đơn đặt chỗ mới tại {bar.BarName}!",
+                                Type = FcmNotificationType.BOOKING,
+                                SpecificAccountIds = staffIds
+                            };
+
+                            await _fcmService.CreateAndSendNotification(fcmNotificationForStaff);
+                        }
                         return paymentHistory.PaymentHistoryId;
                     }
                     catch (Exception ex)

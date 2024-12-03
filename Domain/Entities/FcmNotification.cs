@@ -24,12 +24,14 @@ namespace Domain.Entities
 
         public string? ImageUrl { get; set; }
 
-        public string? DeepLink { get; set; }
+        public string? MobileDeepLink { get; set; }
+
+        public string? WebDeepLink { get; set; }
 
         public Guid? BarId { get; set; }
 
         [Required]
-        public bool IsPublic { get; set; } // True: guest + customer, False: customer only
+        public bool IsPublic { get; set; }
 
         [Required]
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
@@ -39,6 +41,6 @@ namespace Domain.Entities
         // Navigation properties
         [ForeignKey("BarId")]
         public virtual Bar? Bar { get; set; }
-        public virtual ICollection<FcmNotificationCustomer> NotificationCustomers { get; set; }
+        public virtual ICollection<NotificationAccount> NotificationAccounts { get; set; }
     }
 } 

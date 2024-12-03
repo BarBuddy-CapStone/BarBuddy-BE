@@ -7,13 +7,16 @@ namespace Application.Interfaces
 {
     public interface IFcmService
     {
-        Task SaveGuestDeviceToken(string deviceToken, string platform);
-        Task UpdateDeviceTokenForUser(Guid accountId, UpdateDeviceTokenRequest request);
         Task<Guid> CreateAndSendNotification(CreateNotificationRequest request);
-        Task<List<NotificationResponse>> GetNotifications(string deviceToken, Guid? accountId = null, int page = 1, int pageSize = 20);
-        Task<int> GetUnreadNotificationCount(string deviceToken, Guid? accountId = null);
-        Task<Guid> CreateAndSendNotificationToCustomer(CreateNotificationRequest request, Guid customerId);
-        Task MarkAsRead(string deviceToken, Guid notificationId, Guid? accountId = null);
-        Task MarkAllAsRead(string deviceToken, Guid? accountId = null);
+        Task<List<NotificationResponse>> GetNotifications(Guid accountId, int page = 1, int pageSize = 20);
+        Task<int> GetUnreadNotificationCount(Guid accountId);
+        Task MarkAsRead(Guid accountId, Guid notificationId);
+        Task MarkAllAsRead(Guid accountId);
+
+        Task SaveDeviceToken(string deviceToken, string platform);
+        Task LinkDeviceTokenToAccount(Guid accountId, string deviceToken);
+        Task UnlinkDeviceToken(string deviceToken);
+
+        Task SendPushNotificationToAllDevices(CreateNotificationRequest request);
     }
 }
