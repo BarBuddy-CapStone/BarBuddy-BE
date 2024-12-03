@@ -20,11 +20,15 @@ namespace Application.DTOs.Fcm
 
         public string? ImageUrl { get; set; }
 
-        public string? DeepLink { get; set; }
+        public string? MobileDeepLink { get; set; }
+        
+        public string? WebDeepLink { get; set; }
 
         public Guid? BarId { get; set; }
 
         [Required]
         public bool IsPublic { get; set; }
+        
+        public List<Guid>? SpecificAccountIds { get; set; }
     }
 } 

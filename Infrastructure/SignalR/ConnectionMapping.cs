@@ -9,22 +9,21 @@ namespace Infrastructure.SignalR
 {
     public interface IConnectionMapping
     {
-        void Add(string connectionId, string deviceToken, string accountId = null);
+        void Add(string connectionId, Guid accountId);
         void Remove(string connectionId);
-        IEnumerable<string> GetConnectionIds(string deviceToken);
-        string GetDeviceToken(string connectionId);
-        string GetAccountId(string connectionId);
-        IReadOnlyDictionary<string, (string DeviceToken, string AccountId)> GetAllConnections();
+        IEnumerable<string> GetConnectionIds(Guid accountId);
+        Guid? GetAccountId(string connectionId);
+        IReadOnlyDictionary<string, Guid> GetAllConnections();
     }
 
     public class ConnectionMapping : IConnectionMapping
     {
-        private readonly ConcurrentDictionary<string, (string DeviceToken, string AccountId)> _connections 
-            = new ConcurrentDictionary<string, (string DeviceToken, string AccountId)>();
+        private readonly ConcurrentDictionary<string, Guid> _connections 
+            = new ConcurrentDictionary<string, Guid>();
 
-        public void Add(string connectionId, string deviceToken, string accountId = null)
+        public void Add(string connectionId, Guid accountId)
         {
-            _connections.TryAdd(connectionId, (deviceToken, accountId));
+            _connections.TryAdd(connectionId, accountId);
         }
 
         public void Remove(string connectionId)
@@ -32,24 +31,19 @@ namespace Infrastructure.SignalR
             _connections.TryRemove(connectionId, out _);
         }
 
-        public IEnumerable<string> GetConnectionIds(string deviceToken)
+        public IEnumerable<string> GetConnectionIds(Guid accountId)
         {
             return _connections
-                .Where(x => x.Value.DeviceToken == deviceToken)
+                .Where(x => x.Value == accountId)
                 .Select(x => x.Key);
         }
 
-        public string GetDeviceToken(string connectionId)
+        public Guid? GetAccountId(string connectionId)
         {
-            return _connections.TryGetValue(connectionId, out var value) ? value.DeviceToken : null;
+            return _connections.TryGetValue(connectionId, out var accountId) ? accountId : null;
         }
 
-        public string GetAccountId(string connectionId)
-        {
-            return _connections.TryGetValue(connectionId, out var value) ? value.AccountId : null;
-        }
-
-        public IReadOnlyDictionary<string, (string DeviceToken, string AccountId)> GetAllConnections()
+        public IReadOnlyDictionary<string, Guid> GetAllConnections()
         {
             return _connections;
         }

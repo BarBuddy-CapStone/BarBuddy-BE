@@ -10,14 +10,10 @@ namespace Infrastructure.SignalR
     public class NotificationHub : Hub
     {
         private readonly IConnectionMapping _connectionMapping;
-        private readonly IFcmService _fcmService;
 
-        public NotificationHub(
-            IConnectionMapping connectionMapping,
-            IFcmService fcmService)
+        public NotificationHub(IConnectionMapping connectionMapping)
         {
             _connectionMapping = connectionMapping;
-            _fcmService = fcmService;
         }
 
         public override async Task OnConnectedAsync()
@@ -25,25 +21,17 @@ namespace Infrastructure.SignalR
             var httpContext = Context.GetHttpContext();
             if (httpContext != null)
             {
-                var deviceToken = httpContext.Request.Query["deviceToken"].ToString();
-                var accountId = httpContext.Request.Query["accountId"].ToString();
-
-                if (string.IsNullOrEmpty(deviceToken))
+                var accountIdStr = httpContext.Request.Query["accountId"].ToString();
+                
+                if (string.IsNullOrEmpty(accountIdStr))
                 {
-                    throw new HubException("DeviceToken is required");
+                    throw new HubException("AccountId is required");
                 }
 
-                if (!string.IsNullOrEmpty(accountId))
-                {
-                    _connectionMapping.Add(Context.ConnectionId, deviceToken, accountId);
-                    await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{accountId}");
-                    Console.WriteLine($"User {accountId} connected with device {deviceToken}");
-                }
-                else
-                {
-                    _connectionMapping.Add(Context.ConnectionId, deviceToken);
-                    Console.WriteLine($"Guest connected with device {deviceToken}");
-                }
+                var accountId = Guid.Parse(accountIdStr);
+                _connectionMapping.Add(Context.ConnectionId, accountId);
+                await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{accountId}");
+                Console.WriteLine($"User {accountId} connected");
             }
             await base.OnConnectedAsync();
         }
@@ -54,40 +42,12 @@ namespace Infrastructure.SignalR
             await base.OnDisconnectedAsync(exception);
         }
 
-        public async Task SendNotification(string deviceToken, object notification)
-        {
-            var connectionIds = _connectionMapping.GetConnectionIds(deviceToken);
-            if (connectionIds.Any())
-            {
-                await Clients.Clients(connectionIds).SendAsync("ReceiveNotification", notification);
-            }
-        }
-
-        public async Task SendBroadcast(string message)
-        {
-            await Clients.All.SendAsync("ReceiveBroadcast", message);
-        }
-
         public async Task RequestUnreadCount()
         {
-            var deviceToken = _connectionMapping.GetDeviceToken(Context.ConnectionId);
             var accountId = _connectionMapping.GetAccountId(Context.ConnectionId);
-
-            if (!string.IsNullOrEmpty(deviceToken))
+            if (accountId.HasValue)
             {
-                var unreadCount = await _fcmService.GetUnreadNotificationCount(
-                    deviceToken,
-                    !string.IsNullOrEmpty(accountId) ? Guid.Parse(accountId) : null);
-
-                if (!string.IsNullOrEmpty(accountId))
-                {
-                    await Clients.Group($"user_{accountId}")
-                        .SendAsync("ReceiveUnreadCount", unreadCount);
-                }
-                else
-                {
-                    await Clients.Caller.SendAsync("ReceiveUnreadCount", unreadCount);
-                }
+                await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{accountId}");
             }
         }
     }

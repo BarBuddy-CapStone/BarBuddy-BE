@@ -1,10 +1,14 @@
-using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Domain.Entities
 {
-    public class FcmNotificationCustomer
+    public class NotificationAccount
     {
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
@@ -12,11 +16,8 @@ namespace Domain.Entities
         [Required]
         public Guid NotificationId { get; set; }
 
-        public Guid? CustomerId { get; set; }
-
         [Required]
-        [StringLength(500)]
-        public string DeviceToken { get; set; }
+        public Guid AccountId { get; set; }
 
         public bool IsRead { get; set; } = false;
 
@@ -29,7 +30,7 @@ namespace Domain.Entities
         [ForeignKey("NotificationId")]
         public virtual FcmNotification Notification { get; set; }
 
-        [ForeignKey("CustomerId")]
-        public virtual Account Customer { get; set; }
+        [ForeignKey("AccountId")]
+        public virtual Account Account { get; set; }
     }
-} 
+}
