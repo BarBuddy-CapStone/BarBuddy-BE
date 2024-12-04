@@ -577,7 +577,7 @@ namespace Application.Service
                     {
                         BarId = booking.Bar.BarId,
                         MobileDeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
-                        WebDeepLink = $"/booking-detail/{booking.BookingId}",
+                        WebDeepLink = $"booking-detail/{booking.BookingId}",
                         ImageUrl = bar == null ? null : bar.Images.Split(',')[0],
                         IsPublic = false,
                         Message = $"Đặt bàn thành công tại {bar.BarName} với mã đặt chỗ {booking.BookingCode}, quý khách hãy dùng mã đặt chỗ hoặc mã QR để thực hiện check-in khi đến quán.",
