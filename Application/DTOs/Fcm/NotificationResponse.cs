@@ -14,7 +14,8 @@ namespace Application.DTOs.Fcm
         public string Message { get; set; }
         public FcmNotificationType Type { get; set; }
         public string? ImageUrl { get; set; }
-        public string? DeepLink { get; set; }
+        public string? MobileDeepLink { get; set; }
+        public string? WebDeepLink { get; set; }
         public string? BarName { get; set; }
         public bool IsPublic { get; set; }
         public bool IsRead { get; set; }

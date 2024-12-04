@@ -49,6 +49,8 @@ namespace Domain.Constants
         public static string BOOKING_CANCEL_TITLE = "Hủy đặt chỗ tại {0} thành công!";
         public static string EVENT_TITLE_NOTI = "Đừng bỏ lỡ tại {0}!";
         public static string EVENT_CONTENT_MESSAGE_NOTI = "Sự kiện {0} tại {1} sẽ diễn ra vào ngày {2} từ {3} đến {4}";
+        public static string EXTRA_DRINK_TITLE_NOTI = "Yêu cầu thêm nước từ khách hàng";
+        public static string EXTRA_DRINK_CONTENT = "Khách hàng có mã đặt {0} vừa yêu cầu thêm nước. Vui lòng xử lý ngay.";
         #endregion
     }
 }
