@@ -22,7 +22,7 @@ namespace Infrastructure.SignalR
 
         public async Task ReleaseListTable(BookingHubResponse response)
         {
-            await Clients.Group(response.BarId.ToString()).SendAsync("TableListReleased", response);
+            await Clients.All.SendAsync("TableListReleased", response);
         }
     }
 }
