@@ -126,7 +126,7 @@ namespace Application.Service
                 {
                     BarId = booking.Bar.BarId,
                     MobileDeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
-                    WebDeepLink = $"/booking-detail/{booking.BookingId}",
+                    WebDeepLink = $"booking-detail/{booking.BookingId}",
                     ImageUrl = bar == null ? null : bar.Images.Split(',')[0],
                     IsPublic = false,
                     Message = $"Đơn đặt chỗ tại {bar.BarName} với mã đặt chỗ {booking.BookingCode} vào lúc {booking.BookingTime} - {booking.BookingDate.ToString("yyyy/mm/dd")} đã được hủy thành công.",
@@ -603,7 +603,7 @@ namespace Application.Service
                         {
                             BarId = booking.Bar.BarId,
                             MobileDeepLink = null,
-                            WebDeepLink = $"/staff/table-registration-detail/{booking.BookingId}",
+                            WebDeepLink = $"staff/table-registration-detail/{booking.BookingId}",
                             ImageUrl = bar == null ? null : bar.Images.Split(',')[0],
                             IsPublic = false,
                             Message = $"Đơn đăt chỗ mới với mã đặt chỗ {booking.BookingCode} đã được đặt vào ngày {booking.BookingDate.ToString("dd/MM/yyyy")} lúc {booking.BookingTime.Hours:D2}:{booking.BookingTime.Minutes:D2}.",
