@@ -89,12 +89,6 @@ namespace Application.Service
                     return false;
                 }
 
-                //var creNoti = new NotificationRequest
-                //{
-                //    BarId = booking.BarId,
-                //    Title = booking.Bar.BarName,
-                //    Message = string.Format(PrefixKeyConstant.BOOKING_CANCEL_NOTI, booking.Bar.BarName, booking.BookingDate.ToString("yyyy/mm/dd"), booking.BookingTime)
-                //};
 
                 // Cancelled status (temp)
                 booking.Status = 1;
@@ -554,13 +548,6 @@ namespace Application.Service
                     throw new CustomException.InvalidDataException("Booking request does not have table field");
                 }
 
-                var creNoti = new NotificationRequest
-                {
-                    Title = booking.Bar.BarName,
-                    Message = PrefixKeyConstant.BOOKING_SUCCESS,
-                    BarId = booking.Bar.BarId,
-                };
-
                 try
                 {
                     _unitOfWork.BeginTransaction();
@@ -905,12 +892,6 @@ namespace Application.Service
                     }
                 }
 
-                var creNoti = new NotificationRequest
-                {
-                    BarId = booking.BarId,
-                    Title = booking.Bar.BarName,
-                    Message = PrefixKeyConstant.BOOKING_SUCCESS
-                };
 
                 try
                 {
