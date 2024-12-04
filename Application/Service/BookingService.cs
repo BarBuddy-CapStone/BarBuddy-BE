@@ -40,7 +40,7 @@ namespace Application.Service
         private readonly IFcmService _fcmService;
 
         public BookingService(IUnitOfWork unitOfWork, IMapper mapper, IAuthentication authentication,
-            IPaymentService paymentService, IEmailSender emailSender,IQRCodeService qrCodeService, IFirebase firebase,
+            IPaymentService paymentService, IEmailSender emailSender, IQRCodeService qrCodeService, IFirebase firebase,
             IEventVoucherService eventVoucherService, IHttpContextAccessor contextAccessor, IFcmService fcmService)
         {
             _unitOfWork = unitOfWork;
@@ -1201,7 +1201,6 @@ namespace Application.Service
                                             .Get(filter: x => x.BookingId.Equals(bookingId),
                                                  includeProperties: "Bar")
                                             .FirstOrDefault();
-
                 if (!getAccount.BarId.HasValue && getAccount.Role.RoleName.Equals("CUSTOMER"))
                 {
                     if (!getAccount.AccountId.Equals(getBooking.AccountId))
@@ -1218,6 +1217,13 @@ namespace Application.Service
                     throw new CustomException.InvalidDataException("Không thể thêm đồ uống khi đơn không ở trạng thái đang phục vụ !");
                 }
 
+                var getAccStaffOfBar = _unitOfWork.AccountRepository
+                             .Get(filter: x => x.BarId.Equals(getBooking.BarId) &&
+                                       x.Status == 1 && 
+                                       x.Role.RoleName.Equals(PrefixKeyConstant.STAFF),
+                                  includeProperties: "Role")
+                             .Select(x => x.AccountId)
+                             .ToList();
                 var getTimeSlot = getBooking?.Bar.TimeSlot ?? 0;
 
                 if (getBooking.BookingDate.Date != DateTime.Now.Date ||
@@ -1244,7 +1250,8 @@ namespace Application.Service
                         throw new CustomException.DataNotFoundException("Không tìm thấy đồ uống !");
                     }
 
-                    if (getBooking.AdditionalFee == null) {
+                    if (getBooking.AdditionalFee == null)
+                    {
                         getBooking.AdditionalFee = 0;
                     }
 
@@ -1289,6 +1296,21 @@ namespace Application.Service
                 getBooking.AdditionalFee += addFeeExtraDrink;
                 await _unitOfWork.BookingRepository.UpdateRangeAsync(getBooking);
                 await Task.Delay(100);
+
+                var fcmNotification = new CreateNotificationRequest
+                {
+                    BarId = getBooking.Bar.BarId,
+                    MobileDeepLink = $"com.fptu.barbuddy://booking-detail/{getBooking.BookingId}",
+                    WebDeepLink = $"staff/booking-detail/{getBooking.BookingId}",
+                    ImageUrl = getBooking.Bar == null ? null : getBooking.Bar.Images.Split(',')[0],
+                    IsPublic = false,
+                    Message = string.Format(PrefixKeyConstant.EXTRA_DRINK_CONTENT, getBooking.BookingCode),
+                    Title = PrefixKeyConstant.EXTRA_DRINK_TITLE_NOTI,
+                    Type = FcmNotificationType.BOOKING,
+                    SpecificAccountIds = getAccStaffOfBar
+                };
+
+                await _fcmService.CreateAndSendNotification(fcmNotification);
                 await _unitOfWork.SaveAsync();
                 _unitOfWork.CommitTransaction();
             }
