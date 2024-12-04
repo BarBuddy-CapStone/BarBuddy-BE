@@ -17,6 +17,7 @@ using Domain.Enums;
 using Domain.IRepository;
 using Domain.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.SqlServer.Server;
@@ -89,12 +90,6 @@ namespace Application.Service
                     return false;
                 }
 
-                var creNoti = new NotificationRequest
-                {
-                    BarId = booking.BarId,
-                    Title = booking.Bar.BarName,
-                    Message = string.Format(PrefixKeyConstant.BOOKING_CANCEL_NOTI, booking.Bar.BarName, booking.BookingDate.ToString("yyyy/mm/dd"), booking.BookingTime)
-                };
 
                 // Cancelled status (temp)
                 booking.Status = 1;
@@ -504,6 +499,8 @@ namespace Application.Service
                 {
                     throw new CustomException.InvalidDataException("Chỉ được đặt tối đa 5 bàn");
                 }
+                await ValidateTableAvailability(request.TableIds, request.BookingDate, request.BookingTime, request.BarId);
+
                 booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext))
                     ?? throw new DataNotFoundException("Không tìm thấy tài khoản !");
                 booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId)
@@ -553,13 +550,6 @@ namespace Application.Service
                 {
                     throw new CustomException.InvalidDataException("Booking request does not have table field");
                 }
-
-                var creNoti = new NotificationRequest
-                {
-                    Title = booking.Bar.BarName,
-                    Message = PrefixKeyConstant.BOOKING_SUCCESS,
-                    BarId = booking.Bar.BarId,
-                };
 
                 try
                 {
@@ -633,6 +623,205 @@ namespace Application.Service
             catch (CustomException.InvalidDataException ex)
             {
                 throw new CustomException.InvalidDataException(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
+
+        public async Task<PaymentLink> CreateBookingTableWithDrinks(BookingDrinkRequest request, HttpContext httpContext, bool isMobile = false)
+        {
+            try
+            {
+                var booking = _mapper.Map<Booking>(request);
+                if (request?.TableIds?.Count() > 6)
+                {
+                    throw new CustomException.InvalidDataException("Chỉ được đặt tối đa 5 bàn");
+                }
+                await ValidateTableAvailability(request.TableIds, request.BookingDate, request.BookingTime, request.BarId);
+
+                booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext))
+                    ?? throw new DataNotFoundException("Không tìm thấy tài khoản !");
+                booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId)
+                    ?? throw new DataNotFoundException("Không tìm thấy quán bar !");
+
+                var barTimes = await _unitOfWork.BarTimeRepository.GetAsync(x => x.BarId == request.BarId);
+                if (barTimes == null || !barTimes.Any())
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy thông tin thời gian của Bar.");
+                }
+
+                Utils.ValidateOpenCloseTimeWithTimeSlot(request.BookingDate, request.BookingTime,
+                    barTimes.ToList(), booking.Bar.TimeSlot);
+
+                booking.BookingTables = booking.BookingTables ?? new List<BookingTable>();
+                booking.BookingDrinks = booking.BookingDrinks ?? new List<BookingDrink>();
+                booking.BookingDate = request.BookingDate.Date;
+                booking.BookingCode = $"{booking.BookingDate.ToString("yyMMdd")}{RandomHelper.GenerateRandomNumberString()}";
+                booking.Status = (int)PrefixValueEnum.PendingBooking;
+                booking.BookingTime = request.BookingTime;
+                booking.CreateAt = TimeHelper.ConvertDateTimeToUtcPlus7(DateTime.UtcNow);
+
+                var qrCode = _qrCodeService.GenerateQRCode(booking.BookingId);
+                booking.QRTicket = await _firebase.UploadImageAsync(Utils.ConvertBase64ToFile(qrCode));
+
+                booking.ExpireAt = (request.BookingDate + request.BookingTime).AddHours(2);
+
+                double totalPrice = 0;
+
+                if (request.TableIds != null && request.TableIds.Count > 0)
+                {
+                    var existingTables = _unitOfWork.TableRepository
+                                                        .Get(t => request.TableIds.Contains(t.TableId) &&
+                                                                  t.TableType.BarId.Equals(request.BarId),
+                                                        includeProperties: "TableType");
+                    if (existingTables.Count() != request.TableIds.Count)
+                    {
+                        throw new CustomException.InvalidDataException("Some TableIds do not exist.");
+                    }
+                    foreach (var tableId in request.TableIds)
+                    {
+                        var bookingTable = new BookingTable
+                        {
+                            BookingId = booking.BookingId,
+                            TableId = tableId,
+                        };
+
+                        booking.BookingTables?.Add(bookingTable);
+                    }
+                }
+                else
+                {
+                    throw new CustomException.InvalidDataException("Booking request does not have table field");
+                }
+
+                if (request.Drinks != null && request.Drinks.Count > 0)
+                {
+                    var drinkIds = request.Drinks.Select(drink => drink.DrinkId).ToList();
+                    var existingDrinks = _unitOfWork.DrinkRepository
+                                                    .Get(d => drinkIds.Contains(d.DrinkId) &&
+                                                              d.BarId.Equals(request.BarId),
+                                                        includeProperties: "DrinkCategory");
+                    double discoutVoucher = 0;
+                    double maxPriceVoucher = 0;
+                    double discountMount = 0;
+                    if (existingDrinks.Count() != request.Drinks.Count)
+                    {
+                        throw new CustomException.InvalidDataException("Some DrinkIds do not exist.");
+                    }
+                    foreach (var drink in request.Drinks)
+                    {
+                        var bookingDrink = new BookingDrink
+                        {
+                            BookingId = booking.BookingId,
+                            DrinkId = drink.DrinkId,
+                            ActualPrice = existingDrinks.FirstOrDefault(e => e.DrinkId == drink.DrinkId &&
+                                                              e.BarId.Equals(request.BarId)).Price,
+                            Quantity = drink.Quantity
+
+                        };
+                        totalPrice += bookingDrink.ActualPrice * bookingDrink.Quantity;
+                        booking.TotalPrice = totalPrice;
+                        booking.BookingDrinks?.Add(bookingDrink);
+                    }
+                    totalPrice = totalPrice - totalPrice * booking.Bar.Discount / 100;
+
+                    if (request.VoucherCode != null)
+                    {
+
+                        var voucherQuery = new VoucherQueryRequest
+                        {
+                            barId = request.BarId,
+                            bookingDate = booking.BookingDate,
+                            bookingTime = booking.BookingTime,
+                            voucherCode = request.VoucherCode
+                        };
+
+                        var voucher = await _eventVoucherService
+                                                .GetVoucherByCode(voucherQuery);
+
+                        discoutVoucher = voucher.Discount;
+                        maxPriceVoucher = voucher.MaxPrice;
+
+                        if (voucher?.Quantity != null)
+                        {
+                            voucher.Quantity -= 1;
+                            if (voucher.Quantity == 0)
+                            {
+                                voucher.Status = PrefixKeyConstant.FALSE;
+                            }
+                            await _eventVoucherService.UpdateStatusNStsVoucher(voucher.EventVoucherId, voucher.Quantity, voucher.Status);
+                        }
+
+                        if (voucher?.Discount > 0)
+                        {
+                            discountMount = totalPrice * (discoutVoucher / 100);
+                            if (discountMount > voucher?.MaxPrice)
+                            {
+                                discountMount = voucher.MaxPrice;
+                            }
+                            totalPrice -= discountMount;
+                        }
+                    }
+                }
+
+
+                try
+                {
+                    booking.TotalPrice = totalPrice;
+                    _unitOfWork.BeginTransaction();
+                    _unitOfWork.BookingRepository.Insert(booking);
+                    _unitOfWork.CommitTransaction();
+                    await _emailSender.SendBookingInfo(booking, totalPrice);
+
+                    return _paymentService.GetPaymentLink(booking.BookingId, booking.AccountId,
+                                request.PaymentDestination, totalPrice, isMobile);
+                }
+                catch (Exception ex)
+                {
+                    _unitOfWork.RollBack();
+                    throw new InternalServerErrorException($"An Internal error occurred: {ex.Message}");
+                }
+            }
+            catch (DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                throw new CustomException.InvalidDataException(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
+
+        private async Task ValidateTableAvailability(List<Guid> tableIds, DateTime bookingDate, 
+            TimeSpan bookingTime, Guid barId)
+        {
+            try
+            {
+                var bookingsInDate = await _unitOfWork.BookingRepository
+                    .GetAsync(b => b.BookingDate.Date == bookingDate.Date && 
+                        b.BookingTime == bookingTime &&
+                        b.BarId == barId &&
+                        (b.Status == (int)PrefixValueEnum.PendingBooking ||
+                        b.Status == (int)PrefixValueEnum.Serving),
+                     includeProperties: "BookingTables");
+
+                foreach (var tableId in tableIds)
+                {
+                    var conflictBookings = bookingsInDate.Where(b =>
+                        b.BookingTables.Any(bt => bt.TableId == tableId));
+
+                    if (conflictBookings.Any()) 
+                    {
+                        throw new CustomException.InvalidDataException($"Bàn đã được đặt trong ngày {bookingDate.ToString(@"dd/mm/yyyy")} " +
+                            $"tại thời gian {bookingTime.ToString(@"hh\:mm")} ");
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -770,179 +959,6 @@ namespace Application.Service
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
-
-        public async Task<PaymentLink> CreateBookingTableWithDrinks(BookingDrinkRequest request, HttpContext httpContext, bool isMobile = false)
-        {
-            try
-            {
-                var booking = _mapper.Map<Booking>(request);
-                if (request?.TableIds?.Count() > 6)
-                {
-                    throw new CustomException.InvalidDataException("Chỉ được đặt tối đa 5 bàn");
-                }
-                booking.Account = _unitOfWork.AccountRepository.GetByID(_authentication.GetUserIdFromHttpContext(httpContext))
-                    ?? throw new DataNotFoundException("Không tìm thấy tài khoản !");
-                booking.Bar = _unitOfWork.BarRepository.GetByID(request.BarId)
-                    ?? throw new DataNotFoundException("Không tìm thấy quán bar !");
-
-                var barTimes = await _unitOfWork.BarTimeRepository.GetAsync(x => x.BarId == request.BarId);
-                if (barTimes == null || !barTimes.Any())
-                {
-                    throw new CustomException.DataNotFoundException("Không tìm thấy thông tin thời gian của Bar.");
-                }
-
-                Utils.ValidateOpenCloseTimeWithTimeSlot(request.BookingDate, request.BookingTime,
-                    barTimes.ToList(), booking.Bar.TimeSlot);
-
-                booking.BookingTables = booking.BookingTables ?? new List<BookingTable>();
-                booking.BookingDrinks = booking.BookingDrinks ?? new List<BookingDrink>();
-                booking.BookingDate = request.BookingDate.Date;
-                booking.BookingCode = $"{booking.BookingDate.ToString("yyMMdd")}{RandomHelper.GenerateRandomNumberString()}";
-                booking.Status = (int)PrefixValueEnum.PendingBooking;
-                booking.BookingTime = request.BookingTime;
-                booking.CreateAt = TimeHelper.ConvertDateTimeToUtcPlus7(DateTime.UtcNow);
-
-                var qrCode = _qrCodeService.GenerateQRCode(booking.BookingId);
-                booking.QRTicket = await _firebase.UploadImageAsync(Utils.ConvertBase64ToFile(qrCode));
-
-                booking.ExpireAt = (request.BookingDate + request.BookingTime).AddHours(2);
-
-                double totalPrice = 0;
-
-                if (request.TableIds != null && request.TableIds.Count > 0)
-                {
-                    var existingTables = _unitOfWork.TableRepository
-                                                        .Get(t => request.TableIds.Contains(t.TableId) &&
-                                                                  t.TableType.BarId.Equals(request.BarId),
-                                                        includeProperties: "TableType");
-                    if (existingTables.Count() != request.TableIds.Count)
-                    {
-                        throw new CustomException.InvalidDataException("Some TableIds do not exist.");
-                    }
-                    foreach (var tableId in request.TableIds)
-                    {
-                        var bookingTable = new BookingTable
-                        {
-                            BookingId = booking.BookingId,
-                            TableId = tableId,
-                        };
-
-                        booking.BookingTables?.Add(bookingTable);
-                    }
-                }
-                else
-                {
-                    throw new CustomException.InvalidDataException("Booking request does not have table field");
-                }
-
-                if (request.Drinks != null && request.Drinks.Count > 0)
-                {
-                    var drinkIds = request.Drinks.Select(drink => drink.DrinkId).ToList();
-                    var existingDrinks = _unitOfWork.DrinkRepository
-                                                    .Get(d => drinkIds.Contains(d.DrinkId) &&
-                                                              d.BarId.Equals(request.BarId),
-                                                        includeProperties: "DrinkCategory");
-                    double discoutVoucher = 0;
-                    double maxPriceVoucher = 0;
-                    double discountMount = 0;
-                    if (existingDrinks.Count() != request.Drinks.Count)
-                    {
-                        throw new CustomException.InvalidDataException("Some DrinkIds do not exist.");
-                    }
-                    foreach (var drink in request.Drinks)
-                    {
-                        var bookingDrink = new BookingDrink
-                        {
-                            BookingId = booking.BookingId,
-                            DrinkId = drink.DrinkId,
-                            ActualPrice = existingDrinks.FirstOrDefault(e => e.DrinkId == drink.DrinkId &&
-                                                              e.BarId.Equals(request.BarId)).Price,
-                            Quantity = drink.Quantity
-
-                        };
-                        totalPrice += bookingDrink.ActualPrice * bookingDrink.Quantity;
-                        booking.TotalPrice = totalPrice;
-                        booking.BookingDrinks?.Add(bookingDrink);
-                    }
-                    totalPrice = totalPrice - totalPrice * booking.Bar.Discount / 100;
-
-                    if (request.VoucherCode != null)
-                    {
-
-                        var voucherQuery = new VoucherQueryRequest
-                        {
-                            barId = request.BarId,
-                            bookingDate = booking.BookingDate,
-                            bookingTime = booking.BookingTime,
-                            voucherCode = request.VoucherCode
-                        };
-
-                        var voucher = await _eventVoucherService
-                                                .GetVoucherByCode(voucherQuery);
-
-                        discoutVoucher = voucher.Discount;
-                        maxPriceVoucher = voucher.MaxPrice;
-
-                        if (voucher?.Quantity != null)
-                        {
-                            voucher.Quantity -= 1;
-                            if (voucher.Quantity == 0)
-                            {
-                                voucher.Status = PrefixKeyConstant.FALSE;
-                            }
-                            await _eventVoucherService.UpdateStatusNStsVoucher(voucher.EventVoucherId, voucher.Quantity, voucher.Status);
-                        }
-
-                        if (voucher?.Discount > 0)
-                        {
-                            discountMount = totalPrice * (discoutVoucher / 100);
-                            if (discountMount > voucher?.MaxPrice)
-                            {
-                                discountMount = voucher.MaxPrice;
-                            }
-                            totalPrice -= discountMount;
-                        }
-                    }
-                }
-
-                var creNoti = new NotificationRequest
-                {
-                    BarId = booking.BarId,
-                    Title = booking.Bar.BarName,
-                    Message = PrefixKeyConstant.BOOKING_SUCCESS
-                };
-
-                try
-                {
-                    booking.TotalPrice = totalPrice;
-                    _unitOfWork.BeginTransaction();
-                    _unitOfWork.BookingRepository.Insert(booking);
-                    _unitOfWork.CommitTransaction();
-                    await _emailSender.SendBookingInfo(booking, totalPrice);
-
-                    return _paymentService.GetPaymentLink(booking.BookingId, booking.AccountId,
-                                request.PaymentDestination, totalPrice, isMobile);
-                }
-                catch (Exception ex)
-                {
-                    _unitOfWork.RollBack();
-                    throw new InternalServerErrorException($"An Internal error occurred: {ex.Message}");
-                }
-            }
-            catch (DataNotFoundException ex)
-            {
-                throw new CustomException.DataNotFoundException(ex.Message);
-            }
-            catch (CustomException.InvalidDataException ex)
-            {
-                throw new CustomException.InvalidDataException(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                throw new CustomException.InternalServerErrorException(ex.Message);
-            }
-        }
-
         public async Task<List<BookingCustomResponse>> GetAllBookingByStsPending()
         {
             try
@@ -1634,5 +1650,6 @@ namespace Application.Service
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
+
     }
 }
