@@ -55,13 +55,14 @@ namespace Infrastructure.Payment.Service
             _fcmService = fcmService;
         }
 
-        public PaymentLink GetPaymentLink(Guid bookingId, Guid accountId, 
+        public PaymentLink GetPaymentLink(Guid bookingId, Guid accountId,
             string PaymentDestination, double totalPrice, bool isMobile = false)
         {
-            if(isMobile)
+            if (isMobile)
             {
                 return GetVnpayPaymentLinkByMobile(bookingId, accountId, PaymentDestination, totalPrice);
-            } else
+            }
+            else
             {
                 switch (PaymentDestination)
                 {
@@ -76,10 +77,10 @@ namespace Infrastructure.Payment.Service
                 }
             }
 
-            
+
         }
 
-        private PaymentLink GetVnpayPaymentLink(Guid bookingId, Guid accountId, 
+        private PaymentLink GetVnpayPaymentLink(Guid bookingId, Guid accountId,
             string paymentDestination, double totalPrice)
         {
             try
@@ -108,7 +109,7 @@ namespace Infrastructure.Payment.Service
             }
         }
 
-        private PaymentLink GetZalopayPaymentLink(Guid bookingId, Guid accountId, 
+        private PaymentLink GetZalopayPaymentLink(Guid bookingId, Guid accountId,
             string paymentDestination, double totalPrice)
         {
             var paymentHistory = CreatePaymentHistory(bookingId, accountId, paymentDestination, totalPrice);
@@ -140,9 +141,9 @@ namespace Infrastructure.Payment.Service
             var paymentHistory = CreatePaymentHistory(bookingId, accountId, paymentDestination, totalPrice);
 
             var outputIdParam = RandomHelper.GenerateRandomNumberString();
-            var momoOneTimePayRequest = new MomoOneTimePaymentRequest(momoConfig.PartnerCode, 
-                    outputIdParam?.ToString() ?? string.Empty, (long)paymentHistory.TotalPrice!, 
-                    outputIdParam?.ToString() ?? string.Empty, paymentHistory.PaymentHistoryId.ToString(), 
+            var momoOneTimePayRequest = new MomoOneTimePaymentRequest(momoConfig.PartnerCode,
+                    outputIdParam?.ToString() ?? string.Empty, (long)paymentHistory.TotalPrice!,
+                    outputIdParam?.ToString() ?? string.Empty, paymentHistory.PaymentHistoryId.ToString(),
                     momoConfig.ReturnUrl, momoConfig.IpnUrl, "captureWallet", string.Empty);
             momoOneTimePayRequest.MakeSignature(momoConfig.AccessKey, momoConfig.SecretKey);
             (bool createMomoLinkResult, string? createMessage) = momoOneTimePayRequest.GetLink(momoConfig.PaymentUrl);
@@ -197,8 +198,8 @@ namespace Infrastructure.Payment.Service
             {
                 var paymentHistory = (await unitOfWork.PaymentHistoryRepository
                     .GetAsync(
-                        filter: x => x.PaymentHistoryId == Guid.Parse(response.vnp_OrderInfo), 
-                        includeProperties: "Booking"))
+                        filter: x => x.PaymentHistoryId == Guid.Parse(response.vnp_OrderInfo),
+                        includeProperties: "Booking.Bar"))
                     .FirstOrDefault();
                 if (paymentHistory != null)
                 {
@@ -208,6 +209,23 @@ namespace Infrastructure.Payment.Service
                         paymentHistory.Status = (int)PaymentStatusEnum.Failed;
                         await unitOfWork.PaymentHistoryRepository.UpdateAsync(paymentHistory);
                         await unitOfWork.SaveAsync();
+
+                        var fcmNotificationCustomer = new CreateNotificationRequest
+                        {
+                            BarId = paymentHistory.Booking.Bar.BarId,
+                            MobileDeepLink = $"com.fptu.barbuddy://booking-detail/{paymentHistory.Booking.BookingId}",
+                            WebDeepLink = $"/booking-detail/{paymentHistory.Booking.BookingId}",
+                            ImageUrl = paymentHistory.Booking.Bar == null ? null : paymentHistory.Booking.Bar.Images.Split(',')[0],
+                            IsPublic = false,
+                            Message = $"Bạn đã thanh toán thất bại cho quán {paymentHistory.Booking.Bar.BarName} " +
+                                      $"cho đơn vào lúc {paymentHistory.Booking.BookingTime} " +
+                                      $"ngày {paymentHistory.Booking.BookingDate.ToString("dd/MM/yyyy")}",
+                            Title = $"Thanh toán thất bại tại {paymentHistory.Booking.Bar.BarName}!",
+                            Type = FcmNotificationType.BOOKING,
+                            SpecificAccountIds = new List<Guid> { paymentHistory.Booking.AccountId }
+                        };
+                        await _fcmService.CreateAndSendNotification(fcmNotificationCustomer);
+
                         throw new CustomException.InvalidDataException("Payment process failed");
                     }
                     try
@@ -222,6 +240,23 @@ namespace Infrastructure.Payment.Service
 
                         List<Guid> ids = new List<Guid>();
                         ids.Add(paymentHistory.Booking.AccountId);
+
+                        var fcmNotificationCustomer = new CreateNotificationRequest
+                        {
+                            BarId = paymentHistory.Booking.Bar.BarId,
+                            MobileDeepLink = $"com.fptu.barbuddy://booking-detail/{paymentHistory.Booking.BookingId}",
+                            WebDeepLink = $"/booking-detail/{paymentHistory.Booking.BookingId}",
+                            ImageUrl = bar == null ? null : bar.Images.Split(',')[0],
+                            IsPublic = false,
+                            Message = $"Bạn đã thanh toán thành công cho quán {bar.BarName} " +
+                                      $"cho đơn vào lúc {paymentHistory.Booking.BookingTime} " +
+                                      $"ngày {paymentHistory.Booking.BookingDate.ToString("dd/MM/yyyy")}",
+                            Title = $"Thanh toán thành công tại {bar.BarName}!",
+                            Type = FcmNotificationType.BOOKING,
+                            SpecificAccountIds = new List<Guid> { paymentHistory.Booking.AccountId }
+                        };
+
+                        await _fcmService.CreateAndSendNotification(fcmNotificationCustomer);
 
                         var fcmNotification = new CreateNotificationRequest
                         {
@@ -291,7 +326,7 @@ namespace Infrastructure.Payment.Service
                     .GetAsync(
                         filter: x => x.PaymentHistoryId == Guid.Parse(request.orderInfo),
                         includeProperties: "Booking"))
-                    .FirstOrDefault(); 
+                    .FirstOrDefault();
                 if (paymentHistory != null)
                 {
                     if (request.resultCode != 0)

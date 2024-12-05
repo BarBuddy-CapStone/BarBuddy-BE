@@ -636,7 +636,7 @@ namespace Application.Service
 
                 var booking = (await _unitOfWork.BookingRepository
                                          .GetAsync(b => b.BookingId == BookingId,
-                                                includeProperties: "BookingExtraDrinks"))
+                                                includeProperties: "BookingExtraDrinks,Bar"))
                                          .FirstOrDefault();
                 _unitOfWork.BeginTransaction();
 
@@ -650,25 +650,7 @@ namespace Application.Service
                     throw new UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
                 }
 
-                if (booking.Status == 1 && (Status == 2 || Status == 3))
-                {
-                    throw new CustomException.InvalidDataException("Không thể thực hiện check-in: Lịch đặt chỗ đã bị hủy");
-                }
-                if (booking.Status == 0 && booking.BookingDate.Date != DateTime.Now.Date && (Status == 2 || Status == 3))
-                {
-                    throw new CustomException.InvalidDataException("Không thể thực hiện check-in: vẫn chưa đến ngày đặt bàn");
-                }
-                if (Status == 3 && booking.BookingDrinks != null)
-                {
-                    booking.AdditionalFee = booking.BookingExtraDrinks
-                        .Sum(x => x.ActualPrice * x.Quantity);
-                }
-                else
-                {
-                    booking.AdditionalFee = null;
-                }
-
-                switch (booking.Status)
+                switch (booking?.Status)
                 {
                     case 1:
                         if (Status == (int)PrefixValueEnum.Serving ||
@@ -708,9 +690,6 @@ namespace Application.Service
                         throw new CustomException.InvalidDataException("Dịch vụ cộng thêm không thể nhỏ hơn 0");
                     }
                 }
-                booking.Status = Status;
-                _unitOfWork.BookingRepository.Update(booking);
-                _unitOfWork.Save();
 
                 if (Status == 2 || Status == 3)
                 {
@@ -734,6 +713,31 @@ namespace Application.Service
                         _unitOfWork.Save();
                     }
                 }
+
+                booking.Status = Status;
+                _unitOfWork.BookingRepository.Update(booking);
+
+                switch (booking.Status)
+                {
+                    case 1:
+                        await SendNotiBookingSts(booking.Bar, booking,
+                            string.Format(PrefixKeyConstant.BOOKING_CANCEL_NOTI, booking.Bar.BarName, booking.BookingCode,
+                                          booking.BookingTime, booking.BookingDate.ToString("dd/MM/yyyy")),
+                            string.Format(PrefixKeyConstant.BOOKING_CANCEL_TITLE, booking.Bar.BarName));
+                        break;
+
+                    case 2:
+                        await SendNotiBookingSts(booking.Bar, booking, PrefixKeyConstant.BOOKING_SERVING_CONTENT_NOTI,
+                            string.Format(PrefixKeyConstant.BOOKING_SERVING_TITLE_NOTI, booking.Bar.BarName));
+                        break;
+
+                    case 3:
+                        await SendNotiBookingSts(booking.Bar, booking, PrefixKeyConstant.BOOKING_COMPLETED_CONTENT_NOTI,
+                            string.Format(PrefixKeyConstant.BOOKING_COMPLETED_TITLE_NOTI, booking.Bar.BarName));
+                        break;
+                }
+
+                _unitOfWork.Save();
                 _unitOfWork.CommitTransaction();
             }
             catch (CustomException.UnAuthorizedException ex)
@@ -1200,7 +1204,7 @@ namespace Application.Service
 
                 var getAccStaffOfBar = _unitOfWork.AccountRepository
                              .Get(filter: x => x.BarId.Equals(getBooking.BarId) &&
-                                       x.Status == 1 && 
+                                       x.Status == 1 &&
                                        x.Role.RoleName.Equals(PrefixKeyConstant.STAFF),
                                   includeProperties: "Role")
                              .Select(x => x.AccountId)
@@ -1614,6 +1618,24 @@ namespace Application.Service
                 _unitOfWork.RollBack();
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
+        }
+
+        public async Task SendNotiBookingSts(Bar bar, Booking booking, string message, string title)
+        {
+            var fcmNotification = new CreateNotificationRequest
+            {
+                BarId = booking.Bar.BarId,
+                MobileDeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
+                WebDeepLink = $"booking-detail/{booking.BookingId}",
+                ImageUrl = bar == null ? null : bar.Images.Split(',')[0],
+                IsPublic = false,
+                Message = message,
+                Title = title,
+                Type = FcmNotificationType.BOOKING,
+                SpecificAccountIds = new List<Guid> { booking.AccountId }
+            };
+
+            await _fcmService.CreateAndSendNotification(fcmNotification);
         }
     }
 }
