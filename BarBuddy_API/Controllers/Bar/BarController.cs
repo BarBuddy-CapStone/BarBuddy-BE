@@ -354,13 +354,28 @@ namespace BarBuddy_API.Controllers.Bar
             }
         }
 
-        [Authorize(Roles = "ADMIN,MANAGER")]
-        [HttpGet("download-revenue")]
+        [Authorize(Roles = "MANAGER")]
+        [HttpGet("manager/download-revenue")]
         public async Task<IActionResult> DownloadRevenue([FromQuery] ObjectKeyDateTimeQuery query)
         {
             try
             {
                 var (fileContents, fileName) = await _barService.DownloadRevenueExcel(query);
+                return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize(Roles = "ADMIN")]
+        [HttpGet("admin/download-revenue")]
+        public async Task<IActionResult> DownloadRevenueAllBranchExcel([FromQuery] ObjectKeyDateTimeQuery query)
+        {
+            try
+            {
+                var (fileContents, fileName) = await _barService.DownloadRevenueAllBranchExcel(query);
                 return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
             }
             catch (Exception ex)

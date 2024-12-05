@@ -27,6 +27,9 @@
     <EmbeddedResource Include="Common\ExcelFile\Revenue.xlsx">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+	  <EmbeddedResource Include="Common\ExcelFile\RevenueAllBranch.xlsx">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </EmbeddedResource>
   </ItemGroup>
 
 </Project>
