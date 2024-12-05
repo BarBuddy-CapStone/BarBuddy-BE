@@ -1,4 +1,4 @@
-﻿using Application.DTOs.Bar;
+using Application.DTOs.Bar;
 using Application.Interfaces;
 using Application.IService;
 using AutoMapper;
@@ -20,6 +20,10 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using Application.DTOs.Booking;
 using Azure.Core;
 using MediatR;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
+using System.Drawing;
+using System.IO;
 
 namespace Application.Service
 {
@@ -624,6 +628,191 @@ namespace Application.Service
                 PageSize = validPageSize,
                 TotalItems = totalItems
             };
+        }
+
+        public async Task<(byte[] fileContents, string fileName)> DownloadRevenueExcel(ObjectKeyDateTimeQuery query)
+        {
+            try
+            {
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+
+                if (getAccount.BarId.HasValue && query.BarId != null && !getAccount.BarId.Equals(query.BarId))
+                {
+                    throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào Bar này !");
+                }
+                if ((query.FromDate.HasValue && !query.ToDate.HasValue) ||
+                    (!query.FromDate.HasValue && query.ToDate.HasValue))
+                {
+                    throw new CustomException.InvalidDataException("Vui lòng nhập cả FromDate và ToDateTime!");
+                }
+
+                if (query.FromDate.HasValue && query.ToDate.HasValue && query.FromDate.Value > query.ToDate.Value)
+                {
+                    throw new CustomException.InvalidDataException("FromDate không thể lớn hơn ToDateTime!");
+                }
+                var bookings = await _unitOfWork.BookingRepository.GetAsync(
+                    filter: x => (x.BarId.Equals(getAccount.BarId) || x.BarId == null) && 
+                                x.Status != (int)PrefixValueEnum.Serving &&
+                                x.Status != (int)PrefixValueEnum.Pending &&
+                                (!query.FromDate.HasValue || x.BookingDate.Date >= query.FromDate.Value.Date) &&
+                                (!query.ToDate.HasValue || x.BookingDate.Date <= query.ToDate.Value.Date),
+                    orderBy: x => x.OrderBy(x => x.BookingDate),
+                    includeProperties: "Account,BookingTables,Bar"
+                );
+
+                var getBarName = bookings.Select(x => x.Bar.BarName).FirstOrDefault();
+                
+                var assembly = typeof(Domain.Common.BaseEntity).Assembly;
+                var resourceNames = assembly.GetManifestResourceNames();
+                foreach (var name in resourceNames)
+                {
+                    Console.WriteLine($"Resource found: {name}");
+                }
+
+                var stream = assembly.GetManifestResourceStream("Domain.Common.ExcelFile.Revenue.xlsx");
+                if (stream == null)
+                {
+                    var resourceName = resourceNames.FirstOrDefault(x => x.EndsWith("Revenue.xlsx"));
+                    if (resourceName != null)
+                    {
+                        stream = assembly.GetManifestResourceStream(resourceName);
+                    }
+                    else
+                    {
+                        throw new CustomException.DataNotFoundException("Không tìm thấy file template!");
+                    }
+                }
+
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                using var package = new ExcelPackage(stream);
+                var worksheet = package.Workbook.Worksheets[0];
+
+                var reportTimeCell = worksheet.Cells[15, 2, 15, 18];  // Dòng 15, từ cột B đến R
+                reportTimeCell.Merge = true;
+                reportTimeCell.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+                string reportTimeText;
+                if (query.FromDate.HasValue && query.ToDate.HasValue)
+                {
+                    reportTimeText = $"Thời gian báo cáo: {query.FromDate.Value.ToString("dd/MM/yyyy")} - {query.ToDate.Value.ToString("dd/MM/yyyy")}";
+                }
+                else
+                {
+                    reportTimeText = $"Thời gian báo cáo: Tất cả";
+                }
+                reportTimeCell.Value = reportTimeText;
+
+                int startRow = 17;
+                int currentRow = startRow;
+                double totalRevenue = 0;
+                int totalBookings = 0;
+
+                foreach (var booking in bookings)
+                {
+                    var bookingTotal = booking.TotalPrice ?? 0;
+                    var additionalFee = booking.AdditionalFee ?? 0;
+                    var grandTotal = bookingTotal + additionalFee;
+
+                    totalRevenue += grandTotal;
+                    totalBookings++;
+
+                    var mergePairs = new[]
+                    {
+                        worksheet.Cells[currentRow, 2, currentRow, 3],
+                        worksheet.Cells[currentRow, 4, currentRow, 5],
+                        worksheet.Cells[currentRow, 9, currentRow, 10],
+                        worksheet.Cells[currentRow, 11, currentRow, 12],
+                        worksheet.Cells[currentRow, 13, currentRow, 14],
+                        worksheet.Cells[currentRow, 17, currentRow, 18]
+                    };
+
+                    foreach (var mergeRange in mergePairs)
+                    {
+                        mergeRange.Merge = true;
+                        mergeRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    }
+
+                    var rowRange = worksheet.Cells[currentRow, 2, currentRow, 18];
+                    rowRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                    rowRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                    rowRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                    rowRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                    rowRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    rowRange.Style.Font.Bold = false;
+                    rowRange.Style.Font.Size = 11;
+
+                    // Thêm màu cho trạng thái đơn
+                    var statusCell = worksheet.Cells[currentRow, 16];  // Cột trạng thái đơn
+                    if (booking.Status == 3) // Hoàn thành
+                    {
+                        statusCell.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        statusCell.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(198, 239, 206)); // Màu xanh nhạt
+                        statusCell.Style.Font.Color.SetColor(Color.FromArgb(0, 97, 0));  // Màu xanh đậm cho chữ
+                    }
+                    else // Đã hủy
+                    {
+                        statusCell.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        statusCell.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 199, 206)); // Màu đỏ nhạt
+                        statusCell.Style.Font.Color.SetColor(Color.FromArgb(156, 0, 6));  // Màu đỏ đậm cho chữ
+                    }
+
+                    worksheet.Cells[currentRow, 2].Value = booking.BookingDate.ToString("dd/MM/yyyy");
+                    worksheet.Cells[currentRow, 4].Value = booking.BookingTime;
+                    worksheet.Cells[currentRow, 6].Value = booking.Account.Email;
+                    worksheet.Cells[currentRow, 7].Value = booking.Account.Phone;
+                    worksheet.Cells[currentRow, 8].Value = booking.BookingCode;
+                    worksheet.Cells[currentRow, 9].Value = booking.BookingTables.Count();
+                    worksheet.Cells[currentRow, 11].Value = bookingTotal;
+                    worksheet.Cells[currentRow, 13].Value = additionalFee;
+                    worksheet.Cells[currentRow, 15].Value = bookingTotal == 0 ? "Không" : "Chuyển khoản";
+                    worksheet.Cells[currentRow, 16].Value = booking.Status == 3 ? "Hoàn thành" : "Đã hủy";
+                    worksheet.Cells[currentRow, 17].Value = grandTotal;
+
+                    currentRow++;
+                }
+
+                // Add total row
+                var totalRow = currentRow;
+                var totalRowRange = worksheet.Cells[totalRow, 2, totalRow, 18];
+
+                // Style cho toàn bộ dòng tổng cộng
+                totalRowRange.Style.Font.Bold = true;
+                totalRowRange.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                totalRowRange.Style.Fill.BackgroundColor.SetColor(Color.LightGray);
+                totalRowRange.Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                totalRowRange.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                totalRowRange.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                totalRowRange.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                totalRowRange.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+                // Merge các cột theo yêu cầu
+                worksheet.Cells[totalRow, 2, totalRow, 7].Merge = true;  // Merge B-G cho "Tổng cộng"
+                worksheet.Cells[totalRow, 9, totalRow, 10].Merge = true; // Merge I-J
+                worksheet.Cells[totalRow, 11, totalRow, 12].Merge = true; // Merge K-L cho tổng tiền
+                worksheet.Cells[totalRow, 13, totalRow, 14].Merge = true; // Merge M-N cho tổng phụ thu
+                worksheet.Cells[totalRow, 17, totalRow, 18].Merge = true; // Merge Q-R cho tổng doanh thu
+
+                // Tính tổng tiền và phụ thu
+                var totalPrice = bookings.Sum(x => x.TotalPrice ?? 0);
+                var totalAdditionalFee = bookings.Sum(x => x.AdditionalFee ?? 0);
+                var totalOrders = bookings.Count();  // Tổng số đơn ở cột H
+
+                // Gán giá trị
+                worksheet.Cells[totalRow, 2].Value = "Tổng cộng";
+                worksheet.Cells[totalRow, 8].Value = totalOrders;     // Tổng số đơn ở cột H
+                worksheet.Cells[totalRow, 9].Value = totalBookings;   // Tổng số lượng booking
+                worksheet.Cells[totalRow, 11].Value = totalPrice;     // Tổng tiền
+                worksheet.Cells[totalRow, 13].Value = totalAdditionalFee;  // Tổng phụ thu
+                worksheet.Cells[totalRow, 17].Value = totalRevenue;   // Tổng doanh thu
+
+                string fileName = $"DoanhThu_{getBarName}_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+                return (package.GetAsByteArray(), fileName);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException($"Lỗi khi tạo file Excel: {ex.Message}");
+            }
         }
     }
 }
