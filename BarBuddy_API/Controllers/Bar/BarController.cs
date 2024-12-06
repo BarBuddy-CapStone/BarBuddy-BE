@@ -26,7 +26,7 @@ namespace BarBuddy_API.Controllers.Bar
         /// <returns></returns>
         ///
 
-        [Authorize(Roles ="ADMIN")]
+        [Authorize(Roles = "ADMIN")]
         [HttpGet("admin/barmanager")]
         public async Task<IActionResult> GetAllBar([FromQuery] ObjectQueryCustom query)
         {
@@ -351,6 +351,36 @@ namespace BarBuddy_API.Controllers.Bar
             catch (CustomException.InternalServerErrorException ex)
             {
                 return CustomResult("Lỗi hệ thống !", HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [Authorize(Roles = "MANAGER")]
+        [HttpGet("manager/download-revenue")]
+        public async Task<IActionResult> DownloadRevenue([FromQuery] ObjectKeyDateTimeQuery query)
+        {
+            try
+            {
+                var (fileContents, fileName) = await _barService.DownloadRevenueExcel(query);
+                return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [Authorize(Roles = "ADMIN")]
+        [HttpGet("admin/download-revenue")]
+        public async Task<IActionResult> DownloadRevenueAllBranchExcel([FromQuery] ObjectKeyDateTimeQuery query)
+        {
+            try
+            {
+                var (fileContents, fileName) = await _barService.DownloadRevenueAllBranchExcel(query);
+                return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
     }

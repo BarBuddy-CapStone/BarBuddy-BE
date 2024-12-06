@@ -23,4 +23,13 @@
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.8" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Common\ExcelFile\Revenue.xlsx">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+	  <EmbeddedResource Include="Common\ExcelFile\RevenueAllBranch.xlsx">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

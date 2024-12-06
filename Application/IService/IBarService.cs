@@ -17,5 +17,7 @@ namespace Application.IService
         Task<List<OnlyBarIdNameResponse>> GetBarNameId(ObjectQuery query);
         Task<RevenueBranchResponse> GetAllRevenueBranch();
         Task<PagingOnlyBarIdNameResponse> GetBarNameIdAdMa(ObjectQuery query);
+        Task<(byte[] fileContents, string fileName)> DownloadRevenueExcel(ObjectKeyDateTimeQuery query);
+        Task<(byte[] fileContents, string fileName)> DownloadRevenueAllBranchExcel(ObjectKeyDateTimeQuery query);
     }
 }
