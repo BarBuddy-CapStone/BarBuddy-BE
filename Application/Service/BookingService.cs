@@ -630,6 +630,141 @@ namespace Application.Service
             }
         }
 
+        public async Task UpdateBookingStatus(Guid BookingId, int Status)
+        {
+            try
+            {
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+
+                var booking = (await _unitOfWork.BookingRepository
+                                         .GetAsync(b => b.BookingId == BookingId,
+                                                includeProperties: "BookingExtraDrinks,Bar"))
+                                         .FirstOrDefault();
+                _unitOfWork.BeginTransaction();
+
+                if (booking == null)
+                {
+                    throw new DataNotFoundException("Không tìm thấy đơn Đặt bàn.");
+                }
+
+                if (!getAccount.BarId.Equals(booking?.BarId))
+                {
+                    throw new UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
+                }
+
+                switch (booking?.Status)
+                {
+                    case 1:
+                        if (Status == (int)PrefixValueEnum.Serving ||
+                            Status == (int)PrefixValueEnum.Completed ||
+                            Status == (int)PrefixValueEnum.PendingBooking)
+                        {
+                            throw new CustomException.InvalidDataException("Không thể thực hiện check-in: Lịch đặt chỗ đã bị hủy");
+                        }
+                        break;
+
+                    case 0:
+                        if (Status == (int)PrefixValueEnum.Serving &&
+                                      (booking.BookingDate.Date != DateTime.Now.Date ||
+                                       booking.BookingTime > DateTime.Now.AddMinutes(45).TimeOfDay) ||
+                            Status == (int)PrefixValueEnum.Completed)
+                        {
+                            throw new CustomException.InvalidDataException("Không thể thực hiện check-in: vẫn chưa đến ngày hoặc thời gian đặt bàn");
+                        }
+                        break;
+
+                    case 2:
+                        if (Status == (int)PrefixValueEnum.PendingBooking || Status == (int)PrefixValueEnum.Cancelled)
+                        {
+                            throw new CustomException.InvalidDataException("Không thể chuyển từ trạng thái đang phục vụ về pending hoặc cancelled");
+                        }
+                        break;
+
+                    case 3:
+                        throw new CustomException.InvalidDataException("Không thể thay đổi trạng thái của booking đã hoàn thành");
+                }
+
+                if (Status == 3)
+                {
+                    booking.CheckOutStaffId = accountId;
+                    if (booking.AdditionalFee < 0)
+                    {
+                        throw new CustomException.InvalidDataException("Dịch vụ cộng thêm không thể nhỏ hơn 0");
+                    }
+                }
+
+                if (Status == 2 || Status == 3)
+                {
+                    var bookingTables = _unitOfWork.BookingTableRepository.Get(t => t.BookingId == booking.BookingId);
+                    foreach (var bookingTable in bookingTables)
+                    {
+                        var table = _unitOfWork.TableRepository.GetByID(bookingTable.TableId);
+                        if (table == null)
+                        {
+                            throw new CustomException.DataNotFoundException("Không tìm thấy bàn");
+                        }
+                        if (Status == 2)
+                        {
+                            table.Status = 1;
+                        }
+                        else
+                        {
+                            table.Status = 0;
+                        }
+                        _unitOfWork.TableRepository.Update(table);
+                        _unitOfWork.Save();
+                    }
+                }
+
+                booking.Status = Status;
+                _unitOfWork.BookingRepository.Update(booking);
+
+                switch (booking.Status)
+                {
+                    case 1:
+                        await SendNotiBookingSts(booking.Bar, booking,
+                            string.Format(PrefixKeyConstant.BOOKING_CANCEL_NOTI, booking.Bar.BarName, booking.BookingCode,
+                                          booking.BookingTime, booking.BookingDate.ToString("dd/MM/yyyy")),
+                            string.Format(PrefixKeyConstant.BOOKING_CANCEL_TITLE, booking.Bar.BarName));
+                        break;
+
+                    case 2:
+                        await SendNotiBookingSts(booking.Bar, booking, PrefixKeyConstant.BOOKING_SERVING_CONTENT_NOTI,
+                            string.Format(PrefixKeyConstant.BOOKING_SERVING_TITLE_NOTI, booking.Bar.BarName));
+                        break;
+
+                    case 3:
+                        await SendNotiBookingSts(booking.Bar, booking, PrefixKeyConstant.BOOKING_COMPLETED_CONTENT_NOTI,
+                            string.Format(PrefixKeyConstant.BOOKING_COMPLETED_TITLE_NOTI, booking.Bar.BarName));
+                        break;
+                }
+
+                _unitOfWork.Save();
+                _unitOfWork.CommitTransaction();
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                _unitOfWork.RollBack();
+                throw new CustomException.UnAuthorizedException(ex.Message);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                _unitOfWork.RollBack();
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                _unitOfWork.RollBack();
+                throw new CustomException.InvalidDataException(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.RollBack();
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
+
         public async Task<PaymentLink> CreateBookingTableWithDrinks(BookingDrinkRequest request, HttpContext httpContext, bool isMobile = false)
         {
             try
@@ -829,136 +964,6 @@ namespace Application.Service
             }
         }
 
-        public async Task UpdateBookingStatus(Guid BookingId, int Status)
-        {
-            try
-            {
-                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
-
-                var booking = (await _unitOfWork.BookingRepository
-                                         .GetAsync(b => b.BookingId == BookingId,
-                                                includeProperties: "BookingExtraDrinks"))
-                                         .FirstOrDefault();
-                _unitOfWork.BeginTransaction();
-
-                if (booking == null)
-                {
-                    throw new DataNotFoundException("Không tìm thấy đơn Đặt bàn.");
-                }
-
-                if (!getAccount.BarId.Equals(booking?.BarId))
-                {
-                    throw new UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
-                }
-
-                if (booking.Status == 1 && (Status == 2 || Status == 3))
-                {
-                    throw new CustomException.InvalidDataException("Không thể thực hiện check-in: Lịch đặt chỗ đã bị hủy");
-                }
-                if (booking.Status == 0 && booking.BookingDate.Date != DateTime.Now.Date && (Status == 2 || Status == 3))
-                {
-                    throw new CustomException.InvalidDataException("Không thể thực hiện check-in: vẫn chưa đến ngày đặt bàn");
-                }
-                if (Status == 3 && booking.BookingDrinks != null)
-                {
-                    booking.AdditionalFee = booking.BookingExtraDrinks
-                        .Sum(x => x.ActualPrice * x.Quantity);
-                }
-                else
-                {
-                    booking.AdditionalFee = null;
-                }
-
-                switch (booking.Status)
-                {
-                    case 1:
-                        if (Status == (int)PrefixValueEnum.Serving ||
-                            Status == (int)PrefixValueEnum.Completed ||
-                            Status == (int)PrefixValueEnum.PendingBooking)
-                        {
-                            throw new CustomException.InvalidDataException("Không thể thực hiện check-in: Lịch đặt chỗ đã bị hủy");
-                        }
-                        break;
-
-                    case 0:
-                        if (Status == (int)PrefixValueEnum.Serving &&
-                                      (booking.BookingDate.Date != DateTime.Now.Date ||
-                                       booking.BookingTime > DateTime.Now.AddMinutes(45).TimeOfDay) ||
-                            Status == (int)PrefixValueEnum.Completed)
-                        {
-                            throw new CustomException.InvalidDataException("Không thể thực hiện check-in: vẫn chưa đến ngày hoặc thời gian đặt bàn");
-                        }
-                        break;
-
-                    case 2:
-                        if (Status == (int)PrefixValueEnum.PendingBooking || Status == (int)PrefixValueEnum.Cancelled)
-                        {
-                            throw new CustomException.InvalidDataException("Không thể chuyển từ trạng thái đang phục vụ về pending hoặc cancelled");
-                        }
-                        break;
-
-                    case 3:
-                        throw new CustomException.InvalidDataException("Không thể thay đổi trạng thái của booking đã hoàn thành");
-                }
-
-                if (Status == 3)
-                {
-                    booking.CheckOutStaffId = accountId;
-                    if (booking.AdditionalFee < 0)
-                    {
-                        throw new CustomException.InvalidDataException("Dịch vụ cộng thêm không thể nhỏ hơn 0");
-                    }
-                }
-                booking.Status = Status;
-                _unitOfWork.BookingRepository.Update(booking);
-                _unitOfWork.Save();
-
-                if (Status == 2 || Status == 3)
-                {
-                    var bookingTables = _unitOfWork.BookingTableRepository.Get(t => t.BookingId == booking.BookingId);
-                    foreach (var bookingTable in bookingTables)
-                    {
-                        var table = _unitOfWork.TableRepository.GetByID(bookingTable.TableId);
-                        if (table == null)
-                        {
-                            throw new CustomException.DataNotFoundException("Không tìm thấy bàn");
-                        }
-                        if (Status == 2)
-                        {
-                            table.Status = 1;
-                        }
-                        else
-                        {
-                            table.Status = 0;
-                        }
-                        _unitOfWork.TableRepository.Update(table);
-                        _unitOfWork.Save();
-                    }
-                }
-                _unitOfWork.CommitTransaction();
-            }
-            catch (CustomException.UnAuthorizedException ex)
-            {
-                _unitOfWork.RollBack();
-                throw new CustomException.UnAuthorizedException(ex.Message);
-            }
-            catch (CustomException.DataNotFoundException ex)
-            {
-                _unitOfWork.RollBack();
-                throw new CustomException.DataNotFoundException(ex.Message);
-            }
-            catch (CustomException.InvalidDataException ex)
-            {
-                _unitOfWork.RollBack();
-                throw new CustomException.InvalidDataException(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                _unitOfWork.RollBack();
-                throw new CustomException.InternalServerErrorException(ex.Message);
-            }
-        }
         public async Task<List<BookingCustomResponse>> GetAllBookingByStsPending()
         {
             try
@@ -1235,7 +1240,7 @@ namespace Application.Service
 
                 var getAccStaffOfBar = _unitOfWork.AccountRepository
                              .Get(filter: x => x.BarId.Equals(getBooking.BarId) &&
-                                       x.Status == 1 && 
+                                       x.Status == 1 &&
                                        x.Role.RoleName.Equals(PrefixKeyConstant.STAFF),
                                   includeProperties: "Role")
                              .Select(x => x.AccountId)
@@ -1651,5 +1656,22 @@ namespace Application.Service
             }
         }
 
+        public async Task SendNotiBookingSts(Bar bar, Booking booking, string message, string title)
+        {
+            var fcmNotification = new CreateNotificationRequest
+            {
+                BarId = booking.Bar.BarId,
+                MobileDeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
+                WebDeepLink = $"booking-detail/{booking.BookingId}",
+                ImageUrl = bar == null ? null : bar.Images.Split(',')[0],
+                IsPublic = false,
+                Message = message,
+                Title = title,
+                Type = FcmNotificationType.BOOKING,
+                SpecificAccountIds = new List<Guid> { booking.AccountId }
+            };
+
+            await _fcmService.CreateAndSendNotification(fcmNotification);
+        }
     }
 }
