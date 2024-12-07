@@ -1558,8 +1558,7 @@ namespace Application.Service
                     case 0:
                         if ((Status == (int)PrefixValueEnum.Serving &&
                                       (booking.BookingDate.Date != DateTime.Now.Date ||
-                                       booking.BookingTime > DateTime.Now.AddMinutes(45).TimeOfDay)) ||
-                            Status == (int)PrefixValueEnum.Completed)
+                                       booking.BookingTime > DateTime.Now.AddMinutes(45).TimeOfDay)))
                         {
                             throw new CustomException.InvalidDataException("Không thể thực hiện check-in: vẫn chưa đến ngày hoặc thời gian đặt bàn");
                         }

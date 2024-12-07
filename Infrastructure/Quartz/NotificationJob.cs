@@ -101,7 +101,7 @@ namespace Infrastructure.Quartz
                            booking.Status == (int)PrefixValueEnum.PendingBooking)
                         {
                             await _bookingService.UpdateBookingStatusJob(booking.AccountId, booking.BookingId, (int)PrefixValueEnum.Cancelled);
-                            var messages = string.Format(PrefixKeyConstant.BOOKING_CANCEL_NOTI_JOB, booking.BarName);
+                            var messages = string.Format(PrefixKeyConstant.BOOKING_CANCEL_NOTI_JOB, booking.BookingTime, booking.BookingDate ,booking.BarName);
                             
                             _cache.Remove(cacheKey);
                             var bar = await _unitOfWork.BarRepository.GetByIdAsync(booking.BarId);
