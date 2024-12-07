@@ -117,11 +117,11 @@ namespace Application.Service
                     throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
                 }
 
-                var tables = await _unitOfWork.TableRepository.GetAsync(t => t.TableTypeId == TableTypeId && t.IsDeleted == false);
-                if (tables.Any())
-                {
-                    return false;
-                }
+                //var tables = await _unitOfWork.TableRepository.GetAsync(t => t.TableTypeId == TableTypeId && t.IsDeleted == false);
+                //if (tables.Any())
+                //{
+                //    return false;
+                //}
                 existedTableType.IsDeleted = true;
                 await _unitOfWork.TableTypeRepository.UpdateAsync(existedTableType);
                 await _unitOfWork.SaveAsync();
@@ -314,6 +314,14 @@ namespace Application.Service
         {
             try
             {
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+
+                if(!getAccount.BarId.Equals(barId))
+                {
+                    throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
+                }
+
                 var pageIndex = query.PageIndex ?? 1;
                 var pageSize = query.PageSize ?? 6;
 

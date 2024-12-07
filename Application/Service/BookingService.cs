@@ -21,6 +21,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.SqlServer.Server;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using static Domain.CustomException.CustomException;
 
@@ -528,7 +529,9 @@ namespace Application.Service
                 {
                     var existingTables = _unitOfWork.TableRepository
                                                     .Get(t => request.TableIds.Contains(t.TableId) &&
-                                                              t.TableType.BarId.Equals(request.BarId),
+                                                              t.TableType.BarId.Equals(request.BarId) && 
+                                                              t.IsDeleted == false &&
+                                                              t.TableType.IsDeleted == PrefixKeyConstant.FALSE,
                                                               includeProperties: "TableType");
 
                     if (existingTables.Count() != request.TableIds.Count)
@@ -699,7 +702,10 @@ namespace Application.Service
                     var bookingTables = _unitOfWork.BookingTableRepository.Get(t => t.BookingId == booking.BookingId);
                     foreach (var bookingTable in bookingTables)
                     {
-                        var table = _unitOfWork.TableRepository.GetByID(bookingTable.TableId);
+                        var table = _unitOfWork.TableRepository
+                                                .Get(x => x.TableId.Equals(bookingTable.TableId) && x.IsDeleted == false &&
+                                                          x.TableType.IsDeleted == PrefixKeyConstant.FALSE)
+                                                .FirstOrDefault();
                         if (table == null)
                         {
                             throw new CustomException.DataNotFoundException("Không tìm thấy bàn");
@@ -809,7 +815,9 @@ namespace Application.Service
                 {
                     var existingTables = _unitOfWork.TableRepository
                                                         .Get(t => request.TableIds.Contains(t.TableId) &&
-                                                                  t.TableType.BarId.Equals(request.BarId),
+                                                                  t.TableType.BarId.Equals(request.BarId) &&
+                                                                  t.IsDeleted == false &&
+                                                          t.TableType.IsDeleted == PrefixKeyConstant.FALSE,
                                                         includeProperties: "TableType");
                     if (existingTables.Count() != request.TableIds.Count)
                     {
@@ -1209,7 +1217,7 @@ namespace Application.Service
             }
         }
 
-        public async Task ExtraDrinkInServing(Guid bookingId, List<DrinkRequest> request)
+        public async Task<List<BookingDrinkDetailResponse>> ExtraDrinkInServing(Guid bookingId, List<DrinkRequest> request)
         {
             try
             {
@@ -1331,9 +1339,15 @@ namespace Application.Service
                     SpecificAccountIds = getAccStaffOfBar
                 };
 
+                var getAllExtraDrinkOfBk = _unitOfWork.BookingExtraDrinkRepository
+                                                      .Get(filter: x => x.BookingId.Equals(bookingId) && 
+                                                                x.Status != (int)ExtraDrinkStsEnum.Preparing,
+                                                            includeProperties: "Drink");
                 await _fcmService.CreateAndSendNotification(fcmNotification);
                 await _unitOfWork.SaveAsync();
                 _unitOfWork.CommitTransaction();
+                var response = _mapper.Map<List<BookingDrinkDetailResponse>>(getAllExtraDrinkOfBk);
+                return response;
             }
             catch (CustomException.InternalServerErrorException ex)
             {
@@ -1342,7 +1356,7 @@ namespace Application.Service
             }
         }
 
-        public async Task UpdExtraDrinkInServing(Guid bookingId, List<UpdBkDrinkExtraRequest> request)
+        public async Task<List<BookingDrinkDetailResponse>> UpdExtraDrinkInServing(Guid bookingId, List<UpdBkDrinkExtraRequest> request)
         {
             try
             {
@@ -1488,7 +1502,14 @@ namespace Application.Service
                 await _unitOfWork.BookingRepository.UpdateRangeAsync(getBooking);
                 await Task.Delay(10);
                 await _unitOfWork.SaveAsync();
+                var getAllExtraDrinkOfBk = _unitOfWork.BookingExtraDrinkRepository
+                                                      .Get(filter: x => x.BookingId.Equals(bookingId) &&
+                                                                x.Status != (int)ExtraDrinkStsEnum.Preparing,
+                                                            includeProperties: "Drink");
+                var response = _mapper.Map<List<BookingDrinkDetailResponse>>(getAllExtraDrinkOfBk);
+                
                 _unitOfWork.CommitTransaction();
+                return response;
             }
             catch (CustomException.InternalServerErrorException ex)
             {
@@ -1580,8 +1601,7 @@ namespace Application.Service
                     case 0:
                         if ((Status == (int)PrefixValueEnum.Serving &&
                                       (booking.BookingDate.Date != DateTime.Now.Date ||
-                                       booking.BookingTime > DateTime.Now.AddMinutes(45).TimeOfDay)) ||
-                            Status == (int)PrefixValueEnum.Completed)
+                                       booking.BookingTime > DateTime.Now.AddMinutes(45).TimeOfDay)))
                         {
                             throw new CustomException.InvalidDataException("Không thể thực hiện check-in: vẫn chưa đến ngày hoặc thời gian đặt bàn");
                         }
@@ -1615,7 +1635,9 @@ namespace Application.Service
                     var bookingTables = _unitOfWork.BookingTableRepository.Get(t => t.BookingId == booking.BookingId);
                     foreach (var bookingTable in bookingTables)
                     {
-                        var table = _unitOfWork.TableRepository.GetByID(bookingTable.TableId);
+                        var table = _unitOfWork.TableRepository
+                                                .Get(x => x.TableId.Equals(bookingTable.TableId) && x.IsDeleted == false)
+                                                .FirstOrDefault();
                         if (table == null)
                         {
                             throw new CustomException.DataNotFoundException("Không tìm thấy bàn");
@@ -1672,6 +1694,56 @@ namespace Application.Service
             };
 
             await _fcmService.CreateAndSendNotification(fcmNotification);
+        }
+
+        public async Task<List<BookingDrinkDetailResponse>> UpdateStsExtra(UpdateStsBookingExtraDrink request)
+        {
+            try
+            {
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+
+                var isExistExtra = _unitOfWork.BookingExtraDrinkRepository
+                                              .Get(filter: x => x.BookingExtraDrinkId.Equals(request.BookingExtraDrinkId) &&
+                                                                x.BookingId.Equals(request.BookingId) &&
+                                                                x.DrinkId.Equals(request.DrinkId) &&
+                                                                x.Status != (int) ExtraDrinkStsEnum.Delivered,
+                                                   includeProperties: "Booking")
+                                              .FirstOrDefault();
+
+                if (isExistExtra != null && !isExistExtra.Booking.BarId.Equals(getAccount.BarId))
+                {
+                    throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập !");
+                }
+
+                if (isExistExtra is null)
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy đồ uống đặt thêm cho đơn này !");
+                }
+
+                if(isExistExtra.Status == (int)ExtraDrinkStsEnum.Delivered)
+                {
+                    throw new CustomException.InvalidDataException("Đồ uống này đã giao thành công trước đó !");
+                }
+
+                isExistExtra.Status = (int)ExtraDrinkStsEnum.Delivered;
+                isExistExtra.UpdatedDate = DateTime.Now;
+
+                await _unitOfWork.BookingExtraDrinkRepository.UpdateRangeAsync(isExistExtra);
+                await Task.Delay(10);
+                await _unitOfWork.SaveAsync();
+
+                var getAllExtraDrinkOfBk = _unitOfWork.BookingExtraDrinkRepository
+                                                      .Get(filter: x => x.BookingId.Equals(request.BookingId),
+                                                            includeProperties: "Drink");
+
+                var response = _mapper.Map<List<BookingDrinkDetailResponse>>(getAllExtraDrinkOfBk);
+                return response;
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
+            }
         }
     }
 }
