@@ -29,9 +29,11 @@ namespace Application.IService
         Task UpdateStsBookingServing(Guid bookingId);
         Task<(List<StaffBookingReponse> responses, int TotalPage)> GetListBookingAuthorizedAdmin(string qrTicket, Guid? BarId, string? CustomerName, string? Phone, string? Email, DateTimeOffset? bookingDate, TimeSpan? bookingTime, int? Status, int PageIndex, int PageSize);
         Task<BookingDetailByStaff> GetBookingDetailAuthorizedAdmin(Guid BookingId);
-        Task ExtraDrinkInServing(Guid bookingId, List<DrinkRequest> request);
-        Task UpdExtraDrinkInServing(Guid bookingId, List<UpdBkDrinkExtraRequest> request);
+        Task<List<BookingDrinkDetailResponse>> ExtraDrinkInServing(Guid bookingId, List<DrinkRequest> request);
+        Task<List<BookingDrinkDetailResponse>> UpdExtraDrinkInServing(Guid bookingId, List<UpdBkDrinkExtraRequest> request);
         Task<List<BookingDrinkDetailResponse>> GetExtraBookingServing(Guid bookingId);
         Task UpdateBookingStatusJob(Guid AccountId, Guid BookingId, int Status);
+        Task<List<BookingDrinkDetailResponse>> UpdateStsExtra(UpdateStsBookingExtraDrink request);
+
     }
 }
