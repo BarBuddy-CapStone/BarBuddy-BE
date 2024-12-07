@@ -43,7 +43,7 @@ namespace Application.Service
         {
             try
             {
-                var isExistTT = _unitOfWork.TableTypeRepository.GetByID(request.TableTypeId);
+                var isExistTT = _unitOfWork.TableTypeRepository.Get(x => x.TableTypeId.Equals(request.TableTypeId) && x.IsDeleted == false).FirstOrDefault();
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
                 var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
 
@@ -134,9 +134,9 @@ namespace Application.Service
                 //(BarId == null || t.BarId == BarId) &&
                 (TableTypeId == null || t.TableTypeId == TableTypeId) &&
                 (TableName == null || t.TableName.Contains(TableName)) &&
-                t.IsDeleted == false;
+                t.IsDeleted == false && t.TableType.IsDeleted == false;
 
-                var totalTable = (await _unitOfWork.TableRepository.GetAsync(filter: filter)).Count();
+                var totalTable = (await _unitOfWork.TableRepository.GetAsync(filter: filter, includeProperties: "TableType")).Count();
 
                 if (totalTable > 0)
                 {
@@ -200,12 +200,12 @@ namespace Application.Service
                 (t.TableType.Bar.BarId == BarId) &&
                 (TableTypeId == null || t.TableTypeId == TableTypeId) &&
                 (TableName == null || t.TableName.Contains(TableName)) &&
-                t.IsDeleted == false;
+                t.IsDeleted == false && t.TableType.IsDeleted == false;
 
                 if (RequestDate.Date < DateTime.Now.Date) 
                     throw new CustomException.InvalidDataException("Ngày không hợp lệ");
 
-                var totalTable = (await _unitOfWork.TableRepository.GetAsync(filter: filter)).Count();
+                var totalTable = (await _unitOfWork.TableRepository.GetAsync(filter: filter, includeProperties: "TableType")).Count();
 
                 if (totalTable > 0)
                 {

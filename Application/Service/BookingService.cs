@@ -526,7 +526,9 @@ namespace Application.Service
                 {
                     var existingTables = _unitOfWork.TableRepository
                                                     .Get(t => request.TableIds.Contains(t.TableId) &&
-                                                              t.TableType.BarId.Equals(request.BarId),
+                                                              t.TableType.BarId.Equals(request.BarId) && 
+                                                              t.IsDeleted == false &&
+                                                              t.TableType.IsDeleted == PrefixKeyConstant.FALSE,
                                                               includeProperties: "TableType");
 
                     if (existingTables.Count() != request.TableIds.Count)
@@ -697,7 +699,10 @@ namespace Application.Service
                     var bookingTables = _unitOfWork.BookingTableRepository.Get(t => t.BookingId == booking.BookingId);
                     foreach (var bookingTable in bookingTables)
                     {
-                        var table = _unitOfWork.TableRepository.GetByID(bookingTable.TableId);
+                        var table = _unitOfWork.TableRepository
+                                                .Get(x => x.TableId.Equals(bookingTable.TableId) && x.IsDeleted == false &&
+                                                          x.TableType.IsDeleted == PrefixKeyConstant.FALSE)
+                                                .FirstOrDefault();
                         if (table == null)
                         {
                             throw new CustomException.DataNotFoundException("Không tìm thấy bàn");
@@ -805,7 +810,9 @@ namespace Application.Service
                 {
                     var existingTables = _unitOfWork.TableRepository
                                                         .Get(t => request.TableIds.Contains(t.TableId) &&
-                                                                  t.TableType.BarId.Equals(request.BarId),
+                                                                  t.TableType.BarId.Equals(request.BarId) &&
+                                                                  t.IsDeleted == false &&
+                                                          t.TableType.IsDeleted == PrefixKeyConstant.FALSE,
                                                         includeProperties: "TableType");
                     if (existingTables.Count() != request.TableIds.Count)
                     {
@@ -1592,7 +1599,9 @@ namespace Application.Service
                     var bookingTables = _unitOfWork.BookingTableRepository.Get(t => t.BookingId == booking.BookingId);
                     foreach (var bookingTable in bookingTables)
                     {
-                        var table = _unitOfWork.TableRepository.GetByID(bookingTable.TableId);
+                        var table = _unitOfWork.TableRepository
+                                                .Get(x => x.TableId.Equals(bookingTable.TableId) && x.IsDeleted == false)
+                                                .FirstOrDefault();
                         if (table == null)
                         {
                             throw new CustomException.DataNotFoundException("Không tìm thấy bàn");

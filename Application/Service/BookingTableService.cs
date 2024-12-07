@@ -102,7 +102,8 @@ namespace Application.Service
                 var data = await _unitOfWork.TableRepository.GetAsync(
                                                 filter: x => x.TableType.BarId.Equals(request.BarId)
                                                             && x.TableTypeId.Equals(request.TableTypeId)
-                                                          && x.IsDeleted == PrefixKeyConstant.FALSE,
+                                                          && x.IsDeleted == PrefixKeyConstant.FALSE &&
+                                                          x.TableType.IsDeleted == PrefixKeyConstant.FALSE,
                                                 includeProperties: "BookingTables.Booking,TableType.Bar.BarTimes");
 
                 if (data.IsNullOrEmpty())
@@ -154,7 +155,8 @@ namespace Application.Service
             var tableIsExist = _unitOfWork.TableRepository
                                         .Get(filter: x => x.TableType.BarId.Equals(request.BarId)
                                                             && x.TableId.Equals(request.TableId)
-                                                            && x.IsDeleted == PrefixKeyConstant.FALSE,
+                                                            && x.IsDeleted == PrefixKeyConstant.FALSE &&
+                                                          x.TableType.IsDeleted == PrefixKeyConstant.FALSE,
                                                             includeProperties: "TableType.Bar")
                                         .FirstOrDefault();
             if(tableIsExist == null)
@@ -268,7 +270,8 @@ namespace Application.Service
         {
             var tableIsExist = _unitOfWork.TableRepository
                                         .Get(filter: x => x.TableType.BarId.Equals(barId)
-                                                            && x.IsDeleted == PrefixKeyConstant.FALSE);
+                                                            && x.IsDeleted == PrefixKeyConstant.FALSE &&
+                                                          x.TableType.IsDeleted == PrefixKeyConstant.FALSE);
             var accountId = _authentication.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
             List<TableHoldInfo> tableHolds = new List<TableHoldInfo>();
             foreach (var table in tableIsExist)
@@ -297,7 +300,9 @@ namespace Application.Service
             var accountId = _authentication.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
             var tableIsExist = _unitOfWork.TableRepository
                                         .Get(filter: x => x.TableType.BarId.Equals(request.BarId)
-                                                            && x.TableId.Equals(request.TableId))
+                                                            && x.TableId.Equals(request.TableId) &&
+                                                          x.TableType.IsDeleted == PrefixKeyConstant.FALSE,
+                                                          includeProperties: "TableType")
                                         .FirstOrDefault();
             if (tableIsExist == null)
             {
