@@ -317,7 +317,7 @@ namespace Application.Service
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
                 var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
 
-                if(!getAccount.BarId.Equals(barId))
+                if(getAccount.BarId.HasValue && !getAccount.BarId.Equals(barId))
                 {
                     throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
                 }
