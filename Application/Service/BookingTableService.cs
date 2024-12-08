@@ -15,6 +15,7 @@ using Domain.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading;
@@ -200,31 +201,41 @@ namespace Application.Service
                 Utils.ValidateOpenCloseTime(request.Date, request.Time, getTimeOfBar);
 
                 var cacheKey = $"{request.BarId}_{request.TableId}_{request.Date.Date.Date}_{request.Time}";
+                
+                // Tạo CancellationTokenSource với timeout
+                var cts = new CancellationTokenSource();
+                cts.CancelAfter(TimeSpan.FromSeconds(10)); // Set timeout 10 giây
+
                 var cacheEntry = _memoryCache.GetOrCreate(cacheKey, entry =>
                 {
-                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10);
 
-                    entry.RegisterPostEvictionCallback(async (key, value, reason, state) =>
+                    // Đăng ký token để handle khi cache expired
+                    entry.AddExpirationToken(new CancellationChangeToken(cts.Token));
+
+                    // Register callback khi cache bị remove
+                    entry.RegisterPostEvictionCallback((key, value, reason, state) =>
                     {
                         var tableDictionary = value as Dictionary<Guid, TableHoldInfo>;
-                        if (tableDictionary != null)
+                        if (tableDictionary != null && tableDictionary.TryGetValue(request.TableId, out var tableHoldInfo))
                         {
-                            foreach (var tableEntry in tableDictionary)
+                            tableHoldInfo.IsHeld = false;
+                            tableHoldInfo.AccountId = Guid.Empty;
+
+                            // Sử dụng Task.Run để tránh deadlock trong callback
+                            Task.Run(async () =>
                             {
-                                var tableId = tableEntry.Key;
-                                var tableHoldInfo = tableEntry.Value;
-
-                                if (reason == EvictionReason.Expired || reason == EvictionReason.Removed)
+                                try
                                 {
-                                    tableHoldInfo.IsHeld = false;
-                                    tableHoldInfo.AccountId = Guid.Empty;
-
                                     var bkHubResponse = _mapper.Map<BookingHubResponse>(tableHoldInfo);
                                     await _bookingHub.ReleaseTable(bkHubResponse);
-
-                                    _logger.LogInformation($"Cache entry {key} for TableId {tableId} was removed because {reason}. Table is now released.");
+                                    _logger.LogInformation($"Cache entry {key} for TableId {request.TableId} was removed because {reason}. Table is now released.");
                                 }
-                            }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogError(ex, "Error sending SignalR notification on cache eviction");
+                                }
+                            });
                         }
                     });
 
@@ -257,7 +268,23 @@ namespace Application.Service
 
                 _memoryCache.Set(cacheKey, cacheEntry, new MemoryCacheEntryOptions
                 {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10)
+                });
+
+                // Đăng ký callback khi token bị cancel (timeout)
+                cts.Token.Register(async () =>
+                {
+                    try 
+                    {
+                        _memoryCache.Remove(cacheKey);
+                        var bkHubResponse = _mapper.Map<BookingHubResponse>(tableHoldInfo);
+                        await _bookingHub.ReleaseTable(bkHubResponse);
+                        _logger.LogInformation($"Table {request.TableId} was released due to timeout");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error handling table release on timeout");
+                    }
                 });
 
                 return tableHoldInfo;
