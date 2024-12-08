@@ -130,7 +130,9 @@ namespace Application.Service
                             {
                                 TableId = bt.TableId,
                                 TableName = bt.TableName,
-                                Status = matchingBooking?.Booking.Status ?? (int)PrefixValueEnum.Cancelled
+                                Status = matchingBooking?.Booking.Status ?? (int)PrefixValueEnum.Cancelled,
+                                MinimumGuest = bt.TableType.MinimumGuest,
+                                MaximumGuest = bt.TableType.MaximumGuest,
                             };
                         }).ToList()
                     }

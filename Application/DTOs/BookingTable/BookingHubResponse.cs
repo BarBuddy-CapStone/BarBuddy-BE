@@ -13,5 +13,6 @@ namespace Application.DTOs.BookingTable
         public Guid TableId { get; set; }
         public DateTimeOffset Date {  get; set; }
         public TimeSpan Time { get; set; }
+        public DateTimeOffset HoldExpiry { get; set; }
     }
 }
