@@ -39,6 +39,19 @@ namespace BarBuddy_API.Controllers.Table
         }
 
         /// <summary>
+        /// Get Table By Id For Customer
+        /// </summary>
+        /// <param name="TableIdList"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "CUSTOMER")]
+        [HttpGet("tableList")]
+        public async Task<IActionResult> GetTableInformationList([FromQuery] List<Guid> TableIdList)
+        {
+            var responses = await _tableService.GetTableInformationByCustomer(TableIdList);
+            return CustomResult("Tải dữ liệu thành công", responses);
+        }
+
+        /// <summary>
         /// Get All Table Of Bar For Managing by Manage/Staff
         /// </summary>
         /// <param name="BarId"></param>

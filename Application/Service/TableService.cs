@@ -449,5 +449,41 @@ namespace Application.Service
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
+
+        public async Task<List<TableInfoResponse>> GetTableInformationByCustomer(List<Guid> TableIdList)
+        {
+            try
+            {
+                var TableListResponse = new List<TableInfoResponse>();
+                foreach (var tableId in TableIdList)
+                {
+                    var table = (await _unitOfWork.TableRepository.GetAsync(t => t.TableId == tableId, includeProperties: "TableType")).FirstOrDefault();
+                    if(table != null)
+                    {
+                        var tableResponse = new TableInfoResponse
+                        {
+                            TableId = table.TableId,
+                            MaximumGuest = table.TableType.MaximumGuest,
+                            MinimumGuest = table.TableType.MinimumGuest,
+                            MinimumPrice = table.TableType.MinimumPrice,
+                            TableName = table.TableName,
+                            TableTypeId = table.TableTypeId,
+                            TableTypeName = table.TableName,
+                        };
+
+                        TableListResponse.Add(tableResponse);
+                    }
+                }
+                return TableListResponse;
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
     }
 }
