@@ -14,6 +14,7 @@ namespace Application.DTOs.Booking
         [MinLength(1, ErrorMessage ="Bạn phải chọn ít nhất 1 bàn để đặt !")]
         [MaxLength(5, ErrorMessage ="Bạn chỉ được đặt tối đa 5 bàn !")]
         public List<Guid>? TableIds { get; set; }
+        public int NumOfPeople { get; set; }
 
         public static ValidationResult? ValidateBookingDate(DateTime bookingDate, ValidationContext context)
         {
