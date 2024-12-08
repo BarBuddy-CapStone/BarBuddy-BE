@@ -89,26 +89,26 @@ namespace BarBuddy_API.Controllers.Payment
         /// <param name="request"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        [AllowAnonymous]
-        [HttpGet("momo-return")]
-        public async Task<IActionResult> GetMomoReturn([FromQuery] MomoOneTimePaymentResultRequest request)
-        {
-            string? redirectUrl = _configuration["Payment:SuccessUrl"];
-            var result = Guid.Empty;
-            try
-            {
-                result = await _paymentService.ProcessMomoPaymentReturn(request);
-            }
-            catch (CustomException.InvalidDataException)
-            {
-                redirectUrl = _configuration["Payment:FailedUrl"];
-            }
-            catch (Exception ex)
-            {
-                redirectUrl = _configuration["Payment:ErrorUrl"];
-            }
-            return Redirect($"{redirectUrl}{result}");
-        }
+        //[AllowAnonymous]
+        //[HttpGet("momo-return")]
+        //public async Task<IActionResult> GetMomoReturn([FromQuery] MomoOneTimePaymentResultRequest request)
+        //{
+        //    string? redirectUrl = _configuration["Payment:SuccessUrl"];
+        //    var result = Guid.Empty;
+        //    try
+        //    {
+        //        result = await _paymentService.ProcessMomoPaymentReturn(request);
+        //    }
+        //    catch (CustomException.InvalidDataException)
+        //    {
+        //        redirectUrl = _configuration["Payment:FailedUrl"];
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        redirectUrl = _configuration["Payment:ErrorUrl"];
+        //    }
+        //    return Redirect($"{redirectUrl}{result}");
+        //}
 
         /// <summary>
         /// Get Payment Detail by paymentHistoryId
