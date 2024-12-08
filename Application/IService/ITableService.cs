@@ -12,6 +12,7 @@ namespace Application.IService
     public interface ITableService
     {
         Task<(List<TableResponse> response, int TotalPage)> GetAll(Guid? TableTypeId, string? TableName, int? Status, int PageIndex, int PageSize);
+        Task<List<TableInfoResponse>> GetTableInformationByCustomer(List<Guid> TableIdList);
         Task CreateTable(CreateTableRequest request);
         Task UpdateTable(Guid TableId, UpdateTableRequest request);
         Task UpdateTableStatus(Guid TableId, int status);
