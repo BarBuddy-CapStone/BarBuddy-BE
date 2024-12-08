@@ -1744,7 +1744,7 @@ namespace Application.Service
                 {
                     throw new CustomException.InvalidDataException("Đồ uống này đã giao thành công trước đó !");
                 }
-
+                isExistExtra.StaffId = accountId;
                 isExistExtra.Status = (int)ExtraDrinkStsEnum.Delivered;
                 isExistExtra.UpdatedDate = DateTime.Now;
 
