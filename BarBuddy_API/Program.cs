@@ -1,13 +1,6 @@
-﻿using Application.IService;
-using Application.Service;
-using BarBuddy_API.DependencyInjection;
+﻿using BarBuddy_API.DependencyInjection;
 using BarBuddy_API.Middleware;
-using Infrastructure.DependencyInjection;
 using Infrastructure.SignalR;
-using Infrastructure.Vnpay.Config;
-using Infrastructure.Zalopay.Config;
-using Microsoft.OpenApi.Models;
-using Persistence.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,7 +30,7 @@ builder.Services.AddPresentation(builder.Configuration);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if(app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();

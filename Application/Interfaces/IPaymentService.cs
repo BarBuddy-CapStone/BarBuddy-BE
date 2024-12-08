@@ -9,6 +9,6 @@ namespace Application.Interfaces
         Task<PaymentDetailResponse> GetPaymentDetail(Guid paymentHistoryId);
         PaymentLink GetPaymentLink(Guid bookingId, Guid accountId, string PaymentDestination, double totalPrice, bool isMobile = false);
         Task<Guid> ProcessVnpayPaymentReturn(VnpayResponse response);
-        Task<Guid> ProcessMomoPaymentReturn(MomoOneTimePaymentResultRequest request);
+        //Task<Guid> ProcessMomoPaymentReturn(MomoOneTimePaymentResultRequest request);
     }
 }

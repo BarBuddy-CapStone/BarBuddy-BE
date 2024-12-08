@@ -14,8 +14,6 @@ using System.Text;
 using Domain.IRepository;
 using Infrastructure.SignalR;
 using Infrastructure.Vnpay.Config;
-using Infrastructure.Zalopay.Config;
-using Infrastructure.Momo.Config;
 
 using Quartz;
 using Infrastructure.QRService;
@@ -45,9 +43,7 @@ namespace Infrastructure.DependencyInjection
             services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
 
             //Config
-            services.Configure<ZalopayConfig>(configuration.GetSection(ZalopayConfig.ConfigName));
             services.Configure<VnpayConfig>(configuration.GetSection(VnpayConfig.ConfigName));
-            services.Configure<MomoConfig>(configuration.GetSection(MomoConfig.ConfigName));
 
             // Add Firebase Configuration
             services.Configure<FirebaseConfig>(
