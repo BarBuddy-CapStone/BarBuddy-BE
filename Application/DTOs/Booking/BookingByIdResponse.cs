@@ -28,6 +28,8 @@ namespace Application.DTOs.Booking
         public int Status { get; set; }
         public bool? IsRated { get; set; }
         public List<string> TableNameList { get; set; } = new List<string>();
+        public int NumOfTable { get; set; }
+        public int NumOfPeople { get; set; }
         public List<BookingDrinkDetailResponse> bookingDrinksList { get; set; } = new List<BookingDrinkDetailResponse>();
         public List<BookingDrinkExtraResponse> BookingDrinkExtraResponses { get; set; } = new List<BookingDrinkExtraResponse>();
     }

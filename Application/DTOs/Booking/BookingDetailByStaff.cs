@@ -25,6 +25,8 @@ namespace Application.DTOs.Booking
         public DateTimeOffset BookingDate { get; set; }
         public TimeSpan BookingTime { get; set; }
         public DateTime CreateAt { get; set; }
+        public int NumOfPeople { get; set; }
+        public int NumOfTable { get; set; }
         public List<BookingDrinkDetailResponse> bookingDrinksList { get; set; } = new List<BookingDrinkDetailResponse>();
         public List<BookingDrinkExtraResponse>? BookingDrinkExtraResponses { get; set; } = new List<BookingDrinkExtraResponse>();
         public List<BookingTableResponseByStaff> bookingTableList { get; set; } = new List<BookingTableResponseByStaff>();
