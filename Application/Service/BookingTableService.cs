@@ -18,7 +18,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using System.Threading;
-using static Domain.CustomException.CustomException;
 
 namespace Application.Service
 {
@@ -96,7 +95,7 @@ namespace Application.Service
                 }
                 else
                 {
-                    throw new DataNotFoundException("Không tìm thấy khung giờ của quán Bar !");
+                    throw new CustomException.DataNotFoundException("Không tìm thấy khung giờ của quán Bar !");
                 }
 
                 var data = await _unitOfWork.TableRepository.GetAsync(
@@ -139,9 +138,9 @@ namespace Application.Service
 
                 return response;
             }
-            catch (DataNotFoundException ex)
+            catch (CustomException.DataNotFoundException ex)
             {
-                throw new DataNotFoundException(ex.Message);
+                throw new CustomException.DataNotFoundException(ex.Message);
             }
             catch (CustomException.InternalServerErrorException ex)
             {
@@ -201,12 +200,11 @@ namespace Application.Service
                 var cacheKey = $"{request.BarId}_{request.TableId}_{request.Date.Date.Date}_{request.Time}";
                 var cacheEntry = _memoryCache.GetOrCreate(cacheKey, entry =>
                 {
-                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
 
-                    entry.RegisterPostEvictionCallback((key, value, reason, state) =>
+                    entry.RegisterPostEvictionCallback(async (key, value, reason, state) =>
                     {
                         var tableDictionary = value as Dictionary<Guid, TableHoldInfo>;
-
                         if (tableDictionary != null)
                         {
                             foreach (var tableEntry in tableDictionary)
@@ -214,13 +212,16 @@ namespace Application.Service
                                 var tableId = tableEntry.Key;
                                 var tableHoldInfo = tableEntry.Value;
 
-                                if (tableHoldInfo.HoldExpiry < DateTimeOffset.Now)
+                                if (reason == EvictionReason.Expired || reason == EvictionReason.Removed)
                                 {
                                     tableHoldInfo.IsHeld = false;
                                     tableHoldInfo.AccountId = Guid.Empty;
-                                }
 
-                                _logger.LogInformation($"Cache entry {key} for TableId {tableId} was removed because {reason}. Table is now released.");
+                                    var bkHubResponse = _mapper.Map<BookingHubResponse>(tableHoldInfo);
+                                    await _bookingHub.ReleaseTable(bkHubResponse);
+
+                                    _logger.LogInformation($"Cache entry {key} for TableId {tableId} was removed because {reason}. Table is now released.");
+                                }
                             }
                         }
                     });
@@ -254,7 +255,7 @@ namespace Application.Service
 
                 _memoryCache.Set(cacheKey, cacheEntry, new MemoryCacheEntryOptions
                 {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
                 });
 
                 return tableHoldInfo;
