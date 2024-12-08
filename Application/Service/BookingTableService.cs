@@ -204,11 +204,11 @@ namespace Application.Service
                 
                 // Tạo CancellationTokenSource với timeout
                 var cts = new CancellationTokenSource();
-                cts.CancelAfter(TimeSpan.FromSeconds(10)); // Set timeout 10 giây
+                cts.CancelAfter(TimeSpan.FromMinutes(1));
 
                 var cacheEntry = _memoryCache.GetOrCreate(cacheKey, entry =>
                 {
-                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10);
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
 
                     // Đăng ký token để handle khi cache expired
                     entry.AddExpirationToken(new CancellationChangeToken(cts.Token));
@@ -222,7 +222,6 @@ namespace Application.Service
                             tableHoldInfo.IsHeld = false;
                             tableHoldInfo.AccountId = Guid.Empty;
 
-                            // Sử dụng Task.Run để tránh deadlock trong callback
                             Task.Run(async () =>
                             {
                                 try
@@ -268,7 +267,7 @@ namespace Application.Service
 
                 _memoryCache.Set(cacheKey, cacheEntry, new MemoryCacheEntryOptions
                 {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(10)
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
                 });
 
                 // Đăng ký callback khi token bị cancel (timeout)
