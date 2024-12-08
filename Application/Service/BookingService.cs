@@ -266,6 +266,8 @@ namespace Application.Service
                 response.QrTicket = booking.QRTicket;
                 response.IsRated = isRated;
                 response.Images = booking.Bar.Images.Split(',').ToList();
+                response.NumOfPeople = booking.NumOfPeople;
+                response.NumOfTable = booking.NumOfTable;
 
                 if (booking.TotalPrice >= 0 || (booking.AdditionalFee >= 0 && booking.AdditionalFee.HasValue))
                 {
@@ -339,6 +341,8 @@ namespace Application.Service
                 response.TotalPrice = booking.TotalPrice;
                 response.Note = booking.Note;
                 response.QRTicket = booking.QRTicket;
+                response.NumOfPeople = booking.NumOfPeople;
+                response.NumOfTable = booking.NumOfTable;
 
                 if (booking.TotalPrice >= 0 || (booking.AdditionalFee >= 0 && booking.AdditionalFee.HasValue))
                 {
@@ -428,7 +432,9 @@ namespace Application.Service
                         AdditionalFee = booking.AdditionalFee,
                         TotalPrice = booking.TotalPrice,
                         QRTicket = booking.QRTicket,
-                        Note = booking.Note
+                        Note = booking.Note,
+                        NumOfPeople = booking.NumOfPeople,
+                        NumOfTable = booking.NumOfTable
                     };
                     responses.Add(response);
                 }
@@ -1201,6 +1207,8 @@ namespace Application.Service
                 response.TotalPrice = booking.TotalPrice;
                 response.Note = booking.Note;
                 response.QRTicket = booking.QRTicket;
+                response.NumOfPeople = booking.NumOfPeople;
+                response.NumOfTable = booking.NumOfTable;
 
                 if (booking.TotalPrice >= 0 || (booking.AdditionalFee >= 0 && booking.AdditionalFee.HasValue))
                 {
