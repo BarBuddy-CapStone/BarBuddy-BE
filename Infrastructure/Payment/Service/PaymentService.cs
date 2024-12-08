@@ -13,10 +13,7 @@ using Domain.Enums;
 using Domain.IRepository;
 using Domain.Utils;
 using Infrastructure.Integrations;
-using Infrastructure.Momo.Config;
 using Infrastructure.Vnpay.Config;
-using Infrastructure.Zalopay.Config;
-using Infrastructure.Zalopay.Request;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -29,26 +26,20 @@ namespace Infrastructure.Payment.Service
 {
     public class PaymentService : IPaymentService
     {
-        private readonly ZalopayConfig zaloPayConfig;
         private readonly VnpayConfig vnPayConfig;
-        private readonly MomoConfig momoConfig;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IUnitOfWork unitOfWork;
         private readonly IMapper mapper;
         private readonly IFcmService _fcmService;
 
         public PaymentService(
-            IOptions<ZalopayConfig> zaloPayConfigOptions,
             IOptions<VnpayConfig> vnPayConfigOptions,
-            IOptions<MomoConfig> momoConfigOptions,
             IHttpContextAccessor httpContextAccessor,
             IUnitOfWork unitOfWork,
             IMapper mapper,
             IFcmService fcmService)
         {
-            zaloPayConfig = zaloPayConfigOptions.Value;
             vnPayConfig = vnPayConfigOptions.Value;
-            momoConfig = momoConfigOptions.Value;
             this.httpContextAccessor = httpContextAccessor;
             this.unitOfWork = unitOfWork;
             this.mapper = mapper;
@@ -68,10 +59,10 @@ namespace Infrastructure.Payment.Service
                 {
                     case "VNPAY":
                         return GetVnpayPaymentLink(bookingId, accountId, PaymentDestination, totalPrice);
-                    case "ZALOPAY":
-                        return GetZalopayPaymentLink(bookingId, accountId, PaymentDestination, totalPrice);
-                    case "MOMO":
-                        return GetMomopayPaymentLink(bookingId, accountId, PaymentDestination, totalPrice);
+                    //case "ZALOPAY":
+                    //    return GetZalopayPaymentLink(bookingId, accountId, PaymentDestination, totalPrice);
+                    //case "MOMO":
+                    //    return GetMomopayPaymentLink(bookingId, accountId, PaymentDestination, totalPrice);
                     default:
                         throw new InternalServerErrorException("Không tìm thấy phương thức thích hợp");
                 }
@@ -109,58 +100,58 @@ namespace Infrastructure.Payment.Service
             }
         }
 
-        private PaymentLink GetZalopayPaymentLink(Guid bookingId, Guid accountId,
-            string paymentDestination, double totalPrice)
-        {
-            var paymentHistory = CreatePaymentHistory(bookingId, accountId, paymentDestination, totalPrice);
+        //private PaymentLink GetZalopayPaymentLink(Guid bookingId, Guid accountId,
+        //    string paymentDestination, double totalPrice)
+        //{
+        //    var paymentHistory = CreatePaymentHistory(bookingId, accountId, paymentDestination, totalPrice);
 
-            var outputIdParam = RandomHelper.GenerateRandomNumberString();
-            var zalopayPayRequest = new CreateZalopayRequest(zaloPayConfig.AppId, zaloPayConfig.AppUser,
-                                        DateTime.Now.GetTimeStamp(), (long)paymentHistory.TotalPrice!,
-                                        DateTime.Now.ToString("yymmdd") + "_" + outputIdParam!.ToString() ?? string.Empty,
-                                        "zalopayapp", paymentHistory.PaymentHistoryId.ToString());
-            zalopayPayRequest.MakeSignature(zaloPayConfig.Key1);
-            (bool createZaloPayLinkResult, string? createZaloPayMessage) = zalopayPayRequest.GetLink(zaloPayConfig.PaymentUrl);
-            if (createZaloPayLinkResult)
-            {
-                var zaloPayResult = new PaymentLink
-                {
-                    PaymentId = outputIdParam,
-                    PaymentUrl = createZaloPayMessage
-                };
-                return zaloPayResult;
-            }
-            else
-            {
-                throw new InternalServerErrorException("Có lỗi tại GetPaymentLink");
-            }
-        }
+        //    var outputIdParam = RandomHelper.GenerateRandomNumberString();
+        //    var zalopayPayRequest = new CreateZalopayRequest(zaloPayConfig.AppId, zaloPayConfig.AppUser,
+        //                                DateTime.Now.GetTimeStamp(), (long)paymentHistory.TotalPrice!,
+        //                                DateTime.Now.ToString("yymmdd") + "_" + outputIdParam!.ToString() ?? string.Empty,
+        //                                "zalopayapp", paymentHistory.PaymentHistoryId.ToString());
+        //    zalopayPayRequest.MakeSignature(zaloPayConfig.Key1);
+        //    (bool createZaloPayLinkResult, string? createZaloPayMessage) = zalopayPayRequest.GetLink(zaloPayConfig.PaymentUrl);
+        //    if (createZaloPayLinkResult)
+        //    {
+        //        var zaloPayResult = new PaymentLink
+        //        {
+        //            PaymentId = outputIdParam,
+        //            PaymentUrl = createZaloPayMessage
+        //        };
+        //        return zaloPayResult;
+        //    }
+        //    else
+        //    {
+        //        throw new InternalServerErrorException("Có lỗi tại GetPaymentLink");
+        //    }
+        //}
 
-        private PaymentLink GetMomopayPaymentLink(Guid bookingId, Guid accountId, string paymentDestination, double totalPrice)
-        {
-            var paymentHistory = CreatePaymentHistory(bookingId, accountId, paymentDestination, totalPrice);
+        //private PaymentLink GetMomopayPaymentLink(Guid bookingId, Guid accountId, string paymentDestination, double totalPrice)
+        //{
+        //    var paymentHistory = CreatePaymentHistory(bookingId, accountId, paymentDestination, totalPrice);
 
-            var outputIdParam = RandomHelper.GenerateRandomNumberString();
-            var momoOneTimePayRequest = new MomoOneTimePaymentRequest(momoConfig.PartnerCode,
-                    outputIdParam?.ToString() ?? string.Empty, (long)paymentHistory.TotalPrice!,
-                    outputIdParam?.ToString() ?? string.Empty, paymentHistory.PaymentHistoryId.ToString(),
-                    momoConfig.ReturnUrl, momoConfig.IpnUrl, "captureWallet", string.Empty);
-            momoOneTimePayRequest.MakeSignature(momoConfig.AccessKey, momoConfig.SecretKey);
-            (bool createMomoLinkResult, string? createMessage) = momoOneTimePayRequest.GetLink(momoConfig.PaymentUrl);
-            if (createMomoLinkResult)
-            {
-                var momoPayResult = new PaymentLink
-                {
-                    PaymentId = outputIdParam,
-                    PaymentUrl = createMessage
-                };
-                return momoPayResult;
-            }
-            else
-            {
-                throw new InternalServerErrorException("Có lỗi tại GetPaymentLink");
-            }
-        }
+        //    var outputIdParam = RandomHelper.GenerateRandomNumberString();
+        //    var momoOneTimePayRequest = new MomoOneTimePaymentRequest(momoConfig.PartnerCode,
+        //            outputIdParam?.ToString() ?? string.Empty, (long)paymentHistory.TotalPrice!,
+        //            outputIdParam?.ToString() ?? string.Empty, paymentHistory.PaymentHistoryId.ToString(),
+        //            momoConfig.ReturnUrl, momoConfig.IpnUrl, "captureWallet", string.Empty);
+        //    momoOneTimePayRequest.MakeSignature(momoConfig.AccessKey, momoConfig.SecretKey);
+        //    (bool createMomoLinkResult, string? createMessage) = momoOneTimePayRequest.GetLink(momoConfig.PaymentUrl);
+        //    if (createMomoLinkResult)
+        //    {
+        //        var momoPayResult = new PaymentLink
+        //        {
+        //            PaymentId = outputIdParam,
+        //            PaymentUrl = createMessage
+        //        };
+        //        return momoPayResult;
+        //    }
+        //    else
+        //    {
+        //        throw new InternalServerErrorException("Có lỗi tại GetPaymentLink");
+        //    }
+        //}
 
         private PaymentLink GetVnpayPaymentLinkByMobile(Guid bookingId, Guid accountId,
             string paymentDestination, double totalPrice)
@@ -317,50 +308,50 @@ namespace Infrastructure.Payment.Service
             }
         }
 
-        public async Task<Guid> ProcessMomoPaymentReturn(MomoOneTimePaymentResultRequest request)
-        {
-            var isValidSignature = request.IsValidSignature(momoConfig.AccessKey, momoConfig.SecretKey);
-            if (isValidSignature && !request.orderInfo.IsNullOrEmpty())
-            {
-                var paymentHistory = (await unitOfWork.PaymentHistoryRepository
-                    .GetAsync(
-                        filter: x => x.PaymentHistoryId == Guid.Parse(request.orderInfo),
-                        includeProperties: "Booking"))
-                    .FirstOrDefault();
-                if (paymentHistory != null)
-                {
-                    if (request.resultCode != 0)
-                    {
-                        paymentHistory.Booking.Status = (int)PrefixValueEnum.Cancelled;
-                        paymentHistory.Status = (int)PaymentStatusEnum.Failed;
-                        await unitOfWork.PaymentHistoryRepository.UpdateAsync(paymentHistory);
-                        await unitOfWork.SaveAsync();
-                        throw new CustomException.InvalidDataException("Payment process failed");
-                    }
-                    try
-                    {
-                        paymentHistory.Status = (int)PaymentStatusEnum.Success;
-                        paymentHistory.Booking.Status = (int)PrefixValueEnum.PendingBooking;
-                        paymentHistory.TransactionCode = $"{DateTime.Now.ToString("yyyyMMdd")}-{request.transId}";
-                        await unitOfWork.PaymentHistoryRepository.UpdateAsync(paymentHistory);
-                        await unitOfWork.SaveAsync();
-                        return paymentHistory.PaymentHistoryId;
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new Exception(ex.Message);
-                    }
-                }
-                else
-                {
-                    throw new DataNotFoundException("Can't find payment at payment service");
-                }
-            }
-            else
-            {
-                throw new CustomException.InvalidDataException("Invalid signature in response");
-            }
-        }
+        //public async Task<Guid> ProcessMomoPaymentReturn(MomoOneTimePaymentResultRequest request)
+        //{
+        //    var isValidSignature = request.IsValidSignature(momoConfig.AccessKey, momoConfig.SecretKey);
+        //    if (isValidSignature && !request.orderInfo.IsNullOrEmpty())
+        //    {
+        //        var paymentHistory = (await unitOfWork.PaymentHistoryRepository
+        //            .GetAsync(
+        //                filter: x => x.PaymentHistoryId == Guid.Parse(request.orderInfo),
+        //                includeProperties: "Booking"))
+        //            .FirstOrDefault();
+        //        if (paymentHistory != null)
+        //        {
+        //            if (request.resultCode != 0)
+        //            {
+        //                paymentHistory.Booking.Status = (int)PrefixValueEnum.Cancelled;
+        //                paymentHistory.Status = (int)PaymentStatusEnum.Failed;
+        //                await unitOfWork.PaymentHistoryRepository.UpdateAsync(paymentHistory);
+        //                await unitOfWork.SaveAsync();
+        //                throw new CustomException.InvalidDataException("Payment process failed");
+        //            }
+        //            try
+        //            {
+        //                paymentHistory.Status = (int)PaymentStatusEnum.Success;
+        //                paymentHistory.Booking.Status = (int)PrefixValueEnum.PendingBooking;
+        //                paymentHistory.TransactionCode = $"{DateTime.Now.ToString("yyyyMMdd")}-{request.transId}";
+        //                await unitOfWork.PaymentHistoryRepository.UpdateAsync(paymentHistory);
+        //                await unitOfWork.SaveAsync();
+        //                return paymentHistory.PaymentHistoryId;
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                throw new Exception(ex.Message);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            throw new DataNotFoundException("Can't find payment at payment service");
+        //        }
+        //    }
+        //    else
+        //    {
+        //        throw new CustomException.InvalidDataException("Invalid signature in response");
+        //    }
+        //}
 
         private PaymentHistory CreatePaymentHistory(Guid bookingId, Guid accountId, string PaymentDestination, double totalPrice)
         {
