@@ -541,8 +541,8 @@ namespace Application.Service
                 booking.BookingTime = request.BookingTime;
                 booking.ExpireAt = (request.BookingDate + request.BookingTime).AddHours(2);
                 booking.TotalPrice = null;
-
-                if (request.TableIds != null && request.TableIds.Count > 0)
+                booking.NumOfTable = request?.TableIds?.Count ?? 0;
+                if (request?.TableIds != null && request.TableIds.Count > 0)
                 {
                     var existingTables = _unitOfWork.TableRepository
                                                     .Get(t => request.TableIds.Contains(t.TableId) &&
@@ -820,7 +820,7 @@ namespace Application.Service
                 booking.Status = (int)PrefixValueEnum.PendingBooking;
                 booking.BookingTime = request.BookingTime;
                 booking.CreateAt = TimeHelper.ConvertDateTimeToUtcPlus7(DateTime.UtcNow);
-
+                booking.NumOfTable = request?.TableIds?.Count ?? 0;
                 var qrCode = _qrCodeService.GenerateQRCode(booking.BookingId);
                 booking.QRTicket = await _firebase.UploadImageAsync(Utils.ConvertBase64ToFile(qrCode));
 

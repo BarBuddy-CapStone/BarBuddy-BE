@@ -11,5 +11,7 @@ namespace Application.DTOs.Table
         public Guid TableId { get; set; }
         public string TableName { get; set; }
         public int Status { get; set; }
+        public int MinimumGuest { get; set; }
+        public int MaximumGuest { get; set; }
     }
 }
