@@ -353,5 +353,37 @@ namespace Application.Service
             }
         }
 
+        public async Task<List<TableTypeResponse>> GetAllTTOfBarByCustomer(Guid barId)
+        {
+            try
+            {
+                var existingBar = await _unitOfWork.BarRepository.GetByIdAsync(barId);
+
+                if (existingBar == null) {
+                    throw new CustomException.DataNotFoundException("Bar không tồn tại");
+                }
+
+                var tableTypes = (await _unitOfWork.TableTypeRepository
+                                                        .GetAsync(filter: t => t.IsDeleted == false
+                                                                            && t.BarId.Equals(barId),
+                                                        orderBy: o => o.OrderByDescending(t => t.MinimumPrice)))
+                                                        .ToList();
+
+                List<TableTypeResponse> response = new List<TableTypeResponse> ();
+                foreach (var tableType in tableTypes) { 
+                    response.Add(_mapper.Map<TableTypeResponse>(tableType));
+                }
+
+                return response;
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                throw new CustomException.DataNotFoundException(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new CustomException.InternalServerErrorException(ex.Message);
+            }
+        }
     }
 }

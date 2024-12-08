@@ -165,5 +165,29 @@ namespace BarBuddy_API.Controllers.TableType
                 return CustomResult($"{ex.Message}", System.Net.HttpStatusCode.InternalServerError);
             }
         }
+
+        /// <summary>
+        /// Get All TT Of Bar By Customer
+        /// </summary>
+        /// <param name="barId"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "CUSTOMER")]
+        [HttpGet("Bar")]
+        public async Task<IActionResult> GetAllTTOfBarByCustomer([Required] Guid barId)
+        {
+            try
+            {
+                var response = await _tableTypeService.GetAllTTOfBarByCustomer(barId);
+                return CustomResult("Đã tải dữ liệu thành công.", response);
+            }
+            catch (CustomException.DataNotFoundException ex)
+            {
+                return CustomResult($"{ex.Message}", System.Net.HttpStatusCode.NotFound);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult($"{ex.Message}", System.Net.HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }

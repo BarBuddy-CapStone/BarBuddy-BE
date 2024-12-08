@@ -271,6 +271,17 @@ namespace Application.Service
                 {
                     response.bookingDrinksList = _mapper.Map<List<BookingDrinkDetailResponse>>(booking.BookingDrinks);
                     response.BookingDrinkExtraResponses = _mapper.Map<List<BookingDrinkExtraResponse>>(booking.BookingExtraDrinks);
+                    foreach (var drink in response.BookingDrinkExtraResponses)
+                    {
+                        if (drink.StaffId != null)
+                        {
+                            var staff = await _unitOfWork.AccountRepository.GetByIdAsync(drink.StaffId);
+                            drink.StaffName = staff != null ? staff.Fullname : "Nhân viên";
+                        } else
+                        {
+                            drink.StaffName = "Nhân viên";
+                        }
+                    }
                 }
 
                 var bookingTables = await _unitOfWork.BookingTableRepository.GetAsync(bt => bt.BookingId == BookingId, includeProperties: "Table");

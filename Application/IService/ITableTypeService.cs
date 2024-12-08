@@ -17,5 +17,6 @@ namespace Application.IService
         Task UpdateTableType(TableTypeRequest request, Guid TableTypeId);
         Task<bool> DeleteTableType(Guid TableTypeId);
         Task<PaginationTableTypeResponse> GetAllTTOfBar(Guid barId, ObjectQuery query);
+        Task<List<TableTypeResponse>> GetAllTTOfBarByCustomer(Guid barId);
     }
 }
