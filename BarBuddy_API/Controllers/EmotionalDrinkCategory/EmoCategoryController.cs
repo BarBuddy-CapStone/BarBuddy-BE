@@ -51,7 +51,7 @@ namespace BarBuddy_API.Controllers.EmotionalDrinkCategory
         public async Task<IActionResult> CreateEmotionCategory(CreateEmotionCategoryRequest request)
         {
             var emotional = await _emotionalDrinkCategory.CreateEmotionCategory(request);
-            return CustomResult("Thêm Danh mục cảm xúc thành công.", emotional);
+            return CustomResult("Đã tạo danh mục cảm xúc thành công.", emotional);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace BarBuddy_API.Controllers.EmotionalDrinkCategory
         public async Task<IActionResult> UpdateEmotionCategory(Guid id, UpdateEmotionCategoryRequest request)
         {
             var emotional = await _emotionalDrinkCategory.UpdateEmotionCategory(id, request);
-            return CustomResult("Cập Nhật Danh mục cảm xúc thành công.", emotional);
+            return CustomResult("Đã cập nhật Danh mục cảm xúc thành công.", emotional);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace BarBuddy_API.Controllers.EmotionalDrinkCategory
         public async Task<IActionResult> DeleteEmotionCategory(Guid id)
         {
             await _emotionalDrinkCategory.DeleteEmotionCategory(id);
-            return CustomResult("Xóa Danh mục cảm xúc thành công.");
+            return CustomResult("Đã xóa Danh mục cảm xúc thành công.");
         }
         /// <summary>
         /// Get Emotion Category Of Bar
@@ -91,7 +91,7 @@ namespace BarBuddy_API.Controllers.EmotionalDrinkCategory
             try
             {
                 var emotional = await _emotionalDrinkCategory.GetEmotionCategoryOfBar(barId);
-                return CustomResult("Tải dữ liệu thành công", emotional);
+                return CustomResult("Đã tải dữ liệu thành công", emotional);
             }
             catch (CustomException.DataNotFoundException ex)
             {

@@ -33,7 +33,7 @@ namespace BarBuddy_API.Controllers.Bar
             try
             {
                 var response = await _barService.GetAllBar(query);
-                return CustomResult("Data loaded", response);
+                return CustomResult("Đã tải dự liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException e)
             {
@@ -57,7 +57,7 @@ namespace BarBuddy_API.Controllers.Bar
             try
             {
                 var response = await _barService.GetAllBarWithFeedback(query);
-                return CustomResult("Data loaded", response);
+                return CustomResult("Đã tải dự liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException e)
             {
@@ -80,7 +80,7 @@ namespace BarBuddy_API.Controllers.Bar
             try
             {
                 var response = await _barService.GetAllAvailableBars(datePicker, query);
-                return CustomResult("Data loaded", response);
+                return CustomResult("Đã tải dự liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException e)
             {
@@ -105,7 +105,7 @@ namespace BarBuddy_API.Controllers.Bar
             try
             {
                 var response = await _barService.GetBarByIdWithFeedback(barId);
-                return CustomResult("Data loaded", response);
+                return CustomResult("Đã tải dự liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException e)
             {
@@ -129,7 +129,7 @@ namespace BarBuddy_API.Controllers.Bar
             try
             {
                 var response = await _barService.GetBarByIdWithTable(barId);
-                return CustomResult("Data loaded", response);
+                return CustomResult("Đã tải dự liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException e)
             {
@@ -154,7 +154,7 @@ namespace BarBuddy_API.Controllers.Bar
             try
             {
                 var response = await _barService.GetBarById(barId);
-                return CustomResult("Data loaded", response);
+                return CustomResult("Đã tải dự liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException e)
             {
@@ -179,7 +179,7 @@ namespace BarBuddy_API.Controllers.Bar
             try
             {
                 await _barService.CreateBar(request);
-                return CustomResult("Created Successfully");
+                return CustomResult("Đã tạo quán bar thành công !");
             }
             catch (CustomException.InvalidDataException e)
             {
@@ -210,7 +210,7 @@ namespace BarBuddy_API.Controllers.Bar
             try
             {
                 var response = await _barService.UpdateBarById(request);
-                return CustomResult("Updated Successfully", response);
+                return CustomResult("Cập nhật quán Bar thành công !", response);
             }
             catch (CustomException.InvalidDataException e)
             {
@@ -239,7 +239,7 @@ namespace BarBuddy_API.Controllers.Bar
             try
             {
                 var response = await _barService.GetRevenueOfBar(request);
-                return CustomResult("Đã tải dữ liệu", response);
+                return CustomResult("Đã tải dữ liệu thành công !", response);
             }
             catch (CustomException.UnAuthorizedException e)
             {
@@ -272,7 +272,7 @@ namespace BarBuddy_API.Controllers.Bar
             try
             {
                 var response = await _barService.GetBarNameId(query);
-                return CustomResult("Đã tải dữ liệu.", response);
+                return CustomResult("Đã tải dữ liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException ex)
             {
@@ -295,7 +295,7 @@ namespace BarBuddy_API.Controllers.Bar
             try
             {
                 var response = await _barService.GetAllRevenueBranch();
-                return CustomResult("Đã tải dữ liệu", response);
+                return CustomResult("Đã tải dữ liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException e)
             {
@@ -323,7 +323,7 @@ namespace BarBuddy_API.Controllers.Bar
             try
             {
                 var response = await _barService.GetBarNameId(query);
-                return CustomResult("Đã tải dữ liệu.", response);
+                return CustomResult("Đã tải dữ liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException ex)
             {
@@ -342,7 +342,7 @@ namespace BarBuddy_API.Controllers.Bar
             try
             {
                 var response = await _barService.GetBarNameIdAdMa(query);
-                return CustomResult("Đã tải dữ liệu.", response);
+                return CustomResult("Đã tải dữ liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException ex)
             {

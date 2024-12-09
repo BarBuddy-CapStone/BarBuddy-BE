@@ -108,7 +108,7 @@ namespace Application.Service
 
                 if (data.IsNullOrEmpty())
                 {
-                    throw new CustomException.InvalidDataException("Data not found !");
+                    throw new CustomException.InvalidDataException("Không tìm thấy !");
                 }
 
                 var getOne = data.FirstOrDefault();

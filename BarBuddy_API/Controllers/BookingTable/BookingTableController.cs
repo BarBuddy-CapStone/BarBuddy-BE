@@ -33,7 +33,7 @@ namespace BarBuddy_API.Controllers.BookingTable
             try
             {
                 var data = await _bookingTableService.FilterTableTypeReponse(request);
-                return CustomResult("Đã tải dữ liệu", data);
+                return CustomResult("Đã tải dữ liệu thành công !", data);
             }
             catch (CustomException.InternalServerErrorException ex)
             {
@@ -52,7 +52,7 @@ namespace BarBuddy_API.Controllers.BookingTable
             try
             {
                 var data = await _bookingTableService.HoldTableList(Guid.Parse(barId), request);
-                return CustomResult("Đã tải dữ liệu", data);
+                return CustomResult("Đã tải dữ liệu thành công !", data);
             }
             catch (CustomException.InternalServerErrorException ex)
             {

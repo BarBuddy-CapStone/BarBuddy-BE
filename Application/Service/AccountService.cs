@@ -56,7 +56,7 @@ namespace Application.Service
                 .FirstOrDefault();
             if (existedAccount != null)
             {
-                throw new DataExistException("Email đã tồn tại");
+                throw new DataExistException("Email đã tồn tại, vui lòng thử lại !");
             }
 
             var customerRole = (await _unitOfWork.RoleRepository.GetAsync(filter: r => r.RoleName == "CUSTOMER")).FirstOrDefault();
@@ -91,7 +91,7 @@ namespace Application.Service
             var existedAccount = (await _accountRepository.GetAsync(a => a.Email.Equals(request.Email))).FirstOrDefault();
             if (existedAccount != null)
             {
-                throw new DataExistException("Email đã tồn tại");
+                throw new DataExistException("Email đã tồn tại, vui lòng thử lại !");
             }
             var staffRole = (await _unitOfWork.RoleRepository.GetAsync(filter: r => r.RoleName == "STAFF")).FirstOrDefault();
             var existedBar = await _barRepository.GetByIdAsync(request.BarId);

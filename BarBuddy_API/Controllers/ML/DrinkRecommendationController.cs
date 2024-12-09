@@ -34,7 +34,7 @@ namespace BarBuddy_API.Controllers.ML
                 drinkList = recommendations.Item1,
                 emotion = recommendations.Item2
             };
-            return CustomResult("Data loaded", response);
+            return CustomResult("Đã tải dữ liệu thành công !", response);
         }
 
         //[Authorize(Roles = "CUSTOMER")]
@@ -43,7 +43,7 @@ namespace BarBuddy_API.Controllers.ML
         {
             var recommendations = await _recommendationService.GetRecommendationsAsync(emotion, barId);
             
-            return CustomResult("Data loaded", recommendations);
+            return CustomResult("Đã tải dữ liệu thành công !", recommendations);
         }
     }
 }

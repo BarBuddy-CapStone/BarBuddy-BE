@@ -335,9 +335,12 @@ namespace Application.Service
         {
             try
             {
-                var isExistTT = _unitOfWork.TableTypeRepository.GetByID(request.TableTypeId);
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
                 var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var isExistTT = _unitOfWork.TableTypeRepository
+                                           .Get(x => x.TableTypeId.Equals(request.TableTypeId) && 
+                                                     x.BarId.Equals(getAccount.BarId))
+                                           .FirstOrDefault();
 
                 if (isExistTT == null)
                 {

@@ -63,7 +63,7 @@ namespace BarBuddy_API.Controllers.FeedBack
             try
             {
                 var responses = await _feedBackService.GetFeedBackManager(BarId, query);
-                return CustomResult("Tải dữ liệu thành công", responses);
+                return CustomResult("Đã tải dữ liệu thành công !", responses);
             }
             catch (CustomException.UnAuthorizedException ex)
             {
@@ -84,7 +84,7 @@ namespace BarBuddy_API.Controllers.FeedBack
         public async Task<IActionResult> GetFeedBackByID(Guid id)
         {
             var feedback = await _feedBackService.GetFeedBackByID(id);
-            return CustomResult("Tải dữ liệu thành công", feedback);
+            return CustomResult("Đã tải dữ liệu thành công !", feedback);
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace BarBuddy_API.Controllers.FeedBack
         public async Task<IActionResult> GetFeedBackByBookingID(Guid bookingId)
         {
             var feedback = await _feedBackService.GetFeedBackByBookingId(bookingId);
-            return CustomResult("Tải dữ liệu thành công", feedback);
+            return CustomResult("Đã tải dữ liệu thành công !", feedback);
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace BarBuddy_API.Controllers.FeedBack
             try
             {
                 var feedback = await _feedBackService.CreateFeedBack(request);
-                return CustomResult("Tạo Feedback thành công.", feedback);
+                return CustomResult("Đã tạo Feedback thành công.", feedback);
             }
             catch (CustomException.UnAuthorizedException ex)
             {

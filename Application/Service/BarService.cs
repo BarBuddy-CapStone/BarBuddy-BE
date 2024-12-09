@@ -133,7 +133,7 @@ namespace Application.Service
 
             if (getAllBar.IsNullOrEmpty() || !getAllBar.Any())
             {
-                throw new CustomException.DataNotFoundException("Danh sách đang trống !");
+                throw new CustomException.DataNotFoundException("Không tìm thấy !");
             }
 
             var response = _mapper.Map<List<BarResponse>>(getAllBar);
@@ -187,7 +187,7 @@ namespace Application.Service
 
             if (bars.IsNullOrEmpty() || !bars.Any())
             {
-                throw new CustomException.DataNotFoundException("Danh sách đang trống !");
+                throw new CustomException.DataNotFoundException("Không tìm thấy ! ");
             }
 
             foreach (var bar in bars)
@@ -525,7 +525,7 @@ namespace Application.Service
 
             if (getAllBar.IsNullOrEmpty() || !getAllBar.Any())
             {
-                throw new CustomException.DataNotFoundException("Danh sách đang trống !");
+                throw new CustomException.DataNotFoundException("Không tìm thấy quán Bar!");
             }
 
             var response = _mapper.Map<List<OnlyBarIdNameResponse>>(getAllBar);
@@ -602,7 +602,7 @@ namespace Application.Service
 
             if (!bars.Any())
             {
-                throw new CustomException.DataNotFoundException("Danh sách đang trống !");
+                throw new CustomException.DataNotFoundException("Không tìm thấy các quán Bar!");
             }
 
             var response = _mapper.Map<List<OnlyBarNameIdResponse>>(bars);

@@ -9,7 +9,7 @@ namespace Application.DTOs.Request.FeedBackRequest
 {
     public class DeleteFeedBackRequest
     {
-        [Required(ErrorMessage = "Status cannot be empty")]
+        [Required(ErrorMessage = "Status không được để trống !")]
         public bool IsDeleted { get; set; }
     }
 }

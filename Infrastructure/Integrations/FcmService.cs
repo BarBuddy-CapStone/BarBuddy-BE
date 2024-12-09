@@ -260,7 +260,7 @@ namespace Infrastructure.Integrations
             platform = platform.ToLower();
             if (!IsValidPlatform(platform))
             {
-                throw new ArgumentException("Invalid platform. Platform must be 'web', 'ios', or 'android'");
+                throw new ArgumentException("Không hợp lệ. Platform phải là 'web', 'ios', hoặc 'android'");
             }
 
             var existingDevice = (await _unitOfWork.FcmUserDeviceRepository

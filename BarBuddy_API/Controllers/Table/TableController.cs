@@ -35,7 +35,7 @@ namespace BarBuddy_API.Controllers.Table
         public async Task<IActionResult> GetAll([FromQuery] Guid? TableTypeId, [FromQuery] string? TableName, [FromQuery] int? Status,[FromQuery] int PageIndex = 1, [FromQuery] int PageSize = 10)
         {
             var responses = await _tableService.GetAll(TableTypeId, TableName, Status, PageIndex, PageSize);
-            return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.response });
+            return CustomResult("Đã tải dữ liệu thành công !", new { totalPage = responses.TotalPage, response = responses.response });
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace BarBuddy_API.Controllers.Table
             var time = RequestTime ?? CoreHelper.SystemTimeNow.TimeOfDay;
 
             var responses = await _tableService.GetAllOfBar(BarId,TableTypeId,TableName,Status,PageIndex,PageSize,date,time);
-            return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, 
+            return CustomResult("Đã tải dữ liệu thành công !", new { totalPage = responses.TotalPage, 
                 response = responses.response, barTimes = responses.barTimes, timeSlot = responses.timeSlot });
         }
 
@@ -85,7 +85,7 @@ namespace BarBuddy_API.Controllers.Table
             try
             {
                 await _tableService.CreateTable(request);
-                return CustomResult("Tạo bàn thành công");
+                return CustomResult("Đã tạo bàn thành công !");
             }
             catch (CustomException.DataExistException e)
             {
@@ -109,7 +109,7 @@ namespace BarBuddy_API.Controllers.Table
             try
             {
                 await _tableService.UpdateTable(TableId, request);
-                return CustomResult("Cập nhật bàn thành công");
+                return CustomResult("Đã cập nhật bàn thành công !");
             }
             catch (CustomException.DataNotFoundException e)
             {
@@ -134,7 +134,7 @@ namespace BarBuddy_API.Controllers.Table
             try
             {
                 await _tableService.UpdateTableStatus(TableId, Status);
-                return CustomResult("Cập nhật bàn thành công");
+                return CustomResult("Đã cập nhật bàn thành công");
             }
             catch (CustomException.DataNotFoundException e)
             {
@@ -165,7 +165,7 @@ namespace BarBuddy_API.Controllers.Table
                 {
                     return CustomResult("Vẫn còn lịch đặt chỗ của bàn này trong tương lai, hãy cập nhật trước khi xóa", System.Net.HttpStatusCode.BadRequest);
                 }
-                return CustomResult("Xóa bàn thành công");
+                return CustomResult("Đã xóa bàn thành công !");
             }
             catch (CustomException.DataNotFoundException e)
             {

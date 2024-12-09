@@ -118,7 +118,7 @@ namespace BarBuddy_API.Controllers.Booking
             try
             {
                 var responses = await _bookingService.GetListBookingAuthorized(qrTicket, BarId, CustomerName, Phone, Email, bookingDate, bookingTime, Status, PageIndex, PageSize);
-                return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.responses });
+                return CustomResult("Đã tải dữ liệu thành công !", new { totalPage = responses.TotalPage, response = responses.responses });
             }
             catch (CustomException.UnAuthorizedException ex)
             {
@@ -140,7 +140,7 @@ namespace BarBuddy_API.Controllers.Booking
         public async Task<IActionResult> GetBookingDetailByStaff(Guid bookingId)
         {
             var responses = await _bookingService.GetBookingDetailAuthorized(bookingId);
-            return CustomResult("Tải dữ liệu thành công", responses);
+            return CustomResult("Đã tải dữ liệu thành công !", responses);
         }
 
         [Authorize(Roles = "MANAGER")]
@@ -151,7 +151,7 @@ namespace BarBuddy_API.Controllers.Booking
             try
             {
                 var responses = await _bookingService.GetListBookingAuthorized(qrTicket, BarId, CustomerName, Phone, Email, bookingDate, bookingTime, Status, PageIndex, PageSize);
-                return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.responses });
+                return CustomResult("Đã tải dữ liệu thành công !", new { totalPage = responses.TotalPage, response = responses.responses });
             }
             catch (CustomException.UnAuthorizedException ex)
             {
@@ -175,7 +175,7 @@ namespace BarBuddy_API.Controllers.Booking
             try
             {
                 var responses = await _bookingService.GetBookingDetailAuthorized(bookingId);
-                return CustomResult("Tải dữ liệu thành công", responses);
+                return CustomResult("Đã tải dữ liệu thành công !", responses);
             }
             catch (CustomException.UnAuthorizedException ex)
             {
@@ -195,7 +195,7 @@ namespace BarBuddy_API.Controllers.Booking
             try
             {
                 var responses = await _bookingService.GetListBookingAuthorizedAdmin(qrTicket, BarId, CustomerName, Phone, Email, bookingDate, bookingTime, Status, PageIndex, PageSize);
-                return CustomResult("Tải dữ liệu thành công", new { totalPage = responses.TotalPage, response = responses.responses });
+                return CustomResult("Đã tải dữ liệu thành công !", new { totalPage = responses.TotalPage, response = responses.responses });
             }
             catch (CustomException.UnAuthorizedException ex)
             {
@@ -219,7 +219,7 @@ namespace BarBuddy_API.Controllers.Booking
             try
             {
                 var responses = await _bookingService.GetBookingDetailAuthorizedAdmin(bookingId);
-                return CustomResult("Tải dữ liệu thành công", responses);
+                return CustomResult("Đã tải dữ liệu thành công !", responses);
             }
             catch (CustomException.UnAuthorizedException ex)
             {
@@ -480,7 +480,7 @@ namespace BarBuddy_API.Controllers.Booking
             try
             {
                 var response = await _bookingService.GetExtraBookingServing(bookingId);
-                return CustomResult("Đã tải dữ liệu đồ uống !", response);
+                return CustomResult("Đã tải dữ liệu thành công !", response);
             }
             catch (CustomException.UnAuthorizedException ex)
             {

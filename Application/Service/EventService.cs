@@ -366,7 +366,7 @@ namespace Application.Service
 
                 if (request.Images.IsNullOrEmpty() && request.OldImages.IsNullOrEmpty())
                 {
-                    throw new CustomException.InvalidDataException("Không thể thiếu hình ảnh !");
+                    throw new CustomException.InvalidDataException("Hình ảnh bắt buộc phải có !");
                 }
 
                 if (request.UpdateEventTimeRequests.Count < 1)

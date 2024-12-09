@@ -64,7 +64,7 @@ namespace Application.Service
 
                 if (payments is null || !payments.Any())
                 {
-                    throw new CustomException.DataNotFoundException("Bạn không có lịch sử giao dịch nào cả !");
+                    throw new CustomException.DataNotFoundException("Không tìm thấy, Bạn không có lịch sử giao dịch nào cả !");
                 }
 
                 int totalPage = 1;
@@ -83,7 +83,7 @@ namespace Application.Service
                 
                 if(paymentsWithPagination is null )
                 {
-                    throw new CustomException.DataNotFoundException("Bạn không có lịch sử giao dịch nào cả !");
+                    throw new CustomException.DataNotFoundException("Không tìm thấy, Bạn không có lịch sử giao dịch nào cả !");
                 }
 
                 foreach (var payment in paymentsWithPagination) {
