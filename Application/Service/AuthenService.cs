@@ -145,7 +145,7 @@ namespace Application.Service
             }
             else if (existEmail != null && existEmail.Status == (int)PrefixValueEnum.Active)
             {
-                throw new DataExistException("Email đã tồn tại");
+                throw new DataExistException("Email đã tồn tại, vui lòng thử lại !");
             }
 
             if (!request.Password.Equals(request.ConfirmPassword))

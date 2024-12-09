@@ -34,7 +34,7 @@ namespace BarBuddy_API.Controllers.Event
             try
             {
                 var response = await _eventService.GetAllEvent(query);
-                return CustomResult("Đã tải dữ liệu thành công", response);
+                return CustomResult("Đã tải dữ liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException ex)
             {
@@ -58,7 +58,7 @@ namespace BarBuddy_API.Controllers.Event
             try
             {
                 var response = await _eventService.GetEventsByBarId(query, barId);
-                return CustomResult("Đã tải dữ liệu thành công", response);
+                return CustomResult("Đã tải dữ liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException ex)
             {
@@ -82,7 +82,7 @@ namespace BarBuddy_API.Controllers.Event
             try
             {
                 var response = await _eventService.GetOneEvent(eventId);
-                return CustomResult("Đã tải dữ liệu thành công", response);
+                return CustomResult("Đã tải dữ liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException ex)
             {
@@ -107,7 +107,7 @@ namespace BarBuddy_API.Controllers.Event
             try
             {
                 await _eventService.CreateEvent(request);
-                return CustomResult("Đã tạo thành công");
+                return CustomResult("Đã tạo thành công !");
             }
             catch (CustomException.DataNotFoundException ex)
             {
@@ -140,7 +140,7 @@ namespace BarBuddy_API.Controllers.Event
             try
             {
                 await _eventService.UpdateEvent(eventId, request);
-                return CustomResult("Đã update thành công");
+                return CustomResult("Đã update thành công !");
             }
             catch (CustomException.DataNotFoundException ex)
             {
@@ -168,7 +168,7 @@ namespace BarBuddy_API.Controllers.Event
             try
             {
                 await _eventService.DeleteEvent(eventId);
-                return CustomResult("Đã xóa thành công");
+                return CustomResult("Đã xóa thành công !");
             }
             catch (CustomException.DataNotFoundException ex)
             {

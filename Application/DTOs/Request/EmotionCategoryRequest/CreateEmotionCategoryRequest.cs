@@ -9,7 +9,7 @@ namespace Application.DTOs.Request.EmotionCategoryRequest
 {
     public class CreateEmotionCategoryRequest
     {
-        [Required(ErrorMessage = "Tên thể loại danh mục cảm xúc không thể thiếu !")]
+        [Required(ErrorMessage = "Tên thể loại danh mục cảm xúc không được để trống ! !")]
         [StringLength(20, MinimumLength = 3, ErrorMessage = "Thể loại cảm xúc phải có độ dài từ 3 đến 20 kí tự !")]
         public string CategoryName { get; set; }
         [Required(ErrorMessage = "Mô tả không được để trống ! ")]

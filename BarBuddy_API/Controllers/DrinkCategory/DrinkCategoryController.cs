@@ -28,7 +28,7 @@ namespace BarBuddy_API.Controllers.DrinkCategory
             try
             {
                 var response = await _drinkCategoryService.GetAllDrinkCategory(query);
-                return CustomResult("Data loaded", response);
+                return CustomResult("Đã tải dữ liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException e)
             {
@@ -47,7 +47,7 @@ namespace BarBuddy_API.Controllers.DrinkCategory
             try
             {
                 var response = await _drinkCategoryService.GetAllDrinkCateOfBar(barId);
-                return CustomResult("Data loaded", response);
+                return CustomResult("Đã tải dữ liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException e)
             {
@@ -71,7 +71,7 @@ namespace BarBuddy_API.Controllers.DrinkCategory
             try
             {
                 var response = await _drinkCategoryService.GetDrinkCategoryById(cateDrinkId);
-                return CustomResult("Data loaded", response);
+                return CustomResult("Đã tải dữ liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException e)
             {
@@ -94,7 +94,7 @@ namespace BarBuddy_API.Controllers.DrinkCategory
             try
             {
                 var response = await _drinkCategoryService.CreateDrinkCategory(request);
-                return CustomResult("Created Successfully", response);
+                return CustomResult("Đã tạo thànhh công !", response);
             }
             catch (CustomException.InternalServerErrorException e)
             {
@@ -114,7 +114,7 @@ namespace BarBuddy_API.Controllers.DrinkCategory
             try
             {
                 var response = await _drinkCategoryService.UpdateDrinkCategory(cateDrinkId, request);
-                return CustomResult("Updated Successfully", response);
+                return CustomResult("Cập nhật thành công !", response);
             }
             catch (CustomException.DataNotFoundException e)
             {
@@ -137,7 +137,7 @@ namespace BarBuddy_API.Controllers.DrinkCategory
             try
             {
                 var response = await _drinkCategoryService.DeleteDrinkCategory(cateDrinkId);
-                return CustomResult("Deleted Successfully", response);
+                return CustomResult("Đã xóa thành công !", response);
             }
             catch (CustomException.DataNotFoundException e)
             {

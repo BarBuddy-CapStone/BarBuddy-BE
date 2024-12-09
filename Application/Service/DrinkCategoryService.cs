@@ -182,7 +182,7 @@ namespace Application.Service
 
                 if (getOne == null)
                 {
-                    throw new CustomException.DataNotFoundException("The category drink is empty !");
+                    throw new CustomException.DataNotFoundException("Không tìm thấy thể loại đồ uống !");
                 }
 
                 var response = _mapper.Map<DrinkCategoryResponse>(getOne);

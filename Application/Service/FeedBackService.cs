@@ -36,7 +36,7 @@ namespace Application.Service
 
             if (!feedback.Any())
             {
-                throw new CustomException.DataNotFoundException("No feedback in Database");
+                throw new CustomException.DataNotFoundException("Không tìm thấy !");
             }
 
             var myfeedback = _mapper.Map<IEnumerable<FeedBackResponse>>(feedback);

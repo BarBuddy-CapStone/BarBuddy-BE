@@ -282,7 +282,7 @@ namespace Application.Service
 
                 if (getOne == null)
                 {
-                    throw new CustomException.DataNotFoundException("Data not found !");
+                    throw new CustomException.DataNotFoundException("Không tìm thấy !");
                 }
 
                 var response = _mapper.Map<DrinkResponse>(getOne);
@@ -344,12 +344,12 @@ namespace Application.Service
 
                     if (getOneDrink == null)
                     {
-                        throw new CustomException.DataNotFoundException("Data not found !");
+                        throw new CustomException.DataNotFoundException("Không tìm thấy !");
                     }
 
                     if (request.OldImages.IsNullOrEmpty() && getOneDrink.Image.IsNullOrEmpty())
                     {
-                        throw new CustomException.InvalidDataException("Invalid data");
+                        throw new CustomException.InvalidDataException("Dữ liệu không hợp lệ, vui lòng thử lại !");
                     }
 
                     if (getDrinkCate == null)
@@ -444,7 +444,7 @@ namespace Application.Service
 
                 if (getAllDrink.IsNullOrEmpty())
                 {
-                    throw new CustomException.DataNotFoundException("Data not found !");
+                    throw new CustomException.DataNotFoundException("Không tìm thấy !");
                 }
                 var response = _mapper.Map<IEnumerable<DrinkResponse>>(getAllDrink);
                 return response;

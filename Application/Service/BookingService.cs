@@ -1114,7 +1114,7 @@ namespace Application.Service
                     var Bar = await _unitOfWork.BarRepository.GetByIdAsync(BarId);
                     if (Bar == null)
                     {
-                        throw new CustomException.DataNotFoundException("Không có thông tin của Bar");
+                        throw new CustomException.DataNotFoundException("Không tìm thấy quán Bar !");
                     }
                 }
 

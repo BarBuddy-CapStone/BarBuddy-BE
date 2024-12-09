@@ -12,8 +12,8 @@ namespace Application.DTOs.Authen
         [Required]
         [EmailAddress]
         public string Email { get; set; }
-        [Required(ErrorMessage = "TableName cannot be empty")]
-        [StringLength(6, MinimumLength = 6, ErrorMessage = "Otp must be 6 characters")]
+        [Required(ErrorMessage = "Otp Không thể trống !")]
+        [StringLength(6, MinimumLength = 6, ErrorMessage = "Otp phải là 6 kí tự")]
         public string Otp { get; set; }
     }
 }

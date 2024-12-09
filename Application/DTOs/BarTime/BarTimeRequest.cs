@@ -10,7 +10,7 @@ namespace Application.DTOs.BarTime
     public class BarTimeRequest
     {
         [Required]
-        [Range(0,6, ErrorMessage ="Giá trị ngày chỉ từ 0 đến 6, vui lòng thử lại")]
+        [Range(0,6, ErrorMessage ="Giá trị ngày chỉ từ 0 đến 6")]
         public int DayOfWeek { get; set; }
         [Required]
         public TimeSpan StartTime { get; set; }

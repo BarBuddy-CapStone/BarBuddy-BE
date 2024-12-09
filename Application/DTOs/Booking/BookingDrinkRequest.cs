@@ -9,7 +9,7 @@ namespace Application.DTOs.Booking
 {
     public class BookingDrinkRequest : BookingTableRequest
     {
-        [Required(AllowEmptyStrings = false, ErrorMessage = "PaymentDestination is required.")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "PaymentDestination không thể trống !")]
         public string? PaymentDestination { get; set; }
         public string? VoucherCode { get; set; }
         public List<DrinkRequest>? Drinks { get; set; }

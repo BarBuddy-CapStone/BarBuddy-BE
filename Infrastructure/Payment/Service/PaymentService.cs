@@ -299,7 +299,7 @@ namespace Infrastructure.Payment.Service
                 }
                 else
                 {
-                    throw new DataNotFoundException("Can't find payment at payment service");
+                    throw new DataNotFoundException("Không tìm thấy payment");
                 }
             }
             else
@@ -390,7 +390,7 @@ namespace Infrastructure.Payment.Service
             var paymentHistory = (await unitOfWork.PaymentHistoryRepository.GetAsync(
                 filter: p => p.PaymentHistoryId == paymentHistoryId,
                 includeProperties: "Account,Booking.BookingTables,Booking.BookingDrinks,Booking.Bar")).FirstOrDefault();
-            if (paymentHistory == null) throw new DataNotFoundException("Not found PaymentHistory");
+            if (paymentHistory == null) throw new DataNotFoundException("Không tìm thấy PaymentHistory");
 
             var response = mapper.Map<PaymentDetailResponse>(paymentHistory);
 

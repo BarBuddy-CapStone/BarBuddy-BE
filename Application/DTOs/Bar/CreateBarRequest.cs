@@ -11,7 +11,7 @@ namespace Application.DTOs.Bar
     public class CreateBarRequest : BarBaseRequest
     {
         [Required]
-        [MinLength(1,ErrorMessage ="Bắt buộc phải có thời gian hoạt động !")]
+        [MinLength(1,ErrorMessage = "Thời gian hoạt động không thể trống !")]
         public List<BarTimeRequest> BarTimeRequest { get; set; }
     }
 }

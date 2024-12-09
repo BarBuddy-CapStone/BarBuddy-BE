@@ -25,7 +25,7 @@ namespace BarBuddy_API.Controllers.Voucher
             try
             {
                 var response = await _eventVoucherService.GetVoucherByCode(request);
-                return CustomResult("Đã tải dữ liệu.", response);
+                return CustomResult("Đã tải dữ liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException e)
             {

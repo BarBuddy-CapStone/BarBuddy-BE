@@ -28,7 +28,7 @@ namespace BarBuddy_API.Controllers.TableType
         public async Task<IActionResult> GetAll()
         {
             var tableTypes = await _tableTypeService.GetAll();
-            return CustomResult("Dữ liệu đã tải lên", tableTypes);
+            return CustomResult("Đã tải dữ liệu thành công !", tableTypes);
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace BarBuddy_API.Controllers.TableType
         public async Task<IActionResult> GetAllForAdmin([FromQuery][Required] int Status)
         {
             var tableTypes = await _tableTypeService.GetAllForAdmin(Status);
-            return CustomResult("Dữ liệu đã tải lên", tableTypes);
+            return CustomResult("Đã tải dữ liệu thành công !", tableTypes);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace BarBuddy_API.Controllers.TableType
         public async Task<IActionResult> GetById(Guid TableTypeId)
         {
             var tableType = await _tableTypeService.GetById(TableTypeId);
-            return CustomResult("Dữ liệu đã tải lên", tableType);
+            return CustomResult("Đã tải dữ liệu thành công !", tableType);
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace BarBuddy_API.Controllers.TableType
             try
             {
                 await _tableTypeService.CreateTableType(request);
-                return CustomResult("Tạo thành công");
+                return CustomResult("Đã tạo thành công");
             }
             catch (CustomException.UnAuthorizedException e)
             {
@@ -97,7 +97,7 @@ namespace BarBuddy_API.Controllers.TableType
             try
             {
                 await _tableTypeService.UpdateTableType(request, TableTypeId);
-                return CustomResult("Cập nhật thành công");
+                return CustomResult("Đã cập nhật thành công");
             }
             catch (CustomException.UnAuthorizedException e)
             {
@@ -129,7 +129,7 @@ namespace BarBuddy_API.Controllers.TableType
                 {
                     return StatusCode(202, "Vẫn còn bàn đang hoạt động thuộc loại bàn này, vui lòng cập nhật lại tất cả bàn của các chi nhánh trước khi xóa loại bàn này");
                 }
-                return CustomResult("Cập nhật thành công");
+                return CustomResult("Đã cập nhật thành công");
             }
             catch (CustomException.UnAuthorizedException e)
             {

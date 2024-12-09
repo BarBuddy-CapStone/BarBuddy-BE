@@ -53,7 +53,7 @@ namespace BarBuddy_API.Controllers.Drink
             try
             {
                 var response = await _drinkService.GetAllDrinkCustomer();
-                return CustomResult("Data loaded", response);
+                return CustomResult("Đã tải dữ liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException e)
             {
@@ -73,7 +73,7 @@ namespace BarBuddy_API.Controllers.Drink
             try
             {
                 var response = await _drinkService.GetDrinkCustomerOfBar(barId);
-                return CustomResult("Data loaded", response);
+                return CustomResult("Đã tải dữ liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException e)
             {
@@ -98,7 +98,7 @@ namespace BarBuddy_API.Controllers.Drink
             try
             {
                 var response = await _drinkService.GetDrink(drinkId);
-                return CustomResult("Data loaded", response);
+                return CustomResult("Đã tải dữ liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException e)
             {
@@ -122,7 +122,7 @@ namespace BarBuddy_API.Controllers.Drink
             try
             {
                 var response = await _drinkService.GetAllDrinkBasedCateId(cateId, query);
-                return CustomResult("Data loaded", response);
+                return CustomResult("Đã tải dữ liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException e)
             {
@@ -145,7 +145,7 @@ namespace BarBuddy_API.Controllers.Drink
             try
             {
                 var response = await _drinkService.GetAllDrinkBasedEmoId(emoId);
-                return CustomResult("Data loaded", response);
+                return CustomResult("Đã tải dữ liệu thành công !", response);
             }
             catch (CustomException.DataNotFoundException e)
             {
