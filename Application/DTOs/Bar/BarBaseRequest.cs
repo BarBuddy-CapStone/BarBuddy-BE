@@ -31,7 +31,7 @@ namespace Application.DTOs.Bar
         public string Email { get; set; }
         public List<string>? Images { get; set; }
         public List<string>? imgsAsString { get; set; }
-        [Range(0,100, ErrorMessage ="Chiết khấu phải từ 0 đến 100 !")]
+        [Range(0,100, ErrorMessage ="Giảm giá phải từ 0 đến 100 !")]
         [Required(ErrorMessage = "Giảm giá chỉ từ 0 đến 100% !")]
         public double Discount { get; set; }
         [Required]

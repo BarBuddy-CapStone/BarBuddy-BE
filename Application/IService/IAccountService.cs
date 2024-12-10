@@ -18,7 +18,7 @@ namespace Application.IService
         Task<PaginationList<StaffAccountResponse>> GetPaginationStaffAccount(int pageSize, int pageIndex, Guid? barId);
         Task<StaffAccountResponse> GetStaffAccountById(Guid accountId);
         Task<CustomerAccountResponse> UpdateCustomerAccount(Guid accountId, CustomerAccountRequest request);
-        Task UpdateCustomerAccountByCustomer(Guid accountId, CustomerInfoRequest request);
+        Task<CustomerInfoResponse> UpdateCustomerAccountByCustomer(Guid accountId, CustomerInfoRequest request);
         Task<string> UpdateCustomerAvatar(Guid accountId, IFormFile Image);
         Task<ManagerAccountResponse> UpdateManagerAccount(Guid accountId, ManagerAccountRequest request);
         Task<StaffAccountResponse> UpdateStaffAccount(Guid accountId, StaffAccountRequest request);

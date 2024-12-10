@@ -137,7 +137,7 @@ namespace Infrastructure.Email
                     </div>
 
                     <div style="text-align: right; font-weight: bold; margin-top: 10px; color: black;">
-                        TỔNG TIỀN (VNĐ) - ĐÃ ÁP DỤNG CHIẾT KHẤU {booking.Bar.Discount}%: {totalPrice}
+                        TỔNG TIỀN (VNĐ) - ĐÃ ÁP DỤNG GIẢM GIÁ {booking.Bar.Discount}%: {totalPrice}
                     </div>
                     <div style="text-align: center; margin-top: 20px; font-size: 1em; color: #B8860B;">
                         Chúc Quý khách vui vẻ. Trao niềm tin nhận tài lộc !
