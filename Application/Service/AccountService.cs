@@ -640,7 +640,7 @@ namespace Application.Service
             }
         }
 
-        public async Task UpdateCustomerAccountByCustomer(Guid accountId, CustomerInfoRequest request)
+        public async Task<CustomerInfoResponse> UpdateCustomerAccountByCustomer(Guid accountId, CustomerInfoRequest request)
         {
             try
             {
@@ -658,6 +658,9 @@ namespace Application.Service
                 updatedAccount.UpdatedAt = DateTime.Now;
                 await _unitOfWork.AccountRepository.UpdateAsync(updatedAccount);
                 await _unitOfWork.SaveAsync();
+
+                var response = _mapper.Map<CustomerInfoResponse>(updatedAccount);
+                return response;
             }
             catch (Exception ex)
             {

@@ -32,7 +32,25 @@ namespace Application.DTOs.Authen
         public string Phone { get; set; }
 
         [Required]
-        //[CustomValidation(typeof(Utils), nameof(Utils.ValidateAge), ErrorMessage = "Bạn phải đủ 18 tuổi.")]
+        [CustomValidation(typeof(CustomerAccountRequest), "ValidateAge", ErrorMessage = "Bạn phải đủ 18 tuổi.")]
         public DateTimeOffset Dob { get; set; }
+
+        public static ValidationResult? ValidateAge(DateTimeOffset birthdate, ValidationContext context)
+        {
+            // Lấy giá trị hiện tại theo DateTimeOffset
+            DateTimeOffset today = DateTimeOffset.Now;
+
+            // Tính toán tuổi
+            int age = today.Year - birthdate.Year;
+
+            // Kiểm tra xem sinh nhật trong năm nay đã qua chưa
+            if (birthdate > today.AddYears(-age))
+            {
+                age--;
+            }
+
+            // Kiểm tra tuổi có lớn hơn hoặc bằng 18 không
+            return age >= 18 ? ValidationResult.Success : new ValidationResult("Bạn phải đủ 18 tuổi.");
+        }
     }
 }

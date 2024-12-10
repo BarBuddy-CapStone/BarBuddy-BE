@@ -278,8 +278,8 @@ namespace BarBuddy_API.Controllers.Account
             {
                 return BadRequest(ModelState);
             }
-            await _accountService.UpdateCustomerAccountByCustomer(accountId, request);
-            return CustomResult("Update thành công");
+            var response = await _accountService.UpdateCustomerAccountByCustomer(accountId, request);
+            return CustomResult("Cập nhật thành công !", response);
         }
 
         /// <summary>
