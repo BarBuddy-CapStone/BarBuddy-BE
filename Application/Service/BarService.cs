@@ -170,7 +170,11 @@ namespace Application.Service
 
             if (!string.IsNullOrWhiteSpace(query.Search))
             {
-                filter = barName => barName.BarName.Contains(query.Search);
+                filter = barName => barName.BarName.Contains(query.Search) 
+                                 && barName.Status == PrefixKeyConstant.TRUE;
+            }else
+            {
+                filter = barName => barName.Status == PrefixKeyConstant.TRUE;
             }
 
             var bars = await _unitOfWork.BarRepository
@@ -239,7 +243,9 @@ namespace Application.Service
             bool isAnyTableAvailable = false;
             var response = new BarResponse();
             var currentDateTime = TimeHelper.ConvertToUtcPlus7(DateTimeOffset.Now);
-            var getBarById = (await _unitOfWork.BarRepository.GetAsync(filter: a => a.BarId == barId,
+            var getBarById = (await _unitOfWork.BarRepository
+                                                .GetAsync(filter: a => a.BarId == barId 
+                                                && a.Status == PrefixKeyConstant.TRUE,
                     includeProperties: "Feedbacks.Account,BarTimes")).FirstOrDefault();
 
             if (getBarById == null)
@@ -273,7 +279,9 @@ namespace Application.Service
 
         public async Task<BarResponse> GetBarByIdWithTable(Guid barId)
         {
-            var getBarById = (await _unitOfWork.BarRepository.GetAsync(filter: a => a.BarId == barId,
+            var getBarById = (await _unitOfWork.BarRepository
+                                               .GetAsync(filter: a => a.BarId == barId && 
+                                                                 a.Status == PrefixKeyConstant.TRUE,
                     includeProperties: "TableTypes.Tables,BarTimes")).FirstOrDefault();
 
             if (getBarById == null)

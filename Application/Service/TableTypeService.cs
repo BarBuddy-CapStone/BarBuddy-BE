@@ -7,6 +7,7 @@ using Domain.Common;
 using Domain.Constants;
 using Domain.CustomException;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.IRepository;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -40,7 +41,10 @@ namespace Application.Service
             try
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getAccount = _unitOfWork.AccountRepository
+                                .Get(filter: x => x.AccountId.Equals(accountId) &&
+                                                  x.Status == (int)PrefixValueEnum.Active)
+                                .FirstOrDefault();
                 var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId) &&
                                                                    x.Status == PrefixKeyConstant.TRUE)
                                                       .FirstOrDefault();
@@ -95,11 +99,16 @@ namespace Application.Service
             try
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
-                
+                var getAccount = _unitOfWork.AccountRepository
+                                .Get(filter: x => x.AccountId.Equals(accountId) &&
+                                                  x.Status == (int)PrefixValueEnum.Active)
+                                .FirstOrDefault();
+
                 var existedTableType = (await _unitOfWork.TableTypeRepository
-                                                            .GetAsync(filter: t => t.TableTypeId == TableTypeId && 
-                                                            t.IsDeleted == PrefixKeyConstant.FALSE)).FirstOrDefault();
+                                                            .GetAsync(filter: t => t.TableTypeId == TableTypeId &&
+                                                            t.IsDeleted == PrefixKeyConstant.FALSE && 
+                                                            t.Bar.Status == PrefixKeyConstant.TRUE))
+                                                            .FirstOrDefault();
                 if (existedTableType == null)
                 {
                     throw new CustomException.DataNotFoundException("Loại bàn không tồn tại");
@@ -149,7 +158,7 @@ namespace Application.Service
 
                 var tableTypes = (await _unitOfWork.TableTypeRepository.GetAsync(filter: t => t.IsDeleted == false, orderBy: o => o.OrderByDescending(t => t.MinimumPrice))).ToList();
 
-                foreach ( var tableType in tableTypes)
+                foreach (var tableType in tableTypes)
                 {
                     var tableTypeDto = _mapper.Map<TableTypeResponse>(tableType);
                     responses.Add(tableTypeDto);
@@ -157,7 +166,8 @@ namespace Application.Service
 
                 return responses;
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
@@ -193,7 +203,7 @@ namespace Application.Service
                             var numOfTables = (await _unitOfWork.TableRepository.GetAsync(filter: t => t.TableTypeId == tableTypeTemp.TableTypeId)).Count();
                             var numOfDeletedTables = (await _unitOfWork.TableRepository.GetAsync(filter: t => t.TableTypeId == tableTypeTemp.TableTypeId && t.IsDeleted == true)).Count();
                             int subtraction = numOfTables - numOfDeletedTables;
-                            if(subtraction == 0)
+                            if (subtraction == 0)
                             {
                                 tableTypes.Add(tableTypeTemp);
                             }
@@ -229,10 +239,11 @@ namespace Application.Service
 
                 var tableType = (await _unitOfWork.TableTypeRepository.GetAsync(filter: t => t.TableTypeId == TableTypeId && t.IsDeleted == false)).FirstOrDefault();
 
-                if(tableType != null)
+                if (tableType != null)
                 {
                     tableTypeDto = _mapper.Map<TableTypeResponse>(tableType);
-                } else
+                }
+                else
                 {
                     throw new CustomException.DataNotFoundException("Không tìm thấy loại bàn");
                 }
@@ -253,7 +264,10 @@ namespace Application.Service
             try
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getAccount = _unitOfWork.AccountRepository
+                                .Get(filter: x => x.AccountId.Equals(accountId) &&
+                                                  x.Status == (int)PrefixValueEnum.Active)
+                                .FirstOrDefault();
                 var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId) &&
                                                                    x.Status == PrefixKeyConstant.TRUE)
                                                       .FirstOrDefault();
@@ -315,18 +329,29 @@ namespace Application.Service
             try
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getAccount = _unitOfWork.AccountRepository
+                                            .Get(filter: x => x.AccountId.Equals(accountId) &&
+                                                              x.Status == (int)PrefixValueEnum.Active,
+                                                 includeProperties: "Role")
+                                            .FirstOrDefault();
 
-                if(getAccount.BarId.HasValue && !getAccount.BarId.Equals(barId))
+                var getBar = _unitOfWork.BarRepository.GetByID(getAccount.BarId);
+                if (getBar.Status == PrefixKeyConstant.FALSE && !getAccount.Role.RoleName.Equals(PrefixKeyConstant.MANAGER))
+                {
+                    throw new CustomException.UnAuthorizedException("Hiện tại bạn không thể truy cập vào quán bar này được !");
+                }
+
+                if (getAccount.BarId.HasValue && !getAccount.BarId.Equals(barId))
                 {
                     throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
                 }
+
 
                 var pageIndex = query.PageIndex ?? 1;
                 var pageSize = query.PageSize ?? 6;
 
                 var tableTypes = (await _unitOfWork.TableTypeRepository
-                                                        .GetAsync(filter: t => t.IsDeleted == false 
+                                                        .GetAsync(filter: t => t.IsDeleted == false
                                                                             && t.BarId.Equals(barId),
                                                         orderBy: o => o.OrderByDescending(t => t.MinimumPrice)))
                                                         .ToList();
@@ -357,9 +382,13 @@ namespace Application.Service
         {
             try
             {
-                var existingBar = await _unitOfWork.BarRepository.GetByIdAsync(barId);
+                var existingBar = _unitOfWork.BarRepository
+                                             .Get(filter: x => x.BarId.Equals(barId) && 
+                                                               x.Status == PrefixKeyConstant.TRUE)
+                                             .FirstOrDefault();
 
-                if (existingBar == null) {
+                if (existingBar == null)
+                {
                     throw new CustomException.DataNotFoundException("Bar không tồn tại");
                 }
 
@@ -369,8 +398,9 @@ namespace Application.Service
                                                         orderBy: o => o.OrderByDescending(t => t.MinimumPrice)))
                                                         .ToList();
 
-                List<TableTypeResponse> response = new List<TableTypeResponse> ();
-                foreach (var tableType in tableTypes) { 
+                List<TableTypeResponse> response = new List<TableTypeResponse>();
+                foreach (var tableType in tableTypes)
+                {
                     response.Add(_mapper.Map<TableTypeResponse>(tableType));
                 }
 
