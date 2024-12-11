@@ -149,7 +149,7 @@ namespace Application.Service
 
                 if (isExistVoucher == null)
                 {
-                    throw new CustomException.DataNotFoundException("Không tìm thấy voucher");
+                    throw new CustomException.DataNotFoundException("Có vẻ voucher này không áp dụng cho ngày hôm nay !");
                 }
                 
                 Utils.ValidateTimeWithinEvent(request.bookingDate, request.bookingTime, isExistVoucher.Event.TimeEvent.ToList());
