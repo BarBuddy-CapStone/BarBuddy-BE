@@ -79,6 +79,7 @@ namespace BarBuddy_API.Controllers.Table
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
+        [Authorize(Roles ="MANAGER")]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] CreateTableRequest request)
         {
@@ -103,6 +104,7 @@ namespace BarBuddy_API.Controllers.Table
         /// <param name="request"></param>
         /// <param name="TableId"></param>
         /// <returns></returns>
+        [Authorize(Roles = "MANAGER")]
         [HttpPatch("{TableId}")]
         public async Task<IActionResult> Patch([FromBody] UpdateTableRequest request, Guid TableId)
         {
@@ -155,6 +157,7 @@ namespace BarBuddy_API.Controllers.Table
         /// </summary>
         /// <param name="TableId"></param>
         /// <returns></returns>
+        [Authorize(Roles = "MANAGER")]
         [HttpDelete("{TableId}")]
         public async Task<IActionResult> Delete(Guid TableId)
         {

@@ -24,6 +24,7 @@ using Application.DTOs.DrinkCategory;
 using Domain.Common;
 using Azure.Core;
 using System.Linq.Expressions;
+using Domain.Enums;
 
 namespace Application.Service
 {
@@ -35,8 +36,8 @@ namespace Application.Service
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly IAuthentication _authentication;
 
-        public DrinkService(IUnitOfWork unitOfWork, IMapper mapper, 
-                            IFirebase firebase, IAuthentication authentication, 
+        public DrinkService(IUnitOfWork unitOfWork, IMapper mapper,
+                            IFirebase firebase, IAuthentication authentication,
                             IHttpContextAccessor contextAccessor)
         {
             _unitOfWork = unitOfWork;
@@ -64,7 +65,10 @@ namespace Application.Service
                     }
 
                     var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                    var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                    var getAccount = _unitOfWork.AccountRepository
+                                                    .Get(filter: x => x.AccountId.Equals(accountId) &&
+                                                                      x.Status == (int)PrefixValueEnum.Active)
+                                                    .FirstOrDefault();
                     var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId) &&
                                                                        x.Status == PrefixKeyConstant.TRUE)
                                                           .FirstOrDefault();
@@ -83,7 +87,7 @@ namespace Application.Service
                                                                       x.IsDeleted == PrefixKeyConstant.FALSE)
                                                     .FirstOrDefault();
 
-                    if(getDrinkCate == null)
+                    if (getDrinkCate == null)
                     {
                         throw new CustomException.DataNotFoundException("Không tìm thấy loại đồ uống !");
                     }
@@ -91,7 +95,7 @@ namespace Application.Service
                     var isExistDrinkName = _unitOfWork.DrinkRepository
                                                         .Get(filter: x => x.DrinkName.Equals(request.DrinkName))
                                                         .FirstOrDefault();
-                    if(isExistDrinkName != null)
+                    if (isExistDrinkName != null)
                     {
                         throw new CustomException.DataExistException("Tên thức uống đã tồn tại ! Vui lòng thử lại.");
                     }
@@ -114,7 +118,7 @@ namespace Application.Service
                     foreach (var emotion in request.DrinkBaseEmo)
                     {
                         var emotionid = _unitOfWork.EmotionalDrinkCategoryRepository
-                            .Get(e => e.EmotionalDrinksCategoryId.Equals(emotion) && 
+                            .Get(e => e.EmotionalDrinksCategoryId.Equals(emotion) &&
                                       e.IsDeleted == PrefixKeyConstant.FALSE)
                             .FirstOrDefault();
                         if (emotionid == null)
@@ -136,7 +140,7 @@ namespace Application.Service
                     }
 
                     foreach (var image in imgsFile)
-                    {   
+                    {
                         var uploadImg = await _firebase.UploadImageAsync(image);
                         imgsString.Add(uploadImg);
                     }
@@ -166,8 +170,19 @@ namespace Application.Service
             try
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getAccount = _unitOfWork.AccountRepository
+                                            .Get(filter: x => x.AccountId.Equals(accountId),
+                                                 includeProperties: "Role,Bar")
+                                            .FirstOrDefault();
+                if (getAccount.Status != (int)PrefixValueEnum.Active)
+                {
+                    throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào quán Bar này !");
+                }
 
+                if(getAccount.Bar.Status == PrefixKeyConstant.FALSE && getAccount.Role.RoleName.Equals(PrefixKeyConstant.STAFF))
+                {
+                    throw new CustomException.UnAuthorizedException("Hiện tại bạn không thể truy cập vào quán bar này được !");
+                }
                 Expression<Func<Drink, bool>> filter = drink =>
                         drink.BarId.Equals(getAccount.BarId) &&
                         (string.IsNullOrWhiteSpace(query.Search) || drink.DrinkName.Contains(query.Search)) &&
@@ -187,7 +202,7 @@ namespace Application.Service
                 var response = _mapper.Map<IEnumerable<DrinkResponse>>(getAllDrink);
                 return response;
             }
-            catch(CustomException.DataNotFoundException ex)
+            catch (CustomException.DataNotFoundException ex)
             {
                 throw new CustomException.DataNotFoundException(ex.Message);
             }
@@ -207,6 +222,11 @@ namespace Application.Service
                 var getAllDrink = await _unitOfWork.DrinkRepository
                                         .GetAsync(filter: x => x.Status == PrefixKeyConstant.TRUE,
                                                 includeProperties: "DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory,Bar");
+                
+                if(!getAllDrink.IsNullOrEmpty() && getAllDrink.FirstOrDefault().Bar.Status == PrefixKeyConstant.FALSE)
+                {
+                    throw new CustomException.InvalidDataException("Quán bar này đã đóng cửa, bạn không thể xem đồ uống của quán được !");
+                }
                 var response = _mapper.Map<IEnumerable<DrinkResponse>>(getAllDrink);
                 return response;
             }
@@ -222,6 +242,10 @@ namespace Application.Service
                 var getAllDrink = await _unitOfWork.DrinkRepository
                                         .GetAsync(filter: x => x.Status == PrefixKeyConstant.TRUE && x.Bar.BarId.Equals(barId),
                                                 includeProperties: "DrinkCategory,DrinkEmotionalCategories.EmotionalDrinkCategory,Bar");
+                if (!getAllDrink.IsNullOrEmpty() && getAllDrink.FirstOrDefault().Bar.Status == PrefixKeyConstant.FALSE)
+                {
+                    throw new CustomException.InvalidDataException("Quán bar này đã đóng cửa, bạn không thể xem đồ uống của quán được !");
+                }
                 var response = _mapper.Map<IEnumerable<DrinkResponse>>(getAllDrink);
                 return response;
             }
@@ -238,7 +262,7 @@ namespace Application.Service
                 var pageSize = query.PageSize ?? 6;
 
                 var getAllDrink = await _unitOfWork.DrinkRepository
-                                    .GetAsync(filter: x => (string.IsNullOrWhiteSpace(query.Search) || query.Search.Contains(x.DrinkName)) && 
+                                    .GetAsync(filter: x => (string.IsNullOrWhiteSpace(query.Search) || query.Search.Contains(x.DrinkName)) &&
                                                             x.DrinkCategory.DrinksCategoryId.Equals(cateId)
                                     , includeProperties: "DrinkCategory,Bar");
 
@@ -314,15 +338,18 @@ namespace Application.Service
                 try
                 {
                     var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                    var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                    var getAccount = _unitOfWork.AccountRepository
+                                                    .Get(filter: x => x.AccountId.Equals(accountId) &&
+                                                                      x.Status == (int)PrefixValueEnum.Active)
+                                                    .FirstOrDefault();
                     var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId) &&
                                                                        x.Status == PrefixKeyConstant.TRUE)
                                                           .FirstOrDefault();
                     var getDrinkCate = _unitOfWork.DrinkCategoryRepository
-                                                    .Get(filter: x => x.DrinksCategoryId.Equals(request.DrinkCategoryId) && 
+                                                    .Get(filter: x => x.DrinksCategoryId.Equals(request.DrinkCategoryId) &&
                                                                       x.IsDeleted == PrefixKeyConstant.FALSE)
                                                     .FirstOrDefault();
-                    
+
                     if (getBar == null)
                     {
                         throw new CustomException.DataNotFoundException("Không tìm thấy quán Bar");
@@ -338,7 +365,7 @@ namespace Application.Service
                         imgsFile = Utils.CheckValidateImageFile(request.Images);
                     }
                     var getOneDrink = (await _unitOfWork.DrinkRepository
-                                                        .GetAsync(filter: x => x.DrinkId.Equals(drinkId) && 
+                                                        .GetAsync(filter: x => x.DrinkId.Equals(drinkId) &&
                                                                                x.BarId.Equals(getBar.BarId)))
                                                         .FirstOrDefault();
 
@@ -418,7 +445,7 @@ namespace Application.Service
                     await Task.Delay(200);
                     await _unitOfWork.SaveAsync();
 
-                    
+
 
                     var getAllDrink = await _unitOfWork.DrinkRepository
                                         .GetAsync(filter: x => x.DrinkId.Equals(mapper.DrinkId),
@@ -470,17 +497,17 @@ namespace Application.Service
 
                 foreach (var childUrl in childUrls)
                 {
-                    try 
+                    try
                     {
                         string baseUrl = $"https://sanhruou.com/{childUrl}.html";
                         Console.WriteLine($"Đang crawl category: {childUrl}");
 
                         var initialResponse = await httpClient.GetStringAsync(baseUrl);
                         homepageDoc.LoadHtml(initialResponse);
-                        
+
                         var productCountNode = homepageDoc.DocumentNode
                             .SelectSingleNode("//b[contains(@class, 'page-count-total')]");
-                        
+
                         if (productCountNode == null) continue;
 
                         string productCountText = productCountNode.InnerText.Replace(".", "");
@@ -565,7 +592,7 @@ namespace Application.Service
                     catch (InvalidDataException ix)
                     {
                         throw new InvalidDataException(ix.Message);
-                    } 
+                    }
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Lỗi crawl category {childUrl}: {ex.Message}");
@@ -635,7 +662,7 @@ namespace Application.Service
             }
         }
 
-        private HashSet<DrinkEmotionalCategory> RandomDrinkEmotionalCategories(Guid drinkId, int count, 
+        private HashSet<DrinkEmotionalCategory> RandomDrinkEmotionalCategories(Guid drinkId, int count,
             Random random)
         {
             var emotions = _unitOfWork.EmotionalDrinkCategoryRepository.GetAll().ToList();

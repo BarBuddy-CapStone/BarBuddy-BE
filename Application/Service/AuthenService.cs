@@ -6,6 +6,7 @@ using Application.IService;
 using AutoMapper;
 using Azure;
 using Azure.Core;
+using Domain.Constants;
 using Domain.CustomException;
 using Domain.Entities;
 using Domain.Enums;
@@ -64,6 +65,13 @@ namespace Application.Service
                 if(getOne == null)
                 {
                     throw new CustomException.InvalidDataException("Sai tài khoản hoặc mật khẩu! Vui lòng kiểm tra lại.");
+                }
+
+                if(getOne.BarId.HasValue && 
+                   getOne.Bar.Status == PrefixKeyConstant.FALSE &&
+                   getOne.Role.RoleName.Equals(PrefixKeyConstant.STAFF))
+                {
+                    throw new UnAuthorizedException("Hiện tại bạn không thể đăng nhập vào quán Bar này được !");
                 }
 
                 var response = _mapper.Map<LoginResponse>(getOne);

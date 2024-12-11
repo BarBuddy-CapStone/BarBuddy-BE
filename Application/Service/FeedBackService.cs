@@ -8,6 +8,7 @@ using AutoMapper;
 using Domain.Common;
 using Domain.CustomException;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.IRepository;
 using Microsoft.AspNetCore.Http;
 using System.Linq.Expressions;
@@ -136,7 +137,10 @@ namespace Application.Service
             try
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getAccount = _unitOfWork.AccountRepository
+                                .Get(filter: x => x.AccountId.Equals(accountId) &&
+                                                  x.Status == (int)PrefixValueEnum.Active)
+                                .FirstOrDefault();
 
                 var feedback = (await _unitOfWork.FeedbackRepository
                                                  .GetAsync(f => f.BookingId == BookingId && 
@@ -252,7 +256,10 @@ namespace Application.Service
             try
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_httpContextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getAccount = _unitOfWork.AccountRepository
+                                .Get(filter: x => x.AccountId.Equals(accountId) &&
+                                                  x.Status == (int)PrefixValueEnum.Active)
+                                .FirstOrDefault();
 
                 if (!getAccount.BarId.Equals(BarId))
                 {

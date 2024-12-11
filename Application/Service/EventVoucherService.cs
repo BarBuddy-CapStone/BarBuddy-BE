@@ -139,6 +139,7 @@ namespace Application.Service
                                                     (x.Quantity > 0 || x.Quantity == null) &&
                                                     x.Status == PrefixKeyConstant.TRUE &&
                                                     x.Event.Bar.BarId.Equals(request.barId) &&
+                                                    x.Event.Bar.Status == PrefixKeyConstant.TRUE &&
                                                     x.Event.TimeEvent.Any(t =>
                                                         (t.DayOfWeek != null && t.DayOfWeek == (int)request.bookingDate.DayOfWeek) ||
                                                         (t.Date != null && t.Date.Value.Date == request.bookingDate.Date)

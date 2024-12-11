@@ -2,8 +2,10 @@
 using Application.Interfaces;
 using Application.IService;
 using AutoMapper;
+using Domain.Constants;
 using Domain.CustomException;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.IRepository;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -38,8 +40,11 @@ namespace Application.Service
             try
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
-
+                var getAccount = _unitOfWork.AccountRepository
+                                            .Get(filter: x => x.AccountId.Equals(accountId) && 
+                                                              x.Status == (int)PrefixValueEnum.Active, 
+                                                 includeProperties: "Role")
+                                            .FirstOrDefault();
                 if (getAccount.BarId.HasValue)
                 {
                     if (BarId.HasValue && !getAccount.BarId.Equals(BarId))
@@ -49,6 +54,11 @@ namespace Application.Service
                     BarId = getAccount.BarId;
                 }
 
+                var getBar = _unitOfWork.BarRepository.GetByID(getAccount.BarId);
+                if (getBar.Status == PrefixKeyConstant.FALSE && getAccount.Role.RoleName.Equals(PrefixKeyConstant.STAFF))
+                {
+                    throw new CustomException.UnAuthorizedException("Hiện tại bạn không thể truy cập vào quán bar này được !");
+                }
                 var response = new List<PaymentHistoryResponse>();
 
                 // filter expression
@@ -125,12 +135,22 @@ namespace Application.Service
             {
 
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getAccount = _unitOfWork.AccountRepository
+                                            .Get(filter: x => x.AccountId.Equals(accountId) &&
+                                                              x.Status == (int)PrefixValueEnum.Active,
+                                                 includeProperties: "Role")
+                                            .FirstOrDefault();
 
-                if(!accountId.Equals(customerId))
+                var getBar = _unitOfWork.BarRepository.GetByID(getAccount.BarId);
+                if (getBar.Status == PrefixKeyConstant.FALSE && getAccount.Role.RoleName.Equals(PrefixKeyConstant.STAFF))
+                {
+                    throw new CustomException.UnAuthorizedException("Hiện tại bạn không thể truy cập vào quán bar này được !");
+                }
+                if (!accountId.Equals(customerId))
                 {
                     throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào tài khoản này !");
                 }
+
                 var response = new List<PaymentHistoryByCustomerResponse>();
                 int totalPage = 1;
 
@@ -203,13 +223,22 @@ namespace Application.Service
             try
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getAccount = _unitOfWork.AccountRepository
+                                .Get(filter: x => x.AccountId.Equals(accountId) &&
+                                                  x.Status == (int)PrefixValueEnum.Active,
+                                                  includeProperties: "Bar,Role")
+                                .FirstOrDefault();
 
                 if (!getAccount.BarId.Equals(barId))
                 {
                     throw new UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
                 }
-
+                if (getAccount.BarId.Equals(barId) && 
+                    getAccount.Bar.Status == PrefixKeyConstant.FALSE &&
+                    getAccount.Role.RoleName.Equals(PrefixKeyConstant.STAFF))
+                {
+                    throw new UnAuthorizedException("Hiện tại bạn không có quyền truy cập vào quán bar này !");
+                }
                 var payments = await _unitOfWork.PaymentHistoryRepository
                     .GetAsync(filter: p => p.Booking.BarId.Equals(barId),
                     includeProperties: "Booking.Bar,Account");
