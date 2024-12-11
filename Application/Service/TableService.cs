@@ -60,8 +60,7 @@ namespace Application.Service
                 {
                     throw new CustomException.DataExistException("Trùng tên bàn");
                 }
-                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(isExistTT.BarId) &&
-                                                   x.Status == PrefixKeyConstant.TRUE)
+                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(isExistTT.BarId))
                                       .FirstOrDefault();
                 if (getBar == null)
                 {
@@ -359,8 +358,7 @@ namespace Application.Service
                                 .FirstOrDefault();
                 var isExistTT = _unitOfWork.TableTypeRepository
                                            .Get(x => x.TableTypeId.Equals(request.TableTypeId) && 
-                                                     x.BarId.Equals(getAccount.BarId) && 
-                                                     x.Bar.Status == PrefixKeyConstant.TRUE, 
+                                                     x.BarId.Equals(getAccount.BarId), 
                                                      includeProperties: "Bar")
                                            .FirstOrDefault();
 

@@ -204,7 +204,7 @@ namespace Application.Common
 
             if (!isValidTime)
             {
-                throw new CustomException.InvalidDataException("Voucher chỉ được áp dụng trước và trong thời gian diễn ra sự kiện !");
+                throw new CustomException.InvalidDataException($"Voucher chỉ được áp dụng trong khung giờ diễn ra sự kiện !");
             }
 
             return isValidTime;

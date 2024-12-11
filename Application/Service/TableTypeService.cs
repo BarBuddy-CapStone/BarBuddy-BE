@@ -45,8 +45,7 @@ namespace Application.Service
                                 .Get(filter: x => x.AccountId.Equals(accountId) &&
                                                   x.Status == (int)PrefixValueEnum.Active)
                                 .FirstOrDefault();
-                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId) &&
-                                                                   x.Status == PrefixKeyConstant.TRUE)
+                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId))
                                                       .FirstOrDefault();
                 if (getBar == null)
                 {
@@ -106,8 +105,7 @@ namespace Application.Service
 
                 var existedTableType = (await _unitOfWork.TableTypeRepository
                                                             .GetAsync(filter: t => t.TableTypeId == TableTypeId &&
-                                                            t.IsDeleted == PrefixKeyConstant.FALSE && 
-                                                            t.Bar.Status == PrefixKeyConstant.TRUE))
+                                                            t.IsDeleted == PrefixKeyConstant.FALSE))
                                                             .FirstOrDefault();
                 if (existedTableType == null)
                 {
@@ -268,8 +266,7 @@ namespace Application.Service
                                 .Get(filter: x => x.AccountId.Equals(accountId) &&
                                                   x.Status == (int)PrefixValueEnum.Active)
                                 .FirstOrDefault();
-                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId) &&
-                                                                   x.Status == PrefixKeyConstant.TRUE)
+                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId))
                                                       .FirstOrDefault();
                 var existedTableType = await _unitOfWork.TableTypeRepository.GetByIdAsync(TableTypeId);
 

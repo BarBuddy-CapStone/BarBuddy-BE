@@ -63,8 +63,7 @@ namespace Application.Service
                                     .Get(filter: x => x.AccountId.Equals(accountId) &&
                                                       x.Status == (int)PrefixValueEnum.Active)
                                     .FirstOrDefault();
-                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId) &&
-                                                                   x.Status == PrefixKeyConstant.TRUE)
+                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId))
                                                       .FirstOrDefault();
                 if (getBar == null)
                 {
@@ -169,8 +168,7 @@ namespace Application.Service
                                                 .Get(filter: x => x.EventId.Equals(eventId) &&
                                                 x.IsDeleted == PrefixKeyConstant.FALSE).FirstOrDefault();
 
-                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(getAccount.BarId) &&
-                                                                   x.Status == PrefixKeyConstant.TRUE)
+                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(getAccount.BarId))
                                                       .FirstOrDefault();
                 if (getBar == null)
                 {
@@ -261,7 +259,11 @@ namespace Application.Service
                                          .Where(x => !query.IsEveryWeekEvent.HasValue ||
                                              (query.IsEveryWeekEvent.Value == 1 ?
                                                  x.EventTimeResponses.Any(t => t.DayOfWeek != null) :
-                                                 x.EventTimeResponses.All(t => t.DayOfWeek == null)));
+                                                 x.EventTimeResponses.All(t => t.DayOfWeek == null)))
+                                         .Where(x => x.EventTimeResponses.Any(t => 
+                                             (t.DayOfWeek != null) ||
+                                             (t.Date != null && t.Date.Value.Date >= DateTimeOffset.Now.Date)))
+                                         .ToList();
 
             var eventsWithDayOfWeek = filteredResponse.Where(x => x.EventTimeResponses.Any(t => t.DayOfWeek != null))
                                                      .OrderBy(x => x.EventTimeResponses
@@ -371,8 +373,7 @@ namespace Application.Service
                                                     .Get(filter: x => x.AccountId.Equals(accountId) &&
                                                                       x.Status == (int)PrefixValueEnum.Active)
                                                     .FirstOrDefault();
-                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId) && 
-                                                                   x.Status == PrefixKeyConstant.TRUE)
+                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId))
                                                       .FirstOrDefault();
                 if(getBar == null)
                 {
