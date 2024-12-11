@@ -62,7 +62,10 @@ namespace Application.Service
             try
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getAccount = _unitOfWork.AccountRepository
+                                                    .Get(filter: x => x.AccountId.Equals(accountId) && 
+                                                                      x.Status == (int)PrefixValueEnum.Active)
+                                                    .FirstOrDefault();
 
                 var booking = (await _unitOfWork.BookingRepository
                                                 .GetAsync(b => b.BookingId == BookingId &&
@@ -305,7 +308,11 @@ namespace Application.Service
             try
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getAccount = _unitOfWork.AccountRepository
+                                            .Get(filter: x => x.AccountId.Equals(accountId) && 
+                                                              x.Status == (int)PrefixValueEnum.Active,
+                                                 includeProperties: "Role")
+                                            .FirstOrDefault();
 
                 var response = new BookingDetailByStaff();
 
@@ -319,7 +326,12 @@ namespace Application.Service
                 {
                     throw new UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
                 }
-
+                if (booking != null && 
+                    getAccount.Role.RoleName.Equals(PrefixKeyConstant.STAFF) &&
+                    booking.Bar.Status == PrefixKeyConstant.FALSE)
+                {
+                    throw new CustomException.UnAuthorizedException("Hiện tại bạn không thể truy cập vào quán Bar này !");
+                }
                 if (booking == null)
                 {
                     throw new CustomException.DataNotFoundException("Không tìm thấy Id Đặt bàn");
@@ -375,7 +387,11 @@ namespace Application.Service
             try
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getAccount = _unitOfWork.AccountRepository
+                                            .Get(filter: x =>x.AccountId.Equals(accountId) &&
+                                                             x.Status == (int)PrefixValueEnum.Active,
+                                                 includeProperties:"Role")
+                                            .FirstOrDefault();
 
                 if (!getAccount.BarId.Equals(BarId))
                 {
@@ -388,6 +404,10 @@ namespace Application.Service
                 if (Bar == null)
                 {
                     throw new CustomException.DataNotFoundException("Không có thông tin của Bar");
+                } else if(getAccount.Role.RoleName.Equals(PrefixKeyConstant.STAFF) &&
+                          Bar.Status == PrefixKeyConstant.FALSE)
+                {
+                    throw new CustomException.UnAuthorizedException("Hiện tại bạn không thể truy cập vào quán Bar này !");
                 }
 
                 Expression<Func<Booking, bool>> filter = b =>
@@ -655,13 +675,24 @@ namespace Application.Service
             try
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getAccount = _unitOfWork.AccountRepository
+                                            .Get(filter: x => x.AccountId.Equals(accountId) &&
+                                                              x.Status == (int) PrefixValueEnum.Active,
+                                                 includeProperties: "Role")
+                                            .FirstOrDefault();
 
                 var booking = (await _unitOfWork.BookingRepository
                                          .GetAsync(b => b.BookingId == BookingId,
                                                 includeProperties: "BookingExtraDrinks,Bar"))
                                          .FirstOrDefault();
                 _unitOfWork.BeginTransaction();
+
+                if (booking != null &&
+                    getAccount.Role.RoleName.Equals(PrefixKeyConstant.STAFF) &&
+                    booking.Bar.Status == PrefixKeyConstant.FALSE)
+                {
+                    throw new CustomException.UnAuthorizedException("Hiện tại bạn không thể truy cập vào quán Bar này !");
+                }
 
                 if (booking == null)
                 {
@@ -672,6 +703,7 @@ namespace Application.Service
                 {
                     throw new UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
                 }
+
 
                 switch (booking?.Status)
                 {
@@ -1067,7 +1099,10 @@ namespace Application.Service
             {
                 var timeNow = DateTimeOffset.Now.AddMinutes(45).TimeOfDay;
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getAccount = _unitOfWork.AccountRepository
+                                                    .Get(filter: x => x.AccountId.Equals(accountId) &&
+                                                                      x.Status == (int)PrefixValueEnum.Active)
+                                                    .FirstOrDefault();
                 var getBooking = _unitOfWork.BookingRepository.GetByID(bookingId);
 
                 if (!getAccount.BarId.Equals(getBooking.BarId))
@@ -1242,7 +1277,8 @@ namespace Application.Service
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
                 var getAccount = _unitOfWork.AccountRepository
-                                            .Get(filter: x => x.AccountId.Equals(accountId),
+                                            .Get(filter: x => x.AccountId.Equals(accountId) && 
+                                                              x.Status == (int)PrefixValueEnum.Active,
                                                  includeProperties: "Role")
                                             .FirstOrDefault();
                 var getBooking = _unitOfWork.BookingRepository
@@ -1381,7 +1417,8 @@ namespace Application.Service
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
                 var getAccount = _unitOfWork.AccountRepository
-                                            .Get(filter: x => x.AccountId.Equals(accountId),
+                                            .Get(filter: x => x.AccountId.Equals(accountId) && 
+                                                              x.Status == (int)PrefixValueEnum.Active,
                                                  includeProperties: "Role")
                                             .FirstOrDefault();
                 var getBooking = _unitOfWork.BookingRepository
@@ -1543,7 +1580,8 @@ namespace Application.Service
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
                 var getAccount = _unitOfWork.AccountRepository
-                                            .Get(filter: x => x.AccountId.Equals(accountId),
+                                            .Get(filter: x => x.AccountId.Equals(accountId) && 
+                                                              x.Status == (int)PrefixValueEnum.Active,
                                                  includeProperties: "Role")
                                             .FirstOrDefault();
                 var getBooking = await _unitOfWork.BookingExtraDrinkRepository
@@ -1720,7 +1758,10 @@ namespace Application.Service
             try
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getAccount = _unitOfWork.AccountRepository
+                                                    .Get(filter: x => x.AccountId.Equals(accountId) &&
+                                                                      x.Status == (int)PrefixValueEnum.Active)
+                                                    .FirstOrDefault();
 
                 var isExistExtra = _unitOfWork.BookingExtraDrinkRepository
                                               .Get(filter: x => x.BookingExtraDrinkId.Equals(request.BookingExtraDrinkId) &&

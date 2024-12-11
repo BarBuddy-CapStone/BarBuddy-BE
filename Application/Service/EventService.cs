@@ -59,9 +59,11 @@ namespace Application.Service
                 var mapper = _mapper.Map<Event>(request);
 
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
-                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId) &&
-                                                                   x.Status == PrefixKeyConstant.TRUE)
+                var getAccount = _unitOfWork.AccountRepository
+                                    .Get(filter: x => x.AccountId.Equals(accountId) &&
+                                                      x.Status == (int)PrefixValueEnum.Active)
+                                    .FirstOrDefault();
+                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId))
                                                       .FirstOrDefault();
                 if (getBar == null)
                 {
@@ -157,12 +159,21 @@ namespace Application.Service
             try
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getAccount = _unitOfWork.AccountRepository
+                                                    .Get(filter: x => x.AccountId.Equals(accountId) &&
+                                                                      x.Status == (int)PrefixValueEnum.Active)
+                                                    .FirstOrDefault();
 
                 var isExistEvent = _unitOfWork.EventRepository
                                                 .Get(filter: x => x.EventId.Equals(eventId) &&
                                                 x.IsDeleted == PrefixKeyConstant.FALSE).FirstOrDefault();
 
+                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(getAccount.BarId))
+                                                      .FirstOrDefault();
+                if (getBar == null)
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy quán Bar");
+                }
                 if (isExistEvent == null)
                 {
                     throw new CustomException.DataNotFoundException("Không tìm thấy event !");
@@ -216,11 +227,13 @@ namespace Application.Service
                 filter = events => events.Bar.BarId.Equals(query.BarId);
             }
             var getAll = (await _unitOfWork.EventRepository
-                                            .GetAsync(filter: filter,
-                                                 includeProperties: "Bar,TimeEvent,EventVoucher"))
-                                                 .Where(x => x.IsDeleted == PrefixKeyConstant.FALSE &&
-                                                        x.IsHide == PrefixKeyConstant.FALSE)
-                                                 .ToList();
+                                .GetAsync(filter: filter,
+                                     includeProperties: "Bar,TimeEvent,EventVoucher"))
+                                     .Where(x => x.IsDeleted == PrefixKeyConstant.FALSE &&
+                                                 x.IsHide == PrefixKeyConstant.FALSE &&
+                                                 (query.BarId == null || x.Bar.BarId.Equals(query.BarId)) &&
+                                                 (x.Bar.Status == PrefixKeyConstant.TRUE))
+                                     .ToList();
             if (getAll.IsNullOrEmpty())
             {
                 throw new CustomException.DataNotFoundException("Không tìm thấy dữ liệu");
@@ -283,7 +296,9 @@ namespace Application.Service
         {
             if (!barId.HasValue) throw new CustomException.InvalidDataException(nameof(barId));
 
-            var getAll = (await _unitOfWork.EventRepository.GetAsync(filter: e => e.BarId.Equals(barId),
+            var getAll = (await _unitOfWork.EventRepository
+                                           .GetAsync(filter: e => e.BarId.Equals(barId) && 
+                                                                  e.Bar.Status == PrefixKeyConstant.TRUE,
                     includeProperties: "Bar,TimeEvent,EventVoucher",
                     pageIndex: query.PageIndex,
                     pageSize: query.PageSize
@@ -350,9 +365,11 @@ namespace Application.Service
                 string oldImgsUploaded = string.Empty;
 
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
-                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId) && 
-                                                                   x.Status == PrefixKeyConstant.TRUE)
+                var getAccount = _unitOfWork.AccountRepository
+                                                    .Get(filter: x => x.AccountId.Equals(accountId) &&
+                                                                      x.Status == (int)PrefixValueEnum.Active)
+                                                    .FirstOrDefault();
+                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(request.BarId))
                                                       .FirstOrDefault();
                 if(getBar == null)
                 {

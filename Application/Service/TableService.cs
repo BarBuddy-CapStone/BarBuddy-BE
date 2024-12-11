@@ -45,7 +45,10 @@ namespace Application.Service
             {
                 var isExistTT = _unitOfWork.TableTypeRepository.Get(x => x.TableTypeId.Equals(request.TableTypeId) && x.IsDeleted == false).FirstOrDefault();
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getAccount = _unitOfWork.AccountRepository
+                                .Get(filter: x => x.AccountId.Equals(accountId) &&
+                                                  x.Status == (int)PrefixValueEnum.Active)
+                                .FirstOrDefault();
 
                 if (isExistTT == null)
                 {
@@ -57,8 +60,7 @@ namespace Application.Service
                 {
                     throw new CustomException.DataExistException("Trùng tên bàn");
                 }
-                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(isExistTT.BarId) &&
-                                                   x.Status == PrefixKeyConstant.TRUE)
+                var getBar = _unitOfWork.BarRepository.Get(filter: x => x.BarId.Equals(isExistTT.BarId))
                                       .FirstOrDefault();
                 if (getBar == null)
                 {
@@ -125,6 +127,19 @@ namespace Application.Service
         {
             try
             {
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository
+                                            .Get(filter: x => x.AccountId.Equals(accountId) &&
+                                                              x.Status == (int)PrefixValueEnum.Active,
+                                                 includeProperties: "Role")
+                                            .FirstOrDefault();
+
+                var getBar = _unitOfWork.BarRepository.GetByID(getAccount.BarId);
+                if (getBar.Status == PrefixKeyConstant.FALSE && getAccount.Role.RoleName.Equals(PrefixKeyConstant.STAFF))
+                {
+                    throw new CustomException.UnAuthorizedException("Hiện tại bạn không thể truy cập vào quán bar này được !");
+                }
+
                 var responses = new List<TableResponse>();
                 int totalPage = 1;
 
@@ -188,7 +203,8 @@ namespace Application.Service
                 var responses = new List<TableResponse>();
                 int totalPage = 1;
 
-                var bar = (await _unitOfWork.BarRepository.GetAsync(filter: x => x.BarId.Equals(BarId),
+                var bar = (await _unitOfWork.BarRepository.GetAsync(filter: x => x.BarId.Equals(BarId) 
+                                                                         && x.Status == PrefixKeyConstant.TRUE,
                         includeProperties: "BarTimes")).FirstOrDefault()
                         ?? throw new CustomException.DataNotFoundException("Không tìm thấy quán bar");
                 var timeSlot = bar.TimeSlot;
@@ -336,10 +352,14 @@ namespace Application.Service
             try
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getAccount = _unitOfWork.AccountRepository
+                                .Get(filter: x => x.AccountId.Equals(accountId) &&
+                                                  x.Status == (int)PrefixValueEnum.Active)
+                                .FirstOrDefault();
                 var isExistTT = _unitOfWork.TableTypeRepository
                                            .Get(x => x.TableTypeId.Equals(request.TableTypeId) && 
-                                                     x.BarId.Equals(getAccount.BarId))
+                                                     x.BarId.Equals(getAccount.BarId), 
+                                                     includeProperties: "Bar")
                                            .FirstOrDefault();
 
                 if (isExistTT == null)
@@ -416,11 +436,15 @@ namespace Application.Service
             {
 
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
-                var getAccount = _unitOfWork.AccountRepository.GetByID(accountId);
+                var getAccount = _unitOfWork.AccountRepository
+                                .Get(filter: x => x.AccountId.Equals(accountId) &&
+                                                  x.Status == (int)PrefixValueEnum.Active)
+                                .FirstOrDefault();
 
                 var existedTable = _unitOfWork.TableRepository
-                                            .Get(filter: x => x.TableId.Equals(TableId),
-                                                includeProperties: "TableType").FirstOrDefault();
+                                            .Get(filter: x => x.TableId.Equals(TableId) && 
+                                                              x.TableType.Bar.Status == PrefixKeyConstant.TRUE,
+                                                includeProperties: "TableType.Bar").FirstOrDefault();
                 if (existedTable == null)
                 {
                     throw new CustomException.DataNotFoundException("Table Id không tồn tại");
