@@ -141,11 +141,6 @@ namespace Application.Service
                                                  includeProperties: "Role")
                                             .FirstOrDefault();
 
-                var getBar = _unitOfWork.BarRepository.GetByID(getAccount.BarId);
-                if (getBar.Status == PrefixKeyConstant.FALSE && getAccount.Role.RoleName.Equals(PrefixKeyConstant.STAFF))
-                {
-                    throw new CustomException.UnAuthorizedException("Hiện tại bạn không thể truy cập vào quán bar này được !");
-                }
                 if (!accountId.Equals(customerId))
                 {
                     throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào tài khoản này !");
