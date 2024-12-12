@@ -333,7 +333,7 @@ namespace Application.Service
                                             .FirstOrDefault();
 
                 var getBar = _unitOfWork.BarRepository.GetByID(getAccount.BarId);
-                if (getBar.Status == PrefixKeyConstant.FALSE && !getAccount.Role.RoleName.Equals(PrefixKeyConstant.MANAGER))
+                if (getAccount.BarId.HasValue && getBar.Status == PrefixKeyConstant.FALSE && !getAccount.Role.RoleName.Equals(PrefixKeyConstant.MANAGER))
                 {
                     throw new CustomException.UnAuthorizedException("Hiện tại bạn không thể truy cập vào quán bar này được !");
                 }
