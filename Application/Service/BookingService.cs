@@ -1385,7 +1385,7 @@ namespace Application.Service
                 {
                     BarId = getBooking.Bar.BarId,
                     MobileDeepLink = $"com.fptu.barbuddy://booking-detail/{getBooking.BookingId}",
-                    WebDeepLink = $"staff/booking-detail/{getBooking.BookingId}",
+                    WebDeepLink = $"staff/table-registration-detail/{getBooking.BookingId}",
                     ImageUrl = getBooking.Bar == null ? null : getBooking.Bar.Images.Split(',')[0],
                     IsPublic = false,
                     Message = string.Format(PrefixKeyConstant.EXTRA_DRINK_CONTENT, getBooking.BookingCode),
