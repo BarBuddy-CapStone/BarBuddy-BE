@@ -1319,7 +1319,6 @@ namespace Application.Service
                 }
 
                 var extraDrink = new List<BookingExtraDrink>();
-                double addFeeExtraDrink = 0;
                 _unitOfWork.BeginTransaction();
 
                 foreach (var drink in request)
@@ -1375,17 +1374,15 @@ namespace Application.Service
                     await Task.Delay(10);
                     await _unitOfWork.SaveAsync();
                     extraDrink.Add(mapper);
-                    addFeeExtraDrink += isDrink.Price * drink.Quantity;
+                    //addFeeExtraDrink += isDrink.Price * drink.Quantity;
                 }
-                getBooking.AdditionalFee += addFeeExtraDrink;
-                await _unitOfWork.BookingRepository.UpdateRangeAsync(getBooking);
                 await Task.Delay(100);
 
                 var fcmNotification = new CreateNotificationRequest
                 {
                     BarId = getBooking.Bar.BarId,
                     MobileDeepLink = $"com.fptu.barbuddy://booking-detail/{getBooking.BookingId}",
-                    WebDeepLink = $"staff/booking-detail/{getBooking.BookingId}",
+                    WebDeepLink = $"staff/table-registration-detail/{getBooking.BookingId}",
                     ImageUrl = getBooking.Bar == null ? null : getBooking.Bar.Images.Split(',')[0],
                     IsPublic = false,
                     Message = string.Format(PrefixKeyConstant.EXTRA_DRINK_CONTENT, getBooking.BookingCode),
@@ -1793,6 +1790,9 @@ namespace Application.Service
                 await Task.Delay(10);
                 await _unitOfWork.SaveAsync();
 
+                var getBooking = _unitOfWork.BookingRepository.GetByID(request.BookingId);
+                getBooking.AdditionalFee += isExistExtra.Quantity * isExistExtra.ActualPrice;
+                await _unitOfWork.BookingRepository.UpdateRangeAsync(getBooking);
                 var getAllExtraDrinkOfBk = _unitOfWork.BookingExtraDrinkRepository
                                                       .Get(filter: x => x.BookingId.Equals(request.BookingId),
                                                             includeProperties: "Drink");
