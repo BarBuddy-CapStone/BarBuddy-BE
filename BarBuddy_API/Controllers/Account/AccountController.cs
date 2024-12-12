@@ -296,6 +296,7 @@ namespace BarBuddy_API.Controllers.Account
             return CustomResult(new { url = res });
         }
 
+        [Authorize(Roles ="ADMIN")]
         [HttpPatch("/api/v1/customer/updSts")]
         public async Task<IActionResult> UpdateCustomeStatus(UpdCustomerStsRequest request)
         {
