@@ -569,6 +569,21 @@ namespace Persistence.Data
                 },
                 new Account
                 {
+                    AccountId = Guid.NewGuid(),
+                    BarId = Constants.Ids.Bars.Bar1,
+                    RoleId = Constants.Ids.Roles.Manager,
+                    Email = "trinhduc047@gmail.com",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "Trinh Duc",
+                    Dob = new DateTime(1980, 1, 1),
+                    Phone = "0901234577",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "default",
+                    Status = 1
+                },
+                new Account
+                {
                     AccountId = Constants.Ids.Accounts.Manager2,
                     BarId = Constants.Ids.Bars.Bar2,
                     RoleId = Constants.Ids.Roles.Manager,
@@ -710,6 +725,21 @@ namespace Persistence.Data
                     Email = "staff1@barbuddy1.com",
                     Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
                     Fullname = "Neymar Jr",
+                    Dob = new DateTime(1992, 7, 15),
+                    Phone = "0901234568",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "https://dailytrust.com/wp-content/uploads/2022/12/Neymar.jpg",
+                    Status = 1
+                },
+                new Account
+                {
+                    AccountId = Guid.NewGuid(),
+                    BarId = Constants.Ids.Bars.Bar1,
+                    RoleId = Constants.Ids.Roles.Staff,
+                    Email = "tamnmse162008@fpt.edu.vn",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "Nguyen Minh Tam",
                     Dob = new DateTime(1992, 7, 15),
                     Phone = "0901234568",
                     CreatedAt = DateTime.Now,
@@ -887,9 +917,24 @@ namespace Persistence.Data
                     AccountId = Constants.Ids.Accounts.Tien,
                     BarId = null,
                     RoleId = Constants.Ids.Roles.Customer,
-                    Email = "tientn@email.com",
+                    Email = "tienpnse162054@fpt.edu.vn",
                     Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
                     Fullname = "Mr.Tien",
+                    Dob = new DateTime(2002, 12, 5),
+                    Phone = "0912345678",
+                    CreatedAt = DateTime.Now,
+                    UpdatedAt = DateTime.Now,
+                    Image = "https://cdn-icons-png.flaticon.com/512/4862/4862440.png",
+                    Status = 1
+                },
+                new Account
+                {
+                    AccountId = Guid.NewGuid(),
+                    BarId = null,
+                    RoleId = Constants.Ids.Roles.Customer,
+                    Email = "kiense161968@fpt.edu.vn",
+                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
+                    Fullname = "Mr.Kien",
                     Dob = new DateTime(2002, 12, 5),
                     Phone = "0912345678",
                     CreatedAt = DateTime.Now,
@@ -2012,17 +2057,19 @@ namespace Persistence.Data
                 });
             }
 
-            // Bar Buddy 1 - Mở 4 ngày đầu 17:00-23:00
+            // Bar Buddy 1 - Mở 5 ngày đầu 17:00-23:00
             for (int day = 0; day <= 4; day++)
             {
-                AddBarTime(Constants.Ids.Bars.Bar1, day, 17, 23);
+                if (day==4 || day==2) AddBarTime(Constants.Ids.Bars.Bar1, day, 10, 23);
+                else AddBarTime(Constants.Ids.Bars.Bar1, day, 17, 23);
             }
 
             // Bar Buddy 2 - T3,T5,T7 (2,4,6) 17:00-23:00
             int[] bar2Days = { 2, 4, 6 };
             foreach (var day in bar2Days)
             {
-                AddBarTime(Constants.Ids.Bars.Bar2, day, 17, 23);
+                if (day == 4) AddBarTime(Constants.Ids.Bars.Bar2, day, 10, 23);
+                else AddBarTime(Constants.Ids.Bars.Bar2, day, 17, 23);
             }
 
             // Bar Buddy 3 - CN,T4,T6 (0,3,5) 17:00-23:00

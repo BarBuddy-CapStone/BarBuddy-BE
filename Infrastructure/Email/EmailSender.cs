@@ -85,6 +85,7 @@ namespace Infrastructure.Email
                         <p style="margin: 5px 0; color: black;">ĐỊA CHỈ: {address}</p>
                         <p style="margin: 5px 0; color: black;">NGÀY ĐẶT: {booking.BookingDate.ToString("dd/MM/yyyy")}-{booking.BookingTime}</p>
                         <p style="margin: 5px 0; color: black;">SỐ BÀN: {booking.BookingTables.Count}</p>
+                        <p style="margin: 5px 0; color: black;">SỐ NGƯỜI: {booking.NumOfPeople}</p>
                     </div>
                     <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; color: black;">
                         <thead>

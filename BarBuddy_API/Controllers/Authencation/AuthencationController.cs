@@ -114,6 +114,21 @@ namespace BarBuddy_API.Controllers.Authencation
             }
         }
 
+        [AllowAnonymous]
+        [HttpPost("reset-password/verification")]
+        public async Task<IActionResult> ResetPasswordVerification([FromBody] OtpVerificationRequest request)
+        {
+            var response = await _authenService.ResetPasswordVerification(request);
+            if (response != null)
+            {
+                return CustomResult("Xác thực đặt lại mật khẩu thành công", response);
+            }
+            else
+            {
+                return CustomResult("Xác thực đặt lại mật khẩu không thành công", code: HttpStatusCode.InternalServerError);
+            }
+        }
+
         /// <summary>
         /// SendOtp From Email Bar to Email Register
         /// </summary>
