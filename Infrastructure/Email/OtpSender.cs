@@ -48,7 +48,7 @@ namespace Infrastructure.Email
 
         private string GenerateOtp()
         {
-            return new Random().Next(000000, 999999).ToString();
+            return new Random().Next(100000, 999999).ToString();
         }
     }
 }
