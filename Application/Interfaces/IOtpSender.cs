@@ -11,5 +11,7 @@ namespace Application.Interfaces
     {
         Task SendOtpAsync(string email);
         bool VerifyOtp(OtpVerificationRequest request);
+        Task SendOtpResetPasswordAsync(string email);
+        bool VerifyOtpResetPassword(OtpVerificationRequest request);
     }
 }

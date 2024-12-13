@@ -16,5 +16,6 @@ namespace Application.IService
         Task<bool> ConfirmAccountByOtp(OtpVerificationRequest request);
         Task<bool> RegisterWithOtp(RegisterRequest request);
         Task<bool> ResetPassword(string email);
+        Task<LoginResponse> ResetPasswordVerification(OtpVerificationRequest request);
     }
 }
