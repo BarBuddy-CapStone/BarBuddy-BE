@@ -1375,28 +1375,50 @@ namespace Application.Service
                     await Task.Delay(10);
                     await _unitOfWork.SaveAsync();
                     extraDrink.Add(mapper);
-                    //addFeeExtraDrink += isDrink.Price * drink.Quantity;
                 }
                 await Task.Delay(100);
 
-                var fcmNotification = new CreateNotificationRequest
+                var fcmNotificationStaff = new CreateNotificationRequest
                 {
                     BarId = getBooking.Bar.BarId,
-                    MobileDeepLink = $"com.fptu.barbuddy://booking-detail/{getBooking.BookingId}",
+                    //MobileDeepLink = $"com.fptu.barbuddy://booking-detail/{getBooking.BookingId}",
                     WebDeepLink = $"staff/table-registration-detail/{getBooking.BookingId}",
                     ImageUrl = getBooking.Bar == null ? null : getBooking.Bar.Images.Split(',')[0],
                     IsPublic = false,
                     Message = string.Format(PrefixKeyConstant.EXTRA_DRINK_CONTENT, getBooking.BookingCode),
-                    Title = PrefixKeyConstant.EXTRA_DRINK_TITLE_NOTI,
+                    Title = PrefixKeyConstant.STAFF_EXTRA_DRINK_TITLE_NOTI,
                     Type = FcmNotificationType.BOOKING,
                     SpecificAccountIds = getAccStaffOfBar
                 };
+
+                // Tạo thông báo cho customer
+                var fcmNotificationCustomer = new CreateNotificationRequest
+                {
+                    BarId = getBooking.Bar.BarId,
+                    MobileDeepLink = $"com.fptu.barbuddy://booking-detail/{getBooking.BookingId}",
+                    WebDeepLink = $"booking-detail/{getBooking.BookingId}",
+                    ImageUrl = getBooking.Bar == null ? null : getBooking.Bar.Images.Split(',')[0],
+                    IsPublic = false,
+                    Message = string.Format(PrefixKeyConstant.CUSTOMER_EXTRA_DRINK_CONTENT, getBooking.BookingCode),
+                    Title = PrefixKeyConstant.CUSTOMER_EXTRA_DRINK_TITLE_NOTI,
+                    Type = FcmNotificationType.BOOKING,
+                    SpecificAccountIds = new List<Guid> { getBooking.AccountId } 
+                };
+
+                if (getAccount.AccountId.Equals(getBooking.AccountId))
+                {
+                    await _fcmService.CreateAndSendNotification(fcmNotificationStaff);
+                    await _fcmService.CreateAndSendNotification(fcmNotificationCustomer);
+                }
+                else
+                {
+                    await _fcmService.CreateAndSendNotification(fcmNotificationCustomer);
+                }
 
                 var getAllExtraDrinkOfBk = _unitOfWork.BookingExtraDrinkRepository
                                                       .Get(filter: x => x.BookingId.Equals(bookingId) && 
                                                                 x.Status != (int)ExtraDrinkStsEnum.Preparing,
                                                             includeProperties: "Drink");
-                await _fcmService.CreateAndSendNotification(fcmNotification);
                 await _unitOfWork.SaveAsync();
                 _unitOfWork.CommitTransaction();
                 var response = _mapper.Map<List<BookingDrinkDetailResponse>>(getAllExtraDrinkOfBk);
@@ -1732,7 +1754,7 @@ namespace Application.Service
                 throw new CustomException.InternalServerErrorException(ex.Message);
             }
         }
-
+        #region common noti
         public async Task SendNotiBookingSts(Bar bar, Booking booking, string message, string title)
         {
             var fcmNotification = new CreateNotificationRequest
@@ -1750,7 +1772,7 @@ namespace Application.Service
 
             await _fcmService.CreateAndSendNotification(fcmNotification);
         }
-
+        #endregion
         public async Task<List<BookingDrinkDetailResponse>> UpdateStsExtra(UpdateStsBookingExtraDrink request)
         {
             try
@@ -1794,6 +1816,23 @@ namespace Application.Service
                 var getBooking = _unitOfWork.BookingRepository.GetByID(request.BookingId);
                 getBooking.AdditionalFee += isExistExtra.Quantity * isExistExtra.ActualPrice;
                 await _unitOfWork.BookingRepository.UpdateRangeAsync(getBooking);
+
+                var fcmNotificationCustomer = new CreateNotificationRequest
+                {
+                    BarId = getBooking.Bar.BarId,
+                    MobileDeepLink = $"com.fptu.barbuddy://booking-detail/{getBooking.BookingId}",
+                    WebDeepLink = $"booking-detail/{getBooking.BookingId}",
+                    ImageUrl = getBooking.Bar == null ? null : getBooking.Bar.Images.Split(',')[0],
+                    IsPublic = false,
+                    Message = string.Format(PrefixKeyConstant.UPDATE_STS_EXTRA_DRINK_TITLE_NOTI_CONTENT,
+                                            isExistExtra.Drink.DrinkName, isExistExtra.Quantity),
+                    Title = string.Format(PrefixKeyConstant.UPDATE_STS_EXTRA_DRINK_TITLE_NOTI, getBooking.BookingCode),
+                    Type = FcmNotificationType.BOOKING,
+                    SpecificAccountIds = new List<Guid> { getBooking.AccountId }
+                };
+
+                await _fcmService.CreateAndSendNotification(fcmNotificationCustomer);
+
                 var getAllExtraDrinkOfBk = _unitOfWork.BookingExtraDrinkRepository
                                                       .Get(filter: x => x.BookingId.Equals(request.BookingId),
                                                             includeProperties: "Drink");
