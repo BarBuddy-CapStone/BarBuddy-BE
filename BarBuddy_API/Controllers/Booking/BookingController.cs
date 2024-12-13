@@ -518,5 +518,29 @@ namespace BarBuddy_API.Controllers.Booking
                 return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
             }
         }
+
+        /// <summary>
+        /// Get All Serving Booking By CustomerId
+        /// </summary>
+        /// <param name="CustomerId"></param>
+        /// <returns></returns>
+        [Authorize(Roles = "CUSTOMER")]
+        [HttpGet("serving/{CustomerId}")]
+        public async Task<IActionResult> GetAllServingBookingByCustomerId(Guid CustomerId)
+        {
+            try
+            {
+                var responses = await _bookingService.GetAllServingCustomerBooking(CustomerId);
+                return CustomResult("Đã tải dữ liệu thành công !", responses);
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }

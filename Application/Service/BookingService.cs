@@ -22,6 +22,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.SqlServer.Server;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using System.Linq.Expressions;
 using static Domain.CustomException.CustomException;
 
@@ -1802,6 +1803,46 @@ namespace Application.Service
             }
             catch (CustomException.InternalServerErrorException ex)
             {
+                throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
+            }
+        }
+
+        public async Task<List<TopBookingResponse>> GetAllServingCustomerBooking(Guid CustomerId)
+        {
+            try
+            {
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+
+                if (!accountId.Equals(CustomerId))
+                {
+                    throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập vào tài khoản này !");
+                }
+                var responses = new List<TopBookingResponse>();
+
+                var bookings = await _unitOfWork.BookingRepository.GetAsync(b => b.AccountId == CustomerId && b.Status == 2, includeProperties: "Bar");
+
+                foreach (var booking in bookings)
+                {
+                    var response = new TopBookingResponse
+                    {
+                        BarName = booking.Bar.BarName,
+                        BarId = booking.BarId,
+                        BookingDate = booking.BookingDate,
+                        BookingId = booking.BookingId,
+                        BookingTime = booking.BookingTime,
+                        CreateAt = booking.CreateAt,
+                        Status = booking.Status,
+                        Image = booking.Bar.Images.Split(',')[0],
+                        BookingCode = booking.BookingCode,
+                        Note = booking.Note,
+                        IsRated = false
+                    };
+                    responses.Add(response);
+                }
+
+                return responses;
+            }
+            catch (CustomException.InternalServerErrorException ex) {
                 throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
             }
         }
