@@ -249,7 +249,7 @@ namespace Application.Service
         public async Task<LoginResponse> ResetPasswordVerification(OtpVerificationRequest request)
         {
             var existAccount = _unitOfWork.AccountRepository
-                .Get(filter: x => x.Email.Equals(request.Email)).FirstOrDefault();
+                .Get(filter: x => x.Email.Equals(request.Email), includeProperties: "Role,Bar").FirstOrDefault();
             if (existAccount == null)
             {
                 throw new DataNotFoundException("Tài khoản không tồn tại");
