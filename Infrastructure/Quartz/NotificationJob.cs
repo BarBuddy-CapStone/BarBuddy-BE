@@ -152,6 +152,11 @@ namespace Infrastructure.Quartz
                     }
                     else
                     {
+                        var staffId = _unitOfWork.AccountRepository
+                                                .Get(filter: x => x.BarId.Equals(booking.BarId) &&
+                                                                  x.Status == (int)PrefixValueEnum.Active)
+                                                .Select(x => x.AccountId).ToList();
+
                         //Đến giờ
                         if (booking.BookingDate.Date == now.Date &&
                            booking.BookingTime == roundedTimeOfDay &&
@@ -173,6 +178,54 @@ namespace Infrastructure.Quartz
                                     Title = booking.BarName,
                                     Type = FcmNotificationType.BOOKING,
                                     SpecificAccountIds = new List<Guid> { booking.AccountId }
+                                }
+                            );
+                        }
+
+                        // Khi slot hết giờ thì thông báo cho staff va` customer
+                        var endTime = booking.BookingTime.Add(TimeSpan.FromHours(booking.TimeSlot));
+                        var bookingEndDate = booking.BookingDate;
+
+                        if (endTime.Hours < booking.BookingTime.Hours)
+                        {
+                            bookingEndDate = booking.BookingDate.AddDays(1);
+                        }
+
+                        if (bookingEndDate.Date == now.Date &&
+                            endTime == roundedTimeOfDay &&
+                            booking.Status == (int)PrefixValueEnum.PendingBooking)
+                        {
+                            var messagesCustomer = string.Format(PrefixKeyConstant.BOOKING_END_NOTI_CUSTOMER, booking.BarName, booking.BookingDate.ToString("dd/MM/yyyy"), $"{endTime.Hours:D2}:{endTime.Minutes:D2}");
+                            var messagesStaff = string.Format(PrefixKeyConstant.BOOKING_END_NOTI_STAFF, booking.BarName, booking.BookingDate.ToString("dd/MM/yyyy"), $"{endTime.Hours:D2}:{endTime.Minutes:D2}");
+                            _logger.LogInformation($"Đã gửi thông báo kết thúc timeslot cho tài khoản {booking.AccountId}");
+                            var bar = await _unitOfWork.BarRepository.GetByIdAsync(booking.BarId);
+                            await _fcmService.CreateAndSendNotification(
+                                new CreateNotificationRequest
+                                {
+                                    BarId = bar?.BarId,
+                                    MobileDeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
+                                    WebDeepLink = $"booking-detail/{booking.BookingId}",
+                                    ImageUrl = bar?.Images.Split(",")[0],
+                                    IsPublic = false,
+                                    Message = messagesCustomer,
+                                    Title = $"Hết giờ đặt chỗ - {booking.BarName}",
+                                    Type = FcmNotificationType.BOOKING,
+                                    SpecificAccountIds = new List<Guid> { booking.AccountId }
+                                }
+                            );
+
+                            await _fcmService.CreateAndSendNotification(
+                                new CreateNotificationRequest
+                                {
+                                    BarId = bar?.BarId,
+                                    //MobileDeepLink = $"com.fptu.barbuddy://booking-detail/{booking.BookingId}",
+                                    WebDeepLink = $"staff/table-registration-detail/{booking.BookingId}",
+                                    ImageUrl = bar?.Images.Split(",")[0],
+                                    IsPublic = false,
+                                    Message = messagesStaff,
+                                    Title = $"Hết giờ đặt chỗ - {booking.BarName}",
+                                    Type = FcmNotificationType.BOOKING,
+                                    SpecificAccountIds = staffId
                                 }
                             );
                         }

@@ -55,6 +55,17 @@ namespace Domain.Constants
         public static string EVENT_CONTENT_MESSAGE_NOTI = "Sự kiện {0} tại {1} sẽ diễn ra vào ngày {2} từ {3} đến {4}";
         public static string EXTRA_DRINK_TITLE_NOTI = "Yêu cầu thêm nước từ khách hàng";
         public static string EXTRA_DRINK_CONTENT = "Khách hàng có mã đặt {0} vừa yêu cầu thêm nước. Vui lòng xử lý ngay.";
+        public const string BOOKING_END_NOTI_CUSTOMER = "Đơn đặt chỗ của bạn tại {0} vào ngày {1} lúc {2} đã đến giờ check-out.";
+        public const string BOOKING_END_NOTI_STAFF = "Đơn đặt chỗ của bạn tại {0} vào ngày {1} lúc {2} đã đến giờ check-out.";
+
+        public const string STAFF_EXTRA_DRINK_CONTENT = "Có đơn đặt thêm đồ uống mới từ booking {0}";
+        public const string STAFF_EXTRA_DRINK_TITLE_NOTI = "Đơn đặt thêm đồ uống mới";
+
+        public const string CUSTOMER_EXTRA_DRINK_CONTENT = "Đơn đặt thêm đồ uống của bạn cho đơn {0} đã được ghi nhận";
+        public const string CUSTOMER_EXTRA_DRINK_TITLE_NOTI = "Đặt thêm đồ uống thành công";
+
+        public const string UPDATE_STS_EXTRA_DRINK_TITLE_NOTI = "Thông tin đồ uống đặt thêm đơn {0}";
+        public const string UPDATE_STS_EXTRA_DRINK_TITLE_NOTI_CONTENT = "Đồ uống {0} với số lượng {1} đã giao thành công";
         #endregion
     }
 }
