@@ -164,7 +164,7 @@ namespace Application.Service
                 mapper.UpdatedAt = mapper.CreatedAt;
                 mapper.RoleId = role.RoleId;
                 mapper.Status = (int)PrefixValueEnum.Pending;
-                mapper.Image = "https://th.bing.com/th/id/R.c2d58313dad3a99231d27d38bc77e9bb?rik=G%2bdXJz91ZlvDaw&pid=ImgRaw&r=0";
+                mapper.Image = "https://cdn-icons-png.flaticon.com/512/4814/4814961.png";
 
                 _unitOfWork.BeginTransaction();
                 await _unitOfWork.AccountRepository.InsertAsync(mapper);
