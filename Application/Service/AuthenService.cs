@@ -16,6 +16,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using static Domain.CustomException.CustomException;
+using static System.Net.WebRequestMethods;
 
 namespace Application.Service
 {
@@ -246,7 +247,49 @@ namespace Application.Service
             return flag;
         }
 
-        public async Task<LoginResponse> ResetPasswordVerification(OtpVerificationRequest request)
+        public async Task<bool> ResetToNewPassword(ResetPasswordRequest request)
+        {
+            bool flag = false;
+            if (!request.Password.Equals(request.ConfirmPassword))
+            {
+                throw new CustomException.InvalidDataException("Mật khẩu không giống nhau! Vui lòng thử lại.");
+            }
+
+            var cachedOtp = _cache.Get($"KEY-{request.UniqueCode}");
+
+            if(cachedOtp != null)
+            {
+                var existEmail = _unitOfWork.AccountRepository.GetByID(cachedOtp);
+
+                var role = _unitOfWork.RoleRepository.Get(x => x.RoleName == "CUSTOMER").FirstOrDefault();
+
+                if (role == null)
+                {
+                    throw new ForbbidenException("Bạn không thể truy cập");
+                }
+
+                try
+                {
+                    _unitOfWork.BeginTransaction();
+                    existEmail.Password = await _authentication.HashedPassword(request.Password);
+                    existEmail.UpdatedAt = DateTimeOffset.Now;
+                    await _unitOfWork.AccountRepository.UpdateAsync(existEmail);
+                    _unitOfWork.CommitTransaction();
+                    _unitOfWork.Save();
+                    _cache.Remove(request.UniqueCode);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    _unitOfWork.RollBack();
+                    throw new InternalServerErrorException($"Lỗi hệ thống: {ex.Message}");
+                }
+            }
+
+            return flag;
+        }
+
+        public string VerifyResetPassword(OtpVerificationRequest request)
         {
             var existAccount = _unitOfWork.AccountRepository
                 .Get(filter: x => x.Email.Equals(request.Email), includeProperties: "Role,Bar").FirstOrDefault();
@@ -261,14 +304,11 @@ namespace Application.Service
             else if (existAccount != null && existAccount.Status == (int)PrefixValueEnum.Active)
             {
                 var flag = _otpSender.VerifyOtpResetPassword(request);
-                if (flag) 
+                if (flag)
                 {
-                    var response = _mapper.Map<LoginResponse>(existAccount);
-                    response.AccessToken = _authentication.GenerteDefaultToken(existAccount);
-                    var refreshToken = _authentication.GenerateRefreshToken(existAccount);
-                    response.RefreshToken = refreshToken;
-                    await _tokenService.SaveRefreshToken(response.RefreshToken, existAccount.AccountId);
-                    return response;
+                    TimeSpan expireTime = TimeSpan.FromMinutes(40);
+                    _cache.Set($"KEY-{existAccount.AccountId}", existAccount.AccountId, expireTime);
+                     return existAccount.AccountId.ToString();
                 }
             }
             return null;

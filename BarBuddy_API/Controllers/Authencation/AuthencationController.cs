@@ -107,25 +107,40 @@ namespace BarBuddy_API.Controllers.Authencation
             var response = await _authenService.ResetPassword(email);
             if(response)
             {
-                return CustomResult("Đặt lại mật khẩu thành công", "Quý khách hãy check Email hoặc tin Spam");
+                return CustomResult("Đã gửi mã Otp thành công", "Quý khách hãy check Email hoặc tin Spam");
             } else
             {
-                return CustomResult("Đặt lại mật khẩu không thành công");
+                return CustomResult("Đã gửi mã Otp không thành công");
             }
         }
 
         [AllowAnonymous]
         [HttpPost("reset-password/verification")]
-        public async Task<IActionResult> ResetPasswordVerification([FromBody] OtpVerificationRequest request)
+        public IActionResult VerifyResetPassword([FromBody] OtpVerificationRequest request)
         {
-            var response = await _authenService.ResetPasswordVerification(request);
+            var response = _authenService.VerifyResetPassword(request);
             if (response != null)
             {
-                return CustomResult("Xác thực đặt lại mật khẩu thành công", response);
+                return CustomResult("Xác thực Otp đặt lại mật khẩu thành công", response);
             }
             else
             {
-                return CustomResult("Xác thực đặt lại mật khẩu không thành công", code: HttpStatusCode.InternalServerError);
+                return CustomResult("Xác thực Otp đặt lại mật khẩu không thành công", code: HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost("reset-password/new-password")]
+        public async Task<IActionResult> ResetToNewPassword([FromBody] ResetPasswordRequest request)
+        {
+            var response = await _authenService.ResetToNewPassword(request);
+            if (response)
+            {
+                return CustomResult("Đặt lại mật khẩu thành công", response);
+            }
+            else
+            {
+                return CustomResult("Đặt lại mật khẩu không thành công", code: HttpStatusCode.InternalServerError);
             }
         }
 
