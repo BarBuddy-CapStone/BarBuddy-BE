@@ -10,6 +10,7 @@ using Application.DTOs.Payment;
 using Application.Interfaces;
 using Application.IService;
 using AutoMapper;
+using Azure.Core;
 using Domain.Constants;
 using Domain.CustomException;
 using Domain.Entities;
@@ -64,7 +65,7 @@ namespace Application.Service
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
                 var getAccount = _unitOfWork.AccountRepository
-                                                    .Get(filter: x => x.AccountId.Equals(accountId) && 
+                                                    .Get(filter: x => x.AccountId.Equals(accountId) &&
                                                                       x.Status == (int)PrefixValueEnum.Active)
                                                     .FirstOrDefault();
 
@@ -283,7 +284,8 @@ namespace Application.Service
                         {
                             var staff = await _unitOfWork.AccountRepository.GetByIdAsync(drink.StaffId);
                             drink.StaffName = staff != null ? staff.Fullname : "Nhân viên";
-                        } else
+                        }
+                        else
                         {
                             drink.StaffName = "Nhân viên";
                         }
@@ -310,7 +312,7 @@ namespace Application.Service
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
                 var getAccount = _unitOfWork.AccountRepository
-                                            .Get(filter: x => x.AccountId.Equals(accountId) && 
+                                            .Get(filter: x => x.AccountId.Equals(accountId) &&
                                                               x.Status == (int)PrefixValueEnum.Active,
                                                  includeProperties: "Role")
                                             .FirstOrDefault();
@@ -327,7 +329,7 @@ namespace Application.Service
                 {
                     throw new UnAuthorizedException("Bạn không có quyền truy cập vào quán bar này !");
                 }
-                if (booking != null && 
+                if (booking != null &&
                     getAccount.Role.RoleName.Equals(PrefixKeyConstant.STAFF) &&
                     booking.Bar.Status == PrefixKeyConstant.FALSE)
                 {
@@ -389,9 +391,9 @@ namespace Application.Service
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
                 var getAccount = _unitOfWork.AccountRepository
-                                            .Get(filter: x =>x.AccountId.Equals(accountId) &&
+                                            .Get(filter: x => x.AccountId.Equals(accountId) &&
                                                              x.Status == (int)PrefixValueEnum.Active,
-                                                 includeProperties:"Role")
+                                                 includeProperties: "Role")
                                             .FirstOrDefault();
 
                 if (!getAccount.BarId.Equals(BarId))
@@ -405,7 +407,8 @@ namespace Application.Service
                 if (Bar == null)
                 {
                     throw new CustomException.DataNotFoundException("Không có thông tin của Bar");
-                } else if(getAccount.Role.RoleName.Equals(PrefixKeyConstant.STAFF) &&
+                }
+                else if (getAccount.Role.RoleName.Equals(PrefixKeyConstant.STAFF) &&
                           Bar.Status == PrefixKeyConstant.FALSE)
                 {
                     throw new CustomException.UnAuthorizedException("Hiện tại bạn không thể truy cập vào quán Bar này !");
@@ -567,7 +570,7 @@ namespace Application.Service
                 {
                     var existingTables = _unitOfWork.TableRepository
                                                     .Get(t => request.TableIds.Contains(t.TableId) &&
-                                                              t.TableType.BarId.Equals(request.BarId) && 
+                                                              t.TableType.BarId.Equals(request.BarId) &&
                                                               t.IsDeleted == false &&
                                                               t.TableType.IsDeleted == PrefixKeyConstant.FALSE,
                                                               includeProperties: "TableType");
@@ -678,7 +681,7 @@ namespace Application.Service
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
                 var getAccount = _unitOfWork.AccountRepository
                                             .Get(filter: x => x.AccountId.Equals(accountId) &&
-                                                              x.Status == (int) PrefixValueEnum.Active,
+                                                              x.Status == (int)PrefixValueEnum.Active,
                                                  includeProperties: "Role")
                                             .FirstOrDefault();
 
@@ -991,13 +994,13 @@ namespace Application.Service
             }
         }
 
-        private async Task ValidateTableAvailability(List<Guid> tableIds, DateTime bookingDate, 
+        private async Task ValidateTableAvailability(List<Guid> tableIds, DateTime bookingDate,
             TimeSpan bookingTime, Guid barId)
         {
             try
             {
                 var bookingsInDate = await _unitOfWork.BookingRepository
-                    .GetAsync(b => b.BookingDate.Date == bookingDate.Date && 
+                    .GetAsync(b => b.BookingDate.Date == bookingDate.Date &&
                         b.BookingTime == bookingTime &&
                         b.BarId == barId &&
                         (b.Status == (int)PrefixValueEnum.PendingBooking ||
@@ -1009,7 +1012,7 @@ namespace Application.Service
                     var conflictBookings = bookingsInDate.Where(b =>
                         b.BookingTables.Any(bt => bt.TableId == tableId));
 
-                    if (conflictBookings.Any()) 
+                    if (conflictBookings.Any())
                     {
                         throw new CustomException.InvalidDataException($"Bàn đã được đặt trong ngày {bookingDate.ToString(@"dd/mm/yyyy")} " +
                             $"tại thời gian {bookingTime.ToString(@"hh\:mm")} ");
@@ -1278,13 +1281,13 @@ namespace Application.Service
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
                 var getAccount = _unitOfWork.AccountRepository
-                                            .Get(filter: x => x.AccountId.Equals(accountId) && 
+                                            .Get(filter: x => x.AccountId.Equals(accountId) &&
                                                               x.Status == (int)PrefixValueEnum.Active,
                                                  includeProperties: "Role")
                                             .FirstOrDefault();
                 var getBooking = _unitOfWork.BookingRepository
                                             .Get(filter: x => x.BookingId.Equals(bookingId),
-                                                 includeProperties: "Bar")
+                                                 includeProperties: "Bar,Drink")
                                             .FirstOrDefault();
                 if (!getAccount.BarId.HasValue && getAccount.Role.RoleName.Equals("CUSTOMER"))
                 {
@@ -1402,7 +1405,7 @@ namespace Application.Service
                     Message = string.Format(PrefixKeyConstant.CUSTOMER_EXTRA_DRINK_CONTENT, getBooking.BookingCode),
                     Title = PrefixKeyConstant.CUSTOMER_EXTRA_DRINK_TITLE_NOTI,
                     Type = FcmNotificationType.BOOKING,
-                    SpecificAccountIds = new List<Guid> { getBooking.AccountId } 
+                    SpecificAccountIds = new List<Guid> { getBooking.AccountId }
                 };
 
                 if (getAccount.AccountId.Equals(getBooking.AccountId))
@@ -1416,7 +1419,7 @@ namespace Application.Service
                 }
 
                 var getAllExtraDrinkOfBk = _unitOfWork.BookingExtraDrinkRepository
-                                                      .Get(filter: x => x.BookingId.Equals(bookingId) && 
+                                                      .Get(filter: x => x.BookingId.Equals(bookingId) &&
                                                                 x.Status != (int)ExtraDrinkStsEnum.Preparing,
                                                             includeProperties: "Drink");
                 await _unitOfWork.SaveAsync();
@@ -1437,7 +1440,7 @@ namespace Application.Service
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
                 var getAccount = _unitOfWork.AccountRepository
-                                            .Get(filter: x => x.AccountId.Equals(accountId) && 
+                                            .Get(filter: x => x.AccountId.Equals(accountId) &&
                                                               x.Status == (int)PrefixValueEnum.Active,
                                                  includeProperties: "Role")
                                             .FirstOrDefault();
@@ -1583,7 +1586,7 @@ namespace Application.Service
                                                                 x.Status != (int)ExtraDrinkStsEnum.Preparing,
                                                             includeProperties: "Drink");
                 var response = _mapper.Map<List<BookingDrinkDetailResponse>>(getAllExtraDrinkOfBk);
-                
+
                 _unitOfWork.CommitTransaction();
                 return response;
             }
@@ -1600,7 +1603,7 @@ namespace Application.Service
             {
                 var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
                 var getAccount = _unitOfWork.AccountRepository
-                                            .Get(filter: x => x.AccountId.Equals(accountId) && 
+                                            .Get(filter: x => x.AccountId.Equals(accountId) &&
                                                               x.Status == (int)PrefixValueEnum.Active,
                                                  includeProperties: "Role")
                                             .FirstOrDefault();
@@ -1787,7 +1790,7 @@ namespace Application.Service
                                               .Get(filter: x => x.BookingExtraDrinkId.Equals(request.BookingExtraDrinkId) &&
                                                                 x.BookingId.Equals(request.BookingId) &&
                                                                 x.DrinkId.Equals(request.DrinkId) &&
-                                                                x.Status != (int) ExtraDrinkStsEnum.Delivered,
+                                                                x.Status != (int)ExtraDrinkStsEnum.Delivered,
                                                    includeProperties: "Booking")
                                               .FirstOrDefault();
 
@@ -1801,7 +1804,7 @@ namespace Application.Service
                     throw new CustomException.DataNotFoundException("Không tìm thấy đồ uống đặt thêm cho đơn này !");
                 }
 
-                if(isExistExtra.Status == (int)ExtraDrinkStsEnum.Delivered)
+                if (isExistExtra.Status == (int)ExtraDrinkStsEnum.Delivered)
                 {
                     throw new CustomException.InvalidDataException("Đồ uống này đã giao thành công trước đó !");
                 }
@@ -1813,7 +1816,10 @@ namespace Application.Service
                 await Task.Delay(10);
                 await _unitOfWork.SaveAsync();
 
-                var getBooking = _unitOfWork.BookingRepository.GetByID(request.BookingId);
+                var getBooking = _unitOfWork.BookingRepository
+                                            .Get(x => x.BookingId.Equals(request.BookingId), 
+                                                        includeProperties: "Bar,BookingExtraDrinks.Drink")
+                                            .FirstOrDefault();
                 getBooking.AdditionalFee += isExistExtra.Quantity * isExistExtra.ActualPrice;
                 await _unitOfWork.BookingRepository.UpdateRangeAsync(getBooking);
 
@@ -1881,7 +1887,76 @@ namespace Application.Service
 
                 return responses;
             }
-            catch (CustomException.InternalServerErrorException ex) {
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
+            }
+        }
+
+        public async Task<List<BookingDrinkDetailResponse>> DeleteExtraDrink(Guid bookingExtraDrinkId, Guid bookingId)
+        {
+            try
+            {
+                var accountId = _authentication.GetUserIdFromHttpContext(_contextAccessor.HttpContext);
+                var getAccount = _unitOfWork.AccountRepository
+                                                    .Get(filter: x => x.AccountId.Equals(accountId) &&
+                                                                      x.Status == (int)PrefixValueEnum.Active)
+                                                    .FirstOrDefault();
+
+                var isExistExtra = _unitOfWork.BookingExtraDrinkRepository
+                                              .Get(filter: x => x.BookingExtraDrinkId.Equals(bookingExtraDrinkId) &&
+                                                                x.BookingId.Equals(bookingId) &&
+                                                                x.Status != (int)ExtraDrinkStsEnum.Delivered,
+                                                   includeProperties: "Booking,Drink")
+                                              .FirstOrDefault();
+
+                if (isExistExtra != null && !isExistExtra.Booking.BarId.Equals(getAccount.BarId))
+                {
+                    throw new CustomException.UnAuthorizedException("Bạn không có quyền truy cập !");
+                }
+
+                if (isExistExtra is null)
+                {
+                    throw new CustomException.DataNotFoundException("Không tìm thấy đồ uống đặt thêm cho đơn này !");
+                }
+
+                if (isExistExtra.Status == (int)ExtraDrinkStsEnum.Delivered)
+                {
+                    throw new CustomException.InvalidDataException("Đồ uống này đã giao thành công trước đó !");
+                }
+
+                await _unitOfWork.BookingExtraDrinkRepository.DeleteAsync(bookingExtraDrinkId);
+                await Task.Delay(10);
+                await _unitOfWork.SaveAsync();
+                var getBooking = _unitOfWork.BookingRepository
+                            .Get(x => x.BookingId.Equals(bookingId),
+                                        includeProperties: "Bar")
+                            .FirstOrDefault();
+                var fcmNotificationCustomer = new CreateNotificationRequest
+                {
+                    BarId = getBooking.Bar.BarId,
+                    MobileDeepLink = $"com.fptu.barbuddy://booking-detail/{getBooking.BookingId}",
+                    WebDeepLink = $"booking-detail/{getBooking.BookingId}",
+                    ImageUrl = getBooking.Bar == null ? null : getBooking.Bar.Images.Split(',')[0],
+                    IsPublic = false,
+                    Message = string.Format(PrefixKeyConstant.UPDATE_STS_EXTRA_DRINK_TITLE_NOTI_CONTENT,
+                                            isExistExtra.Drink.DrinkName, isExistExtra.Quantity),
+                    Title = string.Format(PrefixKeyConstant.UPDATE_STS_EXTRA_DRINK_TITLE_NOTI, getBooking.BookingCode),
+                    Type = FcmNotificationType.BOOKING,
+                    SpecificAccountIds = new List<Guid> { getBooking.AccountId }
+                };
+
+                await _fcmService.CreateAndSendNotification(fcmNotificationCustomer);
+
+                var getAllExtraDrinkOfBk = _unitOfWork.BookingExtraDrinkRepository
+                                                      .Get(filter: x => x.BookingId.Equals(bookingId),
+                                                            includeProperties: "Drink");
+
+                var response = _mapper.Map<List<BookingDrinkDetailResponse>>(getAllExtraDrinkOfBk);
+                return response;
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
                 throw new CustomException.InternalServerErrorException("Lỗi hệ thống !");
             }
         }

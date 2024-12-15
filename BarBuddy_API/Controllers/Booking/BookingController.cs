@@ -542,5 +542,28 @@ namespace BarBuddy_API.Controllers.Booking
                 return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
             }
         }
+
+        [Authorize(Roles = "STAFF")]
+        [HttpDelete("delete-extra-drink")]
+        public async Task<IActionResult> DeleteExtraDrinkInServing([Required][FromQuery] Guid bookingId, [Required][FromBody] Guid bookingExtraDrinkId)
+        {
+            try
+            {
+                var response = await _bookingService.DeleteExtraDrink(bookingExtraDrinkId, bookingId);
+                return CustomResult("Đã xoá thành công !", response);
+            }
+            catch (CustomException.UnAuthorizedException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.Unauthorized);
+            }
+            catch (CustomException.InvalidDataException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.BadRequest);
+            }
+            catch (CustomException.InternalServerErrorException ex)
+            {
+                return CustomResult(ex.Message, System.Net.HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }
