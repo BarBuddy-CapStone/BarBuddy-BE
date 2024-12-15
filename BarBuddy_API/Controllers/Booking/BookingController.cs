@@ -545,11 +545,11 @@ namespace BarBuddy_API.Controllers.Booking
 
         [Authorize(Roles = "STAFF")]
         [HttpDelete("delete-extra-drink")]
-        public async Task<IActionResult> DeleteExtraDrinkInServing([Required][FromQuery] Guid bookingId, [Required][FromBody] Guid bookingExtraDrinkId)
+        public async Task<IActionResult> DeleteExtraDrinkInServing([FromBody]UpdateStsBookingExtraDrink request)
         {
             try
             {
-                var response = await _bookingService.DeleteExtraDrink(bookingExtraDrinkId, bookingId);
+                var response = await _bookingService.DeleteExtraDrink(request);
                 return CustomResult("Đã xoá thành công !", response);
             }
             catch (CustomException.UnAuthorizedException ex)

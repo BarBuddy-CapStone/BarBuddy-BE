@@ -1893,7 +1893,7 @@ namespace Application.Service
             }
         }
 
-        public async Task<List<BookingDrinkDetailResponse>> DeleteExtraDrink(Guid bookingExtraDrinkId, Guid bookingId)
+        public async Task<List<BookingDrinkDetailResponse>> DeleteExtraDrink(UpdateStsBookingExtraDrink request)
         {
             try
             {
@@ -1904,8 +1904,9 @@ namespace Application.Service
                                                     .FirstOrDefault();
 
                 var isExistExtra = _unitOfWork.BookingExtraDrinkRepository
-                                              .Get(filter: x => x.BookingExtraDrinkId.Equals(bookingExtraDrinkId) &&
-                                                                x.BookingId.Equals(bookingId) &&
+                                              .Get(filter: x => x.BookingExtraDrinkId.Equals(request.BookingExtraDrinkId) &&
+                                                                x.BookingId.Equals(request.BookingId) &&
+                                                                x.DrinkId.Equals(request.DrinkId) &&
                                                                 x.Status != (int)ExtraDrinkStsEnum.Delivered,
                                                    includeProperties: "Booking,Drink")
                                               .FirstOrDefault();
@@ -1925,11 +1926,11 @@ namespace Application.Service
                     throw new CustomException.InvalidDataException("Đồ uống này đã giao thành công trước đó !");
                 }
 
-                await _unitOfWork.BookingExtraDrinkRepository.DeleteAsync(bookingExtraDrinkId);
+                await _unitOfWork.BookingExtraDrinkRepository.DeleteAsync(request.BookingExtraDrinkId);
                 await Task.Delay(10);
                 await _unitOfWork.SaveAsync();
                 var getBooking = _unitOfWork.BookingRepository
-                            .Get(x => x.BookingId.Equals(bookingId),
+                            .Get(x => x.BookingId.Equals(request.BookingId),
                                         includeProperties: "Bar")
                             .FirstOrDefault();
                 var fcmNotificationCustomer = new CreateNotificationRequest
@@ -1949,7 +1950,7 @@ namespace Application.Service
                 await _fcmService.CreateAndSendNotification(fcmNotificationCustomer);
 
                 var getAllExtraDrinkOfBk = _unitOfWork.BookingExtraDrinkRepository
-                                                      .Get(filter: x => x.BookingId.Equals(bookingId),
+                                                      .Get(filter: x => x.BookingId.Equals(request.BookingId),
                                                             includeProperties: "Drink");
 
                 var response = _mapper.Map<List<BookingDrinkDetailResponse>>(getAllExtraDrinkOfBk);
