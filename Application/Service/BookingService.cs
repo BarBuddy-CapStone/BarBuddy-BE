@@ -1287,7 +1287,7 @@ namespace Application.Service
                                             .FirstOrDefault();
                 var getBooking = _unitOfWork.BookingRepository
                                             .Get(filter: x => x.BookingId.Equals(bookingId),
-                                                 includeProperties: "Bar,Drink")
+                                                 includeProperties: "Bar")
                                             .FirstOrDefault();
                 if (!getAccount.BarId.HasValue && getAccount.Role.RoleName.Equals("CUSTOMER"))
                 {
