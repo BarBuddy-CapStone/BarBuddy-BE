@@ -6,12 +6,12 @@ using Application.IService;
 using AutoMapper;
 using Azure;
 using Azure.Core;
-using Domain.Constants;
 using Domain.CustomException;
 using Domain.Entities;
 using Domain.Enums;
 using Domain.IRepository;
 using Domain.Utils;
+using MediatR;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -65,13 +65,6 @@ namespace Application.Service
                 if(getOne == null)
                 {
                     throw new CustomException.InvalidDataException("Sai tài khoản hoặc mật khẩu! Vui lòng kiểm tra lại.");
-                }
-
-                if(getOne.BarId.HasValue && 
-                   getOne.Bar.Status == PrefixKeyConstant.FALSE &&
-                   getOne.Role.RoleName.Equals(PrefixKeyConstant.STAFF))
-                {
-                    throw new UnAuthorizedException("Hiện tại bạn không thể đăng nhập vào quán Bar này được !");
                 }
 
                 var response = _mapper.Map<LoginResponse>(getOne);
@@ -232,37 +225,53 @@ namespace Application.Service
         public async Task<bool> ResetPassword(string email)
         {
             bool flag = false;
+            string keyCache = $"RESET-PASSWORD-{email}";
             var existAccount = _unitOfWork.AccountRepository
                 .Get(filter: x => x.Email.Equals(email)).FirstOrDefault();
             if (existAccount == null)
             {
                 throw new DataNotFoundException("Tài khoản không tồn tại");
             }
-            else if (existAccount.Status == (int)PrefixValueEnum.Inactive)
+            if (existAccount != null && (existAccount.Status == (int)PrefixValueEnum.Inactive || existAccount.Status == (int)PrefixValueEnum.Pending))
             {
                 throw new ForbbidenException("Tài khoản ngưng hoạt động cần liên hệ admin");
             }
+            else if (existAccount != null && existAccount.Status == (int)PrefixValueEnum.Active)
+            {
+                _cache.Remove(keyCache);
+                await _otpSender.SendOtpResetPasswordAsync(existAccount.Email);
+                return flag = true;
+            }
 
-            try
-            {
-                var randomPassword = RandomHelper.GenerateRandomString();
-                _unitOfWork.BeginTransaction();
-                existAccount.Password = await _authentication.HashedPassword(randomPassword);
-                _unitOfWork.AccountRepository.Update(existAccount);
-                _unitOfWork.CommitTransaction();
-                await _unitOfWork.SaveAsync();
-                await _emailSender.SendEmail(existAccount.Email, "Reset Password", $"Your new password is {randomPassword}");
-                flag = true;
-            }
-            catch (Exception ex)
-            {
-                _unitOfWork.RollBack();
-            }
-            finally
-            {
-                _unitOfWork.Dispose();
-            }
             return flag;
+        }
+
+        public async Task<LoginResponse> ResetPasswordVerification(OtpVerificationRequest request)
+        {
+            var existAccount = _unitOfWork.AccountRepository
+                .Get(filter: x => x.Email.Equals(request.Email), includeProperties: "Role,Bar").FirstOrDefault();
+            if (existAccount == null)
+            {
+                throw new DataNotFoundException("Tài khoản không tồn tại");
+            }
+            if (existAccount != null && (existAccount.Status == (int)PrefixValueEnum.Inactive || existAccount.Status == (int)PrefixValueEnum.Pending))
+            {
+                throw new ForbbidenException("Tài khoản ngưng hoạt động cần liên hệ admin");
+            }
+            else if (existAccount != null && existAccount.Status == (int)PrefixValueEnum.Active)
+            {
+                var flag = _otpSender.VerifyOtpResetPassword(request);
+                if (flag) 
+                {
+                    var response = _mapper.Map<LoginResponse>(existAccount);
+                    response.AccessToken = _authentication.GenerteDefaultToken(existAccount);
+                    var refreshToken = _authentication.GenerateRefreshToken(existAccount);
+                    response.RefreshToken = refreshToken;
+                    await _tokenService.SaveRefreshToken(response.RefreshToken, existAccount.AccountId);
+                    return response;
+                }
+            }
+            return null;
         }
 
         public async Task<LoginResponse> GoogleLogin(string idToken)
