@@ -35,6 +35,7 @@ namespace Application.IService
         Task<List<BookingDrinkDetailResponse>> GetExtraBookingServing(Guid bookingId);
         Task UpdateBookingStatusJob(Guid AccountId, Guid BookingId, int Status);
         Task<List<BookingDrinkDetailResponse>> UpdateStsExtra(UpdateStsBookingExtraDrink request);
+        Task<List<BookingDrinkDetailResponse>> DeleteExtraDrink(UpdateStsBookingExtraDrink request);
 
     }
 }
