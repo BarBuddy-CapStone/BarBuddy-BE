@@ -204,37 +204,40 @@ namespace Application.Service
                 
                 // Tạo CancellationTokenSource với timeout
                 var cts = new CancellationTokenSource();
-                cts.CancelAfter(TimeSpan.FromMinutes(1));
+                cts.CancelAfter(TimeSpan.FromMinutes(5));
+
+                var hasSignalRSent = false; // Flag để kiểm soát việc gửi SignalR
 
                 var cacheEntry = _memoryCache.GetOrCreate(cacheKey, entry =>
                 {
-                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
 
                     // Đăng ký token để handle khi cache expired
                     entry.AddExpirationToken(new CancellationChangeToken(cts.Token));
 
                     // Register callback khi cache bị remove
-                    entry.RegisterPostEvictionCallback((key, value, reason, state) =>
+                    entry.RegisterPostEvictionCallback(async (key, value, reason, state) =>
                     {
+                        if (hasSignalRSent) return; // Kiểm tra nếu đã gửi SignalR rồi thì bỏ qua
+
                         var tableDictionary = value as Dictionary<Guid, TableHoldInfo>;
                         if (tableDictionary != null && tableDictionary.TryGetValue(request.TableId, out var tableHoldInfo))
                         {
                             tableHoldInfo.IsHeld = false;
                             tableHoldInfo.AccountId = Guid.Empty;
 
-                            Task.Run(async () =>
+                            try
                             {
-                                try
-                                {
-                                    var bkHubResponse = _mapper.Map<BookingHubResponse>(tableHoldInfo);
-                                    await _bookingHub.ReleaseTable(bkHubResponse);
-                                    _logger.LogInformation($"Cache entry {key} for TableId {request.TableId} was removed because {reason}. Table is now released.");
-                                }
-                                catch (Exception ex)
-                                {
-                                    _logger.LogError(ex, "Error sending SignalR notification on cache eviction");
-                                }
-                            });
+                                var bkHubResponse = _mapper.Map<BookingHubResponse>(tableHoldInfo);
+                                bkHubResponse.TableName = tableIsExist.TableName;
+                                await _bookingHub.ReleaseTable(bkHubResponse);
+                                hasSignalRSent = true; // Đánh dấu đã gửi SignalR
+                                _logger.LogInformation($"Cache entry {key} for TableId {request.TableId} was removed because {reason}. Table is now released.");
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(ex, "Error sending SignalR notification on cache eviction");
+                            }
                         }
                     });
 
@@ -254,7 +257,7 @@ namespace Application.Service
                     TableId = tableIsExist.TableId,
                     TableName = tableIsExist.TableName,
                     IsHeld = true,
-                    HoldExpiry = DateTimeOffset.Now.AddMinutes(1),
+                    HoldExpiry = DateTimeOffset.Now.AddMinutes(5),
                     Date = request.Date,
                     Time = request.Time,
                 };
@@ -262,22 +265,26 @@ namespace Application.Service
                 cacheEntry[request.TableId] = tableHoldInfo;
 
                 var bkHubResponse = _mapper.Map<BookingHubResponse>(tableHoldInfo);
-
+                bkHubResponse.TableName = tableIsExist.TableName;
                 await _bookingHub.HoldTable(bkHubResponse);
 
                 _memoryCache.Set(cacheKey, cacheEntry, new MemoryCacheEntryOptions
                 {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1)
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
                 });
 
                 // Đăng ký callback khi token bị cancel (timeout)
                 cts.Token.Register(async () =>
                 {
+                    if (hasSignalRSent) return; // Kiểm tra nếu đã gửi SignalR rồi thì bỏ qua
+
                     try 
                     {
                         _memoryCache.Remove(cacheKey);
                         var bkHubResponse = _mapper.Map<BookingHubResponse>(tableHoldInfo);
+                        bkHubResponse.TableName = tableIsExist.TableName;
                         await _bookingHub.ReleaseTable(bkHubResponse);
+                        hasSignalRSent = true; // Đánh dấu đã gửi SignalR
                         _logger.LogInformation($"Table {request.TableId} was released due to timeout");
                     }
                     catch (Exception ex)
@@ -355,6 +362,7 @@ namespace Application.Service
             }
 
             var bkHubResponse = _mapper.Map<BookingHubResponse>(cacheEntry[request.TableId]);
+            bkHubResponse.TableName = tableIsExist.TableName;
             await _bookingHub.ReleaseTable(bkHubResponse);
         }
 
@@ -382,6 +390,7 @@ namespace Application.Service
                             var mapper = _mapper.Map<BookingHubResponse>(cacheTbHold[table.TableId]);
                             mapper.BarId = request.BarId;
                             mapper.AccountId = Guid.Empty;
+                            mapper.TableName = tableExist.TableName;
                             await _bookingHub.ReleaseListTablee(mapper);
                         }
                     }

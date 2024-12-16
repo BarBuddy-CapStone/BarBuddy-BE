@@ -16,6 +16,7 @@ namespace Application.IService
     public interface IBookingService
     {
         Task<(List<TopBookingResponse> responses, int TotalPage)> GetAllCustomerBooking(Guid CustomerId, int? Status, int PageIndex = 1, int PageSize = 10);
+        Task<List<TopBookingResponse>> GetAllServingCustomerBooking(Guid CustomerId);
         Task<List<TopBookingResponse>> GetTopBookingByCustomer(Guid CustomerId, int NumOfBookings);
         Task<BookingByIdResponse> GetBookingById(Guid BookingId);
         Task<BookingDetailByStaff> GetBookingDetailAuthorized(Guid BookingId);
@@ -34,6 +35,7 @@ namespace Application.IService
         Task<List<BookingDrinkDetailResponse>> GetExtraBookingServing(Guid bookingId);
         Task UpdateBookingStatusJob(Guid AccountId, Guid BookingId, int Status);
         Task<List<BookingDrinkDetailResponse>> UpdateStsExtra(UpdateStsBookingExtraDrink request);
+        Task<List<BookingDrinkDetailResponse>> DeleteExtraDrink(UpdateStsBookingExtraDrink request);
 
     }
 }
