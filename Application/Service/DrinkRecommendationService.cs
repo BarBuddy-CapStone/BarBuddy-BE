@@ -413,7 +413,7 @@ namespace Application.Service
                         },
                         new {
                             role = "model",
-                            parts = new[] { new { text = "Tôi đã hiểu danh sách đồ uống của quán. Tôi sẽ đóng vai một bartender để gợi ý đồ uống phù hợp với cảm xúc của khách hàng. Tôi sẽ trả về kết quả theo format JSON với drinkRecommendation:[{drinkName, reason}]" } }
+                            parts = new[] { new { text = "Tôi đã hiểu danh sách đồ uống của quán. Tôi sẽ đóng vai một bartender để gợi ý đồ uống phù hợp với cảm xúc của khách hàng. Tôi sẽ luôn luôn trả về kết quả theo format JSON với drinkRecommendation:[{drinkName, reason}]" } }
                         },
                         new {
                             role = "user",
