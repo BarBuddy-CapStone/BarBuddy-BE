@@ -464,71 +464,6 @@ namespace Persistence.Data
                     PhoneNumber = "0901234571",
                     Status = true,
                     TimeSlot = 1
-                },
-                new Bar
-                {
-                    BarId = Constants.Ids.Bars.Bar6,
-                    Address = "41 Nam Kỳ Khởi Nghĩa, Phường Nguyễn Thái Bình, Quận 1, Hồ Chí Minh",
-                    BarName = "Bar Buddy 6",
-                    Description = "Không gian thoải mái với nhiều trò chơi giải trí.",
-                    Discount = 10,
-                    Email = "contact@barbuddy6.com",
-                    Images = "https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2Fe069d8ab-2d19-4c73-95e6-487a269a5104_1580805657-multi_product20-bambamoverview3.jpg.webp?alt=media&token=295ab199-824c-426b-a6e4-701de996a783, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2Fa5c2b7b2-d52c-4f43-bc66-6c2e5fa37e4f_1580805657-multi_product20-bambamoverview4.jpg.webp?alt=media&token=66deb9dc-077c-4863-964c-834405652085",
-                    PhoneNumber = "0901234572",
-                    Status = true,
-                    TimeSlot = 1
-                },
-                new Bar
-                {
-                    BarId = Constants.Ids.Bars.Bar7,
-                    Address = "20 Đ. Nguyễn Công Trứ, Phường Nguyễn Thái Bình, Quận 1",
-                    BarName = "Bar Buddy 7",
-                    Description = "Nơi hội tụ của những tâm hồn yêu thích âm nhạc.",
-                    Discount = 30,
-                    Email = "contact@barbuddy7.com",
-                    Images = "https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2F8bfa6be1-66dc-42f6-b7ab-872d2c8cfd8c_1592203656-multi_product20-lushsaigonoverview5.jpg.webp?alt=media&token=b1e24062-a71b-4a87-b606-8f4434eebc15, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2Fac71e678-83c0-4e51-b6b6-feec37cecaae_1592203656-multi_product20-lushsaigonoverview4.jpg.webp?alt=media&token=609ca44c-2d54-4b30-b6fe-5e8f76a76b7d",
-                    PhoneNumber = "0901234573",
-                    Status = true,
-                    TimeSlot = 1
-                },
-                new Bar
-                {
-                    BarId = Constants.Ids.Bars.Bar8,
-                    Address = "120 Đ. Nguyễn Huệ, Bến Nghé, Quận 1",
-                    BarName = "Bar Buddy 8",
-                    Description = "Quán bar rooftop với tầm nhìn đp.",
-                    Discount = 20,
-                    Email = "contact@barbuddy8.com",
-                    Images = "https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2Fdfe78a6c-d99d-45f5-8d39-4e5564474760_1592206636-multi_product20-khu13overview6.jpg.webp?alt=media&token=83337472-0840-4370-a116-1b9a281ecfbf, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2F6f8a9b89-23ac-4dea-8fa2-cd66080047e4_1592206636-multi_product20-khu13overview5.jpg.webp?alt=media&token=a3f302b2-2998-42fd-b3a0-de3c018e51c4",
-                    PhoneNumber = "0901234574",
-                    Status = true,
-                    TimeSlot = 1
-                },
-                new Bar
-                {
-                    BarId = Constants.Ids.Bars.Bar9,
-                    Address = "30 Đ. Tôn Thất Tùng, Quận 1",
-                    BarName = "Bar Buddy 9",
-                    Description = "Quán bar dành cho các tín đồ yêu thích craft beer.",
-                    Discount = 15,
-                    Email = "contact@barbuddy9.com",
-                    Images = "https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2Fcbf97b22-afbb-42d9-9c1e-374df168ec2f_1664637430-multi_product20-1111clubsaigonoverview2.jpg.webp?alt=media&token=d6ead89e-4d3f-45a8-ac6e-5725cee8dcb1, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2F842406ad-f821-44ec-aa15-7423bde20d98_1664637430-multi_product20-1111clubsaigonoverview1.jpg.webp?alt=media&token=e040cea7-11a6-4f48-ae94-a52729f0405c",
-                    PhoneNumber = "0901234575",
-                    Status = true,
-                    TimeSlot = 1
-                },
-                new Bar
-                {
-                    BarId = Constants.Ids.Bars.Bar10,
-                    Address = "25 Đ. Lê Duẩn, Quận 1",
-                    BarName = "Bar Buddy 10",
-                    Description = "Không gian ấm cúng với các loại cocktail độc đáo.",
-                    Discount = 10,
-                    Email = "contact@barbuddy10.com",
-                    Images = "https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2F432a674c-1b16-47df-a0dc-396d81b3327b_1700112227-multi_product20-districtk2.jpg.webp?alt=media&token=6ae45a8c-84fe-40a0-943e-6bbcc7871925, https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/other%2F9b9395a9-becb-4d13-bad4-406b83edd888_1700112227-multi_product20-districtk1.jpg.webp?alt=media&token=472d0416-0c61-4f6c-bbcd-793b554f0604",
-                    PhoneNumber = "0901234576",
-                    Status = true,
-                    TimeSlot = 1,
                 }
             };
         }
@@ -644,81 +579,6 @@ namespace Persistence.Data
                 },
                 new Account
                 {
-                    AccountId = Constants.Ids.Accounts.Manager6,
-                    BarId = Constants.Ids.Bars.Bar6,
-                    RoleId = Constants.Ids.Roles.Manager,
-                    Email = "manager6@barbuddy6.com",
-                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
-                    Fullname = "Zeus",
-                    Dob = new DateTime(1983, 4, 4),
-                    Phone = "0901234580",
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
-                    Image = "default",
-                    Status = 1
-                },
-                new Account
-                {
-                    AccountId = Constants.Ids.Accounts.Manager7,
-                    BarId = Constants.Ids.Bars.Bar7,
-                    RoleId = Constants.Ids.Roles.Manager,
-                    Email = "manager7@barbuddy7.com",
-                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
-                    Fullname = "7 Vap",
-                    Dob = new DateTime(1983, 4, 4),
-                    Phone = "0901234580",
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
-                    Image = "default",
-                    Status = 1
-                },
-                new Account
-                {
-                    AccountId = Constants.Ids.Accounts.Manager8,
-                    BarId = Constants.Ids.Bars.Bar8,
-                    RoleId = Constants.Ids.Roles.Manager,
-                    Email = "manager8@barbuddy8.com",
-                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
-                    Fullname = "Eric",
-                    Dob = new DateTime(1983, 4, 4),
-                    Phone = "0901234580",
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
-                    Image = "default",
-                    Status = 1
-                },
-                new Account
-                {
-                    AccountId = Constants.Ids.Accounts.Manager9,
-                    BarId = Constants.Ids.Bars.Bar9,
-                    RoleId = Constants.Ids.Roles.Manager,
-                    Email = "manager9@barbuddy9.com",
-                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
-                    Fullname = "Manchester",
-                    Dob = new DateTime(1983, 4, 4),
-                    Phone = "0901234580",
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
-                    Image = "default",
-                    Status = 1
-                },
-                new Account
-                {
-                    AccountId = Constants.Ids.Accounts.Manager10,
-                    BarId = Constants.Ids.Bars.Bar10,
-                    RoleId = Constants.Ids.Roles.Manager,
-                    Email = "manager10@barbuddy10.com",
-                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
-                    Fullname = "Chi Dan",
-                    Dob = new DateTime(1983, 4, 4),
-                    Phone = "0901234580",
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
-                    Image = "default",
-                    Status = 1
-                },
-                new Account
-                {
                     AccountId = Constants.Ids.Accounts.Staff1,
                     BarId = Constants.Ids.Bars.Bar1,
                     RoleId = Constants.Ids.Roles.Staff,
@@ -796,81 +656,6 @@ namespace Persistence.Data
                 {
                     AccountId = Constants.Ids.Accounts.Staff5,
                     BarId = Constants.Ids.Bars.Bar5,
-                    RoleId = Constants.Ids.Roles.Staff,
-                    Email = "staff5@barbuddy5.com",
-                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
-                    Fullname = "Maguire",
-                    Dob = new DateTime(1990, 3, 20),
-                    Phone = "0901234569",
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
-                    Image = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2Fharry-maguire-meme--394065036155577538%2F&psig=AOvVaw0r2-KTF3CHqD3MPpY5RsGF&ust=1731387310547000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCOjE8sC-04kDFQAAAAAdAAAAABAE",
-                    Status = 1
-                },
-                new Account
-                {
-                    AccountId = Constants.Ids.Accounts.Staff6,
-                    BarId = Constants.Ids.Bars.Bar6,
-                    RoleId = Constants.Ids.Roles.Staff,
-                    Email = "staff5@barbuddy5.com",
-                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
-                    Fullname = "Maguire",
-                    Dob = new DateTime(1990, 3, 20),
-                    Phone = "0901234569",
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
-                    Image = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2Fharry-maguire-meme--394065036155577538%2F&psig=AOvVaw0r2-KTF3CHqD3MPpY5RsGF&ust=1731387310547000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCOjE8sC-04kDFQAAAAAdAAAAABAE",
-                    Status = 1
-                },
-                new Account
-                {
-                    AccountId = Constants.Ids.Accounts.Staff7,
-                    BarId = Constants.Ids.Bars.Bar7,
-                    RoleId = Constants.Ids.Roles.Staff,
-                    Email = "staff5@barbuddy5.com",
-                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
-                    Fullname = "Maguire",
-                    Dob = new DateTime(1990, 3, 20),
-                    Phone = "0901234569",
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
-                    Image = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2Fharry-maguire-meme--394065036155577538%2F&psig=AOvVaw0r2-KTF3CHqD3MPpY5RsGF&ust=1731387310547000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCOjE8sC-04kDFQAAAAAdAAAAABAE",
-                    Status = 1
-                },
-                new Account
-                {
-                    AccountId = Constants.Ids.Accounts.Staff8,
-                    BarId = Constants.Ids.Bars.Bar8,
-                    RoleId = Constants.Ids.Roles.Staff,
-                    Email = "staff5@barbuddy5.com",
-                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
-                    Fullname = "Maguire",
-                    Dob = new DateTime(1990, 3, 20),
-                    Phone = "0901234569",
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
-                    Image = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2Fharry-maguire-meme--394065036155577538%2F&psig=AOvVaw0r2-KTF3CHqD3MPpY5RsGF&ust=1731387310547000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCOjE8sC-04kDFQAAAAAdAAAAABAE",
-                    Status = 1
-                },
-                new Account
-                {
-                    AccountId = Constants.Ids.Accounts.Staff9,
-                    BarId = Constants.Ids.Bars.Bar9,
-                    RoleId = Constants.Ids.Roles.Staff,
-                    Email = "staff5@barbuddy5.com",
-                    Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
-                    Fullname = "Maguire",
-                    Dob = new DateTime(1990, 3, 20),
-                    Phone = "0901234569",
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now,
-                    Image = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.pinterest.com%2Fpin%2Fharry-maguire-meme--394065036155577538%2F&psig=AOvVaw0r2-KTF3CHqD3MPpY5RsGF&ust=1731387310547000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCOjE8sC-04kDFQAAAAAdAAAAABAE",
-                    Status = 1
-                },
-                new Account
-                {
-                    AccountId = Constants.Ids.Accounts.Staff10,
-                    BarId = Constants.Ids.Bars.Bar10,
                     RoleId = Constants.Ids.Roles.Staff,
                     Email = "staff5@barbuddy5.com",
                     Password = "2757cb3cafc39af451abb2697be79b4ab61d63d74d85b0418629de8c26811b529f3f3780d0150063ff55a2beee74c4ec102a2a2731a1f1f7f10d473ad18a6a87",
@@ -2093,13 +1878,6 @@ namespace Persistence.Data
                 AddBarTime(Constants.Ids.Bars.Bar5, day, 19, 1);
             }
 
-            // Bar Buddy 6 - T4,T6,T7 (3,5,6) 20:00-02:00
-            int[] bar6Days = { 3, 5, 6 };
-            foreach (var day in bar6Days)
-            {
-                AddBarTime(Constants.Ids.Bars.Bar6, day, 20, 2);
-            }
-
             return barTimes.ToArray();
         }
 
@@ -2311,7 +2089,7 @@ namespace Persistence.Data
                     Note = "VIP customer booking",
                     TotalPrice = 2000000,
                     AdditionalFee = 100000,
-                    QRTicket = "qr_code_1"
+                    QRTicket = "https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2Fbing_generated_qrcode.png?alt=media&token=a5b1c475-8e4d-447b-ad01-2d40a2bc8783"
                 },
                 new Booking
                 {
@@ -2329,7 +2107,7 @@ namespace Persistence.Data
                     Note = "Group booking",
                     TotalPrice = 3500000,
                     AdditionalFee = 150000,
-                    QRTicket = "qr_code_2"
+                    QRTicket = "https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2Fbing_generated_qrcode.png?alt=media&token=a5b1c475-8e4d-447b-ad01-2d40a2bc8783"
                 },
                 new Booking
                 {
@@ -2347,7 +2125,7 @@ namespace Persistence.Data
                     Note = "Birthday celebration",
                     TotalPrice = 1500000,
                     AdditionalFee = 50000,
-                    QRTicket = "qr_code_3"
+                    QRTicket = "https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2Fbing_generated_qrcode.png?alt=media&token=a5b1c475-8e4d-447b-ad01-2d40a2bc8783"
                 },
                 new Booking
                 {
@@ -2365,7 +2143,7 @@ namespace Persistence.Data
                     Note = "Regular booking",
                     TotalPrice = 1800000,
                     AdditionalFee = 80000,
-                    QRTicket = "qr_code_4"
+                    QRTicket = "https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2Fbing_generated_qrcode.png?alt=media&token=a5b1c475-8e4d-447b-ad01-2d40a2bc8783"
                 },
                 new Booking
                 {
@@ -2383,7 +2161,7 @@ namespace Persistence.Data
                     Note = "Anniversary celebration",
                     TotalPrice = 2500000,
                     AdditionalFee = 120000,
-                    QRTicket = "qr_code_5"
+                    QRTicket = "https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2Fbing_generated_qrcode.png?alt=media&token=a5b1c475-8e4d-447b-ad01-2d40a2bc8783"
                 },
                 new Booking
                 {
@@ -2401,7 +2179,7 @@ namespace Persistence.Data
                     Note = "Business meeting with clients",
                     TotalPrice = 3000000,
                     AdditionalFee = 150000,
-                    QRTicket = "qr_code_6"
+                    QRTicket = "https://firebasestorage.googleapis.com/v0/b/barbuddy-b2026.appspot.com/o/images%2Fbing_generated_qrcode.png?alt=media&token=a5b1c475-8e4d-447b-ad01-2d40a2bc8783"
                 }
             };
         }
@@ -2777,12 +2555,7 @@ namespace Persistence.Data
                 { Constants.Ids.Bars.Bar2, 2 },
                 { Constants.Ids.Bars.Bar3, 3 },
                 { Constants.Ids.Bars.Bar4, 4 },
-                { Constants.Ids.Bars.Bar5, 5 },
-                { Constants.Ids.Bars.Bar6, 6 },
-                { Constants.Ids.Bars.Bar7, 7 },
-                { Constants.Ids.Bars.Bar8, 8 },
-                { Constants.Ids.Bars.Bar9, 9 },
-                { Constants.Ids.Bars.Bar10, 10 }
+                { Constants.Ids.Bars.Bar5, 5 }
             };
 
             // Xử lý cho từng bar
