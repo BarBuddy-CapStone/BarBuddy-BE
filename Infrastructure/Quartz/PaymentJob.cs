@@ -26,18 +26,26 @@ namespace Infrastructure.Quartz
         public async Task Execute(IJobExecutionContext context)
         {
             var getAllPayment = _unitOfWork.PaymentHistoryRepository
-                                            .Get(x => x.Status == (int)PaymentStatusEnum.Pending, 
+                                            .Get(x => x.Status == (int)PaymentStatusEnum.Pending,
                                                     includeProperties: "Booking");
             DateTimeOffset now = DateTimeOffset.Now;
             TimeSpan roundedTimeOfDay = TimeSpan.FromHours(now.TimeOfDay.Hours)
                                                .Add(TimeSpan.FromMinutes(now.TimeOfDay.Minutes))
                                                .Add(TimeSpan.FromSeconds(now.TimeOfDay.Seconds));
 
-            foreach (var payment in getAllPayment) {
-                if((payment.Booking.CreateAt.TimeOfDay) <= roundedTimeOfDay)
+            foreach (var payment in getAllPayment)
+            {
+                var currentTimeCreated = payment.Booking.CreateAt.TimeOfDay;
+
+                if (roundedTimeOfDay < currentTimeCreated)
+                {
+                    roundedTimeOfDay = roundedTimeOfDay.Add(TimeSpan.FromDays(1));
+                }
+
+                if (currentTimeCreated <= roundedTimeOfDay)
                 {
                     var getBooking = _unitOfWork.BookingRepository.GetByID(payment.BookingId);
-                    if(getBooking.Status == (int)PaymentStatusEnum.Pending)
+                    if (getBooking.Status == (int)PaymentStatusEnum.Pending)
                     {
                         getBooking.Status = (int)PrefixValueEnum.Cancelled;
                         payment.Status = (int)PaymentStatusEnum.Failed;
