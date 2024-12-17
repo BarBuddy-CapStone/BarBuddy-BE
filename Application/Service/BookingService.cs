@@ -702,6 +702,7 @@ namespace Application.Service
                                          .GetAsync(b => b.BookingId == BookingId,
                                                 includeProperties: "BookingExtraDrinks,Bar"))
                                          .FirstOrDefault();
+                var getStsPayment = _unitOfWork.PaymentHistoryRepository.GetByID(BookingId);
                 _unitOfWork.BeginTransaction();
 
                 if (booking != null &&
@@ -735,6 +736,8 @@ namespace Application.Service
 
                     case 0:
                         if (Status == (int)PrefixValueEnum.Serving &&
+                                       ((booking.TotalPrice.HasValue && getStsPayment != null && getStsPayment.Status == (int)PrefixValueEnum.Pending) || 
+                                       booking.TotalPrice == null) &&
                                       (booking.BookingDate.Date != DateTime.Now.Date ||
                                        booking.BookingTime > DateTime.Now.AddMinutes(45).TimeOfDay) ||
                             Status == (int)PrefixValueEnum.Completed)
