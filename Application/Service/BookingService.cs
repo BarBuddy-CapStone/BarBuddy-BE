@@ -579,6 +579,19 @@ namespace Application.Service
                     {
                         throw new CustomException.InvalidDataException("Vài bàn không tồn tại, vui lòng kiểm tra lại !");
                     }
+
+                    int numOfMinimumGuest = 0;
+                    int numOfMaximumGuest = 0;
+                    foreach (var table in existingTables)
+                    {
+                        numOfMinimumGuest += table.TableType.MinimumGuest;
+                        numOfMaximumGuest += table.TableType.MaximumGuest;
+                    }
+
+                    if (request.NumOfPeople < numOfMinimumGuest || request.NumOfPeople > numOfMaximumGuest) {
+                        throw new CustomException.InvalidDataException($"Các bàn đã chọn hiện tại chỉ phù hợp với nhóm khách hàng có tối thiểu {numOfMinimumGuest} người đến tối đa {numOfMaximumGuest} người, vui lòng chọn lại các bàn với số lượng phù hợp!");
+                    }
+
                     foreach (var tableId in request.TableIds)
                     {
                         var bookingTable = new BookingTable
@@ -876,6 +889,20 @@ namespace Application.Service
                     {
                         throw new CustomException.InvalidDataException("Some TableIds do not exist.");
                     }
+
+                    int numOfMinimumGuest = 0;
+                    int numOfMaximumGuest = 0;
+                    foreach (var table in existingTables)
+                    {
+                        numOfMinimumGuest += table.TableType.MinimumGuest;
+                        numOfMaximumGuest += table.TableType.MaximumGuest;
+                    }
+
+                    if (request.NumOfPeople < numOfMinimumGuest || request.NumOfPeople > numOfMaximumGuest)
+                    {
+                        throw new CustomException.InvalidDataException($"Các bàn đã chọn hiện tại chỉ phù hợp với nhóm khách hàng có tối thiểu {numOfMinimumGuest} người đến tối đa {numOfMaximumGuest} người, vui lòng chọn lại các bàn với số lượng phù hợp!");
+                    }
+
                     foreach (var tableId in request.TableIds)
                     {
                         var bookingTable = new BookingTable
