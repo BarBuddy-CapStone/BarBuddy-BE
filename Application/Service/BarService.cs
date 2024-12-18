@@ -253,6 +253,8 @@ namespace Application.Service
                 throw new CustomException.DataNotFoundException("Không tìm thấy quán bar !");
             }
 
+            getBarById.Feedbacks = getBarById.Feedbacks.Where(f => f.IsDeleted == false).ToList();
+
             var tables = await _unitOfWork.TableRepository
                                                 .GetAsync(t => t.IsDeleted == false);
 
