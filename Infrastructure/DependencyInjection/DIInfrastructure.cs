@@ -213,6 +213,7 @@ namespace Infrastructure.DependencyInjection
                 AddJobWithTrigger<NotificationJob>(options, nameof(NotificationJob));
                 AddJobWithTrigger<EventJob>(options, nameof(EventJob));
                 AddJobWithTrigger<TokenJob>(options, nameof(TokenJob));
+                AddJobWithTrigger<PaymentJob>(options, nameof(PaymentJob));
                 AddJobWithTriggerTime<NotificationEventJob>(options, nameof(NotificationEventJob));
             });
 
@@ -232,7 +233,7 @@ namespace Infrastructure.DependencyInjection
             var jobKey = JobKey.Create(jobName);
             options.AddJob<TJob>(joinBuilder => joinBuilder.WithIdentity(jobKey))
                    .AddTrigger(trigger => trigger.ForJob(jobKey)
-                   .WithCronSchedule("0 30 17 * * ?"));
+                   .WithCronSchedule("0 30 11 * * ?"));
         }
     }
 }
