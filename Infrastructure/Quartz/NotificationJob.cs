@@ -126,6 +126,12 @@ namespace Infrastructure.Quartz
                 foreach (var booking in getListBooking)
                 {
                     // Nhắc nhở booking sắp tới
+                    if (booking.BookingDate.Date > now.Date &&
+                        !(now.TimeOfDay.Add(TimeSpan.FromHours(2)) == booking.BookingTime && 
+                        booking.BookingDate.Date == now.Date.AddDays(-1)))
+                    {
+                        continue;
+                    }
                     var cacheKey = $"{booking.BarName}_{booking.BookingDate.Date}_{booking.BookingTime}_{booking.BookingId}";
                     if (!_cache.TryGetValue(cacheKey, out _))
                     {

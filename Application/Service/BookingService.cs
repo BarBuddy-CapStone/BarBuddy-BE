@@ -1080,7 +1080,8 @@ namespace Application.Service
                          x.BookingTime >= roundedTimeOfDay &&
                          x.BookingTime <= roundedTwoHoursLater)
                         ||
-                        (x.BookingDate.Date == now.Date.AddDays(1) &&
+                        (x.BookingDate.Date > now.Date && 
+                         x.BookingDate.Date == now.Date.AddDays(1) &&
                          x.BookingTime <= roundedTwoHoursLater)
                     ) &&
                     x.Status == (int)PrefixValueEnum.PendingBooking,
