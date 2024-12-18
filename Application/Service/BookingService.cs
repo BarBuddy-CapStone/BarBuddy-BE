@@ -747,9 +747,15 @@ namespace Application.Service
                         break;
 
                     case 2:
-                        if (Status == (int)PrefixValueEnum.PendingBooking || Status == (int)PrefixValueEnum.Cancelled)
+                        if (Status == (int)PrefixValueEnum.PendingBooking || 
+                            Status == (int)PrefixValueEnum.Cancelled)
                         {
                             throw new CustomException.InvalidDataException("Không thể chuyển từ trạng thái đang phục vụ về pending hoặc cancelled");
+                        }
+                        if (Status == (int)PrefixValueEnum.Completed && 
+                            booking.BookingExtraDrinks.Any(x => x.Status != (int)ExtraDrinkStsEnum.Delivered))
+                        {
+                            throw new CustomException.InvalidDataException("Không thể chuyển từ trạng thái hoàn thành khi còn đồ uống chưa được giao !");
                         }
                         break;
 
